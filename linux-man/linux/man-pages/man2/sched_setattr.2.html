@@ -1,0 +1,390 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sched_setattr(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SCHED_SETATTR(2)          Linux Programmer's Manual         SCHED_SETATTR(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sched_setattr,  sched_getattr  -  set  and  get scheduling policy and
+       attributes
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sched.h&gt;</b>
+
+       <b>int sched_setattr(pid_t </b><i>pid</i><b>, struct sched_attr *</b><i>attr</i><b>,</b>
+                         <b>unsigned int </b><i>flags</i><b>);</b>
+
+       <b>int sched_getattr(pid_t </b><i>pid</i><b>, struct sched_attr *</b><i>attr</i><b>,</b>
+                         <b>unsigned int </b><i>size</i><b>, unsigned int </b><i>flags</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>sched_setattr()</b>
+       The <b>sched_setattr</b>() system call sets the scheduling policy and
+       associated attributes for the thread whose ID is specified in <i>pid</i>.
+       If <i>pid</i> equals zero, the scheduling policy and attributes of the
+       calling thread will be set.
+
+       Currently, Linux supports the following "normal" (i.e., non-real-
+       time) scheduling policies as values that may be specified in <i>policy</i>:
+
+       <b>SCHED_OTHER   </b>the standard round-robin time-sharing policy;
+
+       <b>SCHED_BATCH   </b>for "batch" style execution of processes; and
+
+       <b>SCHED_IDLE    </b>for running <i>very</i> low priority background jobs.
+
+       Various "real-time" policies are also supported, for special time-
+       critical applications that need precise control over the way in which
+       runnable threads are selected for execution.  For the rules governing
+       when a process may use these policies, see <a href="../man7/sched.7.html">sched(7)</a>.  The real-time
+       policies that may be specified in <i>policy</i> are:
+
+       <b>SCHED_FIFO    </b>a first-in, first-out policy; and
+
+       <b>SCHED_RR      </b>a round-robin policy.
+
+       Linux also provides the following policy:
+
+       <b>SCHED_DEADLINE</b>
+                     a deadline scheduling policy; see <a href="../man7/sched.7.html">sched(7)</a> for details.
+
+       The <i>attr</i> argument is a pointer to a structure that defines the new
+       scheduling policy and attributes for the specified thread.  This
+       structure has the following form:
+
+           struct sched_attr {
+               u32 size;              /* Size of this structure */
+               u32 sched_policy;      /* Policy (SCHED_*) */
+               u64 sched_flags;       /* Flags */
+               s32 sched_nice;        /* Nice value (SCHED_OTHER,
+                                         SCHED_BATCH) */
+               u32 sched_priority;    /* Static priority (SCHED_FIFO,
+                                         SCHED_RR) */
+               /* Remaining fields are for SCHED_DEADLINE */
+               u64 sched_runtime;
+               u64 sched_deadline;
+               u64 sched_period;
+           };
+
+       The fields of this structure are as follows:
+
+       <b>size   </b>This field should be set to the size of the structure in
+              bytes, as in <i>sizeof(struct sched_attr)</i>.  If the provided
+              structure is smaller than the kernel structure, any additional
+              fields are assumed to be '0'.  If the provided structure is
+              larger than the kernel structure, the kernel verifies that all
+              additional fields are 0; if they are not, <b>sched_setattr</b>()
+              fails with the error <b>E2BIG </b>and updates <i>size</i> to contain the
+              size of the kernel structure.
+
+              The above behavior when the size of the user-space <i>sched_attr</i>
+              structure does not match the size of the kernel structure
+              allows for future extensibility of the interface.  Malformed
+              applications that pass oversize structures won't break in the
+              future if the size of the kernel <i>sched_attr</i> structure is
+              increased.  In the future, it could also allow applications
+              that know about a larger user-space <i>sched_attr</i> structure to
+              determine whether they are running on an older kernel that
+              does not support the larger structure.
+
+       <i>sched_policy</i>
+              This field specifies the scheduling policy, as one of the
+              <b>SCHED_* </b>values listed above.
+
+       <i>sched_flags</i>
+              This field contains flags controlling scheduling behavior.
+              Only one such flag is currently defined:
+              <b>SCHED_FLAG_RESET_ON_FORK</b>.  As a result of including this flag,
+              children created by <a href="fork.2.html">fork(2)</a> do not inherit privileged
+              scheduling policies.  See <a href="../man7/sched.7.html">sched(7)</a> for details.
+
+       <i>sched_nice</i>
+              This field specifies the nice value to be set when specifying
+              <i>sched_policy</i> as <b>SCHED_OTHER </b>or <b>SCHED_BATCH</b>.  The nice value is
+              a number in the range -20 (high priority) to +19 (low
+              priority); see <a href="../man7/sched.7.html">sched(7)</a>.
+
+       <i>sched_priority</i>
+              This field specifies the static priority to be set when
+              specifying <i>sched_policy</i> as <b>SCHED_FIFO </b>or <b>SCHED_RR</b>.  The
+              allowed range of priorities for these policies can be
+              determined using <a href="sched_get_priority_min.2.html">sched_get_priority_min(2)</a> and
+              <a href="sched_get_priority_max.2.html">sched_get_priority_max(2)</a>.  For other policies, this field
+              must be specified as 0.
+
+       <i>sched_runtime</i>
+              This field specifies the "Runtime" parameter for deadline
+              scheduling.  The value is expressed in nanoseconds.  This
+              field, and the next two fields, are used only for
+              <b>SCHED_DEADLINE </b>scheduling; for further details, see <a href="../man7/sched.7.html">sched(7)</a>.
+
+       <i>sched_deadline</i>
+              This field specifies the "Deadline" parameter for deadline
+              scheduling.  The value is expressed in nanoseconds.
+
+       <i>sched_period</i>
+              This field specifies the "Period" parameter for deadline
+              scheduling.  The value is expressed in nanoseconds.
+
+       The <i>flags</i> argument is provided to allow for future extensions to the
+       interface; in the current implementation it must be specified as 0.
+
+   <b>sched_getattr()</b>
+       The <b>sched_getattr</b>() system call fetches the scheduling policy and the
+       associated attributes for the thread whose ID is specified in <i>pid</i>.
+       If <i>pid</i> equals zero, the scheduling policy and attributes of the
+       calling thread will be retrieved.
+
+       The <i>size</i> argument should be set to the size of the <i>sched_attr</i>
+       structure as known to user space.  The value must be at least as
+       large as the size of the initially published <i>sched_attr</i> structure, or
+       the call fails with the error <b>EINVAL</b>.
+
+       The retrieved scheduling attributes are placed in the fields of the
+       <i>sched_attr</i> structure pointed to by <i>attr</i>.  The kernel sets <i>attr.size</i>
+       to the size of its <i>sched_attr</i> structure.
+
+       If the caller-provided <i>attr</i> buffer is larger than the kernel's
+       <i>sched_attr</i> structure, the additional bytes in the user-space
+       structure are not touched.  If the caller-provided structure is
+       smaller than the kernel <i>sched_attr</i> structure and the kernel needs to
+       return values outside the provided space, <b>sched_getattr</b>() fails with
+       the error <b>E2BIG</b>.  As with <b>sched_setattr</b>(), these semantics allow for
+       future extensibility of the interface.
+
+       The <i>flags</i> argument is provided to allow for future extensions to the
+       interface; in the current implementation it must be specified as 0.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>sched_setattr</b>() and <b>sched_getattr</b>() return 0.  On error,
+       -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is set to indicate the cause of the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sched_getattr</b>() and <b>sched_setattr</b>() can both fail for the following
+       reasons:
+
+       <b>EINVAL </b><i>attr</i> is NULL; or <i>pid</i> is negative; or <i>flags</i> is not zero.
+
+       <b>ESRCH  </b>The thread whose ID is <i>pid</i> could not be found.
+
+       In addition, <b>sched_getattr</b>() can fail for the following reasons:
+
+       <b>E2BIG  </b>The buffer specified by <i>size</i> and <i>attr</i> is too small.
+
+       <b>EINVAL </b><i>size</i> is invalid; that is, it is smaller than the initial
+              version of the <i>sched_attr</i> structure (48 bytes) or larger than
+              the system page size.
+
+       In addition, <b>sched_setattr</b>() can fail for the following reasons:
+
+       <b>E2BIG  </b>The buffer specified by <i>size</i> and <i>attr</i> is larger than the
+              kernel structure, and one or more of the excess bytes is
+              nonzero.
+
+       <b>EBUSY  SCHED_DEADLINE </b>admission control failure, see <a href="../man7/sched.7.html">sched(7)</a>.
+
+       <b>EINVAL </b><i>attr.sched_policy</i> is not one of the recognized policies;
+              <i>attr.sched_flags</i> contains a flag other than
+              <b>SCHED_FLAG_RESET_ON_FORK</b>; or <i>attr.sched_priority</i> is invalid;
+              or <i>attr.sched_policy</i> is <b>SCHED_DEADLINE </b>and the deadline
+              scheduling parameters in <i>attr</i> are invalid.
+
+       <b>EPERM  </b>The caller does not have appropriate privileges.
+
+       <b>EPERM  </b>The CPU affinity mask of the thread specified by <i>pid</i> does not
+              include all CPUs in the system (see <a href="sched_setaffinity.2.html">sched_setaffinity(2)</a>).
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls first appeared in Linux 3.14.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls are nonstandard Linux extensions.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sched_setattr</b>() provides a superset of the functionality of
+       <a href="sched_setscheduler.2.html">sched_setscheduler(2)</a>, <a href="sched_setparam.2.html">sched_setparam(2)</a>, <a href="nice.2.html">nice(2)</a>, and (other than
+       the ability to set the priority of all processes belonging to a
+       specified user or all processes in a specified group) <a href="setpriority.2.html">setpriority(2)</a>.
+       Analogously, <b>sched_getattr</b>() provides a superset of the functionality
+       of <a href="sched_getscheduler.2.html">sched_getscheduler(2)</a>, <a href="sched_getparam.2.html">sched_getparam(2)</a>, and (partially)
+       <a href="getpriority.2.html">getpriority(2)</a>.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In Linux versions up to 3.15, <b>sched_settattr</b>() failed with the error
+       <b>EFAULT </b>instead of <b>E2BIG </b>for the case described in ERRORS.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/chrt.1.html">chrt(1)</a>, <a href="nice.2.html">nice(2)</a>, <a href="sched_get_priority_max.2.html">sched_get_priority_max(2)</a>,
+       <a href="sched_get_priority_min.2.html">sched_get_priority_min(2)</a>, <a href="sched_getaffinity.2.html">sched_getaffinity(2)</a>, <a href="sched_getparam.2.html">sched_getparam(2)</a>,
+       <a href="sched_getscheduler.2.html">sched_getscheduler(2)</a>, <a href="sched_rr_get_interval.2.html">sched_rr_get_interval(2)</a>,
+       <a href="sched_setaffinity.2.html">sched_setaffinity(2)</a>, <a href="sched_setparam.2.html">sched_setparam(2)</a>, <a href="sched_setscheduler.2.html">sched_setscheduler(2)</a>,
+       <a href="sched_yield.2.html">sched_yield(2)</a>, <a href="setpriority.2.html">setpriority(2)</a>, <a href="../man3/pthread_getschedparam.3.html">pthread_getschedparam(3)</a>,
+       <a href="../man3/pthread_setschedparam.3.html">pthread_setschedparam(3)</a>, <a href="../man3/pthread_setschedprio.3.html">pthread_setschedprio(3)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>,
+       <a href="../man7/cpuset.7.html">cpuset(7)</a>, <a href="../man7/sched.7.html">sched(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                 SCHED_SETATTR(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="sched_setparam.2.html">sched_setparam(2)</a>,&nbsp; 
+    <a href="sched_setscheduler.2.html">sched_setscheduler(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man7/sched.7.html">sched(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="sched_setattr.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

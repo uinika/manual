@@ -1,0 +1,421 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>lvm.conf(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SYNTAX">SYNTAX</a> | <a href="#SETTINGS">SETTINGS</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LVM.CONF(5)                  File Formats Manual                 LVM.CONF(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       lvm.conf — Configuration file for LVM2
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>/etc/lvm/lvm.conf</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lvm.conf </b>is loaded during the initialisation phase of <a href="../man8/lvm.8.html">lvm(8)</a>.  This
+       file can in turn lead to other files being loaded - settings read in
+       later override earlier settings.  File timestamps are checked between
+       commands and if any have changed, all the files are reloaded.
+
+       For a description of each lvm.conf setting, run:
+
+       <b>lvmconfig --typeconfig default --withcomments --withspaces</b>
+
+       The settings defined in lvm.conf can be overridden by any of these
+       extended configuration methods:
+
+       <b>direct config override on command line</b>
+              The <b>--config ConfigurationString </b>command line option takes the
+              ConfigurationString as direct string representation of the
+              configuration to override the existing configuration. The
+              ConfigurationString is of exactly the same format as used in
+              any LVM configuration file.
+
+       <b>profile config</b>
+              A profile is a set of selected customizable configuration
+              settings that are aimed to achieve a certain characteristics
+              in various environments or uses. It's used to override
+              existing configuration.  Normally, the name of the profile
+              should reflect that environment or use.
+
+              There are two groups of profiles recognised: <b>command profiles</b>
+              and <b>metadata profiles</b>.
+
+              The <b>command profile </b>is used to override selected configuration
+              settings at global LVM command level - it is applied at the
+              very beginning of LVM command execution and it is used
+              throughout the whole time of LVM command execution. The
+              command profile is applied by using the <b>--commandprofile</b>
+              <b>ProfileName </b>command line option that is recognised by all LVM2
+              commands.
+
+              The <b>metadata profile </b>is used to override selected
+              configuration settings at Volume Group/Logical Volume level -
+              it is applied independently for each Volume Group/Logical
+              Volume that is being processed. As such, each Volume
+              Group/Logical Volume can store the profile name used in its
+              metadata so next time the Volume Group/Logical Volume is
+              processed, the profile is applied automatically. If Volume
+              Group and any of its Logical Volumes have different profiles
+              defined, the profile defined for the Logical Volume is
+              preferred. The metadata profile can be attached/detached by
+              using the <b>lvchange </b>and <b>vgchange </b>commands and their
+              <b>--metadataprofile ProfileName </b>and <b>--detachprofile </b>options or
+              the <b>--metadataprofile </b>option during creation when using
+              <b>vgcreate </b>or <b>lvcreate </b>command.  The <b>vgs </b>and <b>lvs </b>reporting
+              commands provide <b>-o vg_profile </b>and <b>-o lv_profile </b>output
+              options to show the metadata profile currently attached to a
+              Volume Group or a Logical Volume.
+
+              The set of options allowed for command profiles is mutually
+              exclusive when compared to the set of options allowed for
+              metadata profiles. The settings that belong to either of these
+              two sets can't be mixed together and LVM tools will reject
+              such profiles.
+
+              LVM itself provides a few predefined configuration profiles.
+              Users are allowed to add more profiles with different values
+              if needed.  For this purpose, there's the
+              <b>command_profile_template.profile </b>(for command profiles) and
+              <b>metadata_profile_template.profile </b>(for metadata profiles)
+              which contain all settings that are customizable by profiles
+              of certain type. Users are encouraged to copy these template
+              profiles and edit them as needed. Alternatively, the <b>lvmconfig</b>
+              <b>--file &lt;ProfileName.profile&gt; --type profilable-command</b>
+              <b>&lt;section&gt; </b>or <b>lvmconfig --file &lt;ProfileName.profile&gt; --type</b>
+              <b>profilable-metadata &lt;section&gt; </b>can be used to generate a
+              configuration with profilable settings in either of the type
+              for given section and save it to new ProfileName.profile (if
+              the section is not specified, all profilable settings are
+              reported).
+
+              The profiles are stored in /etc/lvm/profile directory by
+              default.  This location can be changed by using the
+              <b>config/profile_dir </b>setting.  Each profile configuration is
+              stored in <b>ProfileName.profile </b>file in the profile directory.
+              When referencing the profile, the <b>.profile </b>suffix is left out.
+
+       <b>tag config</b>
+              See <b>tags </b>configuration setting description below.
+
+       When several configuration methods are used at the same time and when
+       LVM looks for the value of a particular setting, it traverses this
+       <b>config cascade </b>from left to right:
+
+       <b>direct config override on command line</b>-&gt; <b>command profile config</b>-&gt;
+       <b>metadata profile config</b>-&gt; <b>tag config</b>-&gt; <b>lvmlocal.conf-&gt; lvm.conf</b>
+
+       <b>No part of this cascade is compulsory. If there's no setting value</b>
+       <b>found at the end of the cascade, a default value is used for that</b>
+       <b>setting.  Use lvmconfig to check what settings are in use and what</b>
+       <b>the default values are.</b>
+</pre>
+<h2><a id="SYNTAX" href="#SYNTAX"></a>SYNTAX  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This section describes the configuration file syntax.
+
+       Whitespace is not significant unless it is within quotes.  This
+       provides a wide choice of acceptable indentation styles.  Comments
+       begin with # and continue to the end of the line.  They are treated
+       as whitespace.
+
+       Here is an informal grammar:
+
+       <b>file </b>= <b>value</b>*
+              A configuration file consists of a set of values.
+
+       <b>value </b>= <b>section </b>| <b>assignment</b>
+              A value can either be a new section, or an assignment.
+
+       <b>section </b>= <b>identifier </b>'<b>{</b>' <b>value</b>* '<b>}</b>'
+              A section groups associated values together. If the same
+              section is encountered multiple times, the contents of all
+              instances are concatenated together in the order of
+              appearance.
+              It is denoted by a name and delimited by curly brackets.
+              e.g. backup {
+                        ...
+                   }
+
+       <b>assignment </b>= <b>identifier </b>'<b>=</b>' ( <b>array </b>| <b>type </b>)
+              An assignment associates a type with an identifier. If the
+              identifier contains forward slashes, those are interpreted as
+              path delimiters. The statement <b>section/key = value </b>is
+              equivalent to <b>section { key = value }</b>. If multiple instances
+              of the same key are encountered, only the last value is used
+              (and a warning is issued).
+              e.g. <b>level = 7</b>
+
+       <b>array </b>=  '<b>[</b>' ( <b>type </b>'<b>,</b>')* <b>type </b>'<b>]</b>' | '<b>[</b>' '<b>]</b>'
+              Inhomogeneous arrays are supported.
+              Elements must be separated by commas.
+              An empty array is acceptable.
+
+       <b>type </b>= <b>integer </b>| <b>float </b>| <b>string</b>
+              <b>integer </b>= [0-9]*
+              <b>float </b>= [0-9]*'<b>.</b>'[0-9]*
+              <b>string </b>= '<b>"</b>'.*'<b>"</b>'
+
+              Strings with spaces must be enclosed in double quotes, single
+              words that start with a letter can be left unquoted.
+</pre>
+<h2><a id="SETTINGS" href="#SETTINGS"></a>SETTINGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>lvmconfig </b>command prints the LVM configuration settings in
+       various ways.  See the man page <a href="../man8/lvmconfig.8.html">lvmconfig(8)</a>.
+
+       Command to print a list of all possible config settings, with their
+       default values:
+       <b>lvmconfig --type default</b>
+
+       Command to print a list of all possible config settings, with their
+       default values, and a full description of each as a comment:
+       <b>lvmconfig --type default --withcomments</b>
+
+       Command to print a list of all possible config settings, with their
+       current values (configured, non-default values are shown):
+       <b>lvmconfig --type current</b>
+
+       Command to print all config settings that have been configured with a
+       different value than the default (configured, non-default values are
+       shown):
+       <b>lvmconfig --type diff</b>
+
+       Command to print a single config setting, with its default value, and
+       a full description, where "Section" refers to the config section,
+       e.g. global, and "Setting" refers to the name of the specific
+       setting, e.g. umask:
+       <b>lvmconfig --type default --withcomments Section/Setting</b>
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/etc/lvm/lvm.conf</i>
+       <i>/etc/lvm/lvmlocal.conf</i>
+       <i>/etc/lvm/archive</i>
+       <i>/etc/lvm/backup</i>
+       <i>/etc/lvm/cache/.cache</i>
+       <i>/run/lock/lvm</i>
+       <i>/etc/lvm/profile</i>
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/lvm.8.html">lvm(8)</a> <a href="../man8/lvmconfig.8.html">lvmconfig(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>lvm2</i> (Logical Volume Manager 2) project.
+       Information about the project can be found at 
+       ⟨<a href="http://www.sourceware.org/lvm2/">http://www.sourceware.org/lvm2/</a>⟩.  If you have a bug report for this
+       manual page, send it to linux-lvm@redhat.com.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://sourceware.org/git/lvm2.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Red Hat, Inc.      LVM TOOLS 2.02.173(2)-git (2017-06-28)        LVM.CONF(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man7/lvmcache.7.html">lvmcache(7)</a>,&nbsp; 
+    <a href="../man7/lvmraid.7.html">lvmraid(7)</a>,&nbsp; 
+    <a href="../man7/lvmsystemid.7.html">lvmsystemid(7)</a>,&nbsp; 
+    <a href="../man7/lvmthin.7.html">lvmthin(7)</a>,&nbsp; 
+    <a href="../man8/clvmd.8.html">clvmd(8)</a>,&nbsp; 
+    <a href="../man8/fsadm.8.html">fsadm(8)</a>,&nbsp; 
+    <a href="../man8/lvchange.8.html">lvchange(8)</a>,&nbsp; 
+    <a href="../man8/lvconvert.8.html">lvconvert(8)</a>,&nbsp; 
+    <a href="../man8/lvcreate.8.html">lvcreate(8)</a>,&nbsp; 
+    <a href="../man8/lvdisplay.8.html">lvdisplay(8)</a>,&nbsp; 
+    <a href="../man8/lvextend.8.html">lvextend(8)</a>,&nbsp; 
+    <a href="../man8/lvm2-activation-generator.8.html">lvm2-activation-generator(8)</a>,&nbsp; 
+    <a href="../man8/lvm.8.html">lvm(8)</a>,&nbsp; 
+    <a href="../man8/lvmconf.8.html">lvmconf(8)</a>,&nbsp; 
+    <a href="../man8/lvmconfig.8.html">lvmconfig(8)</a>,&nbsp; 
+    <a href="../man8/lvmdiskscan.8.html">lvmdiskscan(8)</a>,&nbsp; 
+    <a href="../man8/lvmetad.8.html">lvmetad(8)</a>,&nbsp; 
+    <a href="../man8/lvm-fullreport.8.html">lvm-fullreport(8)</a>,&nbsp; 
+    <a href="../man8/lvm-lvpoll.8.html">lvm-lvpoll(8)</a>,&nbsp; 
+    <a href="../man8/lvmpolld.8.html">lvmpolld(8)</a>,&nbsp; 
+    <a href="../man8/lvreduce.8.html">lvreduce(8)</a>,&nbsp; 
+    <a href="../man8/lvremove.8.html">lvremove(8)</a>,&nbsp; 
+    <a href="../man8/lvrename.8.html">lvrename(8)</a>,&nbsp; 
+    <a href="../man8/lvresize.8.html">lvresize(8)</a>,&nbsp; 
+    <a href="../man8/lvs.8.html">lvs(8)</a>,&nbsp; 
+    <a href="../man8/lvscan.8.html">lvscan(8)</a>,&nbsp; 
+    <a href="../man8/pvchange.8.html">pvchange(8)</a>,&nbsp; 
+    <a href="../man8/pvck.8.html">pvck(8)</a>,&nbsp; 
+    <a href="../man8/pvcreate.8.html">pvcreate(8)</a>,&nbsp; 
+    <a href="../man8/pvdisplay.8.html">pvdisplay(8)</a>,&nbsp; 
+    <a href="../man8/pvmove.8.html">pvmove(8)</a>,&nbsp; 
+    <a href="../man8/pvremove.8.html">pvremove(8)</a>,&nbsp; 
+    <a href="../man8/pvresize.8.html">pvresize(8)</a>,&nbsp; 
+    <a href="../man8/pvs.8.html">pvs(8)</a>,&nbsp; 
+    <a href="../man8/pvscan.8.html">pvscan(8)</a>,&nbsp; 
+    <a href="../man8/vgcfgbackup.8.html">vgcfgbackup(8)</a>,&nbsp; 
+    <a href="../man8/vgcfgrestore.8.html">vgcfgrestore(8)</a>,&nbsp; 
+    <a href="../man8/vgchange.8.html">vgchange(8)</a>,&nbsp; 
+    <a href="../man8/vgck.8.html">vgck(8)</a>,&nbsp; 
+    <a href="../man8/vgconvert.8.html">vgconvert(8)</a>,&nbsp; 
+    <a href="../man8/vgcreate.8.html">vgcreate(8)</a>,&nbsp; 
+    <a href="../man8/vgdisplay.8.html">vgdisplay(8)</a>,&nbsp; 
+    <a href="../man8/vgexport.8.html">vgexport(8)</a>,&nbsp; 
+    <a href="../man8/vgextend.8.html">vgextend(8)</a>,&nbsp; 
+    <a href="../man8/vgimport.8.html">vgimport(8)</a>,&nbsp; 
+    <a href="../man8/vgimportclone.8.html">vgimportclone(8)</a>,&nbsp; 
+    <a href="../man8/vgmerge.8.html">vgmerge(8)</a>,&nbsp; 
+    <a href="../man8/vgmknodes.8.html">vgmknodes(8)</a>,&nbsp; 
+    <a href="../man8/vgreduce.8.html">vgreduce(8)</a>,&nbsp; 
+    <a href="../man8/vgremove.8.html">vgremove(8)</a>,&nbsp; 
+    <a href="../man8/vgrename.8.html">vgrename(8)</a>,&nbsp; 
+    <a href="../man8/vgs.8.html">vgs(8)</a>,&nbsp; 
+    <a href="../man8/vgscan.8.html">vgscan(8)</a>,&nbsp; 
+    <a href="../man8/vgsplit.8.html">vgsplit(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

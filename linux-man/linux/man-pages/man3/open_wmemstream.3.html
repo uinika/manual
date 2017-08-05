@@ -1,0 +1,261 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>open_memstream(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">OPEN_MEMSTREAM(3)         Linux Programmer's Manual        OPEN_MEMSTREAM(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       open_memstream,  open_wmemstream  -   open  a  dynamic  memory buffer
+       stream
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdio.h&gt;</b>
+
+       <b>FILE *open_memstream(char **</b><i>ptr</i><b>, size_t *</b><i>sizeloc</i><b>);</b>
+
+       <b>#include &lt;wchar.h&gt;</b>
+
+       <b>FILE *open_wmemstream(wchar_t **</b><i>ptr</i><b>, size_t *</b><i>sizeloc</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>open_memstream</b>(), <b>open_wmemstream</b>():
+           Since glibc 2.10:
+               _POSIX_C_SOURCE &gt;= 200809L
+           Before glibc 2.10:
+               _GNU_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>open_memstream</b>() function opens a stream for writing to a memory
+       buffer.  The function dynamically allocates the buffer, and the
+       buffer automatically grows as needed.  Initially, the buffer has a
+       size of zero.  After closing the stream, the caller should <a href="free.3.html">free(3)</a>
+       this buffer.
+
+       The locations pointed to by <i>ptr</i> and <i>sizeloc</i> are used to report,
+       respectively, the current location and the size of the buffer.  The
+       locations referred to by these pointers are updated each time the
+       stream is flushed (<a href="fflush.3.html">fflush(3)</a>) and when the stream is closed
+       (<a href="fclose.3.html">fclose(3)</a>).  These values remain valid only as long as the caller
+       performs no further output on the stream.  If further output is
+       performed, then the stream must again be flushed before trying to
+       access these values.
+
+       A null byte is maintained at the end of the buffer.  This byte is <i>not</i>
+       included in the size value stored at <i>sizeloc</i>.
+
+       The stream maintains the notion of a current position, which is
+       initially zero (the start of the buffer).  Each write operation
+       implicitly adjusts the buffer position.  The stream's buffer position
+       can be explicitly changed with <a href="fseek.3.html">fseek(3)</a> or <a href="fseeko.3.html">fseeko(3)</a>.  Moving the
+       buffer position past the end of the data already written fills the
+       intervening space with null characters.
+
+       The <b>open_wmemstream</b>() is similar to <b>open_memstream</b>(), but operates on
+       wide characters instead of bytes.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Upon successful completion, <b>open_memstream</b>() and <b>open_wmemstream</b>()
+       return a <i>FILE</i> pointer.  Otherwise, NULL is returned and <i><a href="errno.3.html">errno</a></i> is set
+       to indicate the error.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>open_memstream</b>() was already available in glibc 1.0.x.
+       <b>open_wmemstream</b>() is available since glibc 2.4.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────────┬───────────────┬─────────┐
+       │<b>Interface         </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├──────────────────┼───────────────┼─────────┤
+       │<b>open_memstream</b>(), │ Thread safety │ MT-Safe │
+       │<b>open_wmemstream   </b>│               │         │
+       └──────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2008.  These functions are not specified in POSIX.1-2001, and
+       are not widely available on other systems.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       There is no file descriptor associated with the file stream returned
+       by these functions (i.e., <a href="fileno.3.html">fileno(3)</a> will return an error if called on
+       the returned stream).
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In glibc before version 2.7, seeking past the end of a stream created
+       by <b>open_memstream</b>() does not enlarge the buffer; instead the <a href="fseek.3.html">fseek(3)</a>
+       call fails, returning -1.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       See <a href="fmemopen.3.html">fmemopen(3)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="fmemopen.3.html">fmemopen(3)</a>, <a href="fopen.3.html">fopen(3)</a>, <a href="setbuf.3.html">setbuf(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2016-03-15                OPEN_MEMSTREAM(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="fmemopen.3.html">fmemopen(3)</a>,&nbsp; 
+    <a href="fopen.3.html">fopen(3)</a>,&nbsp; 
+    <a href="malloc_info.3.html">malloc_info(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="open_memstream.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

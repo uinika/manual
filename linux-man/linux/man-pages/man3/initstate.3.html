@@ -1,0 +1,279 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>random(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">RANDOM(3)                 Linux Programmer's Manual                RANDOM(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       random, srandom, initstate, setstate - random number generator
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdlib.h&gt;</b>
+
+       <b>long int random(void);</b>
+
+       <b>void srandom(unsigned int </b><i>seed</i><b>);</b>
+
+       <b>char *initstate(unsigned int </b><i>seed</i><b>, char *</b><i>state</i><b>, size_t </b><i>n</i><b>);</b>
+       <b>char *setstate(char *</b><i>state</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>random</b>(), <b>srandom</b>(), <b>initstate</b>(), <b>setstate</b>():
+           _XOPEN_SOURCE &gt;= 500
+               || /* Glibc since 2.19: */ _DEFAULT_SOURCE
+               || /* Glibc versions &lt;= 2.19: */ _SVID_SOURCE || _BSD_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>random</b>() function uses a nonlinear additive feedback random
+       number generator employing a default table of size 31 long integers
+       to return successive pseudo-random numbers in the range from 0 to
+       <b>RAND_MAX</b>.  The period of this random number generator is very large,
+       approximately <i>16 * ((2^31) - 1)</i>.
+
+       The <b>srandom</b>() function sets its argument as the seed for a new
+       sequence of pseudo-random integers to be returned by <b>random</b>().  These
+       sequences are repeatable by calling <b>srandom</b>() with the same seed
+       value.  If no seed value is provided, the <b>random</b>() function is
+       automatically seeded with a value of 1.
+
+       The <b>initstate</b>() function allows a state array <i>state</i> to be initialized
+       for use by <b>random</b>().  The size of the state array <i>n</i> is used by
+       <b>initstate</b>() to decide how sophisticated a random number generator it
+       should use—the larger the state array, the better the random numbers
+       will be.  Current "optimal" values for the size of the state array <i>n</i>
+       are 8, 32, 64, 128, and 256 bytes; other amounts will be rounded down
+       to the nearest known amount.  Using less than 8 bytes results in an
+       error.  <i>seed</i> is the seed for the initialization, which specifies a
+       starting point for the random number sequence, and provides for
+       restarting at the same point.
+
+       The <b>setstate</b>() function changes the state array used by the <b>random</b>()
+       function.  The state array <i>state</i> is used for random number generation
+       until the next call to <b>initstate</b>() or <b>setstate</b>().  <i>state</i> must first
+       have been initialized using <b>initstate</b>() or be the result of a
+       previous call of <b>setstate</b>().
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>random</b>() function returns a value between 0 and <b>RAND_MAX</b>.  The
+       <b>srandom</b>() function returns no value.
+
+       The <b>initstate</b>() function returns a pointer to the previous state
+       array.  On error, <i><a href="errno.3.html">errno</a></i> is set to indicate the cause.
+
+       On success, <b>setstate</b>() returns a pointer to the previous state array.
+       On error, it returns NULL, with <i><a href="errno.3.html">errno</a></i> set to indicate the cause of
+       the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EINVAL </b>The <i>state</i> argument given to <b>setstate</b>() was NULL.
+
+       <b>EINVAL </b>A state array of less than 8 bytes was specified to
+              <b>initstate</b>().
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────────────────┬───────────────┬─────────┐
+       │<b>Interface               </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────────────────┼───────────────┼─────────┤
+       │<b>random</b>(), <b>srandom</b>(),    │ Thread safety │ MT-Safe │
+       │<b>initstate</b>(), <b>setstate</b>() │               │         │
+       └────────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, 4.3BSD.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>random</b>() function should not be used in multithreaded programs
+       where reproducible behavior is required.  Use <a href="random_r.3.html">random_r(3)</a> for that
+       purpose.
+
+       Random-number generation is a complex topic.  <i>Numerical Recipes in C:</i>
+       <i>The Art of Scientific Computing</i> (William H. Press, Brian P. Flannery,
+       Saul A. Teukolsky, William T. Vetterling; New York: Cambridge
+       University Press, 2007, 3rd ed.)  provides an excellent discussion of
+       practical random-number generation issues in Chapter 7 (Random
+       Numbers).
+
+       For a more theoretical discussion which also covers many practical
+       issues in depth, see Chapter 3 (Random Numbers) in Donald E. Knuth's
+       <i>The Art of Computer Programming</i>, volume 2 (Seminumerical Algorithms),
+       2nd ed.; Reading, Massachusetts: Addison-Wesley Publishing Company,
+       1981.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       According to POSIX, <b>initstate</b>() should return NULL on error.  In the
+       glibc implementation, <i><a href="errno.3.html">errno</a></i> is (as specified) set on error, but the
+       function does not return NULL.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/getrandom.2.html">getrandom(2)</a>, <a href="drand48.3.html">drand48(3)</a>, <a href="rand.3.html">rand(3)</a>, <a href="random_r.3.html">random_r(3)</a>, <a href="srand.3.html">srand(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2017-03-13                        RANDOM(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="drand48.3.html">drand48(3)</a>,&nbsp; 
+    <a href="drand48_r.3.html">drand48_r(3)</a>,&nbsp; 
+    <a href="rand.3.html">rand(3)</a>,&nbsp; 
+    <a href="random_r.3.html">random_r(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="random.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

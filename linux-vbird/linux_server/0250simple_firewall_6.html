@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="利用简单的 iptables 规则来说明防火墙，另外也会提到 NAT 服务器这个 IP 分享的咚咚！">
+	<title>鸟哥的 Linux 私房菜 -- Linux 防火墙与 NAT 服务器</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0250simple_firewall.php">
+    <span class="text_head0">第九章、防火墙与<span class="text_head_en"> NAT </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/07/22</span>
+    </div>
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+<span class="text_h2">
+9.6 <a href="#hint">重点回顾</a><br>
+9.7 <a href="#ex">本章习题</a><br>
+9.8 <a href="#reference">参考数据与延伸阅读</a><br>
+9.9 <a href="http://phorum.vbird.org/viewtopic.php?p=114475" target="_blank">针对本文的建议：http://phorum.vbird.org/viewtopic.php?p=114475</a><br>
+</span>
+</span></div>
+<!-- 本文的正式部分 -->
+<hr><a name="hint"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">9.6 重点回顾</span><br>
+<ul class="text_import2">
+	<li>要拥有一部安全的主机，必须要有良好的主机权限设定；随时的更新套件；定期的重要数据备份；完善的员工教育训练。
+		仅有防火墙是不足够的；</li>
+	<li>防火墙最大的功能就是帮助你『限制某些服务的存取来源』，可以管制来源与目标的 IP ；</li>
+	<li>防火墙依据封包抵挡的阶层，可以分为 Proxy 以及 IP Filter (封包过滤) 两种类型；</li>
+	<li>在防火墙内，但不在 LAN 内的服务器所在网域，通常被称为 DMZ (非军事区)，如<a href="#fig9.1-4">图 9.1-4</a>所示；</li>
+	<li>封包过滤机制的防火墙，通常至少可以分析 IP, port, flag (如 TCP 封包的 SYN), MAC 等等；</li>
+	<li>防火墙对于病毒的抵挡并不敏感；</li>
+	<li>防火墙对于来自内部的网络误用或滥用的抵挡性可能较不足；</li>
+	<li>并不是架设防火墙之后，系统就一定很安全！还是需要更新套件漏洞以及管制使用者及权限设定等；</li>
+	<li>核心 2.4 以后的 Linux 使用 iptables 作为防火墙的软件；</li>
+	<li>防火墙的订定与『规则顺序』有很大的关系；若规则顺序错误，可能会导致防火墙的失效；</li>
+	<li>iptables 的预设 table 共有三个，分别是 filter, nat 及 mangle ，惯用者为 filter (本机) 与 nat (后端主机)。</li>
+	<li>filter table 主要为针对本机的防火墙设定，依据封包流向又分为 INPUT, OUTPUT, FORWARD 三条链；</li>
+	<li>nat table 主要针对防火墙的后端主机，依据封包流向又分为 PREROUTING, OUTPUT, POSTROUTING 三条链，
+		其中 PREROUTING 与 DNAT 有关， POSTROUTING 则与 SNAT 有关；</li>
+	<li>iptables 的防火墙为规则比对，但所有规则都不符合时，则以预设政策 (policy) 作为封包的行为依据；</li>
+	<li>iptables 的指令列当中，可以下达的参数相当的多，当下达 -j LOG 的参数时，则该封包的流程会被纪录到 
+		/var/log/messages 当中；</li>
+	<li>防火墙可以多重设定，例如虽然已经设定了 iptables ，但是仍然可以持续设定
+		TCP Wrappers ，因为谁也不晓得什么时候 iptables 会有漏洞～或者是规则规划不良！</li>
+</ul>
+
+
+<hr><a name="ex"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">9.7 本章习题</span><br>
+<div class="block1">
+<ul>
+	<li>为什么我架设了防火墙，我的主机还是可能中毒？
+	<div class="blockex">
+		防火墙不是万灵丹，他还是可能被病毒或者是木马程序所入侵的！
+		此外，如果你的主机本身就已经提供了多个网络服务，则当该网络服务的软件有漏洞时，
+		防火墙仍然无法克服该服务的漏洞的！因此仍然需要持续的进行主机的监视与后端分析工作
+	</div></li>
+
+	<li>请说明为何架设了防火墙，我的主机还是可能被入侵？入侵的依据可能是什么方法？
+	<div class="blockex">
+		因为防火墙仅是抵挡某些不受欢迎的封包，如果你有开放 WWW 的服务时，则要求你主机 port 80 
+		的封包将可直接进入你的主机，万一 WWW 套件有漏洞时，那么就可能被入侵了！所以软件的更新很重要！ 
+	</div></li>
+
+	<li>我们知道核心为 2.6 的 Linux 使用的防火墙机制为 iptables ，请问，如何知道我的 Linux 核心版本？
+	<div class="blockex">
+		利用 uname -r 可以查得！
+	</div></li>
+
+	<li>请列出 iptables 预设的两个主要的 table ，以及各个 table 里面的 chains 与各个
+	chains 所代表的意义；
+	<div class="blockex">
+		filter 为预设的 Table，里头预设的链有：
+		<ul><li>INPUT：为来自外部，想要进入主机的封包；</li>
+		<li>OUTPUT：为来自主机，想要离开主机的封包；</li>
+		<li>FORWARD：为主机内部网域与外部网域的封包(不论进或者出)，但该封包不会进入主机。</li>
+		</ul>
+		还有 nat 这个 table：
+		<ul><li>PREROUTING：进行路由之前的封包传送过程</li>
+		<li>OUTPUT：离开主机的封包传送过程；</li>
+		<li>POSTROUTING：已经经过路由了，然后才进行的过滤规则。</li>
+		</ul>
+	</div></li>
+
+	<li>什么是 iptables 的预设政策 (Policy)？若我要针对 filter 的 INPUT 做成 DROP 的默认政策，指令如何下达？
+	<div class="blockex">
+		当封包的所有属性都不在防火墙的规则当中时，那么这个封包能否顺利的通过防火墙，则以 Policy 
+		作为这个封包的最终动作了！ <br>
+		iptables -P INPUT DROP
+	</div></li>
+
+	<li>假设今天我的 Linux 仅是作为 Client 之用，并没有对 Internet 进行任何服务，
+	那么你的防火墙规划应该如何设定比较好？
+	<div class="blockex">
+		既然没有对 Internet 提供任何服务，那么(1)请将所有的对外埠口先关闭吧！(2)防火墙规则当中，最重要的是 
+		INPUT 的 Policy 一定要 DROP ，然后将『 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT 』即可！ 
+	</div></li>
+
+	<li>我要将来自 192.168.1.50 这个 IP 来源的封包，只要是向我的 21~23 埠口要求的封包，就将他抵挡，应该如何下达
+	iptables 指令？
+	<div class="blockex">
+		iptables -A INPUT -p tcp -s 192.168.1.50 --dport 21:23 -j DROP
+	</div></li>
+
+	<li>我要将我自己主机 ping 的响应功能取消，应该如何下达 iptables 的指令？
+	<div class="blockex">
+		因为 ping 能否响应用的是 icmp 的 type 8 (请参考网络基础内的 ICMP 相关内容)，所以我可以这样做：<br>
+		iptables -I INPUT -p icmp --icmp-type 8 -j DROP
+	</div></li>
+
+	<li>请说明为何这个指令是错误的？『iptables -A INPUT -p udp --syn -s 192.168.0.20 -j DROP』？
+	<div class="blockex">
+		因为只有 TCP 封包才会具有 SYN 的标志， UDP 并没有 SYN 的标志啊！所以上面的指令是错误的
+	</div></li>
+
+	<li>DNS 的要求是必须的，那么我该如何设定我的主机可以接受要求 DNS 的响应呢？
+	<div class="blockex">
+		因为 DNS 的来源是 port 53 ，因此要接受来自 port 53 的封包就成为了：<br>
+		iptables -A INPUT -p udp --sport 53 -j ACCEPT<br>
+		iptables -A INPUT -p tcp --sport 53 -j ACCEPT 
+	</div></li>
+
+	<li>如何取消 iptables 在我的系统上面？
+	<div class="blockex">
+		先要清除规则后，才能够将 iptables 移除！不过，我们主要将规则清除即可！<br>
+		iptables -F; iptables -X; iptables -Z<br>
+		iptables -t nat -F; iptables -t nat -X; iptables -t nat -Z 
+	</div></li>
+
+	<li>如何储存目前的防火墙机制，以及如何将上次储存下来的机制回复到目前的系统中？
+	<div class="blockex">
+		请利用 iptables-save 以及 iptables-restore 这两个指令，配合命令重导向即可！
+		也可以使用 /etc/init.d/iptables save 来储存喔！
+	</div></li>
+
+	<li>如果你的区网当中有个 PC 使用者老是连上 Internet 乱搞，你想要将他的 IP 锁住，但他总是有办法修改成其他 IP 来连外，
+	那你该怎么办？让他无法继续连外？
+	<div class="blockex">
+		可以利用封锁网络卡卡号 MAC 来处理！
+	</div></li>
+</ul>
+</div>
+
+
+<hr><a name="reference"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">9.8 参考数据与延伸阅读</span><br>
+<div class="block1">
+<ul>
+	<li><a name="ps1"></a>注1： squid 官网：<a href="http://www.squid-cache.org/" target="_blank">http://www.squid-cache.org/</a><br>
+		鸟哥的旧版文章：<a href="http://linux.vbird.org/linux_server/0420squid.php" target="_blank">http://linux.vbird.org/linux_server/0420squid.php</a></li>
+	<li><a name="ps2"></a>注2： 与 iptables 相关的网站与书籍：<br>
+	中文网站：
+	<ul>
+	<li><a href="http://www.study-area.org/linux/servers/linux_nat.htm" target="_blank">http://www.study-area.org/linux/servers/linux_nat.htm</a></li>
+	</ul>
+	英文网站：
+	<ul>
+	<li><a href="http://www.netfilter.org/" target="_blank">http://www.netfilter.org/</a></li>
+	<li><a href="http://www.netfilter.org/documentation/HOWTO//packet-filtering-HOWTO.html" target="_blank">http://www.netfilter.org/documentation/HOWTO//packet-filtering-HOWTO.html</a></li>
+	<li><a href="http://www.interhack.net/pubs/fwfaq/" target="_blank">http://www.interhack.net/pubs/fwfaq/</a></li>
+	<li><a href="http://www.sysresccd.org/Sysresccd-Networking-EN-Destination-port-routing" target="_blank">http://www.sysresccd.org/Sysresccd-Networking-EN-Destination-port-routing</a></li>
+	</ul>
+	其他书籍与数据：
+	<ul>
+	<li>Robert L. Ziegler 着，朱亮恺等译，『实战 Linux 防火墙--iptables 应用全搜录』，上奇出版社，2004。</li>
+	<li>本机的核心文件：/usr/src/linux-{version}/networking/ip-sysctl.txt</li>
+	<li>iptables 的内建 tables 与各个 chain 的相关性：
+	<a href="../../ebtables.netfilter.org/br_fw_ia/bridge3b.png" target="_blank">http://ebtables.sourceforge.net/br_fw_ia/bridge3b.png</a></li>
+	<li>核心参数的相关说明：<a href="http://www.study-area.org/tips/adv-route/Adv-Routing-HOWTO-12.html" target="_blank">http://www.study-area.org/tips/adv-route/Adv-Routing-HOWTO-12.html</a></li>
+	<li>使用 PPPoE 导致的 MTU 问题：<a href="http://www.akadia.com/services/pppoe_iptables.html" target="_blank">http://www.akadia.com/services/pppoe_iptables.html</a></li>
+	</ul></li>
+</ul>
+
+
+</div><hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

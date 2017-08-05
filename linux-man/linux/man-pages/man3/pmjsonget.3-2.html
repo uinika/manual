@@ -1,0 +1,274 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmjsonget(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#RETURN_CODE">RETURN&nbsp;CODE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMJSONGET(3)              Library Functions Manual              PMJSONGET(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmjsonGet</b>,  <b>pmjsonInit</b>,  <b>pmjsonInitIndom  </b>-  JSON performance metrics
+       extraction
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pcp/pmapi.h&gt;</b>
+       <b>#include &lt;pcp/pmjson.h&gt;</b>
+
+       <b>typedef int (*json_get)(void *</b><i>buffer</i><b>, int </b><i>length</i><b>, void *</b><i>data</i><b>);</b>
+       <b>int pmjsonGet(json_metric_desc *</b><i>json_metrics</i><b>, int </b><i>nmetrics</i><b>, pmInDom</b>
+               <i>indom</i><b>, json_get </b><i>callback</i><b>, void *</b><i>data</i><b>);</b>
+
+       <b>int pmjsonInit(int </b><i>fd</i><b>, json_metric_desc *</b><i>json_metrics</i><b>, int </b><i>nmetrics</i><b>);</b>
+       <b>int   pmjsonInitIndom(int  </b><i>fd</i><b>,  json_metric_desc  *</b><i>json_metrics</i><b>,  int</b>
+               <i>nmetrics</i><b>, pmInDom </b><i>indom</i><b>);</b>
+
+       <b>cc ... -lpcp_web</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmjsonGet </b>performs metric value extraction from JSON strings for a
+       Performance Metric Domain Agent (<a href="PMDA.3.html">PMDA(3)</a>).  Metrics and instances are
+       defined by the <i>json_metrics</i> parameter.  The result of parsing is the
+       extraction of values for the requested metrics (as defined in the
+       json_pointer field) in the values field.
+
+       <i>json_metrics</i> is the array of json_metric_desc struct which contains
+       the json pointer to the metric data, possible flags to check the data
+       against, number of values (in the case of an array), <i>pmAtomValue</i>
+       where the data is stored, as well as the instance domain in the event
+       the PMDA has multiple instance domains.  The number of elements in
+       the <i>json_metrics</i> array is indicated by the <i>nmetrics</i> parameter.
+
+       Interfaces for common cases are provided - <b>pmjsonInit </b>specifies a
+       call to the JSON parsing and metric value extraction functionality
+       where there are no instance domains (or the PMDA wishes to perform
+       instance domain operations itself) and where data can be read
+       directly from an open file descriptor.  <b>pmjsonInitIndom </b>is similar,
+       but makes use of the <b>pmdaCacheAdd</b>(3) function where possible.
+
+       The JSON string must be provided by the <i>callback</i> function.  This
+       function is passed a memory <i>buffer</i> of <i>length</i> bytes and an opaque user
+       <i>data</i> pointer which is unchanged from the original call to <b>pmjsonGet</b>.
+       The returned result must be the number of bytes written into <i>buffer</i>,
+       zero when no more data is available or less than zero on error
+       conditions.
+
+       <i>indom</i> is the instance domain to be passed to <b>pmdaCacheAdd</b>.
+
+            typedef struct json_metrics_desc {
+                char          *json_pointer;  /* json pointer to metric */
+                int           flags;          /* flags to check if set */
+                int           num_values;     /* number of values */
+                pmAtomValue   values;         /* metric value */
+                char          *dom;           /* instance domain */
+            } json_metric_desc;
+
+       The JSON Pointer syntax current follows <i>RFC6901</i> in specifying a
+       metrics location within the JSON document.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For the sample JSON document:
+
+       {
+           "Name": "/clever_almeida",
+           "State": {
+               "Dead": false,
+               "Error": "",
+               "ExitCode": 0,
+               "FinishedAt": "2016-07-18T21:21:20.332488706Z",
+               "OOMKilled": false,
+               "Paused": false,
+               "Pid": 0,
+               "Restarting": false,
+               "Running": false,
+               "StartedAt": "2016-07-18T14:10:58.52487316Z"
+           }
+       }
+
+       A possible corresponding json_metric array would be as follows for
+       the Pid, Name, and metrics to indicate whether the container is
+       Running, Paused, or Restarting.
+
+       static json_metric_desc json_metrics[] = {
+           { "State/Pid", 0, 1, {0}, ""},
+           { "Name", 0, 1, {0}, ""},
+           { "State/Running", CONTAINER_FLAG_RUNNING, 1, {0}, ""},
+           { "State/Paused", CONTAINER_FLAG_PAUSED, 1, {0}, ""},
+           { "State/Restarting", CONTAINER_FLAG_RESTARTING, 1, {0}, ""},
+       };
+</pre>
+<h2><a id="RETURN_CODE" href="#RETURN_CODE"></a>RETURN CODE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The functions return zero on success, otherwise an error code
+       suitable for passing to <a href="pmErrStr_r.3.html">pmErrStr_r(3)</a> is returned.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PMDA.3.html">PMDA(3)</a>, <a href="pmErrStr_r.3.html">pmErrStr_r(3)</a>, <b>pmdaCacheAdd</b>(3), <b><a href="http://json.org/">http://json.org/</a> </b>,
+       <b><a href="https://tools.ietf.org/html/rfc7159">https://tools.ietf.org/html/rfc7159</a> </b>,
+       <b><a href="https://tools.ietf.org/html/rfc6901">https://tools.ietf.org/html/rfc6901</a> </b>,
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                        PMJSONGET(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pmhttpnewclient.3-2.html">pmhttpnewclient(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

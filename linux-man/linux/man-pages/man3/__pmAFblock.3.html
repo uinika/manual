@@ -1,0 +1,282 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmaf(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#DIAGNOSTICS">DIAGNOSTICS</a> | <a href="#CAVEATS">CAVEATS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMAF(3)                   Library Functions Manual                   PMAF(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>__pmAFsetup</b>, <b>__pmAFregister</b>, <b>__pmAFunregister</b>, <b>__pmAFblock</b>, <b>__pmAFun‐</b>
+       <b>block</b>, <b>__pmAFisempty </b>- event queue services for periodic asynchronous
+       callbacks
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pcp/pmapi.h&gt;</b>
+       <b>#include &lt;pcp/impl.h&gt;</b>
+
+       <b>int __pmAFsetup(const struct timeval *</b><i>start</i><b>, const struct timeval</b>
+               <b>*</b><i>delta</i><b>, void *</b><i>data</i><b>, void (*</b><i>func</i><b>)(int, void *));</b>
+       <b>int __pmAFregister(const struct timeval *</b><i>delta</i><b>, void *</b><i>data</i><b>,</b>
+               <b>void (*</b><i>func</i><b>)(int, void *));</b>
+       <b>int __pmAFunregister(int </b><i>afid</i><b>);</b>
+       <b>void __pmAFblock(void);</b>
+       <b>void __pmAFunblock(void);</b>
+       <b>int __pmAFisempty(void);</b>
+
+       <b>cc ... -lpcp</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The routines implement an event queue and callback framework that
+       supports periodic evaluation of a series of events with varying
+       frequencies for Performance Co-Pilot (PCP) applications.
+
+       The <a href="../man1/pmlogger.1.html">pmlogger(1)</a> application, the <a href="../man1/pmdatrace.1.html">pmdatrace(1)</a> PMDA and the
+       <b>pmdahotproc</b>(1) PMDA are the principal users of these services.
+
+       An event is created by calling <b>__pmAFsetup </b>or <b>__pmAFregister </b>and on
+       success the return value is an event number greater than zero.  The
+       event has associated event data identified by the opaque pointer
+       <i>data</i>.  The event will occur with frequency <i>delta</i> and each time the
+       event occurs the function <i>func</i> will be called with the event number
+       and the event data as arguments.
+
+       If <b>__pmAFsetup </b>is used then the first event is scheduled for the
+       current time plus <i>start</i>, else if <b>__pmAFregister </b>is used then the
+       first event is scheduled for the current time plus <i>delta</i>.
+
+       <i>func</i> is called in a SIGALRM signal handler context and so the
+       routines that may be safely called from <i>func</i> are restricted to the
+       so-called <i>async-signal-safe</i> set.  In particular there must be no
+       Standard I/O calls nor calls to any of the <a href="malloc.3.html">malloc(3)</a> routines to
+       modify the state of the heap.  Refer to the <i>Pointer to a Function</i>
+       Section of the POSIX.1-2013 document at
+       <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/V2_chap02.html">http://pubs.opengroup.org/onlinepubs/9699919799/functions/V2_chap02.html</a>
+       for a fuller description.
+
+       The safest and simplest class of <i>func</i> routines are those that do
+       minimal processing, set some global state and return.  The real work
+       associated with the event is done subsequently from the application's
+       main loop when the global state change is detected.
+
+       Once the event occurs and the callback has been executed, the event
+       will be rescheduled for <i>delta</i> into the future, except if all the
+       fields of <i>delta</i> are zero, in which case the event will not be
+       rescheduled (a ``one trip'' event).
+
+       Internally, events are processed serially so there is no possibility
+       of nested callbacks or re-entrant callbacks from the event management
+       routines.
+
+       Given an event number <i>afid</i>, <b>__pmAFunregister </b>will permanently remove
+       the corresponding entry from the event queue.
+
+       To control the event queue processing, <b>__pmAFblock </b>and <b>__pmAFunblock</b>
+       may be used to explicitly block and unblock the dispatch of events.
+       This is most useful when the caller wishes to set up a number of
+       events via <b>__pmAFsetup </b>or <b>__pmAFregister </b>and complete the
+       registration phase before the first event callback occurs.
+
+       A call to <b>__pmAFisempty </b>returns 1 or 0 depending on whether the event
+       queue is empty or not.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PMAPI.3.html">PMAPI(3)</a>
+</pre>
+<h2><a id="DIAGNOSTICS" href="#DIAGNOSTICS"></a>DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>__pmAFsetup</b>, <b>__pmAFregister </b>and <b>__pmAFunregister </b>return values less
+       than zero in the case of an error.  These values are PCP error codes,
+       and may be used to produce error messages via <a href="pmErrStr.3.html">pmErrStr(3)</a>.
+
+       The routines support the standard PCP debug tracing, and the value
+       <b>DBG_TRACE_AF </b>(or <b>-D af </b>on the command line) will produce diagnostics
+       on standard error that trace the enqueuing and execution of events.
+</pre>
+<h2><a id="CAVEATS" href="#CAVEATS"></a>CAVEATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These routines rely on <a href="../man2/setitimer.2.html">setitimer(2)</a> and manipulate the handling of
+       <b>SIGALRM </b>signals, and hence are probably ill-suited for applications
+       that require direct and concurrent access to these services and
+       resources.
+
+       If the callback functions are slow, or delayed, it is possible that
+       the event scheduling could fall behind and never catchup.  When this
+       begins to happen, events are silently skipped and rescheduled at the
+       earliest possible time in the future according to the fixed schedule
+       defined by the time of the call to <b>__pmAFsetup </b>and the value of the
+       <i>start</i> and <i>delta</i> arguments (or defined by the time of the call to
+       <b>__pmAFregister </b>and the value of the <i>delta</i> argument).
+
+       In addition, the semantics of the interval timer(s) and the global
+       state needed to support these services demand that applications
+       calling these routines must do so from a single thread.  This
+       restriction is enforced at the <a href="PMAPI.3.html">PMAPI(3)</a>, where routines may return
+       the error code <b>PM_ERR_THREAD </b>if the library detects calls from more
+       than one thread.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                             PMAF(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pmapi.3-2.html">pmapi(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

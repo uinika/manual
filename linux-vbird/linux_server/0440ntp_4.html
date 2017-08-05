@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="Network Time Protocol 就是 NTP 的全名。NTP 主机主要在提供网络上可以进行网络校时的主机功能！">
+	<title>鸟哥的 Linux 私房菜 -- NTP 时间服务器</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0440ntp.php">
+    <span class="text_head0">第十五章、时间服务器：<span class="text_head_en"> NTP </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/07/29</span>
+    </div>
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+15.4 <a href="#hint">重点回顾</a><br>
+15.5 <a href="#ex">课后练习</a><br>
+15.6 <a href="#reference">参考数据</a><br>
+<span class="text_h2">
+15.7 <a href="http://phorum.vbird.org/viewtopic.php?p=117976" target="_blank">针对本文的建议：http://phorum.vbird.org/viewtopic.php?p=117976</a><br>
+</span>
+</span></div>
+<!-- 本文的正式部分 -->
+<hr><a name="hint"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">15.4 重点回顾</span><br>
+<div class="block1">
+<ul class="text_import2">
+	<li>地球共有 24 个时区，而以格林威治时间 (GMT) 为标准时间；</li>
+	<li>台湾本地时间为 GMT + 8 小时；</li>
+	<li>最准确的时间为使用原子钟 (Atomic clock) 所计算的，例如 UTC (Coordinated Universal Time) 就是一例；</li>
+	<li>Linux 系统本来就有两种时间，一种是 Linux 以 1970/01/01 开始计数的系统时间，一种则是 BIOS 记载的硬件时间；</li>
+	<li>Linux 可以透过网络校时，最常见的网络校时为使用 NTP 服务器，这个服务启动在 udp port 123；</li>
+	<li>时区档案主要放置于 /usr/share/zoneinfo/ 目录下，而本地时区则参考 /etc/localtime；</li>
+	<li>NTP 服务器为一种阶层式的服务，所以 NTP 服务器本来就会与上层时间服务器作时间的同步化，
+		因此 nptd 与 ntpdate 两个指令不可同时使用；</li>
+	<li>NTP 服务器的联机状态可以使用 ntpstat 及 ntpq -p 来查询；</li>
+	<li>NTP 提供的客户端软件为 ntpdate 这个指令；</li>
+	<li>在 Linux  下想要手动处理时间时，需以 date 设定时间后，以 hwclock -w 来写入 BIOS 所记录的时间。</li>
+	<li>NTP 服务器之间的时间误差不可超过 1000 秒，否则 NTP 服务会自动关闭。</li>
+</ul>
+</div>
+
+
+<hr><a name="ex"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">15.5 本章习题</span><br>
+<div class="block1">
+<ul>
+	<li>什么是 GMT (格林威治) 时间与 UTC 时间？
+	<div class="blockex">
+	由于地球是圆的，所以同一时间点上，在地球共可分为 24 个时区，其中，我们以欧洲的格林威治时间为一个对照的依据，这个即是 
+	GMT 时间。台湾时间比 GMT 时间快了 8 小时。至于 UTC 时间则是由原子钟所计算的时间，这个时间是相当的准确的，
+	主要仍以格林威治时间为时区！
+	</div></li>
+
+	<li>Linux 系统的所有时区档案放置哪一个目录底下？
+	<div class="blockex">
+	所有的时区档案放置于：/usr/share/zoneinfo 底下！至于系统时区的配置文件则在 /etc/sysconfig/clock 与 /etc/localtime 喔！
+	</div></li>
+
+	<li>我的 Linux 主机本来放置在日本东京，现在想将他拿到台湾来运作，不过因为日本与台湾有一个小时的时差，
+		所以我的时间应该需要经过调整才行。不过，因为我的 BIOS Time 主要是依据 UTC 
+		时间来设定的，所以似乎只要更动时区参数即可。请问我该如何设定时区，好让我的
+		Linux 主机能够显示正确的时间？
+	<div class="blockex">
+		先将 /etc/localtime 删除，然后将 /usr/share/zoneinfo/Asia/Taipei 这个档案复制成为 /etc/localtime 即可！
+	</div></li>
+
+	<li>目前 Linux 系统上面的时间服务器主要是以 NTP 为主，请问这个 daemon 的主要配置文件放在哪里，而该配置文件中，针对上层
+		time server 的设定参数为何？而那个 driftfile 参数是干嘛用的？
+	<div class="blockex">
+		在 /etc/ntp.conf 这个档案当中，至于上层 time server 的设定参数为 server 啊！那个 driftfile 
+		则是用来做为『时间差额』的计算的！该参数后面接的是一个完整路径的文件名，该档案里面的数值单位为百万分之一(ppm)。
+	</div></li>
+
+	<li>请问 ntptrace 的功能为何？
+	<div class="blockex">
+	可以用来追踪上层 time server 的连接时间与目前时间！
+	</div></li>
+
+	<li>我以 date 更新了我 Linux 上面的时间后，该如何将时间数据写入 BIOS 内？
+	<div class="blockex">
+	必须利用 hwclock 这个程序来写入，利用 hwclock -w 写入 BIOS 
+	</div></li>
+
+	<li>在 Linux 上面如何进行网络校时？
+	<div class="blockex">
+	最简单的方法即是使用『 ntpdate time.servers.ip &amp;&amp; hwclock -w 』即可！
+	</div></li>
+</ul>
+</div>
+
+
+<hr><a name="reference"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">15.6 参考数据与延伸阅读</span><br>
+<div class="block1">
+<ul>
+	<li><a name="ps1"></a>注1：格林威治时间的 Wiki 说明：<a href="http://en.wikipedia.org/wiki/Greenwich_Mean_Time" target="_blank">http://en.wikipedia.org/wiki/Greenwich_Mean_Time</a></li>
+	<li><a name="ps2"></a>注2：UTC 时间的 Wiki 说明：<a href="http://en.wikipedia.org/wiki/Coordinated_Universal_Time" target="_blank">http://en.wikipedia.org/wiki/Coordinated_Universal_Time</a></li>
+	<li><a name="ps3"></a>注3：台湾提供的几部标准时间服务器与时间服务器官网：<br>
+		<a href="http://www.stdtime.gov.tw/Time/ntp/resource.htm" target="_blank">http://www.stdtime.gov.tw/Time/ntp/resource.htm</a><br>
+		<a href="http://www.stdtime.gov.tw/Time/home.htm" target="_blank">http://www.stdtime.gov.tw/Time/home.htm</a></li>
+	<li><a name="ps4"></a>注4：NTP 的官方网站：<a href="http://www.ntp.org/" target="_blank">http://www.ntp.org</a><br>
+		另一个好站：<a href="http://www.eecis.udel.edu/~mills/ntp/html/ntpd.html" target="_blank">http://www.eecis.udel.edu/~mills/ntp/html/ntpd.html</a></li>
+	<li>由网友李涛兄提供的好站：<br>
+		<a href="http://support.ntp.org/bin/view/Support/TroubleshootingNTP#Section_9.5" target="_blank">http://support.ntp.org/bin/view/Support/TroubleshootingNTP#Section_9.5</a><br>
+		<a href="http://www.eecis.udel.edu/~mills/ntp/html/ntpq.html" target="_blank">http://www.eecis.udel.edu/~mills/ntp/html/ntpq.html</a></li>
+</ul>
+</div>
+<hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

@@ -1,0 +1,373 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>selinux(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILE_LABELING">FILE&nbsp;LABELING</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">selinux(8)           SELinux Command Line documentation           selinux(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       SELinux - NSA Security-Enhanced Linux (SELinux)
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       NSA Security-Enhanced Linux (SELinux) is an implementation of a
+       flexible mandatory access control architecture in the Linux operating
+       system.  The SELinux architecture provides general support for the
+       enforcement of many kinds of mandatory access control policies,
+       including those based on the concepts of Type Enforcement®, Role-
+       Based Access Control, and Multi-Level Security.  Background
+       information and technical documentation about SELinux can be found at
+       <a href="http://www.nsa.gov/research/selinux">http://www.nsa.gov/research/selinux</a>.
+
+       The <i>/etc/selinux/config</i> configuration file controls whether SELinux
+       is enabled or disabled, and if enabled, whether SELinux operates in
+       permissive mode or enforcing mode.  The <b>SELINUX </b>variable may be set
+       to any one of disabled, permissive, or enforcing to select one of
+       these options.  The disabled option completely disables the SELinux
+       kernel and application code, leaving the system running without any
+       SELinux protection.  The permissive option enables the SELinux code,
+       but causes it to operate in a mode where accesses that would be
+       denied by policy are permitted but audited.  The enforcing option
+       enables the SELinux code and causes it to enforce access denials as
+       well as auditing them.  Permissive mode may yield a different set of
+       denials than enforcing mode, both because enforcing mode will prevent
+       an operation from proceeding past the first denial and because some
+       application code will fall back to a less privileged mode of
+       operation if denied access.
+
+       The <i>/etc/selinux/config</i> configuration file also controls what policy
+       is active on the system.  SELinux allows for multiple policies to be
+       installed on the system, but only one policy may be active at any
+       given time.  At present, multiple kinds of SELinux policy exist:
+       targeted, mls for example.  The targeted policy is designed as a
+       policy where most user processes operate without restrictions, and
+       only specific services are placed into distinct security domains that
+       are confined by the policy.  For example, the user would run in a
+       completely unconfined domain while the named daemon or apache daemon
+       would run in a specific domain tailored to its operation.  The MLS
+       (Multi-Level Security) policy is designed as a policy where all
+       processes are partitioned into fine-grained security domains and
+       confined by policy.  MLS also supports the Bell And LaPadula model,
+       where processes are not only confined by the type but also the level
+       of the data.
+
+       You can define which policy you will run by setting the <b>SELINUXTYPE</b>
+       environment variable within <i>/etc/selinux/config</i>.  You must reboot and
+       possibly relabel if you change the policy type to have it take effect
+       on the system.  The corresponding policy configuration for each such
+       policy must be installed in the <i>/etc/selinux/{SELINUXTYPE}/</i>
+       directories.
+
+       A given SELinux policy can be customized further based on a set of
+       compile-time tunable options and a set of runtime policy booleans.
+       <b>system-config-selinux </b>allows customization of these booleans and
+       tunables.
+
+       Many domains that are protected by SELinux also include SELinux man
+       pages explaining how to customize their policy.
+</pre>
+<h2><a id="FILE_LABELING" href="#FILE_LABELING"></a>FILE LABELING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All files, directories, devices ... have a security context/label
+       associated with them.  These context are stored in the extended
+       attributes of the file system.  Problems with SELinux often arise
+       from the file system being mislabeled. This can be caused by booting
+       the machine with a non SELinux kernel.  If you see an error message
+       containing file_t, that is usually a good indicator that you have a
+       serious problem with file system labeling.
+
+       The best way to relabel the file system is to create the flag file
+       <i>/.autorelabel</i> and reboot.  <b>system-config-selinux</b>, also has this
+       capability.  The <b>restorecon</b>/<b>fixfiles </b>commands are also available for
+       relabeling files.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page was written by Dan Walsh &lt;dwalsh@redhat.com&gt;.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/etc/selinux/config</i>
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="booleans.8.html">booleans(8)</a>, <a href="setsebool.8.html">setsebool(8)</a>, <a href="sepolicy.8.html">sepolicy(8)</a>, <a href="system-config-selinux.8.html">system-config-selinux(8)</a>,
+       <a href="togglesebool.8.html">togglesebool(8)</a>, <a href="restorecon.8.html">restorecon(8)</a>, <a href="fixfiles.8.html">fixfiles(8)</a>, <a href="setfiles.8.html">setfiles(8)</a>,
+       <a href="semanage.8.html">semanage(8)</a>, <a href="sepolicy.8.html">sepolicy(8)</a>
+
+       Every confined service on the system has a man page in the following
+       format:
+
+       <b>&lt;servicename&gt;_selinux</b>(8)
+
+       For example, httpd has the <b>httpd_selinux</b>(8) man page.
+
+       <b>man -k selinux</b>
+
+       Will list all SELinux man pages.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">dwalsh@redhat.com                29 Apr 2005                      selinux(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/crontab.1.html">crontab(1)</a>,&nbsp; 
+    <a href="../man3/avc_add_callback.3.html">avc_add_callback(3)</a>,&nbsp; 
+    <a href="../man3/avc_cache_stats.3.html">avc_cache_stats(3)</a>,&nbsp; 
+    <a href="../man3/avc_compute_create.3.html">avc_compute_create(3)</a>,&nbsp; 
+    <a href="../man3/avc_context_to_sid.3.html">avc_context_to_sid(3)</a>,&nbsp; 
+    <a href="../man3/avc_has_perm.3.html">avc_has_perm(3)</a>,&nbsp; 
+    <a href="../man3/avc_init.3.html">avc_init(3)</a>,&nbsp; 
+    <a href="../man3/avc_netlink_loop.3.html">avc_netlink_loop(3)</a>,&nbsp; 
+    <a href="../man3/avc_open.3.html">avc_open(3)</a>,&nbsp; 
+    <a href="../man3/context_new.3.html">context_new(3)</a>,&nbsp; 
+    <a href="../man3/getcon.3.html">getcon(3)</a>,&nbsp; 
+    <a href="../man3/getexeccon.3.html">getexeccon(3)</a>,&nbsp; 
+    <a href="../man3/getfilecon.3.html">getfilecon(3)</a>,&nbsp; 
+    <a href="../man3/getfscreatecon.3.html">getfscreatecon(3)</a>,&nbsp; 
+    <a href="../man3/getkeycreatecon.3.html">getkeycreatecon(3)</a>,&nbsp; 
+    <a href="../man3/get_ordered_context_list.3.html">get_ordered_context_list(3)</a>,&nbsp; 
+    <a href="../man3/getseuserbyname.3.html">getseuserbyname(3)</a>,&nbsp; 
+    <a href="../man3/getsockcreatecon.3.html">getsockcreatecon(3)</a>,&nbsp; 
+    <a href="../man3/init_selinuxmnt.3.html">init_selinuxmnt(3)</a>,&nbsp; 
+    <a href="../man3/is_context_customizable.3.html">is_context_customizable(3)</a>,&nbsp; 
+    <a href="../man3/is_selinux_enabled.3.html">is_selinux_enabled(3)</a>,&nbsp; 
+    <a href="../man3/matchmediacon.3.html">matchmediacon(3)</a>,&nbsp; 
+    <a href="../man3/matchpathcon.3.html">matchpathcon(3)</a>,&nbsp; 
+    <a href="../man3/matchpathcon_checkmatches.3.html">matchpathcon_checkmatches(3)</a>,&nbsp; 
+    <a href="../man3/security_check_context.3.html">security_check_context(3)</a>,&nbsp; 
+    <a href="../man3/security_class_to_string.3.html">security_class_to_string(3)</a>,&nbsp; 
+    <a href="../man3/security_compute_av.3.html">security_compute_av(3)</a>,&nbsp; 
+    <a href="../man3/security_disable.3.html">security_disable(3)</a>,&nbsp; 
+    <a href="../man3/security_getenforce.3.html">security_getenforce(3)</a>,&nbsp; 
+    <a href="../man3/security_load_booleans.3.html">security_load_booleans(3)</a>,&nbsp; 
+    <a href="../man3/security_load_policy.3.html">security_load_policy(3)</a>,&nbsp; 
+    <a href="../man3/security_policyvers.3.html">security_policyvers(3)</a>,&nbsp; 
+    <a href="../man3/selabel_digest.3.html">selabel_digest(3)</a>,&nbsp; 
+    <a href="../man3/selabel_lookup.3.html">selabel_lookup(3)</a>,&nbsp; 
+    <a href="../man3/selabel_lookup_best_match.3.html">selabel_lookup_best_match(3)</a>,&nbsp; 
+    <a href="../man3/selabel_open.3.html">selabel_open(3)</a>,&nbsp; 
+    <a href="../man3/selabel_partial_match.3.html">selabel_partial_match(3)</a>,&nbsp; 
+    <a href="../man3/selabel_stats.3.html">selabel_stats(3)</a>,&nbsp; 
+    <a href="../man3/selinux_binary_policy_path.3.html">selinux_binary_policy_path(3)</a>,&nbsp; 
+    <a href="../man3/selinux_check_securetty_context.3.html">selinux_check_securetty_context(3)</a>,&nbsp; 
+    <a href="../man3/selinux_colors_path.3.html">selinux_colors_path(3)</a>,&nbsp; 
+    <a href="../man3/selinux_file_context_cmp.3.html">selinux_file_context_cmp(3)</a>,&nbsp; 
+    <a href="../man3/selinux_file_context_verify.3.html">selinux_file_context_verify(3)</a>,&nbsp; 
+    <a href="../man3/selinux_getenforcemode.3.html">selinux_getenforcemode(3)</a>,&nbsp; 
+    <a href="../man3/selinux_getpolicytype.3.html">selinux_getpolicytype(3)</a>,&nbsp; 
+    <a href="../man3/selinux_lsetfilecon_default.3.html">selinux_lsetfilecon_default(3)</a>,&nbsp; 
+    <a href="../man3/selinux_policy_root.3.html">selinux_policy_root(3)</a>,&nbsp; 
+    <a href="../man3/selinux_raw_context_to_color.3.html">selinux_raw_context_to_color(3)</a>,&nbsp; 
+    <a href="../man3/selinux_set_callback.3.html">selinux_set_callback(3)</a>,&nbsp; 
+    <a href="../man3/selinux_set_mapping.3.html">selinux_set_mapping(3)</a>,&nbsp; 
+    <a href="../man3/set_matchpathcon_flags.3.html">set_matchpathcon_flags(3)</a>,&nbsp; 
+    <a href="../man5/booleans.5.html">booleans(5)</a>,&nbsp; 
+    <a href="../man5/crontab.5.html">crontab(5)</a>,&nbsp; 
+    <a href="../man5/customizable_types.5.html">customizable_types(5)</a>,&nbsp; 
+    <a href="../man5/default_contexts.5.html">default_contexts(5)</a>,&nbsp; 
+    <a href="../man5/default_type.5.html">default_type(5)</a>,&nbsp; 
+    <a href="../man5/failsafe_context.5.html">failsafe_context(5)</a>,&nbsp; 
+    <a href="../man5/local.users.5.html">local.users(5)</a>,&nbsp; 
+    <a href="../man5/removable_context.5.html">removable_context(5)</a>,&nbsp; 
+    <a href="../man5/secolor.conf.5.html">secolor.conf(5)</a>,&nbsp; 
+    <a href="../man5/securetty_types.5.html">securetty_types(5)</a>,&nbsp; 
+    <a href="../man5/selabel_db.5.html">selabel_db(5)</a>,&nbsp; 
+    <a href="../man5/selabel_file.5.html">selabel_file(5)</a>,&nbsp; 
+    <a href="../man5/selabel_media.5.html">selabel_media(5)</a>,&nbsp; 
+    <a href="../man5/selabel_x.5.html">selabel_x(5)</a>,&nbsp; 
+    <a href="../man5/selinux_config.5.html">selinux_config(5)</a>,&nbsp; 
+    <a href="../man5/sepermit.conf.5.html">sepermit.conf(5)</a>,&nbsp; 
+    <a href="../man5/service_seusers.5.html">service_seusers(5)</a>,&nbsp; 
+    <a href="../man5/sestatus.conf.5.html">sestatus.conf(5)</a>,&nbsp; 
+    <a href="../man5/seusers.5.html">seusers(5)</a>,&nbsp; 
+    <a href="../man5/user_contexts.5.html">user_contexts(5)</a>,&nbsp; 
+    <a href="../man5/virtual_domain_context.5.html">virtual_domain_context(5)</a>,&nbsp; 
+    <a href="../man5/virtual_image_context.5.html">virtual_image_context(5)</a>,&nbsp; 
+    <a href="../man7/keyrings.7.html">keyrings(7)</a>,&nbsp; 
+    <a href="avcstat.8.html">avcstat(8)</a>,&nbsp; 
+    <a href="booleans.8.html">booleans(8)</a>,&nbsp; 
+    <a href="getenforce.8.html">getenforce(8)</a>,&nbsp; 
+    <a href="getsebool.8.html">getsebool(8)</a>,&nbsp; 
+    <a href="matchpathcon.8.html">matchpathcon(8)</a>,&nbsp; 
+    <a href="mount.8.html">mount(8)</a>,&nbsp; 
+    <a href="pam_selinux.8.html">pam_selinux(8)</a>,&nbsp; 
+    <a href="pam_sepermit.8.html">pam_sepermit(8)</a>,&nbsp; 
+    <a href="sefcontext_compile.8.html">sefcontext_compile(8)</a>,&nbsp; 
+    <a href="selinuxenabled.8.html">selinuxenabled(8)</a>,&nbsp; 
+    <a href="semanage.8.html">semanage(8)</a>,&nbsp; 
+    <a href="semanage-boolean.8.html">semanage-boolean(8)</a>,&nbsp; 
+    <a href="semanage-dontaudit.8.html">semanage-dontaudit(8)</a>,&nbsp; 
+    <a href="semanage-export.8.html">semanage-export(8)</a>,&nbsp; 
+    <a href="semanage-fcontext.8.html">semanage-fcontext(8)</a>,&nbsp; 
+    <a href="semanage-ibendport.8.html">semanage-ibendport(8)</a>,&nbsp; 
+    <a href="semanage-ibpkey.8.html">semanage-ibpkey(8)</a>,&nbsp; 
+    <a href="semanage-import.8.html">semanage-import(8)</a>,&nbsp; 
+    <a href="semanage-interface.8.html">semanage-interface(8)</a>,&nbsp; 
+    <a href="semanage-login.8.html">semanage-login(8)</a>,&nbsp; 
+    <a href="semanage-module.8.html">semanage-module(8)</a>,&nbsp; 
+    <a href="semanage-permissive.8.html">semanage-permissive(8)</a>,&nbsp; 
+    <a href="semanage-port.8.html">semanage-port(8)</a>,&nbsp; 
+    <a href="semanage-user.8.html">semanage-user(8)</a>,&nbsp; 
+    <a href="sestatus.8.html">sestatus(8)</a>,&nbsp; 
+    <a href="setenforce.8.html">setenforce(8)</a>,&nbsp; 
+    <a href="togglesebool.8.html">togglesebool(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

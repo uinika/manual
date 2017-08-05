@@ -1,0 +1,252 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>perror(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PERROR(3)                 Linux Programmer's Manual                PERROR(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       perror - print a system error message
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdio.h&gt;</b>
+
+       <b>void perror(const char *</b><i>s</i><b>);</b>
+
+       <b>#include &lt;errno.h&gt;</b>
+
+       <b>const char * const </b><i>sys_errlist</i><b>[];</b>
+       <b>int </b><i>sys_nerr</i><b>;</b>
+       <b>int </b><i><a href="errno.3.html">errno</a></i><b>;       </b>/* Not really declared this way; see errno(3) */
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <i>sys_errlist</i>, <i>sys_nerr</i>:
+           Since glibc 2.19:
+               _DEFAULT_SOURCE
+           Glibc 2.19 and earlier:
+               _BSD_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>perror</b>() function produces a message on standard error describing
+       the last error encountered during a call to a system or library
+       function.
+
+       First (if <i>s</i> is not NULL and <i>*s</i> is not a null byte ('\0')), the
+       argument string <i>s</i> is printed, followed by a colon and a blank.  Then
+       an error message corresponding to the current value of <i><a href="errno.3.html">errno</a></i> and a
+       new-line.
+
+       To be of most use, the argument string should include the name of the
+       function that incurred the error.
+
+       The global error list <i>sys_errlist</i>[], which can be indexed by <i><a href="errno.3.html">errno</a></i>,
+       can be used to obtain the error message without the newline.  The
+       largest message number provided in the table is <i>sys_nerr</i>-1.  Be
+       careful when directly accessing this list, because new error values
+       may not have been added to <i>sys_errlist</i>[].  The use of <i>sys_errlist</i>[]
+       is nowadays deprecated; use <a href="strerror.3.html">strerror(3)</a> instead
+
+       When a system call fails, it usually returns -1 and sets the variable
+       <i><a href="errno.3.html">errno</a></i> to a value describing what went wrong.  (These values can be
+       found in <i>&lt;errno.h&gt;</i>.)  Many library functions do likewise.  The
+       function <b>perror</b>() serves to translate this error code into human-
+       readable form.  Note that <i><a href="errno.3.html">errno</a></i> is undefined after a successful
+       system call or library function call: this call may well change this
+       variable, even though it succeeds, for example because it internally
+       used some other library function that failed.  Thus, if a failing
+       call is not immediately followed by a call to <b>perror</b>(), the value of
+       <i><a href="errno.3.html">errno</a></i> should be saved.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────┬───────────────┬─────────────────────┐
+       │<b>Interface </b>│ <b>Attribute     </b>│ <b>Value               </b>│
+       ├──────────┼───────────────┼─────────────────────┤
+       │<b>perror</b>()  │ Thread safety │ MT-Safe race:stderr │
+       └──────────┴───────────────┴─────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>perror</b>(), <i><a href="errno.3.html">errno</a></i>: POSIX.1-2001, POSIX.1-2008, C89, C99, 4.3BSD.
+
+       The externals <i>sys_nerr</i> and <i>sys_errlist</i> derive from BSD, but are not
+       specified in POSIX.1.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The externals <i>sys_nerr</i> and <i>sys_errlist</i> are defined by glibc, but in
+       <i>&lt;stdio.h&gt;</i>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="err.3.html">err(3)</a>, <a href="errno.3.html">errno(3)</a>, <a href="error.3.html">error(3)</a>, <a href="strerror.3.html">strerror(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2016-03-15                        PERROR(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="err.3.html">err(3)</a>,&nbsp; 
+    <a href="errno.3.html">errno(3)</a>,&nbsp; 
+    <a href="error.3.html">error(3)</a>,&nbsp; 
+    <a href="fmtmsg.3.html">fmtmsg(3)</a>,&nbsp; 
+    <a href="pmerrstr.3-2.html">pmerrstr(3)</a>,&nbsp; 
+    <a href="psignal.3.html">psignal(3)</a>,&nbsp; 
+    <a href="sd_journal_print.3.html">sd_journal_print(3)</a>,&nbsp; 
+    <a href="strerror.3.html">strerror(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="perror.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

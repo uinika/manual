@@ -1,0 +1,266 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dlsym(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">DLSYM(3)                  Linux Programmer's Manual                 DLSYM(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dlsym, dlvsym - obtain address of a symbol in a shared object or exe‐
+       cutable
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;dlfcn.h&gt;</b>
+
+       <b>void *dlsym(void *</b><i>handle</i><b>, const char *</b><i>symbol</i><b>);</b>
+
+       <b>#define _GNU_SOURCE</b>
+       <b>#include &lt;dlfcn.h&gt;</b>
+
+       <b>void *dlvsym(void *</b><i>handle</i><b>, char *</b><i>symbol</i><b>, char *</b><i>version</i><b>);</b>
+
+       Link with <i>-ldl</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The function <b>dlsym</b>() takes a "handle" of a dynamic loaded shared
+       object returned by <a href="dlopen.3.html">dlopen(3)</a> along with a null-terminated symbol
+       name, and returns the address where that symbol is loaded into
+       memory.  If the symbol is not found, in the specified object or any
+       of the shared objects that were automatically loaded by <a href="dlopen.3.html">dlopen(3)</a>
+       when that object was loaded, <b>dlsym</b>() returns NULL.  (The search
+       performed by <b>dlsym</b>() is breadth first through the dependency tree of
+       these shared objects.)
+
+       Since the value of the symbol could actually be NULL (so that a NULL
+       return from <b>dlsym</b>() need not indicate an error), the correct way to
+       test for an error is to call <a href="dlerror.3.html">dlerror(3)</a> to clear any old error
+       conditions, then call <b>dlsym</b>(), and then call <a href="dlerror.3.html">dlerror(3)</a> again, saving
+       its return value into a variable, and check whether this saved value
+       is not NULL.
+
+       There are two special pseudo-handles that may be specified in <i>handle</i>:
+
+       <b>RTLD_DEFAULT</b>
+              Find the first occurrence of the desired symbol using the
+              default shared object search order.  The search will include
+              global symbols in the executable and its dependencies, as well
+              as symbols in shared objects that were dynamically loaded with
+              the <b>RTLD_GLOBAL </b>flag.
+
+       <b>RTLD_NEXT</b>
+              Find the next occurrence of the desired symbol in the search
+              order after the current object.  This allows one to provide a
+              wrapper around a function in another shared object, so that,
+              for example, the definition of a function in a preloaded
+              shared object (see <b>LD_PRELOAD </b>in <a href="../man8/ld.so.8.html">ld.so(8)</a>) can find and invoke
+              the "real" function provided in another shared object (or for
+              that matter, the "next" definition of the function in cases
+              where there are multiple layers of preloading).
+
+       The <b>_GNU_SOURCE </b>feature test macro must be defined in order to obtain
+       the definitions of <b>RTLD_DEFAULT </b>and <b>RTLD_NEXT </b>from <i>&lt;dlfcn.h&gt;</i>.
+
+       The function <b>dlvsym</b>() does the same as <b>dlsym</b>() but takes a version
+       string as an additional argument.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, these functions return the address associated with
+       <i>symbol</i>.  On failure, they return NULL; the cause of the error can be
+       diagnosed using <a href="dlerror.3.html">dlerror(3)</a>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dlsym</b>() is present in glibc 2.0 and later.  <b>dlvsym</b>() first appeared
+       in glibc 2.1.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────────┬───────────────┬─────────┐
+       │<b>Interface         </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├──────────────────┼───────────────┼─────────┤
+       │<b>dlsym</b>(), <b>dlvsym</b>() │ Thread safety │ MT-Safe │
+       └──────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001 describes <b>dlsym</b>().  The <b>dlvsym</b>() function is a GNU
+       extension.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>History</b>
+       The <b>dlsym</b>() function is part of the dlopen API, derived from SunOS.
+       That system does not have <b>dlvsym</b>().
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       See <a href="dlopen.3.html">dlopen(3)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="dl_iterate_phdr.3.html">dl_iterate_phdr(3)</a>, <a href="dladdr.3.html">dladdr(3)</a>, <a href="dlerror.3.html">dlerror(3)</a>, <a href="dlinfo.3.html">dlinfo(3)</a>, <a href="dlopen.3.html">dlopen(3)</a>,
+       <a href="../man8/ld.so.8.html">ld.so(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-07-13                         DLSYM(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="dladdr.3.html">dladdr(3)</a>,&nbsp; 
+    <a href="dlerror.3.html">dlerror(3)</a>,&nbsp; 
+    <a href="dlinfo.3.html">dlinfo(3)</a>,&nbsp; 
+    <a href="dlopen.3.html">dlopen(3)</a>,&nbsp; 
+    <a href="../man7/rtld-audit.7.html">rtld-audit(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="dlsym.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

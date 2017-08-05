@@ -1,0 +1,436 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>mysql_upgrade(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#COPYRIGHT">COPYRIGHT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MYSQL_UPGRADE(1)           MariaDB Database System          MYSQL_UPGRADE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       mysql_upgrade - check tables for MariaDB upgrade
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mysql_upgrade [</b><i>options</i><b>]</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mysql_upgrade </b>examines all tables in all databases for
+       incompatibilities with the current version of the MariaDB Server.
+       <b>mysql_upgrade </b>also upgrades the system tables so that you can take
+       advantage of new privileges or capabilities that might have been
+       added.
+
+       <b>mysql_upgrade </b>should be executed each time you upgrade MariaDB.
+
+       If a table is found to have a possible incompatibility, <b>mysql_upgrade</b>
+       performs a table check. If any problems are found, a table repair is
+       attempted.
+
+           <b>Note</b>
+           On Windows Server 2008 and Windows Vista, you must run
+           <b>mysql_upgrade </b>with administrator privileges. You can do this by
+           running a Command Prompt as Administrator and running the
+           command. Failure to do so may result in the upgrade failing to
+           execute correctly.
+
+           <b>Caution</b>
+           You should always back up your current MariaDB installation
+           <i>before</i> performing an upgrade.
+
+       To use <b>mysql_upgrade</b>, make sure that the server is running, and then
+       invoke it like this:
+
+           shell&gt; <b>mysql_upgrade [</b><i>options</i><b>]</b>
+
+       After running <b>mysql_upgrade</b>, stop the server and restart it so that
+       any changes made to the system tables take effect.
+
+       <b>mysql_upgrade </b>executes the following commands to check and repair
+       tables and to upgrade the system tables:
+
+           mysqlcheck --all-databases --check-upgrade --auto-repair
+           mysql &lt; <i>fix_priv_tables</i>
+           mysqlcheck --all-databases --check-upgrade --fix-db-names --fix-table-names
+
+       Notes about the preceding commands:
+
+       ·   Because <b>mysql_upgrade </b>invokes <b>mysqlcheck </b>with the <b>--all-databases</b>
+           option, it processes all tables in all databases, which might
+           take a long time to complete. Each table is locked and therefore
+           unavailable to other sessions while it is being processed. Check
+           and repair operations can be time-consuming, particularly for
+           large tables.
+
+       ·   For details about what checks the <b>--check-upgrade </b>option entails,
+           see the description of the FOR UPGRADE option of the CHECK TABLE
+           statement.
+
+       ·   <i>fix_priv_tables</i> represents a script generated internally by
+           <b>mysql_upgrade </b>that contains SQL statements to upgrade the tables
+           in the mysql database.
+
+       All checked and repaired tables are marked with the current MariaDB
+       version number. This ensures that next time you run <b>mysql_upgrade</b>
+       with the same version of the server, it can tell whether there is any
+       need to check or repair the table again.
+
+       <b>mysql_upgrade </b>also saves the MariaDB version number in a file named
+       mysql_upgrade_info in the data directory. This is used to quickly
+       check whether all tables have been checked for this release so that
+       table-checking can be skipped. To ignore this file and perform the
+       check regardless, use the <b>--force </b>option.
+
+       If you install MariaDB from RPM packages on Linux, you must install
+       the server and client RPMs.  <b>mysql_upgrade </b>is included in the server
+       RPM but requires the client RPM because the latter includes
+       <b>mysqlcheck</b>.
+
+       <b>mysql_upgrade </b>supports the following options, which can be specified
+       on the command line or in the [mysql_upgrade] and [client] option
+       file groups. Other options are passed to <b>mysqlcheck</b>. For example, it
+       might be necessary to specify the <b>--password[=</b><i>password</i><b>] </b>option.
+       <b>mysql_upgrade </b>also supports the options for processing option files.
+
+       ·   <b>--help</b>, <b>-?</b>
+
+           Display a short help message and exit.
+
+       ·   <b>--basedir=</b><i>path</i>
+
+           Old option accepted for backward compatibility but ignored.
+
+       ·   <b>--character-sets-dir=</b><i>path</i>
+
+           Old option accepted for backward compatibility but ignored.
+
+       ·   <b>--datadir=</b><i>path</i>
+
+           Old option accepted for backward compatibility but ignored.
+
+       ·   <b>--debug=</b><i>path</i>, <b>-# </b><i>path</i>
+
+           For debug builds, output debug log.
+
+       ·   <b>--debug-check</b>
+
+           Print some debugging information when the program exits.
+
+       ·   <b>--debug-info</b>, <b>-T</b>
+
+           Print debugging information and memory and CPU usage statistics
+           when the program exits.
+
+       ·   <b>--default-character-set=</b><i>name</i>
+
+           Old option accepted for backward compatibility but ignored.
+
+       ·   <b>--force</b>
+
+           Ignore the mysql_upgrade_info file and force execution of
+           <b>mysqlcheck </b>even if <b>mysql_upgrade </b>has already been executed for
+           the current version of MariaDB.
+
+       ·   <b>--host</b>
+
+           Connect to MariaDB on the given host.
+
+       ·   <b>--password[=</b><i>password</i><b>]</b>, <b>-p[</b><i>password</i><b>]</b>
+
+           The password to use when connecting to the server. If you use the
+           short option form (<b>-p</b>), you <i>cannot</i> have a space between the
+           option and the password. If you omit the <i>password</i> value following
+           the <b>--password </b>or <b>-p </b>option on the command line, <b>mysql_upgrade</b>
+           prompts for one.
+
+           Specifying a password on the command line should be considered
+           insecure. You can use an option file to avoid giving the password
+           on the command line.
+
+       ·   <b>--port=</b><i>port_num</i>, <b>-P </b><i>port_num</i>
+
+           The TCP/IP port number to use for the connection.
+
+       ·   <b>--protocol={TCP|SOCKET|PIPE|MEMORY}</b>
+
+           The connection protocol to use for connecting to the server. It
+           is useful when the other connection parameters normally would
+           cause a protocol to be used other than the one you want.
+
+       ·   <b>--silent</b>
+
+           Print less information.
+
+       ·   <b>--socket=</b><i>path</i>, <b>-S </b><i>path</i>
+
+           For connections to localhost, the Unix socket file to use, or, on
+           Windows, the name of the named pipe to use.
+
+       ·   <b>--ssl</b>
+
+           Enable SSL for connection (automatically enabled with other
+           flags). Disable with <b>--skip-ssl</b>.
+
+       ·   <b>--ssl-ca=</b><i>name</i>
+
+           CA file in PEM format (check OpenSSL docs, implies <b>--ssl</b>).
+
+       ·   <b>--ssl-capath=</b><i>name</i>
+
+           CA directory (check OpenSSL docs, implies <b>--ssl</b>).
+
+       ·   <b>--ssl-cert=</b><i>name</i>
+
+           X509 cert in PEM format (check OpenSSL docs, implies <b>--ssl</b>).
+
+       ·   <b>--ssl-cipher=</b><i>name</i>
+
+           SSL cipher to use (check OpenSSL docs, implies <b>--ssl</b>).
+
+       ·   <b>--ssl-key=</b><i>name</i>
+
+           X509 key in PEM format (check OpenSSL docs, implies <b>--ssl</b>).
+
+       ·   <b>--ssl-crl=</b><i>name</i>
+
+           Certificate revocation list (check OpenSSL docs, implies <b>--ssl</b>).
+
+       ·   <b>--ssl-crlpath=</b><i>name</i>
+
+           Certificate revocation list path (check OpenSSL docs, implies
+           <b>--ssl</b>).
+
+       ·   <b>--ssl-verify-server-cert</b>
+
+           Verify server's "Common Name" in its cert against hostname used
+           when connecting. This option is disabled by default.
+
+       ·   <b>--tmpdir=</b><i>path</i>, <b>-t </b><i>path</i>
+
+           The path name of the directory to use for creating temporary
+           files.
+
+       ·   <b>--upgrade-system-tables</b>, <b>-s</b>
+
+           Only upgrade the system tables in the mysql database. Tables in
+           other databases are not checked or touched.
+
+       ·   <b>--user=</b><i>user_name</i>, <b>-u </b><i>user_name</i>
+
+           The MariaDB user name to use when connecting to the server and
+           not using the current login.
+
+       ·   <b>--verbose</b>
+
+           Display more output about the process. Using it twice will print
+           connection arguments; using it 3 times will print out all CHECK,
+           RENAME and ALTER TABLE commands used during the check phase;
+           using it 4 times (added in MariaDB 10.0.14) will also write out
+           all mysqlcheck commands used.
+
+       ·   <b>--version</b>, <b>-V</b>
+
+           Output version information and exit.
+
+       ·   <b>--version-check</b>, <b>-k</b>
+
+           Run this program only if its 'server version' matches the version
+           of the server to which it's connecting. Note: the 'server
+           version' of the program is the version of the MariaDB server with
+           which it was built/distributed. Defaults to on; use
+           <b>--skip-version-check </b>to disable.
+
+       ·   <b>--write-binlog</b>
+
+           Cause binary logging to be enabled while <b>mysql_upgrade </b>runs. This
+           is the default behavior; to disable binary logging during the
+           upgrade, use the inverse of this option (that is, start the
+           program with <b>--skip-write-binlog</b>).
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Copyright 2007-2008 MySQL AB, 2008-2010 Sun Microsystems, Inc.,
+       2010-2015 MariaDB Foundation
+
+       This documentation is free software; you can redistribute it and/or
+       modify it only under the terms of the GNU General Public License as
+       published by the Free Software Foundation; version 2 of the License.
+
+       This documentation is distributed in the hope that it will be useful,
+       but WITHOUT ANY WARRANTY; without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+       General Public License for more details.
+
+       You should have received a copy of the GNU General Public License
+       along with the program; if not, write to the Free Software
+       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+       02110-1301 USA or see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For more information, please refer to the MariaDB Knowledge Base,
+       available online at <a href="https://mariadb.com/kb/">https://mariadb.com/kb/</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       MariaDB Foundation (<a href="http://www.mariadb.org/">http://www.mariadb.org/</a>).
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>MariaDB</i> (MariaDB database server) project.
+       Information about the project can be found at ⟨<a href="http://mariadb.org/">http://mariadb.org/</a>⟩.
+       If you have a bug report for this manual page, see 
+       ⟨<a href="https://mariadb.com/kb/en/mariadb/reporting-bugs/">https://mariadb.com/kb/en/mariadb/reporting-bugs/</a>⟩.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/MariaDB/server">https://github.com/MariaDB/server</a>⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">MariaDB 10.1                     14/12/2015                 MYSQL_UPGRADE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

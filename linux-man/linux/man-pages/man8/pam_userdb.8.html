@@ -1,0 +1,273 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pam_userdb(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#MODULE_TYPES_PROVIDED">MODULE&nbsp;TYPES&nbsp;PROVIDED</a> | <a href="#RETURN_VALUES">RETURN&nbsp;VALUES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PAM_USERDB(8)                 Linux-PAM Manual                 PAM_USERDB(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_userdb - PAM module to authenticate against a db database
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pam_userdb.so </b>db=<i>/path/database</i> [debug] [crypt=[crypt|none]] [icase]
+                     [dump] [try_first_pass] [use_first_pass] [unknown_ok]
+                     [key_only]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The pam_userdb module is used to verify a username/password pair
+       against values stored in a Berkeley DB database. The database is
+       indexed by the username, and the data fields corresponding to the
+       username keys are the passwords.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>crypt=[crypt|none]</b>
+           Indicates whether encrypted or plaintext passwords are stored in
+           the database. If it is <b>crypt</b>, passwords should be stored in the
+           database in <a href="../man3/crypt.3.html">crypt(3)</a> form. If <b>none </b>is selected, passwords should
+           be stored in the database as plaintext.
+
+       <b>db=</b><i>/path/database</i>
+           Use the /path/database database for performing lookup. There is
+           no default; the module will return <b>PAM_IGNORE </b>if no database is
+           provided. Note that the path to the database file should be
+           specified without the .db suffix.
+
+       <b>debug</b>
+           Print debug information.
+
+       <b>dump</b>
+           Dump all the entries in the database to the log. Don't do this by
+           default!
+
+       <b>icase</b>
+           Make the password verification to be case insensitive (ie when
+           working with registration numbers and such). Only works with
+           plaintext password storage.
+
+       <b>try_first_pass</b>
+           Use the authentication token previously obtained by another
+           module that did the conversation with the application. If this
+           token can not be obtained then the module will try to converse.
+           This option can be used for stacking different modules that need
+           to deal with the authentication tokens.
+
+       <b>use_first_pass</b>
+           Use the authentication token previously obtained by another
+           module that did the conversation with the application. If this
+           token can not be obtained then the module will fail. This option
+           can be used for stacking different modules that need to deal with
+           the authentication tokens.
+
+       <b>unknown_ok</b>
+           Do not return error when checking for a user that is not in the
+           database. This can be used to stack more than one pam_userdb
+           module that will check a username/password pair in more than a
+           database.
+
+       <b>key_only</b>
+           The username and password are concatenated together in the
+           database hash as 'username-password' with a random value. if the
+           concatenation of the username and password with a dash in the
+           middle returns any result, the user is valid. this is useful in
+           cases where the username may not be unique but the username and
+           password pair are.
+</pre>
+<h2><a id="MODULE_TYPES_PROVIDED" href="#MODULE_TYPES_PROVIDED"></a>MODULE TYPES PROVIDED  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>auth </b>and <b>account </b>module types are provided.
+</pre>
+<h2><a id="RETURN_VALUES" href="#RETURN_VALUES"></a>RETURN VALUES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       PAM_AUTH_ERR
+           Authentication failure.
+
+       PAM_AUTHTOK_RECOVERY_ERR
+           Authentication information cannot be recovered.
+
+       PAM_BUF_ERR
+           Memory buffer error.
+
+       PAM_CONV_ERR
+           Conversation failure.
+
+       PAM_SERVICE_ERR
+           Error in service module.
+
+       PAM_SUCCESS
+           Success.
+
+       PAM_USER_UNKNOWN
+           User not known to the underlying authentication module.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           auth  sufficient pam_userdb.so icase db=/etc/dbtest
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man3/crypt.3.html">crypt(3)</a>, <a href="../man5/pam.conf.5.html">pam.conf(5)</a>, <a href="../man5/pam.d.5.html">pam.d(5)</a>, <a href="pam.8-2.html">pam(8)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_userdb was written by Cristian Gafton &gt;gafton@redhat.com&lt;.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>linux-pam</i> (Pluggable Authentication Modules
+       for Linux) project.  Information about the project can be found at 
+       ⟨<a href="http://www.linux-pam.org/">http://www.linux-pam.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨//www.linux-pam.org/⟩.  This page was obtained from the
+       tarball Linux-PAM-1.3.0.tar.gz fetched from 
+       ⟨<a href="http://www.linux-pam.org/library/">http://www.linux-pam.org/library/</a>⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Linux-PAM Manual                 04/01/2016                    PAM_USERDB(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,233 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dpkg-mergechangelogs(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#LIMITATIONS">LIMITATIONS</a> | <a href="#INTEGRATION_WITH_GIT">INTEGRATION&nbsp;WITH&nbsp;GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">dpkg-mergechangelogs(1)          dpkg suite          dpkg-mergechangelogs(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dpkg-mergechangelogs - 3-way merge of debian/changelog files
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dpkg-mergechangelogs </b>[<i>option</i>...] <i>old new-a new-b</i> [<i>out</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This program will use the 3 provided versions of the Debian changelog
+       to generate a merged changelog file. The resulting changelog is
+       stored in the file <i>out</i> or output to the standard output if that
+       parameter is not given.
+
+       Each entry is identified by its version number and they are assumed
+       to be not conflicting, they are simply merged in the right order (by
+       decreasing version number). When <b>--merge-prereleases </b>is used, the
+       part of the version number after the last tilde is dropped so that
+       1.0-1~exp1 and 1.0-1~exp5 are considered to be the same entry. When
+       the same version is available in both <i>new-a</i> and <i>new-b</i>, a standard
+       line-based 3-way merge is attempted (provided that the module
+       Algorithm::Merge is available — it's part of the package
+       libalgorithm-merge-perl — otherwise you get a global conflict on the
+       content of the entry).
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-m</b>, <b>--merge-prereleases</b>
+              Drop the part after the last tilde in the version number when
+              doing version comparison to identify if two entries are
+              supposed to be the same or not.
+
+              This is useful when you keep using the same changelog entry
+              but you increase its version number regularly. For instance,
+              you might have 2.3-1~exp1, 2.3-1~exp2, ... until the official
+              release 2.3-1 and they are all the same changelog entry that
+              has evolved over time.
+
+       <b>--help </b>Show the usage message and exit.
+
+       <b>--version</b>
+              Show the version and exit.
+</pre>
+<h2><a id="LIMITATIONS" href="#LIMITATIONS"></a>LIMITATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Anything that is not parsed by Dpkg::Changelog is lost during the
+       merge.  This might include stuff like vim modelines, comments which
+       were not supposed to be there, etc.
+</pre>
+<h2><a id="INTEGRATION_WITH_GIT" href="#INTEGRATION_WITH_GIT"></a>INTEGRATION WITH GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If you want to use this program to merge Debian changelog files in a
+       git repository, you have first to register a new merge driver in
+       <b>.git/config </b>or <b>~/.gitconfig</b>:
+
+        [merge "dpkg-mergechangelogs"]
+            name = debian/changelog merge driver
+            driver = dpkg-mergechangelogs -m %O %A %B %A
+
+       Then you have to setup the merge attribute for the debian/changelog
+       file either in <b>.gitattributes </b>in the repository itself, or in
+       <b>.git/info/attributes</b>:
+
+        debian/changelog merge=dpkg-mergechangelogs
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01          dpkg-mergechangelogs(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

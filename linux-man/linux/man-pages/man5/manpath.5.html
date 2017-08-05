@@ -1,0 +1,292 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>manpath(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FORMAT">FORMAT</a> | <a href="#BUGS">BUGS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MANPATH(5)               /usr/local/etc/man_db.conf               MANPATH(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       manpath - format of the /usr/local/etc/man_db.conf file
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The manpath configuration file is used by the manual page utilities
+       to assess users' manpaths at run time, to indicate which manual page
+       hierarchies (manpaths) are to be treated as system hierarchies and to
+       assign them directories to be used for storing cat files.
+
+       If the environment variable $<b>MANPATH </b>is already set, the information
+       contained within /usr/local/etc/man_db.conf will not override it.
+</pre>
+<h2><a id="FORMAT" href="#FORMAT"></a>FORMAT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following field types are currently recognised:
+
+       <b># </b><i>comment</i>
+              Blank lines or those beginning with a <b># </b>will be treated as
+              comments and ignored.
+
+       <b>MANDATORY_MANPATH </b><i>manpath_element</i>
+              Lines of this form indicate manpaths that every automatically
+              generated $<b>MANPATH </b>should contain.  This will typically
+              include <i>/usr/man</i>.
+
+       <b>MANPATH_MAP </b><i>path_element manpath_element</i>
+              Lines of this form set up $<b>PATH </b>to $<b>MANPATH </b>mappings.  For
+              each <i>path_element</i> found in the user's $<b>PATH</b>, <i>manpath_element</i>
+              will be added to the $<b>MANPATH</b>.
+
+       <b>MANDB_MAP </b><i>manpath_element</i> [ <i>catpath_element</i> ]
+              Lines of this form indicate which manpaths are to be treated
+              as system manpaths, and optionally where their cat files
+              should be stored.  This field type is particularly important
+              if <b>man </b>is a setuid program, as (when in the system
+              configuration file /usr/local/etc/man_db.conf rather than the
+              per-user configuration file .manpath) it indicates which
+              manual page hierarchies to access as the setuid user and which
+              as the invoking user.
+
+              The system manual page hierarchies are usually those stored
+              under <i>/usr</i> such as <i>/usr/man</i>, <i>/usr/local/man</i> and
+              <i>/usr/X11R6/man</i>.
+
+              If cat pages from a particular <i>manpath_element</i> are not to be
+              stored or are to be stored in the traditional location,
+              <i>catpath_element</i> may be omitted.
+
+              Traditional cat placement would be impossible for read only
+              mounted manual page hierarchies and because of this it is
+              possible to specify any valid directory hierarchy for their
+              storage.  To observe the <b>Linux FSSTND </b>the keyword `<b>FSSTND </b>can
+              be used in place of an actual directory.
+
+              Unfortunately, it is necessary to specify <b>all </b>system man tree
+              paths, including alternate operating system paths such as
+              <i>/usr/man/sun</i> and any <b>NLS locale </b>paths such as
+              <i>/usr/man/de_DE.88591</i>.
+
+              As the information is parsed line by line in the order
+              written, it is necessary for any manpath that is a sub-
+              hierarchy of another hierarchy to be listed first, otherwise
+              an incorrect match will be made.  An example is that
+              <i>/usr/man/de_DE.88591</i> must come before <i>/usr/man</i>.
+
+       <b>DEFINE </b><i>key value</i>
+              Lines of this form define miscellaneous configuration
+              variables; see the default configuration file for those
+              variables used by the manual pager utilities.  They include
+              default paths to various programs (such as <i>grep</i> and <i>tbl</i>), and
+              default sets of arguments to those programs.
+
+       <b>SECTION </b><i>section</i> ...
+              Lines of this form define the order in which manual sections
+              should be searched.  If there are no <b>SECTION </b>directives in the
+              configuration file, the default is:
+
+                     SECTION 1 n l 8 3 0 2 5 4 9 6 7
+
+              If multiple <b>SECTION </b>directives are given, their section lists
+              will be concatenated.
+
+              If a particular extension is not in this list (say, 1mh) it
+              will be displayed with the rest of the section it belongs to.
+              The effect of this is that you only need to explicitly list
+              extensions if you want to force a particular order.  Sections
+              with extensions should usually be adjacent to their main
+              section (e.g. "1 1mh 8 ...").
+
+              <b>SECTIONS </b>is accepted as an alternative name for this
+              directive.
+
+       <b>MINCATWIDTH </b><i>width</i>
+              If the terminal width is less than <i>width</i>, cat pages will not
+              be created (if missing) or displayed.  The default is 80.
+
+       <b>MAXCATWIDTH </b><i>width</i>
+              If the terminal width is greater than <i>width</i>, cat pages will
+              not be created (if missing) or displayed.  The default is 80.
+
+       <b>CATWIDTH </b><i>width</i>
+              If <i>width</i> is non-zero, cat pages will always be formatted for a
+              terminal of the given width, regardless of the width of the
+              terminal actually being used.  This should generally be within
+              the range set by <b>MINCATWIDTH </b>and <b>MAXCATWIDTH</b>.
+
+       <b>NOCACHE</b>
+              This flag prevents <a href="../man1/man.1.html">man(1)</a> from creating cat pages
+              automatically.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Unless the rules above are followed and observed precisely, the
+       manual pager utilities will not function as desired.  The rules are
+       overly complicated.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>man-db</i> (manual pager suite) project.
+       Information about the project can be found at 
+       ⟨<a href="http://www.nongnu.org/man-db/">http://www.nongnu.org/man-db/</a>⟩.  If you have a bug report for this
+       manual page, send it to man-db-devel@nongnu.org.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨<a href="http://git.savannah.gnu.org/r/man-db.git">http://git.savannah.gnu.org/r/man-db.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">2.7.6.1                          2016-12-12                       MANPATH(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/man.1.html">man(1)</a>,&nbsp; 
+    <a href="../man8/catman.8.html">catman(8)</a>,&nbsp; 
+    <a href="../man8/mandb.8.html">mandb(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

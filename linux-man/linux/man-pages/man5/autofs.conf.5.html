@@ -1,0 +1,645 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>autofs.conf(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SECTION_autofs_CONFIGURATION_OPTIONS">SECTION&nbsp;autofs&nbsp;CONFIGURATION&nbsp;OPTIONS</a> | <a href="#SECTION_amd_CONFIGURATION_OPTIONS">SECTION&nbsp;amd&nbsp;CONFIGURATION&nbsp;OPTIONS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">AUTOFS.CONF(23 Jan 2014)                            AUTOFS.CONF(23 Jan 2014)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       autofs.conf - autofs configuration
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Configuration settings used by <a href="../man8/automount.8.html">automount(8)</a> may be changed in the
+       configuration file <b>@mapdir@/autofs.conf</b>.
+
+       This file contains two primary sections, <b>autofs </b>and <b>amd</b>.
+
+       Configuration entries may be present at the beginning of the
+       configuration file without a section header and are implicitly
+       included as part of the <b>autofs </b>section.
+
+       Each section name is enclosed in square brackets with spaces between
+       the brackets and the section name. The <b>amd </b>section may be followed by
+       further sections, named by the top level mount point path, that
+       contain per mount configuration settings.
+</pre>
+<h2><a id="SECTION_autofs_CONFIGURATION_OPTIONS" href="#SECTION_autofs_CONFIGURATION_OPTIONS"></a>SECTION autofs CONFIGURATION OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Configuration settings available are:
+
+       <b>timeout</b>
+              Sets the default mount timeout in seconds. The internal
+              program default is 10 minutes, but the default installed
+              configuration overrides this and sets the timeout to 5 minutes
+              to be consistent with earlier autofs releases.
+
+       <b>master_wait</b>
+              sets the default maximum time to wait for the master map to
+              become available if it cannot be read at program start
+              (program default 10, wait for 10 seconds then continue).
+
+       <b>negative_timeout</b>
+              Set the default timeout for caching failed key lookups
+              (program default 60). If the equivalent command line option is
+              given it will override this setting.
+
+       <b>mount_wait</b>
+              Set the default time to wait for a response from a spawned
+              mount(8) before sending it a SIGTERM. Note that we still need
+              to wait for the RPC layer to timeout before the sub-process
+              exits so this isn't ideal but it is the best we can do. The
+              default is to wait until mount(8) returns without
+              intervention.
+
+       <b>umount_wait</b>
+              Set the default time to wait for a response from a spawned
+              umount(8) before sending it a SIGTERM. Note that we still need
+              to wait for the RPC layer to timeout before the sub-process
+              exits so this isn't ideal but it is the best we can do.
+
+       <b>browse_mode</b>
+              Maps are browsable by default (program default "yes").
+
+       <b>mount_nfs_default_protocol</b>
+              Specify the default protocol used by <a href="../man8/mount.nfs.8.html">mount.nfs(8)</a> (program
+              default 3). Since we can't identify this default automatically
+              we need to set it in the autofs configuration.
+
+       <b>append_options</b>
+              Determine whether global options, given on the command line or
+              per mount in the master map, are appended to map entry options
+              or if the map entry options replace the global options
+              (program default "yes", append options).
+
+       <b>logging</b>
+              set default log level "none", "verbose" or "debug" (program
+              default "none").
+
+       <b>force_standard_program_map_env</b>
+              override the use of a prefix with standard environment
+              variables when a program map is executed. Since program maps
+              are run as the privileded user setting these standard
+              environment variables opens automount(8) to potential user
+              privilege escalation when the program map is written in a
+              language that can load components from, for example, a user
+              home directory (program default "no").
+
+       <b>map_hash_table_size</b>
+              This configuration option may be used to change the number of
+              hash table slots (default 1024).
+
+              This configuration option affects the overhead of searching
+              the map entry cache for map entries when there are a large
+              number of entries.  It affects the number of entries that must
+              be looked at to locate a map entry in the map entry cache. For
+              example, the default of 1024 and a direct map with 8000
+              entries would result in each slot containing an average of 8
+              entries, which should be acceptable.
+
+              However, if excessive CPU usage is observed during automount
+              lookups increasing this option can reduce the CPU overhead
+              considerably becuase it reduces the length of the search
+              chains.
+
+              Note that the number of entries in a map doesn't necessarily
+              relate to the number of entries used in the map entry cache.
+
+              There are three distinct cases, direct maps and indirect maps
+              that use the "browse" option must be read in their entirity at
+              program start so, in these two cases the map size does retate
+              directly to the map entry cache size.
+
+              For indirect maps that do not use the "browse" option entries
+              are added to the map entry cache at lookup so the number of
+              active cache entries, in this case, is usually much less than
+              the number of entries in the map. In this last case it would
+              be unusual for the map entry cache to grow large enough to
+              warrant increasing the default before an event that cleans
+              stale entries, a map re-read for example.
+
+       <b>use_hostname_for_mounts</b>
+              NFS mounts where the host name resolves to more than one IP
+              address are probed for availability and to establish the order
+              in which mounts to them should be tried. To ensure that mount
+              attempts are made only to hosts that are responding and are
+              tried in the order of hosts with the quickest response the IP
+              address of the host needs to be used for the mount.
+
+              If it is necessary to use the hostname given in the map entry
+              for the mount regardless, then set this option to "yes".
+
+              Be aware that if this is done there is no defense against the
+              host name resolving to one that isn't responding and while the
+              number of attempts at a successful mount will correspond to
+              the number of addresses the host name resolves to the order
+              will also not correspond to fastest responding hosts.
+
+       <b>disable_not_found_message</b>
+              The original request to add this log message needed it to be
+              unconditional.  That produces, IMHO, unnecessary noise in the
+              log so a configuration option has been added to provide the
+              ability to turn it off. The default is "no" to maintain the
+              current behaviour.
+
+       <b>sss_master_map_wait</b>
+              Set the time to wait and retry if sssd returns "no such entry"
+              when starting up. When sssd is starting up it can sometimes
+              return "no such entry" for a short time until it has read in
+              the LDAP map information. Default is 0 seconds, don't wait.
+
+       <b>use_mount_request_log_id</b>
+              Set whether to use a mount request log id so that log entries
+              for specific mount requests can be easily identified in logs
+              that have multiple conncurrent requests. Default is don't use
+              mount request log ids.
+
+   <b>LDAP Configuration</b>
+       Configuration settings available are:
+
+       <b>ldap_timeout</b>
+              Set the network response timeout (default 8).  Set timeout
+              value for the synchronous API  calls. The default is the LDAP
+              library default of an infinite timeout.
+
+       <b>ldap_network_timeout</b>
+              Set the network response timeout (default 8).
+
+       <b>ldap_uri</b>
+              A space separated list of server uris of the form
+              &lt;proto&gt;://&lt;server&gt;[/] where &lt;proto&gt; can be ldap or ldaps. The
+              option can be given multiple times.  Map entries that include
+              a server name override this option and it is then not used.
+              Default is an empty list in which case either the server given
+              in a map entry or the LDAP configured default is used. This
+              uri list is read at startup and whenever the daemon receives a
+              HUP signal.
+
+              This configuration option can also be used to request autofs
+              lookup SRV RRs for a domain of the form &lt;proto&gt;:///[&lt;domain
+              dn&gt;]. Note that a trailing "/" is not allowed when using this
+              form. If the domain dn is not specified the dns domain name
+              (if any) is used to construct the domain dn for the SRV RR
+              lookup. The server list returned from an SRV RR lookup is
+              refreshed according to the minimum ttl found in the SRV RR
+              records or after one hour, whichever is less.
+
+       <b>search_base</b>
+              The base dn to use when searching for amap base dn. This entry
+              may be given multiple times and each will be checked for a map
+              base dn in the order they occur in the configuration. The
+              search base list is read at startup and whenever the daemon
+              recieves a HUP signal.
+
+       <b>map_object_class</b>
+              The map object class. In the <b>nisMap </b>schema this corresponds to
+              the class <b>nisMap </b>and in the <b>automountMap </b>schema it corresponds
+              to the class <b>automountMap</b>.
+
+       <b>entry_object_class</b>
+              The map entry object class. In the <b>nisMap </b>schema this
+              corresponds to the class <b>nisObject </b>and in the <b>automountMap</b>
+              schema it corresponds to the class <b>automount</b>.
+
+       <b>map_attribute</b>
+              The attribute used to identify the name of the map to which
+              this entry belongs.  In the <b>nisMap </b>schema this corresponds to
+              the attribute <b>nisMapName </b>and in the <b>automountMap </b>schema it
+              corresponds to the attribute <b>ou </b>or <b>automountMapName</b>.
+
+       <b>entry_attribute</b>
+              The attribute used to identify a map key. In the <b>nisMap </b>schema
+              this corresponds to the attribute <b>cn </b>and in the <b>automountMap</b>
+              schema it corresponds to the attribute <b>automountKey</b>.
+
+       <b>value_attribute</b>
+              The attribute used to identify the value of the map entry. In
+              the <b>nisMap </b>schema this corresponds to the attribute
+              <b>nisMapEntry </b>and in the <b>automountMap </b>schema it corresponds to
+              the attribute <b>automountInformation</b>.
+
+       <b>NOTE:  </b>It is essential that entries use class and attribute in a
+              consistent manner for correct operation of autofs. For example
+              mixing <b>cn </b>and <b>automountKey </b>attributes in <b>automount </b>schema will
+              not work as expected.
+
+       <b>auth_conf_file</b>
+              This configuration option may be used to specify an alternate
+              location for the ldap authentication configuration file. See
+              <a href="autofs_ldap_auth.conf.5.html">autofs_ldap_auth.conf(5)</a> for more information.
+</pre>
+<h2><a id="SECTION_amd_CONFIGURATION_OPTIONS" href="#SECTION_amd_CONFIGURATION_OPTIONS"></a>SECTION amd CONFIGURATION OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A number of the amd configuration options are not used by autofs,
+       some because they are not relevant within autofs, some because they
+       are done differently in autofs and others that are not yet
+       implemented.
+
+       Since <b>mount_type </b>is always autofs (because there's no user space NFS
+       server) the configuration entries relating to that aren't used.
+       Also, server availability is done differently within autofs so the
+       options that relate to the amd server monitoring sub-system are also
+       not used.
+
+       These options are <b>mount_type</b>, <b>auto_attrcache</b>, <b>portmap_program</b>,
+       <b>nfs_vers_ping</b>, <b>nfs_allow_any_interface</b>, <b>nfs_allow_insecure_port</b>,
+       <b>nfs_proto</b>, <b>nfs_retransmit_counter</b>, <b>nfs_retransmit_counter_udp</b>,
+       <b>nfs_retransmit_counter_tcp</b>, <b>nfs_retransmit_counter_toplvl</b>,
+       <b>nfs_retry_interval</b>, <b>nfs_retry_interval_udp</b>, <b>nfs_retry_interval_tcp</b>,
+       <b>nfs_retry_interval_toplvl </b>and <b>nfs_vers</b>.
+
+       Other options that are not used within the autofs implementation:
+
+       <b>log_file</b>, <b>truncate_log</b>
+              sends its output to syslog so an alternate log file (or
+              truncating the log) can't be used.
+
+       <b>print_pid</b>
+              There's no corresponding option for this within autofs.
+
+       <b>use_tcpwrappers</b>, <b>show_statfs_entries</b>
+              There's no user space NFS server to control access to so this
+              option isn't relevant. The show_statfs_entries can't be
+              implemented for the same reason.
+
+       <b>debug_mtab_file</b>
+              There's no user space NFS server and autofs avoids using file
+              based mtab whenever possible.
+
+       <b>sun_map_syntax</b>
+              Sun map format is handled by autofs itself.
+
+       <b>plock</b>, <b>show_statfs_entries</b>, <b>preferred_amq_port</b>
+              Are not supported by autofs.
+
+       <b>ldap_cache_maxmem</b>, <b>ldap_cache_seconds</b>
+              External ldap caching is not used by autofs.
+
+       <b>ldap_proto_version</b>
+              autofs always attempts to use the highest available ldap
+              protocol version.
+
+       <b>cache_duration</b>, <b>map_reload_interval</b>, <b>map_options</b>
+              The map   entry cache is continually updated and stale entries
+              cleaned on re-load, which is done when map changes are
+              detected so these configuration entries are not used by
+              autofs. An exception to this is the case where the map is
+              large. In this case it may be necessary to read the whole map
+              at startup even if browsing is is not enabled. Adding the
+              cache:=all option to map_options can be used to for this.
+
+       <b>localhost_address</b>
+              This is not used within autofs. This configuration option was
+              only used in the amd user space server code and is not
+              relevant within autofs.
+
+       Options that are handled differently within autofs:
+
+       <b>pid_file</b>
+              To specify a pid file name a command line option must be used
+              on startup.
+
+       <b>print_version</b>
+              Program version and feature information is obtained by using
+              the automount command line option "-V".
+
+       <b>debug_options ,  log_options</b>
+              autofs has somewhat more limited logging and debug logging
+              options.  When the log_options options is encountered it is
+              converted to the nearest matching autofs logging option. Since
+              the configuration option debug_options would be handled the
+              same way it is ignored.
+
+       <b>restart_mounts</b>
+              This option has no sensible meaning within autofs because
+              autofs always tries to re-connect to existing mounts. While
+              this has its own set of problems not re-connecting to existing
+              mounts always results in a non-functional automount tree if
+              mounts were busy at the last shutdown (as is also the case
+              with amd when using mount_type autofs).
+
+       <b>forced_unmounts</b>
+              Detaching mounts often causes serious problems for users of
+              existing mounts. It is used by autofs in some cases, either at
+              the explicit request of the user (with a command line or init
+              option) and in some special cases during program operation but
+              is avoided whenever possible.
+
+       A number of configuration options are not yet implemented:
+
+       <b>search_path</b>
+              Always a little frustrating, the compiled in map location
+              should be used to locate maps but isn't in some cases. This
+              requires work within autofs itself and that will (obviously)
+              include implementing this configuration option for the amd map
+              parser as well.
+
+       <b>fully_qualified_hosts</b>
+              Not yet implemented.
+
+       <b>unmount_on_exit</b>
+              Since autofs always tries to re-connect to mounts left mounted
+              from a previous shutdown this is a sensible option to
+              implement and that will be done.
+
+       <b>browsable_dirs</b>
+              Allow map keys to be shown in directory listings. This option
+              can have values of "yes" or "no". The default is "no". A
+              variation of this option, "browsable", can be used as a pseudo
+              mount option in type "auto" map entries to provide provide
+              browsing funtionality in sub-mounts. The amd "browsable_dirs =
+              full" option cannot be implemented within the current autofs
+              framework and is not supported.
+
+       <b>exec_map_timeout</b>
+              A timeout is not currently used for for program maps, might be
+              implemented.
+
+       <b>tag</b>
+              The tag option is not implemented within autofs.
+
+       Supported options:
+
+       <b>arch</b>, <b>karch</b>, <b>os</b>, <b>osver</b>
+              These options default to what is returned from uname(2) and
+              can be overridden if required.
+
+       <b>full_os</b>
+              This option has no default and must be set in the
+              configuration if used in maps.
+
+       <b>cluster</b>
+              If not set defaults to the host domain name. This option
+              corresponds to the HP_UX cluster name (according to the amd
+              source) and is probably not used in Linux but is set anyway.
+
+       <b>vendor </b>This option has a default value of "unknown", it must be set
+              in the configuration if used in maps.
+
+       <b>auto_dir</b>
+              Is the base name of the mount tree used for external mounts
+              that are sometimes needed by amd maps. Its default value is
+              "/a".
+
+       <b>map_type</b>
+              Specifies the autofs map source, such as file, nis, ldap etc.
+              and has no default value set.
+
+       <b>map_defaults</b>
+              This option is used to override /defaults entries within maps
+              and can be used to provide different defaults on specific
+              machines without having to modify centrally managed maps. It
+              is empty by default.
+
+       <b>search_path</b>
+              Colon separated paths to search for maps that are not
+              specified as a full path.
+
+       <b>dismount_interval</b>
+              Is equivalent to the autofs timeout option. It is only
+              possible to use this with type "auto" mounts due to the way
+              the autofs kernel module performs expiry. It takes its default
+              value from the autofs internal defaulti of 600 seconds.
+
+       <b>autofs_use_lofs</b>
+              If set to "yes" autofs will attempt to use bind mounts for
+              type "auto" when possible.
+
+       <b>nis_domain</b>
+              Allows setting of a domain name other than the system default.
+
+       <b>local_domain</b>
+              Is used to override (or set) the host domain name.
+
+       <b>normalize_hostnames</b>
+              If set to "yes" then the contents of ${rhost} is translated in
+              its official host name.
+
+       <b>domain_strip</b>
+              If set to "yes" the domain name part of the host is strippped
+              when normalizing hostnames. This can be useful when using of
+              the same maps in a multiple domain environment.
+
+       <b>normalize_slashes</b>
+              This option is set to "yes" by default and will collapse
+              multiple unescaped occurrences of "/" to a single "/".
+
+       <b>selectors_in_defaults</b>, <b>selectors_on_default</b>
+              This option has a default value of "no". If set to "yes" then
+              any defaults entry will be checked for selectors to determine
+              the values to be used. selectors_in_defaults is the preferred
+              option to use.
+
+       <b>ldap_base</b>
+              iThis option has no default value. It must be set to the base
+              dn that is used for queries if ldap is to be used as a map
+              source.
+
+       <b>ldap_hostports</b>
+              This option has no default value set. It must be set to the
+              URI of the LDAP server to be used for lookups wheni ldap is
+              used a map source. It may contain a comma or space separated
+              list of LDAP URIs.
+
+       <b>hesiod_base</b>
+              Sets the base name used for hesiod map sources.
+
+       <b>linux_ufs_mount_type</b>
+              This is an additional configuration option for the autofs amd
+              format parser implementation.
+
+              There's no simple way to determine what the system default
+              filesystem is and am-utils needs to be continually updated to
+              do this and can easily get it wrong ayway. So allow it to be
+              set in the configuration.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+         [ autofs ]
+         timeout = 300
+         browse_mode = no
+
+         [ amd ]
+         dismount_interval = 300
+         map_type = nis
+         autofs_use_lofs = no
+
+         [ /expamle/mount ]
+         dismount_interval = 60
+         map_type = file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/automount.8.html">automount(8)</a>, <a href="auto.master.5.html">auto.master(5)</a>, <a href="autofs_ldap_auth.conf.5.html">autofs_ldap_auth.conf(5)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page was written by Ian Kent &lt;raven@themaw.net&gt;.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>autofs</i> (automount) project.  Information
+       about the project can be found at ⟨<a href="http://www.autofs.org/">http://www.autofs.org/</a>⟩.  If you
+       have a bug report for this manual page, send it to
+       autofs@vger.kernel.org.  This page was obtained from the project's
+       upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/storage/autofs/autofs.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">                                                    AUTOFS.CONF(23 Jan 2014)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="autofs.5.html">autofs(5)</a>,&nbsp; 
+    <a href="autofs_ldap_auth.conf.5.html">autofs_ldap_auth.conf(5)</a>,&nbsp; 
+    <a href="auto.master.5.html">auto.master(5)</a>,&nbsp; 
+    <a href="../man8/autofs.8.html">autofs(8)</a>,&nbsp; 
+    <a href="../man8/automount.8.html">automount(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

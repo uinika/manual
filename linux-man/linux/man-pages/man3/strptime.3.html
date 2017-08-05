@@ -1,0 +1,453 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>strptime(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">STRPTIME(3)               Linux Programmer's Manual              STRPTIME(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       strptime  -  convert  a  string  representation  of time to a time tm
+       structure
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#define _XOPEN_SOURCE       </b>/* See feature_test_macros(7) */
+       <b>#include &lt;time.h&gt;</b>
+
+       <b>char *strptime(const char *</b><i>s</i><b>, const char *</b><i>format</i><b>, struct tm *</b><i>tm</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>strptime</b>() function is the converse of <a href="strftime.3.html">strftime(3)</a>; it converts
+       the character string pointed to by <i>s</i> to values which are stored in
+       the "broken-down time" structure pointed to by <i>tm</i>, using the format
+       specified by <i>format</i>.
+
+       The broken-down time structure <i>tm</i> is defined in <i>&lt;time.h&gt;</i> as follows:
+
+           struct tm {
+               int tm_sec;    /* Seconds (0-60) */
+               int tm_min;    /* Minutes (0-59) */
+               int tm_hour;   /* Hours (0-23) */
+               int tm_mday;   /* Day of the month (1-31) */
+               int tm_mon;    /* Month (0-11) */
+               int tm_year;   /* Year - 1900 */
+               int tm_wday;   /* Day of the week (0-6, Sunday = 0) */
+               int tm_yday;   /* Day in the year (0-365, 1 Jan = 0) */
+               int tm_isdst;  /* Daylight saving time */
+           };
+
+       For more details on the <i>tm</i> structure, see <a href="ctime.3.html">ctime(3)</a>.
+
+       The <i>format</i> argument is a character string that consists of field
+       descriptors and text characters, reminiscent of <a href="scanf.3.html">scanf(3)</a>.  Each field
+       descriptor consists of a <b>% </b>character followed by another character
+       that specifies the replacement for the field descriptor.  All other
+       characters in the <i>format</i> string must have a matching character in the
+       input string, except for whitespace, which matches zero or more
+       whitespace characters in the input string.  There should be white‐
+       space or other alphanumeric characters between any two field
+       descriptors.
+
+       The <b>strptime</b>() function processes the input string from left to
+       right.  Each of the three possible input elements (whitespace,
+       literal, or format) are handled one after the other.  If the input
+       cannot be matched to the format string, the function stops.  The
+       remainder of the format and input strings are not processed.
+
+       The supported input field descriptors are listed below.  In case a
+       text string (such as the name of a day of the week or a month name)
+       is to be matched, the comparison is case insensitive.  In case a
+       number is to be matched, leading zeros are permitted but not
+       required.
+
+       <b>%%     </b>The <b>% </b>character.
+
+       <b>%a </b>or <b>%A</b>
+              The name of the day of the week according to the current
+              locale, in abbreviated form or the full name.
+
+       <b>%b </b>or <b>%B </b>or <b>%h</b>
+              The month name according to the current locale, in abbreviated
+              form or the full name.
+
+       <b>%c     </b>The date and time representation for the current locale.
+
+       <b>%C     </b>The century number (0-99).
+
+       <b>%d </b>or <b>%e</b>
+              The day of month (1-31).
+
+       <b>%D     </b>Equivalent to <b>%m/%d/%y</b>.  (This is the American style date,
+              very confusing to non-Americans, especially since <b>%d/%m/%y </b>is
+              widely used in Europe.  The ISO 8601 standard format is
+              <b>%Y-%m-%d</b>.)
+
+       <b>%H     </b>The hour (0-23).
+
+       <b>%I     </b>The hour on a 12-hour clock (1-12).
+
+       <b>%j     </b>The day number in the year (1-366).
+
+       <b>%m     </b>The month number (1-12).
+
+       <b>%M     </b>The minute (0-59).
+
+       <b>%n     </b>Arbitrary whitespace.
+
+       <b>%p     </b>The locale's equivalent of AM or PM.  (Note: there may be
+              none.)
+
+       <b>%r     </b>The 12-hour clock time (using the locale's AM or PM).  In the
+              POSIX locale equivalent to <b>%I:%M:%S %p</b>.  If <i>t_fmt_ampm</i> is
+              empty in the <b>LC_TIME </b>part of the current locale, then the
+              behavior is undefined.
+
+       <b>%R     </b>Equivalent to <b>%H:%M</b>.
+
+       <b>%S     </b>The second (0-60; 60 may occur for leap seconds; earlier also
+              61 was allowed).
+
+       <b>%t     </b>Arbitrary whitespace.
+
+       <b>%T     </b>Equivalent to <b>%H:%M:%S</b>.
+
+       <b>%U     </b>The week number with Sunday the first day of the week (0-53).
+              The first Sunday of January is the first day of week 1.
+
+       <b>%w     </b>The ordinal number of the day of the week (0-6), with Sunday =
+              0.
+
+       <b>%W     </b>The week number with Monday the first day of the week (0-53).
+              The first Monday of January is the first day of week 1.
+
+       <b>%x     </b>The date, using the locale's date format.
+
+       <b>%X     </b>The time, using the locale's time format.
+
+       <b>%y     </b>The year within century (0-99).  When a century is not
+              otherwise specified, values in the range 69-99 refer to years
+              in the twentieth century (1969-1999); values in the range
+              00-68 refer to years in the twenty-first century (2000-2068).
+
+       <b>%Y     </b>The year, including century (for example, 1991).
+
+       Some field descriptors can be modified by the E or O modifier
+       characters to indicate that an alternative format or specification
+       should be used.  If the alternative format or specification does not
+       exist in the current locale, the unmodified field descriptor is used.
+
+       The E modifier specifies that the input string may contain
+       alternative locale-dependent versions of the date and time
+       representation:
+
+       <b>%Ec    </b>The locale's alternative date and time representation.
+
+       <b>%EC    </b>The name of the base year (period) in the locale's alternative
+              representation.
+
+       <b>%Ex    </b>The locale's alternative date representation.
+
+       <b>%EX    </b>The locale's alternative time representation.
+
+       <b>%Ey    </b>The offset from <b>%EC </b>(year only) in the locale's alternative
+              representation.
+
+       <b>%EY    </b>The full alternative year representation.
+
+       The O modifier specifies that the numerical input may be in an
+       alternative locale-dependent format:
+
+       <b>%Od </b>or <b>%Oe</b>
+              The day of the month using the locale's alternative numeric
+              symbols; leading zeros are permitted but not required.
+
+       <b>%OH    </b>The hour (24-hour clock) using the locale's alternative
+              numeric symbols.
+
+       <b>%OI    </b>The hour (12-hour clock) using the locale's alternative
+              numeric symbols.
+
+       <b>%Om    </b>The month using the locale's alternative numeric symbols.
+
+       <b>%OM    </b>The minutes using the locale's alternative numeric symbols.
+
+       <b>%OS    </b>The seconds using the locale's alternative numeric symbols.
+
+       <b>%OU    </b>The week number of the year (Sunday as the first day of the
+              week) using the locale's alternative numeric symbols.
+
+       <b>%Ow    </b>The ordinal number of the day of the week (Sunday=0),
+               using the locale's alternative numeric symbols.
+
+       <b>%OW    </b>The week number of the year (Monday as the first day of the
+              week) using the locale's alternative numeric symbols.
+
+       <b>%Oy    </b>The year (offset from <b>%C</b>) using the locale's alternative
+              numeric symbols.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The return value of the function is a pointer to the first character
+       not processed in this function call.  In case the input string
+       contains more characters than required by the format string, the
+       return value points right after the last consumed input character.
+       In case the whole input string is consumed, the return value points
+       to the null byte at the end of the string.  If <b>strptime</b>() fails to
+       match all of the format string and therefore an error occurred, the
+       function returns NULL.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌───────────┬───────────────┬────────────────────┐
+       │<b>Interface  </b>│ <b>Attribute     </b>│ <b>Value              </b>│
+       ├───────────┼───────────────┼────────────────────┤
+       │<b>strptime</b>() │ Thread safety │ MT-Safe env locale │
+       └───────────┴───────────────┴────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SUSv2.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In principle, this function does not initialize <i>tm</i> but stores only
+       the values specified.  This means that <i>tm</i> should be initialized
+       before the call.  Details differ a bit between different UNIX
+       systems.  The glibc implementation does not touch those fields which
+       are not explicitly specified, except that it recomputes the <i>tm_wday</i>
+       and <i>tm_yday</i> field if any of the year, month, or day elements changed.
+
+       The 'y' (year in century) specification is taken to specify a year in
+       the range 1950-2049 by glibc 2.0.  It is taken to be a year in
+       1969-2068 since glibc 2.1.
+
+   <b>Glibc notes</b>
+       For reasons of symmetry, glibc tries to support for <b>strptime</b>() the
+       same format characters as for <a href="strftime.3.html">strftime(3)</a>.  (In most cases, the
+       corresponding fields are parsed, but no field in <i>tm</i> is changed.)
+       This leads to
+
+       <b>%F     </b>Equivalent to <b>%Y-%m-%d</b>, the ISO 8601 date format.
+
+       <b>%g     </b>The year corresponding to the ISO week number, but without the
+              century (0-99).
+
+       <b>%G     </b>The year corresponding to the ISO week number.  (For example,
+              1991.)
+
+       <b>%u     </b>The day of the week as a decimal number (1-7, where Monday =
+              1).
+
+       <b>%V     </b>The ISO 8601:1988 week number as a decimal number (1-53).  If
+              the week (starting on Monday) containing 1 January has four or
+              more days in the new year, then it is considered week 1.
+              Otherwise, it is the last week of the previous year, and the
+              next week is week 1.
+
+       <b>%z     </b>An RFC-822/ISO 8601 standard timezone specification.
+
+       <b>%Z     </b>The timezone name.
+
+       Similarly, because of GNU extensions to <a href="strftime.3.html">strftime(3)</a>, <b>%k </b>is accepted
+       as a synonym for <b>%H</b>, and <b>%l </b>should be accepted as a synonym for <b>%I</b>,
+       and <b>%P </b>is accepted as a synonym for <b>%p</b>.  Finally
+
+       <b>%s     </b>The number of seconds since the Epoch, 1970-01-01 00:00:00
+              +0000 (UTC).  Leap seconds are not counted unless leap second
+              support is available.
+
+       The glibc implementation does not require whitespace between two
+       field descriptors.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following example demonstrates the use of <b>strptime</b>() and
+       <a href="strftime.3.html">strftime(3)</a>.
+
+       #define _XOPEN_SOURCE
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;string.h&gt;
+       #include &lt;time.h&gt;
+
+       int
+       main(void)
+       {
+           struct tm tm;
+           char buf[255];
+
+           memset(&amp;tm, 0, sizeof(struct tm));
+           strptime("2001-11-12 18:31:01", "%Y-%m-%d %H:%M:%S", &amp;tm);
+           strftime(buf, sizeof(buf), "%d %b %Y %H:%M", &amp;tm);
+           puts(buf);
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/time.2.html">time(2)</a>, <a href="getdate.3.html">getdate(3)</a>, <a href="scanf.3.html">scanf(3)</a>, <a href="setlocale.3.html">setlocale(3)</a>, <a href="strftime.3.html">strftime(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2015-08-08                      STRPTIME(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/dpkg-parsechangelog.1.html">dpkg-parsechangelog(1)</a>,&nbsp; 
+    <a href="ctime.3.html">ctime(3)</a>,&nbsp; 
+    <a href="getdate.3.html">getdate(3)</a>,&nbsp; 
+    <a href="strftime.3.html">strftime(3)</a>,&nbsp; 
+    <a href="../man5/locale.5.html">locale(5)</a>,&nbsp; 
+    <a href="../man7/locale.7.html">locale(7)</a>,&nbsp; 
+    <a href="../man7/time.7.html">time(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="strptime.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

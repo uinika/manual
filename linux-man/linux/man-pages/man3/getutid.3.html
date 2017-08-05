@@ -1,0 +1,395 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getutent(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#FILES">FILES</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETUTENT(3)               Linux Programmer's Manual              GETUTENT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getutent, getutid, getutline, pututline, setutent, endutent, utmpname
+       - access utmp file entries
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;utmp.h&gt;</b>
+
+       <b>struct utmp *getutent(void);</b>
+       <b>struct utmp *getutid(const struct utmp *</b><i>ut</i><b>);</b>
+       <b>struct utmp *getutline(const struct utmp *</b><i>ut</i><b>);</b>
+
+       <b>struct utmp *pututline(const struct utmp *</b><i>ut</i><b>);</b>
+
+       <b>void setutent(void);</b>
+       <b>void endutent(void);</b>
+
+       <b>int utmpname(const char *</b><i>file</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       New applications should use the POSIX.1-specified "utmpx" versions of
+       these functions; see CONFORMING TO.
+
+       <b>utmpname</b>() sets the name of the utmp-format file for the other utmp
+       functions to access.  If <b>utmpname</b>() is not used to set the filename
+       before the other functions are used, they assume <b>_PATH_UTMP</b>, as
+       defined in <i>&lt;paths.h&gt;</i>.
+
+       <b>setutent</b>() rewinds the file pointer to the beginning of the utmp
+       file.  It is generally a good idea to call it before any of the other
+       functions.
+
+       <b>endutent</b>() closes the utmp file.  It should be called when the user
+       code is done accessing the file with the other functions.
+
+       <b>getutent</b>() reads a line from the current file position in the utmp
+       file.  It returns a pointer to a structure containing the fields of
+       the line.  The definition of this structure is shown in <a href="../man5/utmp.5.html">utmp(5)</a>.
+
+       <b>getutid</b>() searches forward from the current file position in the utmp
+       file based upon <i>ut</i>.  If <i>ut-&gt;ut_type</i> is one of <b>RUN_LVL</b>, <b>BOOT_TIME</b>,
+       <b>NEW_TIME</b>, or <b>OLD_TIME</b>, <b>getutid</b>() will find the first entry whose
+       <i>ut_type</i> field matches <i>ut-&gt;ut_type</i>.  If <i>ut-&gt;ut_type</i> is one of
+       <b>INIT_PROCESS</b>, <b>LOGIN_PROCESS</b>, <b>USER_PROCESS</b>, or <b>DEAD_PROCESS</b>, <b>getutid</b>()
+       will find the first entry whose <i>ut_id</i> field matches <i>ut-&gt;ut_id</i>.
+
+       <b>getutline</b>() searches forward from the current file position in the
+       utmp file.  It scans entries whose <i>ut_type</i> is <b>USER_PROCESS </b>or
+       <b>LOGIN_PROCESS </b>and returns the first one whose <i>ut_line</i> field matches
+       <i>ut-&gt;ut_line</i>.
+
+       <b>pututline</b>() writes the <i>utmp</i> structure <i>ut</i> into the utmp file.  It uses
+       <b>getutid</b>() to search for the proper place in the file to insert the
+       new entry.  If it cannot find an appropriate slot for <i>ut</i>, <b>pututline</b>()
+       will append the new entry to the end of the file.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>getutent</b>(), <b>getutid</b>(), and <b>getutline</b>() return a pointer to a <i>struct</i>
+       <i>utmp</i> on success, and NULL on failure (which includes the "record not
+       found" case).  This <i>struct utmp</i> is allocated in static storage, and
+       may be overwritten by subsequent calls.
+
+       On success <b>pututline</b>() returns <i>ut</i>; on failure, it returns NULL.
+
+       <b>utmpname</b>() returns 0 if the new name was successfully stored, or -1
+       on failure.
+
+       In the event of an error, these functions <i><a href="errno.3.html">errno</a></i> set to indicate the
+       cause.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ENOMEM </b>Out of memory.
+
+       <b>ESRCH  </b>Record not found.
+
+       <b>setutent</b>(), <b>pututline</b>(), and the <b>getut*</b>() functions can also fail for
+       the reasons described in <a href="../man2/open.2.html">open(2)</a>.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /var/run/utmp  database of currently logged-in users
+       /var/log/wtmp  database of past user logins
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────┬───────────────┬──────────────────────────────┐
+       │<b>Interface   </b>│ <b>Attribute     </b>│ <b>Value                        </b>│
+       ├────────────┼───────────────┼──────────────────────────────┤
+       │<b>getutent</b>()  │ Thread safety │ MT-Unsafe init race:utent    │
+       │            │               │ race:utentbuf sig:ALRM timer │
+       ├────────────┼───────────────┼──────────────────────────────┤
+       │<b>getutid</b>(),  │ Thread safety │ MT-Unsafe init race:utent    │
+       │<b>getutline</b>() │               │ sig:ALRM timer               │
+       ├────────────┼───────────────┼──────────────────────────────┤
+       │<b>pututline</b>() │ Thread safety │ MT-Unsafe race:utent         │
+       │            │               │ sig:ALRM timer               │
+       ├────────────┼───────────────┼──────────────────────────────┤
+       │<b>setutent</b>(), │ Thread safety │ MT-Unsafe race:utent         │
+       │<b>endutent</b>(), │               │                              │
+       │<b>utmpname</b>()  │               │                              │
+       └────────────┴───────────────┴──────────────────────────────┘
+       In the above table, <i>utent</i> in <i>race:utent</i> signifies that if any of the
+       functions <b>setutent</b>(), <b>getutent</b>(), <b>getutid</b>(), <b>getutline</b>(),
+       <b>pututline</b>(), <b>utmpname</b>(), or <b>endutent</b>() are used in parallel in
+       different threads of a program, then data races could occur.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       XPG2, SVr4.
+
+       In XPG2 and SVID 2 the function <b>pututline</b>() is documented to return
+       void, and that is what it does on many systems (AIX, HP-UX).  HP-UX
+       introduces a new function <b>_pututline</b>() with the prototype given above
+       for <b>pututline</b>().
+
+       All these functions are obsolete now on non-Linux systems.
+       POSIX.1-2001 and POSIX.1-2008, following SUSv1, does not have any of
+       these functions, but instead uses
+
+       <b>#include &lt;utmpx.h&gt;</b>
+
+       <b>struct utmpx *getutxent(void);</b>
+       <b>struct utmpx *getutxid(const struct utmpx *);</b>
+       <b>struct utmpx *getutxline(const struct utmpx *);</b>
+       <b>struct utmpx *pututxline(const struct utmpx *);</b>
+       <b>void setutxent(void);</b>
+       <b>void endutxent(void);</b>
+
+       These functions are provided by glibc, and perform the same task as
+       their equivalents without the "x", but use <i>struct utmpx</i>, defined on
+       Linux to be the same as <i>struct utmp</i>.  For completeness, glibc also
+       provides <b>utmpxname</b>(), although this function is not specified by
+       POSIX.1.
+
+       On some other systems, the <i>utmpx</i> structure is a superset of the <i>utmp</i>
+       structure, with additional fields, and larger versions of the
+       existing fields, and parallel files are maintained, often
+       <i>/var/*/utmpx</i> and <i>/var/*/wtmpx</i>.
+
+       Linux glibc on the other hand does not use a parallel <i>utmpx</i> file
+       since its <i>utmp</i> structure is already large enough.  The "x" functions
+       listed above are just aliases for their counterparts without the "x"
+       (e.g., <b>getutxent</b>() is an alias for <b>getutent</b>()).
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Glibc notes</b>
+       The above functions are not thread-safe.  Glibc adds reentrant
+       versions
+
+       <b>#include &lt;utmp.h&gt;</b>
+
+       <b>int getutent_r(struct utmp *</b><i>ubuf</i><b>, struct utmp **</b><i>ubufp</i><b>);</b>
+
+       <b>int getutid_r(struct utmp *</b><i>ut</i><b>,</b>
+                     <b>struct utmp *</b><i>ubuf</i><b>, struct utmp **</b><i>ubufp</i><b>);</b>
+
+       <b>int getutline_r(struct utmp *</b><i>ut</i><b>,</b>
+                       <b>struct utmp *</b><i>ubuf</i><b>, struct utmp **</b><i>ubufp</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>getutent_r</b>(), <b>getutid_r</b>(), <b>getutline_r</b>():
+           _GNU_SOURCE
+           || /* since glibc 2.19: */ _DEFAULT_SOURCE
+           || /* glibc &lt;= 2.19: */    _SVID_SOURCE || _BSD_SOURCE
+
+       These functions are GNU extensions, analogs of the functions of the
+       same name without the _r suffix.  The <i>ubuf</i> argument gives these
+       functions a place to store their result.  On success, they return 0,
+       and a pointer to the result is written in <i>*ubufp</i>.  On error, these
+       functions return -1.  There are no utmpx equivalents of the above
+       functions.  (POSIX.1 does not specify such functions.)
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following example adds and removes a utmp record, assuming it is
+       run from within a pseudo terminal.  For usage in a real application,
+       you should check the return values of <a href="getpwuid.3.html">getpwuid(3)</a> and <a href="ttyname.3.html">ttyname(3)</a>.
+
+       #include &lt;string.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;pwd.h&gt;
+       #include &lt;unistd.h&gt;
+       #include &lt;utmp.h&gt;
+
+       int
+       main(int argc, char *argv[])
+       {
+           struct utmp entry;
+
+           system("echo before adding entry:;who");
+
+           entry.ut_type = USER_PROCESS;
+           entry.ut_pid = getpid();
+           strcpy(entry.ut_line, ttyname(STDIN_FILENO) + strlen("/dev/"));
+           /* only correct for ptys named /dev/tty[pqr][0-9a-z] */
+           strcpy(entry.ut_id, ttyname(STDIN_FILENO) + strlen("/dev/tty"));
+           time(&amp;entry.ut_time);
+           strcpy(entry.ut_user, getpwuid(getuid())-&gt;pw_name);
+           memset(entry.ut_host, 0, UT_HOSTSIZE);
+           entry.ut_addr = 0;
+           setutent();
+           pututline(&amp;entry);
+
+           system("echo after adding entry:;who");
+
+           entry.ut_type = DEAD_PROCESS;
+           memset(entry.ut_line, 0, UT_LINESIZE);
+           entry.ut_time = 0;
+           memset(entry.ut_user, 0, UT_NAMESIZE);
+           setutent();
+           pututline(&amp;entry);
+
+           system("echo after removing entry:;who");
+
+           endutent();
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="getutmp.3.html">getutmp(3)</a>, <a href="../man5/utmp.5.html">utmp(5)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2016-10-08                      GETUTENT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="getlogin.3.html">getlogin(3)</a>,&nbsp; 
+    <a href="getutmp.3.html">getutmp(3)</a>,&nbsp; 
+    <a href="glob.3.html">glob(3)</a>,&nbsp; 
+    <a href="login.3.html">login(3)</a>,&nbsp; 
+    <a href="updwtmp.3.html">updwtmp(3)</a>,&nbsp; 
+    <a href="wordexp.3.html">wordexp(3)</a>,&nbsp; 
+    <a href="../man5/utmp.5.html">utmp(5)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getutent.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pam_fail_delay(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RATIONALE">RATIONALE</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#RETURN_VALUES">RETURN&nbsp;VALUES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#STANDARDS">STANDARDS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PAM_FAIL_DELAY(3)             Linux-PAM Manual             PAM_FAIL_DELAY(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_fail_delay - request a delay on failure
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;security/pam_appl.h&gt;</b>
+
+       <b>int pam_fail_delay(pam_handle_t *</b><i>pamh</i><b>, unsigned int </b><i>usec</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>pam_fail_delay </b>function provides a mechanism by which an
+       application or module can suggest a minimum delay of <i>usec</i>
+       micro-seconds. The function keeps a record of the longest time
+       requested with this function. Should <a href="pam_authenticate.3.html">pam_authenticate(3)</a> fail, the
+       failing return to the application is delayed by an amount of time
+       randomly distributed (by up to 50%) about this longest value.
+
+       Independent of success, the delay time is reset to its zero default
+       value when the PAM service module returns control to the application.
+       The delay occurs <i>after</i> all authentication modules have been called,
+       but <i>before</i> control is returned to the service application.
+
+       When using this function the programmer should check if it is
+       available with:
+
+           #ifdef HAVE_PAM_FAIL_DELAY
+               ....
+           #endif /* HAVE_PAM_FAIL_DELAY */
+
+       For applications written with a single thread that are event driven
+       in nature, generating this delay may be undesirable. Instead, the
+       application may want to register the delay in some other way. For
+       example, in a single threaded server that serves multiple
+       authentication requests from a single event loop, the application
+       might want to simply mark a given connection as blocked until an
+       application timer expires. For this reason the delay function can be
+       changed with the <i>PAM_FAIL_DELAY</i> item. It can be queried and set with
+       <a href="pam_get_item.3.html">pam_get_item(3)</a> and <b>pam_set_item </b>(3) respectively. The value used to
+       set it should be a function pointer of the following prototype:
+
+           void (*delay_fn)(int retval, unsigned usec_delay, void *appdata_ptr);
+
+       The arguments being the <i>retval</i> return code of the module stack, the
+       <i>usec_delay</i> micro-second delay that libpam is requesting and the
+       <i>appdata_ptr</i> that the application has associated with the current
+       <i>pamh</i>. This last value was set by the application when it called
+       <a href="pam_start.3.html">pam_start(3)</a> or explicitly with <a href="pam_set_item.3.html">pam_set_item(3)</a>. Note, if
+       PAM_FAIL_DELAY item is unset (or set to NULL), then no delay will be
+       performed.
+</pre>
+<h2><a id="RATIONALE" href="#RATIONALE"></a>RATIONALE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       It is often possible to attack an authentication scheme by exploiting
+       the time it takes the scheme to deny access to an applicant user. In
+       cases of <i>short</i> timeouts, it may prove possible to attempt a <i>brute</i>
+       <i>force</i> dictionary attack -- with an automated process, the attacker
+       tries all possible passwords to gain access to the system. In other
+       cases, where individual failures can take measurable amounts of time
+       (indicating the nature of the failure), an attacker can obtain useful
+       information about the authentication process. These latter attacks
+       make use of procedural delays that constitute a <i>covert channel</i> of
+       useful information.
+
+       To minimize the effectiveness of such attacks, it is desirable to
+       introduce a random delay in a failed authentication process.
+       Preferable this value should be set by the application or a special
+       PAM module. Standard PAM modules should not modify the delay
+       unconditional.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For example, a login application may require a failure delay of
+       roughly 3 seconds. It will contain the following code:
+
+               pam_fail_delay (pamh, 3000000 /* micro-seconds */ );
+               pam_authenticate (pamh, 0);
+
+       if the modules do not request a delay, the failure delay will be
+       between 2.25 and 3.75 seconds.
+
+       However, the modules, invoked in the authentication process, may also
+       request delays:
+
+           module #1:    pam_fail_delay (pamh, 2000000);
+           module #2:    pam_fail_delay (pamh, 4000000);
+
+       in this case, it is the largest requested value that is used to
+       compute the actual failed delay: here between 3 and 5 seconds.
+</pre>
+<h2><a id="RETURN_VALUES" href="#RETURN_VALUES"></a>RETURN VALUES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       PAM_SUCCESS
+           Delay was successful adjusted.
+
+       PAM_SYSTEM_ERR
+           A NULL pointer was submitted as PAM handle.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="pam_start.3.html">pam_start(3)</a>, <a href="pam_get_item.3.html">pam_get_item(3)</a>, <a href="pam_strerror.3.html">pam_strerror(3)</a>
+</pre>
+<h2><a id="STANDARDS" href="#STANDARDS"></a>STANDARDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>pam_fail_delay </b>function is an Linux-PAM extension.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>linux-pam</i> (Pluggable Authentication Modules
+       for Linux) project.  Information about the project can be found at 
+       ⟨<a href="http://www.linux-pam.org/">http://www.linux-pam.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨//www.linux-pam.org/⟩.  This page was obtained from the
+       tarball Linux-PAM-1.3.0.tar.gz fetched from 
+       ⟨<a href="http://www.linux-pam.org/library/">http://www.linux-pam.org/library/</a>⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Linux-PAM Manual                 04/01/2016                PAM_FAIL_DELAY(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pam_get_item.3.html">pam_get_item(3)</a>,&nbsp; 
+    <a href="pam_set_item.3.html">pam_set_item(3)</a>,&nbsp; 
+    <a href="../man8/pam_faildelay.8.html">pam_faildelay(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,537 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dlopen(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">DLOPEN(3)                 Linux Programmer's Manual                DLOPEN(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dlclose, dlopen, dlmopen - open and close a shared object
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;dlfcn.h&gt;</b>
+
+       <b>void *dlopen(const char *</b><i>filename</i><b>, int </b><i>flags</i><b>);</b>
+
+       <b>int dlclose(void *</b><i>handle</i><b>);</b>
+
+       <b>#define _GNU_SOURCE</b>
+       <b>#include &lt;dlfcn.h&gt;</b>
+
+       <b>void *dlmopen (Lmid_t </b><i>lmid</i><b>, const char *</b><i>filename</i><b>, int </b><i>flags</i><b>);</b>
+
+       Link with <i>-ldl</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>dlopen()</b>
+       The function <b>dlopen</b>() loads the dynamic shared object (shared
+       library) file named by the null-terminated string <i>filename</i> and
+       returns an opaque "handle" for the loaded object.  This handle is
+       employed with other functions in the dlopen API, such as <a href="dlsym.3.html">dlsym(3)</a>,
+       <a href="dladdr.3.html">dladdr(3)</a>, <a href="dlinfo.3.html">dlinfo(3)</a>, and <b>dlclose</b>().
+
+       If <i>filename</i> is NULL, then the returned handle is for the main
+       program.  If <i>filename</i> contains a slash ("/"), then it is interpreted
+       as a (relative or absolute) pathname.  Otherwise, the dynamic linker
+       searches for the object as follows (see <a href="../man8/ld.so.8.html">ld.so(8)</a> for further
+       details):
+
+       o   (ELF only) If the executable file for the calling program
+           contains a DT_RPATH tag, and does not contain a DT_RUNPATH tag,
+           then the directories listed in the DT_RPATH tag are searched.
+
+       o   If, at the time that the program was started, the environment
+           variable <b>LD_LIBRARY_PATH </b>was defined to contain a colon-separated
+           list of directories, then these are searched.  (As a security
+           measure, this variable is ignored for set-user-ID and set-group-
+           ID programs.)
+
+       o   (ELF only) If the executable file for the calling program
+           contains a DT_RUNPATH tag, then the directories listed in that
+           tag are searched.
+
+       o   The cache file <i>/etc/ld.so.cache</i> (maintained by <a href="../man8/ldconfig.8.html">ldconfig(8)</a>) is
+           checked to see whether it contains an entry for <i>filename</i>.
+
+       o   The directories <i>/lib</i> and <i>/usr/lib</i> are searched (in that order).
+
+       If the object specified by <i>filename</i> has dependencies on other shared
+       objects, then these are also automatically loaded by the dynamic
+       linker using the same rules.  (This process may occur recursively, if
+       those objects in turn have dependencies, and so on.)
+
+       One of the following two values must be included in <i>flags</i>:
+
+       <b>RTLD_LAZY</b>
+              Perform lazy binding.  Resolve symbols only as the code that
+              references them is executed.  If the symbol is never
+              referenced, then it is never resolved.  (Lazy binding is
+              performed only for function references; references to
+              variables are always immediately bound when the shared object
+              is loaded.)  Since glibc 2.1.1, this flag is overridden by the
+              effect of the <b>LD_BIND_NOW </b>environment variable.
+
+       <b>RTLD_NOW</b>
+              If this value is specified, or the environment variable
+              <b>LD_BIND_NOW </b>is set to a nonempty string, all undefined symbols
+              in the shared object are resolved before <b>dlopen</b>() returns.  If
+              this cannot be done, an error is returned.
+
+       Zero or more of the following values may also be ORed in <i>flags</i>:
+
+       <b>RTLD_GLOBAL</b>
+              The symbols defined by this shared object will be made
+              available for symbol resolution of subsequently loaded shared
+              objects.
+
+       <b>RTLD_LOCAL</b>
+              This is the converse of <b>RTLD_GLOBAL</b>, and the default if
+              neither flag is specified.  Symbols defined in this shared
+              object are not made available to resolve references in
+              subsequently loaded shared objects.
+
+       <b>RTLD_NODELETE </b>(since glibc 2.2)
+              Do not unload the shared object during <b>dlclose</b>().
+              Consequently, the object's static variables are not
+              reinitialized if the object is reloaded with <b>dlopen</b>() at a
+              later time.
+
+       <b>RTLD_NOLOAD </b>(since glibc 2.2)
+              Don't load the shared object.  This can be used to test if the
+              object is already resident (<b>dlopen</b>() returns NULL if it is
+              not, or the object's handle if it is resident).  This flag can
+              also be used to promote the flags on a shared object that is
+              already loaded.  For example, a shared object that was
+              previously loaded with <b>RTLD_LOCAL </b>can be reopened with
+              <b>RTLD_NOLOAD | RTLD_GLOBAL</b>.
+
+       <b>RTLD_DEEPBIND </b>(since glibc 2.3.4)
+              Place the lookup scope of the symbols in this shared object
+              ahead of the global scope.  This means that a self-contained
+              object will use its own symbols in preference to global
+              symbols with the same name contained in objects that have
+              already been loaded.
+
+       If <i>filename</i> is NULL, then the returned handle is for the main
+       program.  When given to <b>dlsym</b>(), this handle causes a search for a
+       symbol in the main program, followed by all shared objects loaded at
+       program startup, and then all shared objects loaded by <b>dlopen</b>() with
+       the flag <b>RTLD_GLOBAL</b>.
+
+       External references in the shared object are resolved using the
+       shared objects in that object's dependency list and any other objects
+       previously opened with the <b>RTLD_GLOBAL </b>flag.  If the executable was
+       linked with the flag "-rdynamic" (or, synonymously,
+       "--export-dynamic"), then the global symbols in the executable will
+       also be used to resolve references in a dynamically loaded shared
+       object.
+
+       If the same shared object is loaded again with <b>dlopen</b>(), the same
+       object handle is returned.  The dynamic linker maintains reference
+       counts for object handles, so a dynamically loaded shared object is
+       not deallocated until <b>dlclose</b>() has been called on it as many times
+       as <b>dlopen</b>() has succeeded on it.  Any initialization returns (see
+       below) are called just once.  However, a subsequent <b>dlopen</b>() call
+       that loads the same shared object with <b>RTLD_NOW </b>may force symbol
+       resolution for a shared object earlier loaded with <b>RTLD_LAZY</b>.
+
+       If <b>dlopen</b>() fails for any reason, it returns NULL.
+
+   <b>dlmopen()</b>
+       This function performs the same task as <b>dlopen</b>()—the <i>filename</i> and
+       <i>flags</i> arguments, as well as the return value, are the same, except
+       for the differences noted below.
+
+       The <b>dlmopen</b>() function differs from <b>dlopen</b>() primarily in that it
+       accepts an additional argument, <i>lmid</i>, that specifies the link-map
+       list (also referred to as a <i>namespace</i>) in which the shared object
+       should be loaded.  (By comparison, <b>dlopen</b>() adds the dynamically
+       loaded shared object to the same namespace as the shared object from
+       which the <b>dlopen</b>() call is made.)  The <i>Lmid_t</i> type is an opaque
+       handle that refers to a namespace.
+
+       The <i>lmid</i> argument is either the ID of an existing namespace (which
+       can be obtained using the <a href="dlinfo.3.html">dlinfo(3)</a> <b>RTLD_DI_LMID </b>request) or one of
+       the following special values:
+
+       <b>LM_ID_BASE</b>
+              Load the shared object in the initial namespace (i.e., the
+              application's namespace).
+
+       <b>LM_ID_NEWLM</b>
+              Create a new namespace and load the shared object in that
+              namespace.  The object must have been correctly linked to
+              reference all of the other shared objects that it requires,
+              since the new namespace is initially empty.
+
+       If <i>filename</i> is NULL, then the only permitted value for <i>lmid</i> is
+       <b>LM_ID_BASE</b>.
+
+   <b>dlclose()</b>
+       The function <b>dlclose</b>() decrements the reference count on the
+       dynamically loaded shared object referred to by <i>handle</i>.  If the
+       reference count drops to zero, then the object is unloaded.  All
+       shared objects that were automatically loaded when <b>dlopen</b>() was
+       invoked on the object referred to by <i>handle</i> are recursively closed in
+       the same manner.
+
+       A successful return from <b>dlclose</b>() does not guarantee that the
+       symbols associated with <i>handle</i> are removed from the caller's address
+       space.  In addition to references resulting from explicit <b>dlopen</b>()
+       calls, a shared object may have been implicitly loaded (and reference
+       counted) because of dependencies in other shared objects.  Only when
+       all references have been released can the shared object be removed
+       from the address space.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>dlopen</b>() and <b>dlmopen</b>() return a non-NULL handle for the
+       loaded library.  On error (file could not be found, was not readable,
+       had the wrong format, or caused errors during loading), these
+       functions return NULL.
+
+       On success, <b>dlclose</b>() returns 0; on error, it returns a nonzero
+       value.
+
+       Errors from these functions can be diagnosed using <a href="dlerror.3.html">dlerror(3)</a>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dlopen</b>() and <b>dlclose</b>() are present in glibc 2.0 and later.  <b>dlmopen</b>()
+       first appeared in glibc 2.3.4.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌───────────────────────────────┬───────────────┬─────────┐
+       │<b>Interface                      </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├───────────────────────────────┼───────────────┼─────────┤
+       │<b>dlopen</b>(), <b>dlmopen</b>(), <b>dlclose</b>() │ Thread safety │ MT-Safe │
+       └───────────────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001 describes <b>dlclose</b>() and <b>dlopen</b>().  The <b>dlmopen</b>()
+       function is a GNU extension.
+
+       The <b>RTLD_NOLOAD</b>, <b>RTLD_NODELETE</b>, and <b>RTLD_DEEPBIND </b>flags are GNU
+       extensions; the first two of these flags are also present on Solaris.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>dlmopen() and namespaces</b>
+       A link-map list defines an isolated namespace for the resolution of
+       symbols by the dynamic linker.  Within a namespace, dependent shared
+       objects are implicitly loaded according to the usual rules, and
+       symbol references are likewise resolved according to the usual rules,
+       but such resolution is confined to the definitions provided by the
+       objects that have been (explicitly and implicitly) loaded into the
+       namespace.
+
+       The <b>dlmopen</b>() function permits object-load isolation—the ability to
+       load a shared object in a new namespace without exposing the rest of
+       the application to the symbols made available by the new object.
+       Note that the use of the <b>RTLD_LOCAL </b>flag is not sufficient for this
+       purpose, since it prevents a shared object's symbols from being
+       available to <i>any</i> other shared object.  In some cases, we may want to
+       make the symbols provided by a dynamically loaded shared object
+       available to (a subset of) other shared objects without exposing
+       those symbols to the entire application.  This can be achieved by
+       using a separate namespace and the <b>RTLD_GLOBAL </b>flag.
+
+       The <b>dlmopen</b>() function also can be used to provide better isolation
+       than the <b>RTLD_LOCAL </b>flag.  In particular, shared objects loaded with
+       <b>RTLD_LOCAL </b>may be promoted to <b>RTLD_GLOBAL </b>if they are dependencies of
+       another shared object loaded with <b>RTLD_GLOBAL</b>.  Thus, <b>RTLD_LOCAL </b>is
+       insufficient to isolate a loaded shared object except in the
+       (uncommon) case where one has explicit control over all shared object
+       dependencies.
+
+       Possible uses of <b>dlmopen</b>() are plugins where the author of the
+       plugin-loading framework can't trust the plugin authors and does not
+       wish any undefined symbols from the plugin framework to be resolved
+       to plugin symbols.  Another use is to load the same object more than
+       once.  Without the use of <b>dlmopen</b>(), this would require the creation
+       of distinct copies of the shared object file.  Using <b>dlmopen</b>(), this
+       can be achieved by loading the same shared object file into different
+       namespaces.
+
+       The glibc implementation supports a maximum of 16 namespaces.
+
+   <b>Initialization and finalization functions</b>
+       Shared objects may export functions using the
+       <b>__attribute__((constructor)) </b>and <b>__attribute__((destructor)) </b>function
+       attributes.  Constructor functions are executed before <b>dlopen</b>()
+       returns, and destructor functions are executed before <b>dlclose</b>()
+       returns.  A shared object may export multiple constructors and
+       destructors, and priorities can be associated with each function to
+       determine the order in which they are executed.  See the <b>gcc </b>info
+       pages (under "Function attributes") for further information.
+
+       An older method of (partially) achieving the same result is via the
+       use of two special symbols recognized by the linker: <b>_init </b>and <b>_fini</b>.
+       If a dynamically loaded shared object exports a routine named
+       <b>_init</b>(), then that code is executed after loading a shared object,
+       before <b>dlopen</b>() returns.  If the shared object exports a routine
+       named <b>_fini</b>(), then that routine is called just before the object is
+       unloaded.  In this case, one must avoid linking against the system
+       startup files, which contain default versions of these files; this
+       can be done by using the <a href="../man1/gcc.1.html">gcc(1)</a> <i>-nostartfiles</i> command-line option.
+
+       Use of <b>_init </b>and <b>_fini </b>is now deprecated in favor of the
+       aforementioned constructors and destructors, which among other
+       advantages, permit multiple initialization and finalization functions
+       to be defined.
+
+       Since glibc 2.2.3, <a href="atexit.3.html">atexit(3)</a> can be used to register an exit handler
+       that is automatically called when a shared object is unloaded.
+
+   <b>History</b>
+       These functions are part of the dlopen API, derived from SunOS.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       As at glibc 2.24, specifying the <b>RTLD_GLOBAL </b>flag when calling
+       <b>dlmopen</b>() generates an error.  Furthermore, specifying <b>RTLD_GLOBAL</b>
+       when calling <b>dlopen</b>() results in a program crash (<b>SIGSEGV</b>) if the
+       call is made from any object loaded in a namespace other than the
+       initial namespace.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below loads the (glibc) math library, looks up the
+       address of the <a href="cos.3.html">cos(3)</a> function, and prints the cosine of 2.0.  The
+       following is an example of building and running the program:
+
+           $ <b>cc dlopen_demo.c -ldl</b>
+           $ <b>./a.out</b>
+           -0.416147
+
+   <b>Program source</b>
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;dlfcn.h&gt;
+       #include &lt;gnu/lib-names.h&gt;  /* Defines LIBM_SO (which will be a
+                                      string such as "libm.so.6") */
+       int
+       main(void)
+       {
+           void *handle;
+           double (*cosine)(double);
+           char *error;
+
+           handle = dlopen(LIBM_SO, RTLD_LAZY);
+           if (!handle) {
+               fprintf(stderr, "%s\n", dlerror());
+               exit(EXIT_FAILURE);
+           }
+
+           dlerror();    /* Clear any existing error */
+
+           cosine = (double (*)(double)) dlsym(handle, "cos");
+
+           /* According to the ISO C standard, casting between function
+              pointers and 'void *', as done above, produces undefined results.
+              POSIX.1-2003 and POSIX.1-2008 accepted this state of affairs and
+              proposed the following workaround:
+
+                  *(void **) (&amp;cosine) = dlsym(handle, "cos");
+
+              This (clumsy) cast conforms with the ISO C standard and will
+              avoid any compiler warnings.
+
+              The 2013 Technical Corrigendum to POSIX.1-2008 (a.k.a.
+              POSIX.1-2013) improved matters by requiring that conforming
+              implementations support casting 'void *' to a function pointer.
+              Nevertheless, some compilers (e.g., gcc with the '-pedantic'
+              option) may complain about the cast used in this program. */
+
+           error = dlerror();
+           if (error != NULL) {
+               fprintf(stderr, "%s\n", error);
+               exit(EXIT_FAILURE);
+           }
+
+           printf("%f\n", (*cosine)(2.0));
+           dlclose(handle);
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/ld.1.html">ld(1)</a>, <a href="../man1/ldd.1.html">ldd(1)</a>, <a href="../man1/pldd.1.html">pldd(1)</a>, <a href="dl_iterate_phdr.3.html">dl_iterate_phdr(3)</a>, <a href="dladdr.3.html">dladdr(3)</a>, <a href="dlerror.3.html">dlerror(3)</a>,
+       <a href="dlinfo.3.html">dlinfo(3)</a>, <a href="dlsym.3.html">dlsym(3)</a>, <a href="../man7/rtld-audit.7.html">rtld-audit(7)</a>, <a href="../man8/ld.so.8.html">ld.so(8)</a>, <a href="../man8/ldconfig.8.html">ldconfig(8)</a>
+
+       gcc info pages, ld info pages
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                        DLOPEN(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pldd.1.html">pldd(1)</a>,&nbsp; 
+    <a href="../man1/pmcd.1.html">pmcd(1)</a>,&nbsp; 
+    <a href="../man2/uselib.2.html">uselib(2)</a>,&nbsp; 
+    <a href="../man2/vfork.2.html">vfork(2)</a>,&nbsp; 
+    <a href="atexit.3.html">atexit(3)</a>,&nbsp; 
+    <a href="backtrace.3.html">backtrace(3)</a>,&nbsp; 
+    <a href="dladdr.3.html">dladdr(3)</a>,&nbsp; 
+    <a href="dlerror.3.html">dlerror(3)</a>,&nbsp; 
+    <a href="dlinfo.3.html">dlinfo(3)</a>,&nbsp; 
+    <a href="dl_iterate_phdr.3.html">dl_iterate_phdr(3)</a>,&nbsp; 
+    <a href="dlsym.3.html">dlsym(3)</a>,&nbsp; 
+    <a href="lttng-ust.3.html">lttng-ust(3)</a>,&nbsp; 
+    <a href="lttng-ust-dl.3.html">lttng-ust-dl(3)</a>,&nbsp; 
+    <a href="pmda.3-2.html">pmda(3)</a>,&nbsp; 
+    <a href="../man7/rtld-audit.7.html">rtld-audit(7)</a>,&nbsp; 
+    <a href="../man8/ld.so.8.html">ld.so(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="dlopen.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

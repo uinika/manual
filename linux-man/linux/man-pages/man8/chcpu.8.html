@@ -1,0 +1,262 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>chcpu(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#RETURN_CODES">RETURN&nbsp;CODES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COPYRIGHT">COPYRIGHT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">CHCPU(8)                    System Administration                   CHCPU(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       chcpu - configure CPUs
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>chcpu -c</b>|<b>-d</b>|<b>-e</b>|<b>-g </b><i>cpu-list</i>
+       <b>chcpu -p </b><i>mode</i>
+       <b>chcpu -r</b>|<b>-h</b>|<b>-V</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>chcpu </b>can modify the state of CPUs.  It can enable or disable CPUs,
+       scan for new CPUs, change the CPU dispatching <i>mode</i> of the underlying
+       hypervisor, and request CPUs from the hypervisor (configure) or
+       return CPUs to the hypervisor (deconfigure).
+
+       Some options have a <i>cpu-list</i> argument.  Use this argument to specify
+       a comma-separated list of CPUs.  The list can contain individual CPU
+       addresses or ranges of addresses.  For example, <b>0,5,7,9-11 </b>makes the
+       command applicable to the CPUs with the addresses 0, 5, 7, 9, 10, and
+       11.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-c</b>, <b>--configure </b><i>cpu-list</i>
+              Configure the specified CPUs.  Configuring a CPU means that
+              the hypervisor takes a CPU from the CPU pool and assigns it to
+              the virtual hardware on which your kernel runs.
+
+       <b>-d</b>, <b>--disable </b><i>cpu-list</i>
+              Disable the specified CPUs.  Disabling a CPU means that the
+              kernel sets it offline.
+
+       <b>-e</b>, <b>--enable </b><i>cpu-list</i>
+              Enable the specified CPUs.  Enabling a CPU means that the
+              kernel sets it online.  A CPU must be configured, see <b>-c</b>,
+              before it can be enabled.
+
+       <b>-g</b>, <b>--deconfigure </b><i>cpu-list</i>
+              Deconfigure the specified CPUs.  Deconfiguring a CPU means
+              that the hypervisor removes the CPU from the virtual hardware
+              on which the Linux instance runs and returns it to the CPU
+              pool.  A CPU must be offline, see <b>-d</b>, before it can be
+              deconfigured.
+
+       <b>-p</b>, <b>--dispatch </b><i>mode</i>
+              Set the CPU dispatching <i>mode</i> (polarization).  This option has
+              an effect only if your hardware architecture and hypervisor
+              support CPU polarization.  Available <i>modes</i> are:
+
+                     <b>horizontal  </b>The workload is spread across all available
+                                 CPUs.
+                     <b>vertical    </b>The workload is concentrated on few CPUs.
+
+       <b>-r</b>, <b>--rescan</b>
+              Trigger a rescan of CPUs.  After a rescan, the Linux kernel
+              recognizes the new CPUs.  Use this option on systems that do
+              not automatically detect newly attached CPUs.
+
+       <b>-V</b>, <b>--version</b>
+              Display version information and exit.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.
+</pre>
+<h2><a id="RETURN_CODES" href="#RETURN_CODES"></a>RETURN CODES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>chcpu </b>has the following return codes:
+
+       <b>0      </b>success
+
+       <b>1      </b>failure
+
+       <b>64     </b>partial success
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Heiko Carstens ⟨heiko.carstens@de.ibm.com⟩
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Copyright IBM Corp. 2011
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/lscpu.1.html">lscpu(1)</a>
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The chcpu command is part of the util-linux package and is available
+       from Linux Kernel Archive 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                        July 2014                         CHCPU(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/lscpu.1.html">lscpu(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

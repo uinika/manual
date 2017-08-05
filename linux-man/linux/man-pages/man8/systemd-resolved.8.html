@@ -1,0 +1,346 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd-resolved.service(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#/ETC/RESOLV.CONF">/ETC/RESOLV.CONF</a> | <a href="#SIGNALS">SIGNALS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD-RESOLVED.SERVICE(8)ystemd-resolved.serviceYSTEMD-RESOLVED.SERVICE(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-resolved.service, systemd-resolved - Network Name Resolution
+       manager
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-resolved.service
+
+       /usr/lib/systemd/systemd-resolved
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-resolved </b>is a system service that provides network name
+       resolution to local applications. It implements a caching and
+       validating DNS/DNSSEC stub resolver, as well as an LLMNR resolver and
+       responder. Local applications may submit network name resolution
+       requests via three interfaces:
+
+       ·   The native, fully-featured API <b>systemd-resolved </b>exposes on the
+           bus. See the <b>API Documentation</b><b></b>[1] for details. Usage of this API
+           is generally recommended to clients as it is asynchronous and
+           fully featured (for example, properly returns DNSSEC validation
+           status and interface scope for addresses as necessary for
+           supporting link-local networking).
+
+       ·   The glibc <a href="../man3/getaddrinfo.3.html">getaddrinfo(3)</a> API as defined by <b>RFC3493</b><b></b>[2] and its
+           related resolver functions, including <a href="../man3/gethostbyname.3.html">gethostbyname(3)</a>. This API
+           is widely supported, including beyond the Linux platform. In its
+           current form it does not expose DNSSEC validation status
+           information however, and is synchronous only. This API is backed
+           by the glibc Name Service Switch (<a href="../man5/nss.5.html">nss(5)</a>). Usage of the glibc NSS
+           module <a href="nss-resolve.8.html">nss-resolve(8)</a> is required in order to allow glibc's NSS
+           resolver functions to resolve host names via <b>systemd-resolved</b>.
+
+       ·   Additionally, <b>systemd-resolved </b>provides a local DNS stub listener
+           on IP address 127.0.0.53 on the local loopback interface.
+           Programs issuing DNS requests directly, bypassing any local API
+           may be directed to this stub, in order to connect them to
+           <b>systemd-resolved</b>. Note however that it is strongly recommended
+           that local programs use the glibc NSS or bus APIs instead (as
+           described above), as various network resolution concepts (such as
+           link-local addressing, or LLMNR Unicode domains) cannot be mapped
+           to the unicast DNS protocol.
+
+       The DNS servers contacted are determined from the global settings in
+       /etc/systemd/resolved.conf, the per-link static settings in
+       /etc/systemd/network/*.network files, the per-link dynamic settings
+       received over DHCP and any DNS server information made available by
+       other system services. See <a href="../man5/resolved.conf.5.html">resolved.conf(5)</a> and <a href="../man5/systemd.network.5.html">systemd.network(5)</a>
+       for details about systemd's own configuration files for DNS servers.
+       To improve compatibility, /etc/resolv.conf is read in order to
+       discover configured system DNS servers, but only if it is not a
+       symlink to /run/systemd/resolve/resolv.conf (see below).
+
+       <b>systemd-resolved </b>synthesizes DNS resource records (RRs) for the
+       following cases:
+
+       ·   The local, configured hostname is resolved to all locally
+           configured IP addresses ordered by their scope, or — if none are
+           configured — the IPv4 address 127.0.0.2 (which is on the local
+           loopback) and the IPv6 address ::1 (which is the local host).
+
+       ·   The hostnames "localhost" and "localhost.localdomain" (as well as
+           any hostname ending in ".localhost" or ".localhost.localdomain")
+           are resolved to the IP addresses 127.0.0.1 and ::1.
+
+       ·   The hostname "gateway" is resolved to all current default routing
+           gateway addresses, ordered by their metric. This assigns a stable
+           hostname to the current gateway, useful for referencing it
+           independently of the current network configuration state.
+
+       ·   The mappings defined in /etc/hosts are resolved to their
+           configured addresses and back, but they will not affect lookups
+           for non-address types (like MX).
+
+       Lookup requests are routed to the available DNS servers and LLMNR
+       interfaces according to the following rules:
+
+       ·   Lookups for the special hostname "localhost" are never routed to
+           the network. (A few other, special domains are handled the same
+           way.)
+
+       ·   Single-label names are routed to all local interfaces capable of
+           IP multicasting, using the LLMNR protocol. Lookups for IPv4
+           addresses are only sent via LLMNR on IPv4, and lookups for IPv6
+           addresses are only sent via LLMNR on IPv6. Lookups for the
+           locally configured host name and the "gateway" host name are
+           never routed to LLMNR.
+
+       ·   Multi-label names are routed to all local interfaces that have a
+           DNS sever configured, plus the globally configured DNS server if
+           there is one. Address lookups from the link-local address range
+           are never routed to DNS.
+
+       If lookups are routed to multiple interfaces, the first successful
+       response is returned (thus effectively merging the lookup zones on
+       all matching interfaces). If the lookup failed on all interfaces, the
+       last failing response is returned.
+
+       Routing of lookups may be influenced by configuring per-interface
+       domain names. See <a href="../man5/systemd.network.5.html">systemd.network(5)</a> for details. Lookups for a
+       hostname ending in one of the per-interface domains are exclusively
+       routed to the matching interfaces.
+
+       See the <b>resolved D-Bus API Documentation</b><b></b>[1] for information about the
+       APIs systemd-resolved provides.
+</pre>
+<h2><a id="/ETC/RESOLV.CONF" href="#/ETC/RESOLV.CONF"></a>/ETC/RESOLV.CONF  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Three modes of handling /etc/resolv.conf (see <a href="../man5/resolv.conf.5.html">resolv.conf(5)</a>) are
+       supported:
+
+       ·   A static file /usr/lib/systemd/resolv.conf is provided that lists
+           the 127.0.0.53 DNS stub (see above) as only DNS server. This file
+           may be symlinked from /etc/resolv.conf in order to connect all
+           local clients that bypass local DNS APIs to <b>systemd-resolved</b>.
+           This mode of operation is recommended.
+
+       ·   <b>systemd-resolved </b>maintains the /run/systemd/resolve/resolv.conf
+           file for compatibility with traditional Linux programs. This file
+           may be symlinked from /etc/resolv.conf and is always kept
+           up-to-date, containing information about all known DNS servers.
+           Note the file format's limitations: it does not know a concept of
+           per-interface DNS servers and hence only contains system-wide DNS
+           server definitions. Note that /run/systemd/resolve/resolv.conf
+           should not be used directly by applications, but only through a
+           symlink from /etc/resolv.conf. If this mode of operation is used
+           local clients that bypass any local DNS API will also bypass
+           <b>systemd-resolved </b>and will talk directly to the known DNS servers.
+
+       ·   Alternatively, /etc/resolv.conf may be managed by other packages,
+           in which case <b>systemd-resolved </b>will read it for DNS configuration
+           data. In this mode of operation <b>systemd-resolved </b>is consumer
+           rather than provider of this configuration file.
+
+       Note that the selected mode of operation for this file is detected
+       fully automatically, depending on whether /etc/resolv.conf is a
+       symlink to /run/systemd/resolve/resolv.conf or lists 127.0.0.53 as
+       DNS server.
+</pre>
+<h2><a id="SIGNALS" href="#SIGNALS"></a>SIGNALS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>SIGUSR1</b>
+           Upon reception of the SIGUSR1 process signal <b>systemd-resolved</b>
+           will dump the contents of all DNS resource record caches it
+           maintains into the system logs.
+
+       <b>SIGUSR2</b>
+           Upon reception of the SIGUSR2 process signal <b>systemd-resolved</b>
+           will flush all caches it maintains. Note that it should normally
+           not be necessary to request this explicitly – except for
+           debugging purposes – as <b>systemd-resolved </b>flushes the caches
+           automatically anyway any time the host's network configuration
+           changes.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man5/resolved.conf.5.html">resolved.conf(5)</a>, <a href="../man5/dnssec-trust-anchors.d.5.html">dnssec-trust-anchors.d(5)</a>,
+       <a href="nss-resolve.8.html">nss-resolve(8)</a>, <a href="../man1/systemd-resolve.1.html">systemd-resolve(1)</a>, <a href="../man5/resolv.conf.5.html">resolv.conf(5)</a>, <a href="../man5/hosts.5.html">hosts(5)</a>,
+       <a href="../man5/systemd.network.5.html">systemd.network(5)</a>, <a href="systemd-networkd.service.8.html">systemd-networkd.service(8)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. API Documentation
+           <a href="https://www.freedesktop.org/wiki/Software/systemd/resolved">https://www.freedesktop.org/wiki/Software/systemd/resolved</a>
+
+        2. RFC3493
+           <a href="https://tools.ietf.org/html/rfc3493">https://tools.ietf.org/html/rfc3493</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                      SYSTEMD-RESOLVED.SERVICE(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemd-resolve.1.html">systemd-resolve(1)</a>,&nbsp; 
+    <a href="../man5/dnssec-trust-anchors.d.5.html">dnssec-trust-anchors.d(5)</a>,&nbsp; 
+    <a href="../man5/resolved.conf.5.html">resolved.conf(5)</a>,&nbsp; 
+    <a href="../man5/systemd.network.5.html">systemd.network(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="nss-resolve.8.html">nss-resolve(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

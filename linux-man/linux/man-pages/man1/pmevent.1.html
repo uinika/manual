@@ -1,0 +1,413 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmval(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#PCP_ENVIRONMENT">PCP&nbsp;ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#DIAGNOSTICS">DIAGNOSTICS</a> | <a href="#CAVEATS">CAVEATS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMVAL(1)                   General Commands Manual                  PMVAL(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmval</b>, <b>pmevent </b>- arbitrary performance metrics value dumper
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmval </b>[<b>-dgLrvz</b>] [<b>-A </b><i>align</i>] [<b>-a </b><i>archive</i>] [<b>-f </b><i>N</i>] [<b>-h </b><i>host</i>] [<b>-i</b>
+       <i>instances</i>] [<b>-K </b><i>spec</i>] [<b>-n </b><i>pmnsfile</i>] [<b>-O </b><i>offset</i>] [<b>-p </b><i>port</i>] [<b>-S</b>
+       <i>starttime</i>] [<b>-s </b><i>samples</i>] [<b>-T </b><i>endtime</i>] [<b>-t </b><i>interval</i>] [<b>-U </b><i>archive</i>] [<b>-w</b>
+       <i>width</i>] [<b>-x </b><i>pattern</i>] [<b>-Z </b><i>timezone</i>] <i>metricname</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmval </b>prints current or archived values for the nominated performance
+       metric.  The metric of interest is named in the <i>metricname</i> argument,
+       subject to instance qualification with the <b>-i </b>flag as described
+       below.
+
+       Unless directed to another host by the <b>-h </b>option, or to a set of
+       archives by the <b>-a </b>or <b>-U </b>options, <b>pmval </b>will contact the Performance
+       Metrics Collector Daemon (PMCD) on the local host to obtain the
+       required information.
+
+       The <i>metricname</i> argument may also be given in the metric specification
+       syntax, as described in <a href="PCPIntro.1.html">PCPIntro(1)</a>, where the source, metric and
+       instance may all be included in the <i>metricname</i>, e.g.
+       thathost:kernel.all.load["1 minute"].  When this format is used, none
+       of the <b>-h </b>or <b>-a </b>or <b>-U </b>options may be specified.
+
+       When using the metric specification syntax, the ``hostname'' <b>@ </b>is
+       treated specially and causes <b>pmval </b>to use a local context to collect
+       metrics from PMDAs on the local host without PMCD.  Only some metrics
+       are available in this mode.
+
+       When processing a set of archives, <b>pmval </b>may relinquish its own
+       timing control, and operate as a ``slave'' of a <a href="pmtime.1.html">pmtime(1)</a> process
+       that uses a GUI dialog to provide timing control.  In this case,
+       either the <b>-g </b>option should be used to start <b>pmval </b>as the sole slave
+       of a new <a href="pmtime.1.html">pmtime(1)</a> instance, or <b>-p </b>should be used to attach <b>pmval </b>to
+       an existing <a href="pmtime.1.html">pmtime(1)</a> instance via the IPC channel identified by the
+       <i>port</i> argument.
+
+       The <b>-S</b>, <b>-T</b>, <b>-O </b>and <b>-A </b>options may be used to define a time window to
+       restrict the samples retrieved, set an initial origin within the time
+       window, or specify a ``natural'' alignment of the sample times; refer
+       to <a href="PCPIntro.1.html">PCPIntro(1)</a> for a complete description of these options.
+
+       The other options which control the source, timing and layout of the
+       information reported by <b>pmval </b>are as follows:
+
+       <b>-a   </b>Performance metric values are retrieved from the set of
+            Performance Co-Pilot (PCP) archive logs identified. The argument
+            is a comma-separated list of names, each of which may be the
+            base name of an archive or the name of a directory containing
+            one or more archives. See also <b>-U</b>.
+
+       <b>-d   </b>When replaying from a set of archives, this option requests that
+            the prevailing real-time delay be applied between samples (see
+            <b>-t</b>) to effect a pause, rather than the default behaviour of
+            replaying at full speed.
+
+       <b>-f   </b>Numbers are reported in ``fixed point'' notation, rather than
+            the default scientific notation.  Each number will be up to the
+            column width determined by the default heuristics, else the <b>-w</b>
+            option if specified, and include <i>N</i> digits after the decimal
+            point.  So, the options <b>-f 3 -w 8 </b>would produce numbers of the
+            form 9999.999.  A value of zero for <i>N</i> omits the decimal point
+            and any fractional digits.
+
+       <b>-g   </b>Start <b>pmval </b>as the slave of a new <a href="pmtime.1.html">pmtime(1)</a> process for replay
+            of archived performance data using the <a href="pmtime.1.html">pmtime(1)</a> graphical user
+            interface.
+
+       <b>-h   </b>Current performance metric values are retrieved from the
+            nominated <i>host</i> machine.
+
+       <b>-i   </b><i>instances</i> is a list of one or more instance names for the
+            nominated performance metric - just these instances will be
+            retrieved and reported (the default is to report all instances).
+            The list must be a single argument, with elements of the list
+            separated by commas and/or white space.
+
+            The instance name may be quoted with single (') or double (")
+            quotes for those cases where the instance name contains white
+            space or commas.
+
+            Multiple <b>-i </b>options are allowed as an alternative way of
+            specifying more than one instance of interest.
+
+            As an example, the following are all equivalent:
+
+                 <b>$ pmval -i "'1 minute','5 minute'" kernel.all.load</b>
+                 <b>$ pmval -i '"1 minute","5 minute"' kernel.all.load</b>
+                 <b>$ pmval -i "'1 minute' '5 minute'" kernel.all.load</b>
+                 <b>$ pmval -i "'1 minute'" -i "'5 minute'" kernel.all.load</b>
+                 <b>$ pmval 'localhost:kernel.all.load["1 minute","5 minute"]'</b>
+
+       <b>-K   </b>When fetching metrics from a local context, the <b>-K </b>option may be
+            used to control the DSO PMDAs that should be made accessible.
+            The <i>spec</i> argument conforms to the syntax described in
+            <a href="../man3/__pmSpecLocalPMDA.3.html">__pmSpecLocalPMDA(3)</a>.  More than one <b>-K </b>option may be used.
+
+       <b>-n   </b>Normally <b>pmval </b>operates on the default Performance Metrics Name
+            Space (PMNS), however if the <b>-n </b>option is specified an
+            alternative namespace is loaded from the file <i>pmnsfile.</i>
+
+       <b>-p   </b>Attach <b>pmval </b>to an existing <a href="pmtime.1.html">pmtime(1)</a> time control process
+            instance via the IPC channel identified by the <i>port</i> argument.
+            This option is normally only used by other tools, e.g.
+            <a href="pmchart.1.html">pmchart(1)</a>, when they launch <b>pmval </b>with synchronized time
+            control.
+
+       <b>-r   </b>Print raw values for cumulative counter metrics.  Normally
+            cumulative counter metrics are converted to rates.  For example,
+            disk transfers are reported as number of disk transfers per
+            second during the preceding sample interval, rather than the raw
+            value of number of disk transfers since the machine was booted.
+            If you specify this option, the raw metric values are printed.
+
+       <b>-s   </b>The argument <i>samples</i> defines the number of samples to be
+            retrieved and reported.  If <i>samples</i> is 0 or <b>-s </b>is not specified,
+            <b>pmval </b>will sample and report continuously (in real time mode) or
+            until the end of the set of PCP archives (in archive mode).
+
+       <b>-t   </b>The default update <i>interval</i> may be set to something other than
+            the default 1 second.  The <i>interval</i> argument follows the syntax
+            described in <a href="PCPIntro.1.html">PCPIntro(1)</a>, and in the simplest form may be an
+            unsigned integer (the implied units in this case are seconds).
+
+       <b>-U   </b>Performance metric values are retrieved from the set of
+            Performance Co-Pilot (PCP) archive logs identified. The argument
+            is a comma-separated list of names, each of which may be the
+            base name of an archive or the name of a directory containing
+            one or more archives.  However, unlike <b>-a </b>every recorded value
+            in the archive for the selected metric and instances is reported
+            (so no interpolation mode, and the sample interval (<b>-t </b>option)
+            is ignored. See also <b>-a</b>.
+
+            At most one of the options <b>-a </b>and <b>-U </b>may be specified.
+
+       <b>-w   </b>Set the width of each column of output to be <i>width</i> columns.  If
+            not specified columns are wide enough to accommodate the largest
+            value of the type being printed.
+
+       <b>-x   </b>The given <i>pattern</i> is sent to the performance metric domain agent
+            for the requested <i>metricname</i> before any values are requested.
+            This serves two purposes.  Firstly, it provides a mechanism for
+            server-side event filtering that is customisable for individual
+            event streams.  In addition, some performance metrics domain
+            agents also use the PMCD store mechanism to provide a basic
+            security model (e.g. for sensitive log files, only a client host
+            with <a href="../man3/pmStore.3.html">pmStore(3)</a> access would be able to access the event
+            stream).
+
+            As <i>pattern</i> may be processed by <a href="../man3/regcomp.3.html">regcomp(3)</a> it should be a non-
+            empty string.  Use . (dot) for a “match all” <i>pattern</i>.
+
+       <b>-Z   </b>By default, <b>pmval </b>reports the time of day according to the local
+            timezone on the system where <b>pmval </b>is run.  The <b>-Z </b>option
+            changes the timezone to <i>timezone</i> in the format of the
+            environment variable <b>TZ </b>as described in <a href="../man7/environ.7.html">environ(7)</a>.
+
+       <b>-z   </b>Change the reporting timezone to the local timezone at the host
+            that is the source of the performance metrics, as identified via
+            either the <i>metricname</i> or the <b>-h </b>or <b>-a </b>or <b>-U </b>options.
+
+       The following symbols may occasionally appear, in place of a metric
+       value, in <b>pmval </b>output:  A question mark symbol (?) indicates that a
+       value is no longer available for that metric instance.  An
+       exclamation mark (!)  indicates that a 64-bit counter wrapped during
+       the sample.
+
+       The output from <b>pmval </b>is directed to standard output.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>$PCP_VAR_DIR/pmns/</b><i>*</i>
+                 default PMNS specification files
+</pre>
+<h2><a id="PCP_ENVIRONMENT" href="#PCP_ENVIRONMENT"></a>PCP ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Environment variables with the prefix <b>PCP_ </b>are used to parameterize
+       the file and directory names used by PCP.  On each installation, the
+       file <i>/etc/pcp.conf</i> contains the local values for these variables.
+       The <b>$PCP_CONF </b>variable may be used to specify an alternative
+       configuration file, as described in <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PCPIntro.1.html">PCPIntro(1)</a>, <a href="pmcd.1.html">pmcd(1)</a>, <a href="pmchart.1.html">pmchart(1)</a>, <a href="pmdumplog.1.html">pmdumplog(1)</a>, <a href="pmdumptext.1.html">pmdumptext(1)</a>,
+       <a href="pminfo.1.html">pminfo(1)</a>, <a href="pmlogger.1.html">pmlogger(1)</a>, <a href="pmrep.1.html">pmrep(1)</a>, <a href="pmtime.1.html">pmtime(1)</a>, <a href="../man3/PMAPI.3.html">PMAPI(3)</a>, <a href="../man3/pmStore.3.html">pmStore(3)</a>,
+       <a href="../man3/__pmSpecLocalPMDA.3.html">__pmSpecLocalPMDA(3)</a>, <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a> and <a href="../man5/pcp.env.5.html">pcp.env(5)</a>.
+</pre>
+<h2><a id="DIAGNOSTICS" href="#DIAGNOSTICS"></a>DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All are generated on standard error and are intended to be self-
+       explanatory.
+</pre>
+<h2><a id="CAVEATS" href="#CAVEATS"></a>CAVEATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       By default, <b>pmval </b>attempts to display non-integer numeric values in a
+       way that does not distort the inherent precision (rarely more than 4
+       significant digits), and tries to maintain a tabular format in the
+       output.  These goals are sometimes in conflict.
+
+       In the absence of the <b>-f </b>option (described above), the following
+       table describes the formats used for different ranges of numeric
+       values for any metric that is of type <b>PM_TYPE_FLOAT </b>or
+       <b>PM_TYPE_DOUBLE</b>, or any metric that has the semantics of a counter
+       (for which <b>pmval </b>reports the rate converted value):
+
+                        ┌──────────┬──────────────────────┐
+                        │ Format   │     Value Range      │
+                        ├──────────┼──────────────────────┤
+                        │        ! │ No values available  │
+                        │9.999E-99 │ &lt; 0.1                │
+                        │   0.0    │ 0                    │
+                        │   9.9999 │ &gt; 0 and &lt;= 0.9999    │
+                        │   9.999  │ &gt; 0.9999 and &lt; 9.999 │
+                        │  99.99   │ &gt; 9.999 and &lt; 99.99  │
+                        │ 999.9    │ &gt; 99.99 and &lt; 999.9  │
+                        │9999.     │ &gt; 999.9 and &lt; 9999   │
+                        │9.999E+99 │ &gt; 9999               │
+                        └──────────┴──────────────────────┘
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                            PMVAL(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pcp2graphite.1.html">pcp2graphite(1)</a>,&nbsp; 
+    <a href="pcp2influxdb.1.html">pcp2influxdb(1)</a>,&nbsp; 
+    <a href="pcpintro.1-2.html">pcpintro(1)</a>,&nbsp; 
+    <a href="pmafm.1.html">pmafm(1)</a>,&nbsp; 
+    <a href="pmcd.1.html">pmcd(1)</a>,&nbsp; 
+    <a href="pmchart.1.html">pmchart(1)</a>,&nbsp; 
+    <a href="pmclient.1.html">pmclient(1)</a>,&nbsp; 
+    <a href="pmdabash.1.html">pmdabash(1)</a>,&nbsp; 
+    <a href="pmdalogger.1.html">pmdalogger(1)</a>,&nbsp; 
+    <a href="pmdapapi.1.html">pmdapapi(1)</a>,&nbsp; 
+    <a href="pmdapipe.1.html">pmdapipe(1)</a>,&nbsp; 
+    <a href="pmdasystemd.1.html">pmdasystemd(1)</a>,&nbsp; 
+    <a href="pmdumptext.1.html">pmdumptext(1)</a>,&nbsp; 
+    <a href="pmie.1.html">pmie(1)</a>,&nbsp; 
+    <a href="pminfo.1.html">pminfo(1)</a>,&nbsp; 
+    <a href="pmlogcheck.1.html">pmlogcheck(1)</a>,&nbsp; 
+    <a href="pmlogsummary.1.html">pmlogsummary(1)</a>,&nbsp; 
+    <a href="pmrep.1.html">pmrep(1)</a>,&nbsp; 
+    <a href="pmsocks.1.html">pmsocks(1)</a>,&nbsp; 
+    <a href="pmstore.1.html">pmstore(1)</a>,&nbsp; 
+    <a href="pmtime.1.html">pmtime(1)</a>,&nbsp; 
+    <a href="../man3/pmregisterderived.3-2.html">pmregisterderived(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,359 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>gitcli(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#ENHANCED_OPTION_PARSER">ENHANCED&nbsp;OPTION&nbsp;PARSER</a> | <a href="#NOTES_ON_FREQUENTLY_CONFUSED_OPTIONS">NOTES&nbsp;ON&nbsp;FREQUENTLY&nbsp;CONFUSED&nbsp;OPTIONS</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GITCLI(7)                        Git Manual                        GITCLI(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       gitcli - Git command-line interface and conventions
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       gitcli
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual describes the convention used throughout Git CLI.
+
+       Many commands take revisions (most often "commits", but sometimes
+       "tree-ish", depending on the context and command) and paths as their
+       arguments. Here are the rules:
+
+       ·   Revisions come first and then paths. E.g. in <b>git diff v1.0 v2.0</b>
+           <b>arch/x86 include/asm-x86</b>, <b>v1.0 </b>and <b>v2.0 </b>are revisions and
+           <b>arch/x86 </b>and <b>include/asm-x86 </b>are paths.
+
+       ·   When an argument can be misunderstood as either a revision or a
+           path, they can be disambiguated by placing <b>-- </b>between them. E.g.
+           <b>git diff -- HEAD </b>is, "I have a file called HEAD in my work tree.
+           Please show changes between the version I staged in the index and
+           what I have in the work tree for that file", not "show difference
+           between the HEAD commit and the work tree as a whole". You can
+           say <b>git diff HEAD -- </b>to ask for the latter.
+
+       ·   Without disambiguating <b>--</b>, Git makes a reasonable guess, but
+           errors out and asking you to disambiguate when ambiguous. E.g. if
+           you have a file called HEAD in your work tree, <b>git diff HEAD </b>is
+           ambiguous, and you have to say either <b>git diff HEAD -- </b>or <b>git</b>
+           <b>diff -- HEAD </b>to disambiguate.
+
+           When writing a script that is expected to handle random
+           user-input, it is a good practice to make it explicit which
+           arguments are which by placing disambiguating <b>-- </b>at appropriate
+           places.
+
+       ·   Many commands allow wildcards in paths, but you need to protect
+           them from getting globbed by the shell. These two mean different
+           things:
+
+               $ git checkout -- *.c
+               $ git checkout -- \*.c
+
+           The former lets your shell expand the fileglob, and you are
+           asking the dot-C files in your working tree to be overwritten
+           with the version in the index. The latter passes the <b>*.c </b>to Git,
+           and you are asking the paths in the index that match the pattern
+           to be checked out to your working tree. After running <b>git add</b>
+           <b>hello.c; rm hello.c</b>, you will <i>not</i> see <b>hello.c </b>in your working
+           tree with the former, but with the latter you will.
+
+       ·   Just as the filesystem <i>.</i>  (period) refers to the current
+           directory, using a <i>.</i>  as a repository name in Git (a
+           dot-repository) is a relative path and means your current
+           repository.
+
+       Here are the rules regarding the "flags" that you should follow when
+       you are scripting Git:
+
+       ·   it’s preferred to use the non-dashed form of Git commands, which
+           means that you should prefer <b>git foo </b>to <b>git-foo</b>.
+
+       ·   splitting short options to separate words (prefer <b>git foo -a -b</b>
+           to <b>git foo -ab</b>, the latter may not even work).
+
+       ·   when a command-line option takes an argument, use the <i>stuck</i> form.
+           In other words, write <b>git foo -oArg </b>instead of <b>git foo -o Arg </b>for
+           short options, and <b>git foo --long-opt=Arg </b>instead of <b>git foo</b>
+           <b>--long-opt Arg </b>for long options. An option that takes optional
+           option-argument must be written in the <i>stuck</i> form.
+
+       ·   when you give a revision parameter to a command, make sure the
+           parameter is not ambiguous with a name of a file in the work
+           tree. E.g. do not write <b>git log -1 HEAD </b>but write <b>git log -1 HEAD</b>
+           <b>--</b>; the former will not work if you happen to have a file called
+           <b>HEAD </b>in the work tree.
+
+       ·   many commands allow a long option <b>--option </b>to be abbreviated only
+           to their unique prefix (e.g. if there is no other option whose
+           name begins with <b>opt</b>, you may be able to spell <b>--opt </b>to invoke
+           the <b>--option </b>flag), but you should fully spell them out when
+           writing your scripts; later versions of Git may introduce a new
+           option whose name shares the same prefix, e.g.  <b>--optimize</b>, to
+           make a short prefix that used to be unique no longer unique.
+</pre>
+<h2><a id="ENHANCED_OPTION_PARSER" href="#ENHANCED_OPTION_PARSER"></a>ENHANCED OPTION PARSER  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       From the Git 1.5.4 series and further, many Git commands (not all of
+       them at the time of the writing though) come with an enhanced option
+       parser.
+
+       Here is a list of the facilities provided by this option parser.
+
+   <b>Magic Options</b>
+       Commands which have the enhanced option parser activated all
+       understand a couple of magic command-line options:
+
+       -h
+           gives a pretty printed usage of the command.
+
+               $ git describe -h
+               usage: git describe [options] &lt;commit-ish&gt;*
+                  or: git describe [options] --dirty
+
+                   --contains            find the tag that comes after the commit
+                   --debug               debug search strategy on stderr
+                   --all                 use any ref
+                   --tags                use any tag, even unannotated
+                   --long                always use long format
+                   --abbrev[=&lt;n&gt;]        use &lt;n&gt; digits to display SHA-1s
+
+       --help-all
+           Some Git commands take options that are only used for plumbing or
+           that are deprecated, and such options are hidden from the default
+           usage. This option gives the full list of options.
+
+   <b>Negating options</b>
+       Options with long option names can be negated by prefixing <b>--no-</b>. For
+       example, <b>git branch </b>has the option <b>--track </b>which is <i>on</i> by default.
+       You can use <b>--no-track </b>to override that behaviour. The same goes for
+       <b>--color </b>and <b>--no-color</b>.
+
+   <b>Aggregating short options</b>
+       Commands that support the enhanced option parser allow you to
+       aggregate short options. This means that you can for example use <b>git</b>
+       <b>rm -rf </b>or <b>git clean -fdx</b>.
+
+   <b>Abbreviating long options</b>
+       Commands that support the enhanced option parser accepts unique
+       prefix of a long option as if it is fully spelled out, but use this
+       with a caution. For example, <b>git commit --amen </b>behaves as if you
+       typed <b>git commit --amend</b>, but that is true only until a later version
+       of Git introduces another option that shares the same prefix, e.g.
+       <b>git commit --amenity </b>option.
+
+   <b>Separating argument from the option</b>
+       You can write the mandatory option parameter to an option as a
+       separate word on the command line. That means that all the following
+       uses work:
+
+           $ git foo --long-opt=Arg
+           $ git foo --long-opt Arg
+           $ git foo -oArg
+           $ git foo -o Arg
+
+       However, this is <b>NOT </b>allowed for switches with an optional value,
+       where the <i>stuck</i> form must be used:
+
+           $ git describe --abbrev HEAD     # correct
+           $ git describe --abbrev=10 HEAD  # correct
+           $ git describe --abbrev 10 HEAD  # NOT WHAT YOU MEANT
+</pre>
+<h2><a id="NOTES_ON_FREQUENTLY_CONFUSED_OPTIONS" href="#NOTES_ON_FREQUENTLY_CONFUSED_OPTIONS"></a>NOTES ON FREQUENTLY CONFUSED OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Many commands that can work on files in the working tree and/or in
+       the index can take <b>--cached </b>and/or <b>--index </b>options. Sometimes people
+       incorrectly think that, because the index was originally called
+       cache, these two are synonyms. They are <b>not </b>— these two options mean
+       very different things.
+
+       ·   The <b>--cached </b>option is used to ask a command that usually works
+           on files in the working tree to <b>only </b>work with the index. For
+           example, <b>git grep</b>, when used without a commit to specify from
+           which commit to look for strings in, usually works on files in
+           the working tree, but with the <b>--cached </b>option, it looks for
+           strings in the index.
+
+       ·   The <b>--index </b>option is used to ask a command that usually works on
+           files in the working tree to <b>also </b>affect the index. For example,
+           <b>git stash apply </b>usually merges changes recorded in a stash entry
+           to the working tree, but with the <b>--index </b>option, it also merges
+           changes to the index as well.
+
+       <b>git apply </b>command can be used with <b>--cached </b>and <b>--index </b>(but not at
+       the same time). Usually the command only affects the files in the
+       working tree, but with <b>--index</b>, it patches both the files and their
+       index entries, and with <b>--cached</b>, it modifies only the index entries.
+
+       See also <b>http://marc.info/?l=git&amp;m=116563135620359 </b><b></b>and
+       <b>http://marc.info/?l=git&amp;m=119150393620273 </b><b></b>for further information.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="../man1/git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.13.2.556.g5116f7           07/05/2017                        GITCLI(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/git.1.html">git(1)</a>,&nbsp; 
+    <a href="../man1/gitk.1.html">gitk(1)</a>,&nbsp; 
+    <a href="../man1/git-rev-parse.1.html">git-rev-parse(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

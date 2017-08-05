@@ -1,0 +1,311 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>namespace.conf(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">NAMESPACE.CONF(5)             Linux-PAM Manual             NAMESPACE.CONF(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       namespace.conf - the namespace configuration file
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>pam_namespace.so</i> module allows setup of private namespaces with
+       polyinstantiated directories. Directories can be polyinstantiated
+       based on user name or, in the case of SELinux, user name, sensitivity
+       level or complete security context. If an executable script
+       /etc/security/namespace.init exists, it is used to initialize the
+       namespace every time an instance directory is set up and mounted. The
+       script receives the polyinstantiated directory path and the instance
+       directory path as its arguments.
+
+       The /etc/security/namespace.conf file specifies which directories are
+       polyinstantiated, how they are polyinstantiated, how instance
+       directories would be named, and any users for whom polyinstantiation
+       would not be performed.
+
+       When someone logs in, the file namespace.conf is scanned. Comments
+       are marked by <i>#</i> characters. Each non comment line represents one
+       polyinstantiated directory. The fields are separated by spaces but
+       can be quoted by <i>"</i> characters also escape sequences <i>\b</i>, <i>\n</i>, and <i>\t</i>
+       are recognized. The fields are as follows:
+
+       <i>polydirinstance_prefixmethodlist_of_uids</i>
+
+       The first field, <i>polydir</i>, is the absolute pathname of the directory
+       to polyinstantiate. The special string <i>$HOME</i> is replaced with the
+       user's home directory, and <i>$USER</i> with the username. This field cannot
+       be blank.
+
+       The second field, <i>instance_prefix</i> is the string prefix used to build
+       the pathname for the instantiation of &lt;polydir&gt;. Depending on the
+       polyinstantiation <i>method</i> it is then appended with "instance
+       differentiation string" to generate the final instance directory
+       path. This directory is created if it did not exist already, and is
+       then bind mounted on the &lt;polydir&gt; to provide an instance of
+       &lt;polydir&gt; based on the &lt;method&gt; column. The special string <i>$HOME</i> is
+       replaced with the user's home directory, and <i>$USER</i> with the username.
+       This field cannot be blank.
+
+       The third field, <i>method</i>, is the method used for polyinstantiation. It
+       can take these values; "user" for polyinstantiation based on user
+       name, "level" for polyinstantiation based on process MLS level and
+       user name, "context" for polyinstantiation based on process security
+       context and user name, "tmpfs" for mounting tmpfs filesystem as an
+       instance dir, and "tmpdir" for creating temporary directory as an
+       instance dir which is removed when the user's session is closed.
+       Methods "context" and "level" are only available with SELinux. This
+       field cannot be blank.
+
+       The fourth field, <i>list_of_uids</i>, is a comma separated list of user
+       names for whom the polyinstantiation is not performed. If left blank,
+       polyinstantiation will be performed for all users. If the list is
+       preceded with a single "~" character, polyinstantiation is performed
+       only for users in the list.
+
+       The <i>method</i> field can contain also following optional flags separated
+       by <i>:</i> characters.
+
+       <i>create</i>=<i>mode</i>,<i>owner</i>,<i>group</i> - create the polyinstantiated directory. The
+       mode, owner and group parameters are optional. The default for mode
+       is determined by umask, the default owner is the user whose session
+       is opened, the default group is the primary group of the user.
+
+       <i>iscript</i>=<i>path</i> - path to the instance directory init script. The base
+       directory for relative paths is /etc/security/namespace.d.
+
+       <i>noinit</i> - instance directory init script will not be executed.
+
+       <i>shared</i> - the instance directories for "context" and "level" methods
+       will not contain the user name and will be shared among all users.
+
+       <i>mntopts</i>=<i>value</i> - value of this flag is passed to the mount call when
+       the tmpfs mount is done. It allows for example the specification of
+       the maximum size of the tmpfs instance that is created by the mount
+       call. See <a href="../man8/mount.8.html">mount(8)</a> for details.
+
+       The directory where polyinstantiated instances are to be created,
+       must exist and must have, by default, the mode of 0000. The
+       requirement that the instance parent be of mode 0000 can be
+       overridden with the command line option <i>ignore_instance_parent_mode</i>
+
+       In case of context or level polyinstantiation the SELinux context
+       which is used for polyinstantiation is the context used for executing
+       a new process as obtained by getexeccon. This context must be set by
+       the calling application or pam_selinux.so module. If this context is
+       not set the polyinstatiation will be based just on user name.
+
+       The "instance differentiation string" is &lt;user name&gt; for "user"
+       method and &lt;user name&gt;_&lt;raw directory context&gt; for "context" and
+       "level" methods. If the whole string is too long the end of it is
+       replaced with md5sum of itself. Also when command line option
+       <i>gen_hash</i> is used the whole string is replaced with md5sum of itself.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These are some example lines which might be specified in
+       /etc/security/namespace.conf.
+
+                 # The following three lines will polyinstantiate /tmp,
+                 # /var/tmp and user's home directories. /tmp and /var/tmp
+                 # will be polyinstantiated based on the security level
+                 # as well as user name, whereas home directory will be
+                 # polyinstantiated based on the full security context and user name.
+                 # Polyinstantiation will not be performed for user root
+                 # and adm for directories /tmp and /var/tmp, whereas home
+                 # directories will be polyinstantiated for all users.
+                 #
+                 # Note that instance directories do not have to reside inside
+                 # the polyinstantiated directory. In the examples below,
+                 # instances of /tmp will be created in /tmp-inst directory,
+                 # where as instances of /var/tmp and users home directories
+                 # will reside within the directories that are being
+                 # polyinstantiated.
+                 #
+                 /tmp     /tmp-inst/               level      root,adm
+                 /var/tmp /var/tmp/tmp-inst/       level      root,adm
+                 $HOME    $HOME/$USER.inst/inst- context
+
+       For the &lt;service&gt;s you need polyinstantiation (login for example) put
+       the following line in /etc/pam.d/&lt;service&gt; as the last line for
+       session group:
+
+       session required pam_namespace.so [arguments]
+
+       This module also depends on pam_selinux.so setting the context.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/pam_namespace.8.html">pam_namespace(8)</a>, <a href="pam.d.5.html">pam.d(5)</a>, <a href="../man8/pam.8-2.html">pam(8)</a>
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The namespace.conf manual page was written by Janak Desai
+       &lt;janak@us.ibm.com&gt;. More features added by Tomas Mraz
+       &lt;tmraz@redhat.com&gt;.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>linux-pam</i> (Pluggable Authentication Modules
+       for Linux) project.  Information about the project can be found at 
+       ⟨<a href="http://www.linux-pam.org/">http://www.linux-pam.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨//www.linux-pam.org/⟩.  This page was obtained from the
+       tarball Linux-PAM-1.3.0.tar.gz fetched from 
+       ⟨<a href="http://www.linux-pam.org/library/">http://www.linux-pam.org/library/</a>⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Linux-PAM Manual                 04/01/2016                NAMESPACE.CONF(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man8/pam_namespace.8.html">pam_namespace(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

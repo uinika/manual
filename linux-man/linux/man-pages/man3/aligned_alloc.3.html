@@ -1,0 +1,322 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>posix_memalign(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">POSIX_MEMALIGN(3)         Linux Programmer's Manual        POSIX_MEMALIGN(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       posix_memalign,  aligned_alloc,  memalign, valloc, pvalloc - allocate
+       aligned memory
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdlib.h&gt;</b>
+
+       <b>int posix_memalign(void **</b><i>memptr</i><b>, size_t </b><i>alignment</i><b>, size_t </b><i>size</i><b>);</b>
+       <b>void *aligned_alloc(size_t </b><i>alignment</i><b>, size_t </b><i>size</i><b>);</b>
+       <b>void *valloc(size_t </b><i>size</i><b>);</b>
+
+       <b>#include &lt;malloc.h&gt;</b>
+
+       <b>void *memalign(size_t </b><i>alignment</i><b>, size_t </b><i>size</i><b>);</b>
+       <b>void *pvalloc(size_t </b><i>size</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>posix_memalign</b>(): _POSIX_C_SOURCE &gt;= 200112L
+
+       <b>aligned_alloc</b>(): _ISOC11_SOURCE
+
+       <b>valloc</b>():
+           Since glibc 2.12:
+               (_XOPEN_SOURCE &gt;= 500) &amp;&amp; !(_POSIX_C_SOURCE &gt;= 200112L)
+                   || /* Glibc since 2.19: */ _DEFAULT_SOURCE
+                   || /* Glibc versions &lt;= 2.19: */ _SVID_SOURCE || _BSD_SOURCE
+           Before glibc 2.12:
+               _BSD_SOURCE || _XOPEN_SOURCE &gt;= 500
+               (The (nonstandard) header file <i>&lt;malloc.h&gt;</i>  also  exposes  the
+               declaration   of   <b>valloc</b>();   no  feature  test  macros  are
+               required.)
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The function <b>posix_memalign</b>() allocates <i>size</i> bytes and places the
+       address of the allocated memory in <i>*memptr</i>.  The address of the
+       allocated memory will be a multiple of <i>alignment</i>, which must be a
+       power of two and a multiple of <i>sizeof(void *)</i>.  If <i>size</i> is 0, then
+       the value placed in <i>*memptr</i> is either NULL, or a unique pointer value
+       that can later be successfully passed to <a href="free.3.html">free(3)</a>.
+
+       The obsolete function <b>memalign</b>() allocates <i>size</i> bytes and returns a
+       pointer to the allocated memory.  The memory address will be a
+       multiple of <i>alignment</i>, which must be a power of two.
+
+       The function <b>aligned_alloc</b>() is the same as <b>memalign</b>(), except for
+       the added restriction that <i>size</i> should be a multiple of <i>alignment</i>.
+
+       The obsolete function <b>valloc</b>() allocates <i>size</i> bytes and returns a
+       pointer to the allocated memory.  The memory address will be a
+       multiple of the page size.  It is equivalent to
+       <i>memalign(sysconf(_SC_PAGESIZE),size)</i>.
+
+       The obsolete function <b>pvalloc</b>() is similar to <b>valloc</b>(), but rounds
+       the size of the allocation up to the next multiple of the system page
+       size.
+
+       For all of these functions, the memory is not zeroed.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>aligned_alloc</b>(), <b>memalign</b>(), <b>valloc</b>(), and <b>pvalloc</b>() return a pointer
+       to the allocated memory, or NULL if the request fails.
+
+       <b>posix_memalign</b>() returns zero on success, or one of the error values
+       listed in the next section on failure.  The value of <i><a href="errno.3.html">errno</a></i> is not
+       set.  On Linux (and other systems), <b>posix_memalign</b>() does not modify
+       <i>memptr</i> on failure.  A requirement standardizing this behavior was
+       added in POSIX.1-2016.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EINVAL </b>The <i>alignment</i> argument was not a power of two, or was not a
+              multiple of <i>sizeof(void *)</i>.
+
+       <b>ENOMEM </b>There was insufficient memory to fulfill the allocation
+              request.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The functions <b>memalign</b>(), <b>valloc</b>(), and <b>pvalloc</b>() have been available
+       in all Linux libc libraries.
+
+       The function <b>aligned_alloc</b>() was added to glibc in version 2.16.
+
+       The function <b>posix_memalign</b>() is available since glibc 2.1.91.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌─────────────────┬───────────────┬────────────────┐
+       │<b>Interface        </b>│ <b>Attribute     </b>│ <b>Value          </b>│
+       ├─────────────────┼───────────────┼────────────────┤
+       │<b>aligned_alloc</b>(), │ Thread safety │ MT-Safe        │
+       │<b>memalign</b>(),      │               │                │
+       │<b>posix_memalign</b>() │               │                │
+       ├─────────────────┼───────────────┼────────────────┤
+       │<b>valloc</b>(),        │ Thread safety │ MT-Unsafe init │
+       │<b>pvalloc</b>()        │               │                │
+       └─────────────────┴───────────────┴────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The function <b>valloc</b>() appeared in 3.0BSD.  It is documented as being
+       obsolete in 4.3BSD, and as legacy in SUSv2.  It does not appear in
+       POSIX.1.
+
+       The function <b>pvalloc</b>() is a GNU extension.
+
+       The function <b>memalign</b>() appears in SunOS 4.1.3 but not in 4.4BSD.
+
+       The function <b>posix_memalign</b>() comes from POSIX.1d and is specified in
+       POSIX.1-2001 and POSIX.1-2008.
+
+       The function <b>aligned_alloc</b>() is specified in the C11 standard.
+
+   <b>Headers</b>
+       Everybody agrees that <b>posix_memalign</b>() is declared in <i>&lt;stdlib.h&gt;</i>.
+
+       On some systems <b>memalign</b>() is declared in <i>&lt;stdlib.h&gt;</i> instead of
+       <i>&lt;malloc.h&gt;</i>.
+
+       According to SUSv2, <b>valloc</b>() is declared in <i>&lt;stdlib.h&gt;</i>.  Libc4,5 and
+       glibc declare it in <i>&lt;malloc.h&gt;</i>, and also in <i>&lt;stdlib.h&gt;</i> if suitable
+       feature test macros are defined (see above).
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On many systems there are alignment restrictions, for example, on
+       buffers used for direct block device I/O.  POSIX specifies the
+       <i>pathconf(path,_PC_REC_XFER_ALIGN)</i> call that tells what alignment is
+       needed.  Now one can use <b>posix_memalign</b>() to satisfy this
+       requirement.
+
+       <b>posix_memalign</b>() verifies that <i>alignment</i> matches the requirements
+       detailed above.  <b>memalign</b>() may not check that the <i>alignment</i> argument
+       is correct.
+
+       POSIX requires that memory obtained from <b>posix_memalign</b>() can be
+       freed using <a href="free.3.html">free(3)</a>.  Some systems provide no way to reclaim memory
+       allocated with <b>memalign</b>() or <b>valloc</b>() (because one can pass to
+       <a href="free.3.html">free(3)</a> only a pointer obtained from <a href="malloc.3.html">malloc(3)</a>, while, for example,
+       <b>memalign</b>() would call <a href="malloc.3.html">malloc(3)</a> and then align the obtained value).
+       The glibc implementation allows memory obtained from any of these
+       functions to be reclaimed with <a href="free.3.html">free(3)</a>.
+
+       The glibc <a href="malloc.3.html">malloc(3)</a> always returns 8-byte aligned memory addresses,
+       so these functions are needed only if you require larger alignment
+       values.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/brk.2.html">brk(2)</a>, <a href="../man2/getpagesize.2.html">getpagesize(2)</a>, <a href="free.3.html">free(3)</a>, <a href="malloc.3.html">malloc(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2016-03-15                POSIX_MEMALIGN(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="malloc.3.html">malloc(3)</a>,&nbsp; 
+    <a href="malloc_hook.3.html">malloc_hook(3)</a>,&nbsp; 
+    <a href="mallopt.3.html">mallopt(3)</a>,&nbsp; 
+    <a href="mtrace.3.html">mtrace(3)</a>,&nbsp; 
+    <a href="pthread_attr_setstack.3.html">pthread_attr_setstack(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="posix_memalign.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

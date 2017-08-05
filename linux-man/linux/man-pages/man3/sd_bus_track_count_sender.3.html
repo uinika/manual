@@ -1,0 +1,342 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sd_bus_track_add_name(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SD_BUS_TRACK_ADD_NAME(3)    sd_bus_track_add_name   SD_BUS_TRACK_ADD_NAME(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sd_bus_track_add_name, sd_bus_track_add_sender,
+       sd_bus_track_remove_name, sd_bus_track_remove_sender,
+       sd_bus_track_count, sd_bus_track_count_sender,
+       sd_bus_track_count_name, sd_bus_track_contains, sd_bus_track_first,
+       sd_bus_track_next - Add, remove and retrieve bus peers tracked in a
+       bus peer tracking object
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;systemd/sd-bus.h&gt;</b>
+
+       <b>int sd_bus_track_add_name(sd_bus_track* </b><i>t</i><b>, const char* </b><i>name</i><b>);</b>
+
+       <b>int sd_bus_track_add_sender(sd_bus_track* </b><i>t</i><b>,</b>
+                                   <b>sd_bus_message* </b><i>message</i><b>);</b>
+
+       <b>int sd_bus_track_remove_name(sd_bus_track* </b><i>t</i><b>, const char* </b><i>name</i><b>);</b>
+
+       <b>int sd_bus_track_remove_sender(sd_bus_track* </b><i>t</i><b>,</b>
+                                      <b>sd_bus_message* </b><i>message</i><b>);</b>
+
+       <b>unsigned sd_bus_track_count(sd_bus_track* </b><i>t</i><b>);</b>
+
+       <b>int sd_bus_track_count_name(sd_bus_track* </b><i>t</i><b>, const char* </b><i>name</i><b>);</b>
+
+       <b>int sd_bus_track_count_sender(sd_bus_track* </b><i>t</i><b>,</b>
+                                     <b>sd_bus_message* </b><i>message</i><b>);</b>
+
+       <b>int sd_bus_track_contains(sd_bus_track* </b><i>t</i><b>, const char* </b><i>name</i><b>);</b>
+
+       <b>const char* sd_bus_track_first(sd_bus_track* </b><i>t</i><b>);</b>
+
+       <b>const char* sd_bus_track_next(sd_bus_track* </b><i>t</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sd_bus_track_add_name() </b>adds a peer to track to a bus peer tracking
+       object. The first argument should refer to a bus peer tracking object
+       created with <a href="sd_bus_track_new.3.html">sd_bus_track_new(3)</a>, the second name should refer to a
+       D-Bus peer name to track, either in unique or well-known service
+       format. If the name is not tracked yet it will be added to the list
+       of names to track. If it already is being tracked and non-recursive
+       mode is enabled, no operation is executed by this call. If recursive
+       mode is enabled a per-name counter is increased by one each time this
+       call is invoked, and <b>sd_bus_track_remove_name() </b>has to be called as
+       many times as <b>sd_bus_track_add_name() </b>was invoked before in order to
+       stop tracking of the name. Use <a href="sd_bus_track_set_recursive.3.html">sd_bus_track_set_recursive(3)</a> to
+       switch from the default non-recursive mode to recursive mode, or
+       back. Note that the specified name is tracked as it is, well-known
+       names are not resolved to unique names by this call. Note that
+       multiple bus peer tracking objects may track the same name.
+
+       <b>sd_bus_track_remove_name() </b>undoes the effect of
+       <b>sd_bus_track_add_name() </b>and removes a bus peer name from the list of
+       peers to watch. Depending on whether non-recursive or recursive mode
+       is enabled for the bus peer tracking object this call will either
+       remove the name fully from the tracking object, or will simply
+       decrement the per-name counter by one, removing the name only when
+       the counter reaches zero (see above). Note that a bus peer
+       disconnecting from the bus will implicitly remove its names fully
+       from the bus peer tracking object, regardless of the current per-name
+       counter.
+
+       <b>sd_bus_track_add_sender() </b>and <b>sd_bus_track_remove_sender() </b>are
+       similar to <b>sd_bus_track_add_name() </b>and <b>sd_bus_track_remove_name() </b>but
+       take a bus message as argument. The sender of this bus message is
+       determined and added to/removed from the bus peer tracking object. As
+       messages always originate from unique names, and never from
+       well-known names this means that this call will effectively only add
+       unique names to the bus peer tracking object.
+
+       <b>sd_bus_track_count() </b>returns the number of names currently being
+       tracked by the specified bus peer tracking object. Note that this
+       function always returns the actual number of names tracked, and hence
+       if <b>sd_bus_track_add_name() </b>has been invoked multiple times for the
+       same name it is only counted as one, regardless if recursive mode is
+       used or not.
+
+       <b>sd_bus_track_count_name() </b>returns the current per-name counter for
+       the specified name. If non-recursive mode is used this returns either
+       1 or 0, depending on whether the specified name has been added to the
+       tracking object before, or not. If recursive mode has been enabled,
+       values larger than 1 may be returned too, in case
+       <b>sd_bus_track_add_name() </b>has been called multiple times for the same
+       name.
+
+       <b>sd_bus_track_count_sender() </b>is similar to <b>sd_bus_track_count_name()</b>,
+       but takes a bus message object and returns the per-name counter
+       matching the sender of the message.
+
+       <b>sd_bus_track_contains() </b>may be used to determine whether the
+       specified name has been added at least once to the specified bus peer
+       tracking object.
+
+       <b>sd_bus_track_first() </b>and <b>sd_bus_track_next() </b>may be used to enumerate
+       all names currently being tracked by the passed bus peer tracking
+       object.  <b>sd_bus_track_first() </b>returns the first entry in the object,
+       and resets an internally maintained read index. Each subsequent
+       invocation of <b>sd_bus_track_next() </b>returns the next name contained in
+       the bus object. If the end is reached <b>NULL </b>is returned. If no names
+       have been added to the object yet <b>sd_bus_track_first() </b>will return
+       <b>NULL </b>immediately. The order in which names are returned is undefined;
+       in particular which name is considered the first returned is not
+       defined. If recursive mode is enabled and the same name has been
+       added multiple times to the bus peer tracking object it is only
+       returned once by this enumeration. If new names are added to or
+       existing names removed from the bus peer tracking object while it is
+       being enumerated the enumeration ends on the next invocation of
+       <b>sd_bus_track_next() </b>as <b>NULL </b>is returned.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>sd_bus_track_add_name() </b>and <b>sd_bus_track_add_sender()</b>
+       return 0 if the specified name has already been added to the bus peer
+       tracking object before and positive if it hasn't. On failure, they
+       return a negative errno-style error code.
+
+       <b>sd_bus_track_remove_name() </b>and <b>sd_bus_track_remove_sender() </b>return
+       positive if the specified name was previously tracked by the bus peer
+       tracking object and has now been removed. In non-recursive mode, 0 is
+       returned if the specified name was not being tracked yet. In
+       recursive mode <b>-EUNATCH </b>is returned in this case. On failure, they
+       return a negative errno-style error code.
+
+       <b>sd_bus_track_count() </b>returns the number of names currently being
+       tracked, or 0 on failure.
+
+       <b>sd_bus_track_count_name() </b>and <b>sd_bus_track_count_sender() </b>return the
+       current per-name counter for the specified name or the sender of the
+       specified message. Zero is returned for names that are not being
+       tracked yet, a positive value for names added at least once. Larger
+       values than 1 are only returned in recursive mode. On failure, a
+       negative errno-style error code is returned.
+
+       <b>sd_bus_track_contains() </b>returns the passed name if it exists in the
+       bus peer tracking object. On failure, and if the name has not been
+       added yet <b>NULL </b>is returned.
+
+       <b>sd_bus_track_first() </b>and <b>sd_bus_track_next() </b>return the first/next
+       name contained in the bus peer tracking object, and <b>NULL </b>if the end
+       of the enumeration is reached and on error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Returned errors may indicate the following problems:
+
+       <b>-EUNATCH</b>
+           <b>sd_bus_track_remove_name() </b>or <b>sd_bus_track_remove_sender() </b>have
+           been invoked for a name not previously added to the bus peer
+           object.
+
+       <b>-EINVAL</b>
+           Specified parameter is invalid.
+
+       <b>-ENOMEM</b>
+           Memory allocation failed.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sd_bus_track_add_name() </b>and the other calls described here are
+       available as a shared library, which can be compiled and linked to
+       with the <b>libsystemd pkg-config</b>(1) file.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="sd-bus.3.html">sd-bus(3)</a>, <a href="sd_bus_track_new.3.html">sd_bus_track_new(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                         SD_BUS_TRACK_ADD_NAME(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="sd-bus.3.html">sd-bus(3)</a>,&nbsp; 
+    <a href="sd_bus_track_new.3.html">sd_bus_track_new(3)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

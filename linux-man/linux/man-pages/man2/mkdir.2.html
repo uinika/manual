@@ -1,0 +1,322 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>mkdir(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MKDIR(2)                  Linux Programmer's Manual                 MKDIR(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       mkdir, mkdirat - create a directory
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/stat.h&gt;</b>
+       <b>#include &lt;sys/types.h&gt;</b>
+
+       <b>int mkdir(const char *</b><i>pathname</i><b>, mode_t </b><i>mode</i><b>);</b>
+
+       <b>#include &lt;fcntl.h&gt;           </b>/* Definition of AT_* constants */
+       <b>#include &lt;sys/stat.h&gt;</b>
+
+       <b>int mkdirat(int </b><i>dirfd</i><b>, const char *</b><i>pathname</i><b>, mode_t </b><i>mode</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>mkdirat</b>():
+           Since glibc 2.10:
+               _POSIX_C_SOURCE &gt;= 200809L
+           Before glibc 2.10:
+               _ATFILE_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mkdir</b>() attempts to create a directory named <i>pathname</i>.
+
+       The argument <i>mode</i> specifies the mode for the new directory (see
+       <a href="../man7/inode.7.html">inode(7)</a>).  It is modified by the process's <i>umask</i> in the usual way:
+       in the absence of a default ACL, the mode of the created directory is
+       (<i>mode</i> &amp; ~<i>umask</i> &amp; 0777).  Whether other <i>mode</i> bits are honored for the
+       created directory depends on the operating system.  For Linux, see
+       NOTES below.
+
+       The newly created directory will be owned by the effective user ID of
+       the process.  If the directory containing the file has the set-group-
+       ID bit set, or if the filesystem is mounted with BSD group semantics
+       (<i>mount -o bsdgroups</i> or, synonymously <i>mount -o grpid</i>), the new
+       directory will inherit the group ownership from its parent; otherwise
+       it will be owned by the effective group ID of the process.
+
+       If the parent directory has the set-group-ID bit set, then so will
+       the newly created directory.
+
+   <b>mkdirat()</b>
+       The <b>mkdirat</b>() system call operates in exactly the same way as
+       <b>mkdir</b>(), except for the differences described here.
+
+       If the pathname given in <i>pathname</i> is relative, then it is interpreted
+       relative to the directory referred to by the file descriptor <i>dirfd</i>
+       (rather than relative to the current working directory of the calling
+       process, as is done by <b>mkdir</b>() for a relative pathname).
+
+       If <i>pathname</i> is relative and <i>dirfd</i> is the special value <b>AT_FDCWD</b>, then
+       <i>pathname</i> is interpreted relative to the current working directory of
+       the calling process (like <b>mkdir</b>()).
+
+       If <i>pathname</i> is absolute, then <i>dirfd</i> is ignored.
+
+       See <a href="openat.2.html">openat(2)</a> for an explanation of the need for <b>mkdirat</b>().
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mkdir</b>() and <b>mkdirat</b>() return zero on success, or -1 if an error
+       occurred (in which case, <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately).
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EACCES </b>The parent directory does not allow write permission to the
+              process, or one of the directories in <i>pathname</i> did not allow
+              search permission.  (See also <a href="../man7/path_resolution.7.html">path_resolution(7)</a>.)
+
+       <b>EDQUOT </b>The user's quota of disk blocks or inodes on the filesystem
+              has been exhausted.
+
+       <b>EEXIST </b><i>pathname</i> already exists (not necessarily as a directory).
+              This includes the case where <i>pathname</i> is a symbolic link,
+              dangling or not.
+
+       <b>EFAULT </b><i>pathname</i> points outside your accessible address space.
+
+       <b>ELOOP  </b>Too many symbolic links were encountered in resolving
+              <i>pathname</i>.
+
+       <b>EMLINK </b>The number of links to the parent directory would exceed
+              <b>LINK_MAX</b>.
+
+       <b>ENAMETOOLONG</b>
+              <i>pathname</i> was too long.
+
+       <b>ENOENT </b>A directory component in <i>pathname</i> does not exist or is a
+              dangling symbolic link.
+
+       <b>ENOMEM </b>Insufficient kernel memory was available.
+
+       <b>ENOSPC </b>The device containing <i>pathname</i> has no room for the new
+              directory.
+
+       <b>ENOSPC </b>The new directory cannot be created because the user's disk
+              quota is exhausted.
+
+       <b>ENOTDIR</b>
+              A component used as a directory in <i>pathname</i> is not, in fact, a
+              directory.
+
+       <b>EPERM  </b>The filesystem containing <i>pathname</i> does not support the
+              creation of directories.
+
+       <b>EROFS  </b><i>pathname</i> refers to a file on a read-only filesystem.
+
+       The following additional errors can occur for <b>mkdirat</b>():
+
+       <b>EBADF  </b><i>dirfd</i> is not a valid file descriptor.
+
+       <b>ENOTDIR</b>
+              <i>pathname</i> is relative and <i>dirfd</i> is a file descriptor referring
+              to a file other than a directory.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mkdirat</b>() was added to Linux in kernel 2.6.16; library support was
+       added to glibc in version 2.4.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mkdir</b>(): SVr4, BSD, POSIX.1-2001, POSIX.1-2008.
+
+       <b>mkdirat</b>(): POSIX.1-2008.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Under Linux, apart from the permission bits, the <b>S_ISVTX </b><i>mode</i> bit is
+       also honored.
+
+       There are many infelicities in the protocol underlying NFS.  Some of
+       these affect <b>mkdir</b>().
+
+   <b>Glibc notes</b>
+       On older kernels where <b>mkdirat</b>() is unavailable, the glibc wrapper
+       function falls back to the use of <b>mkdir</b>().  When <i>pathname</i> is a
+       relative pathname, glibc constructs a pathname based on the symbolic
+       link in <i>/proc/self/fd</i> that corresponds to the <i>dirfd</i> argument.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/mkdir.1.html">mkdir(1)</a>, <a href="chmod.2.html">chmod(2)</a>, <a href="chown.2.html">chown(2)</a>, <a href="mknod.2.html">mknod(2)</a>, <a href="mount.2.html">mount(2)</a>, <a href="rmdir.2.html">rmdir(2)</a>, <a href="stat.2.html">stat(2)</a>,
+       <a href="umask.2.html">umask(2)</a>, <a href="unlink.2.html">unlink(2)</a>, <a href="../man5/acl.5.html">acl(5)</a> <a href="../man7/path_resolution.7.html">path_resolution(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                         MKDIR(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="chmod.2.html">chmod(2)</a>,&nbsp; 
+    <a href="chown.2.html">chown(2)</a>,&nbsp; 
+    <a href="fcntl.2.html">fcntl(2)</a>,&nbsp; 
+    <a href="mknod.2.html">mknod(2)</a>,&nbsp; 
+    <a href="open.2.html">open(2)</a>,&nbsp; 
+    <a href="rmdir.2.html">rmdir(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="umask.2.html">umask(2)</a>,&nbsp; 
+    <a href="../man3/mkdtemp.3.html">mkdtemp(3)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man7/cpuset.7.html">cpuset(7)</a>,&nbsp; 
+    <a href="../man7/inotify.7.html">inotify(7)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>,&nbsp; 
+    <a href="../man8/mount.8.html">mount(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="mkdir.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

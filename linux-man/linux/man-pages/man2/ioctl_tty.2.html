@@ -1,0 +1,532 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ioctl_tty(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">IOCTL_TTY(2)              Linux Programmer's Manual             IOCTL_TTY(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ioctl_tty - ioctls for terminals and serial lines
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;termios.h&gt;</b>
+
+       <b>int ioctl(int </b><i>fd</i><b>, int </b><i>cmd</i><b>, ...);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <a href="ioctl.2.html">ioctl(2)</a> call for terminals and serial ports accepts many
+       possible command arguments.  Most require a third argument, of
+       varying type, here called <i>argp</i> or <i>arg</i>.
+
+       Use of <i>ioctl</i> makes for nonportable programs.  Use the POSIX interface
+       described in <a href="../man3/termios.3.html">termios(3)</a> whenever possible.
+
+   <b>Get and set terminal attributes</b>
+       <b>TCGETS    struct termios *</b><i>argp</i>
+              Equivalent to <i>tcgetattr(fd, argp)</i>.
+              Get the current serial port settings.
+
+       <b>TCSETS    const struct termios *</b><i>argp</i>
+              Equivalent to <i>tcsetattr(fd, TCSANOW, argp)</i>.
+              Set the current serial port settings.
+
+       <b>TCSETSW   const struct termios *</b><i>argp</i>
+              Equivalent to <i>tcsetattr(fd, TCSADRAIN, argp)</i>.
+              Allow the output buffer to drain, and set the current serial
+              port settings.
+
+       <b>TCSETSF   const struct termios *</b><i>argp</i>
+              Equivalent to <i>tcsetattr(fd, TCSAFLUSH, argp)</i>.
+              Allow the output buffer to drain, discard pending input, and
+              set the current serial port settings.
+
+       The following four ioctls are just like <b>TCGETS</b>, <b>TCSETS</b>, <b>TCSETSW</b>,
+       <b>TCSETSF</b>, except that they take a <i>struct termio *</i> instead of a <i>struct</i>
+       <i>termios *</i>.
+
+              <b>TCGETA    struct termio *</b><i>argp</i>
+
+              <b>TCSETA    const struct termio *</b><i>argp</i>
+
+              <b>TCSETAW   const struct termio *</b><i>argp</i>
+
+              <b>TCSETAF   const struct termio *</b><i>argp</i>
+
+   <b>Locking the termios structure</b>
+       The <i>termios</i> structure of a terminal can be locked.  The lock is
+       itself a <i>termios</i> structure, with nonzero bits or fields indicating a
+       locked value.
+
+       <b>TIOCGLCKTRMIOS struct termios *</b><i>argp</i>
+              Gets the locking status of the <i>termios</i> structure of the
+              terminal.
+
+       <b>TIOCSLCKTRMIOS const struct termios *</b><i>argp</i>
+              Sets the locking status of the <i>termios</i> structure of the
+              terminal.  Only a process with the <b>CAP_SYS_ADMIN </b>capability
+              can do this.
+
+   <b>Get and set window size</b>
+       Window sizes are kept in the kernel, but not used by the kernel
+       (except in the case of virtual consoles, where the kernel will update
+       the window size when the size of the virtual console changes, for
+       example, by loading a new font).
+
+       The following constants and structure are defined in <i>&lt;sys/ioctl.h&gt;</i>.
+
+       <b>TIOCGWINSZ     struct winsize *</b><i>argp</i>
+              Get window size.
+
+       <b>TIOCSWINSZ     const struct winsize *</b><i>argp</i>
+              Set window size.
+
+       The struct used by these ioctls is defined as
+
+           struct winsize {
+               unsigned short ws_row;
+               unsigned short ws_col;
+               unsigned short ws_xpixel;   /* unused */
+               unsigned short ws_ypixel;   /* unused */
+           };
+
+       When the window size changes, a <b>SIGWINCH </b>signal is sent to the
+       foreground process group.
+
+   <b>Sending a break</b>
+       <b>TCSBRK    int </b><i>arg</i>
+              Equivalent to <i>tcsendbreak(fd, arg)</i>.
+              If the terminal is using asynchronous serial data
+              transmission, and <i>arg</i> is zero, then send a break (a stream of
+              zero bits) for between 0.25 and 0.5 seconds.  If the terminal
+              is not using asynchronous serial data transmission, then
+              either a break is sent, or the function returns without doing
+              anything.  When <i>arg</i> is nonzero, nobody knows what will happen.
+
+              (SVr4, UnixWare, Solaris, Linux treat <i>tcsendbreak(fd,arg)</i> with
+              nonzero <i>arg</i> like <i>tcdrain(fd)</i>.  SunOS treats <i>arg</i> as a
+              multiplier, and sends a stream of bits <i>arg</i> times as long as
+              done for zero <i>arg</i>.  DG/UX and AIX treat <i>arg</i> (when nonzero) as
+              a time interval measured in milliseconds.  HP-UX ignores <i>arg</i>.)
+
+       <b>TCSBRKP   int </b><i>arg</i>
+              So-called "POSIX version" of <b>TCSBRK</b>.  It treats nonzero <i>arg</i> as
+              a timeinterval measured in deciseconds, and does nothing when
+              the driver does not support breaks.
+
+       <b>TIOCSBRK  void</b>
+              Turn break on, that is, start sending zero bits.
+
+       <b>TIOCCBRK  void</b>
+              Turn break off, that is, stop sending zero bits.
+
+   <b>Software flow control</b>
+       <b>TCXONC    int </b><i>arg</i>
+              Equivalent to <i>tcflow(fd, arg)</i>.
+              See <a href="../man3/tcflow.3.html">tcflow(3)</a> for the argument values <b>TCOOFF</b>, <b>TCOON</b>, <b>TCIOFF</b>,
+              <b>TCION</b>.
+
+   <b>Buffer count and flushing</b>
+       <b>FIONREAD  int *</b><i>argp</i>
+              Get the number of bytes in the input buffer.
+
+       <b>TIOCINQ   int *</b><i>argp</i>
+              Same as <b>FIONREAD</b>.
+
+       <b>TIOCOUTQ  int *</b><i>argp</i>
+              Get the number of bytes in the output buffer.
+
+       <b>TCFLSH    int </b><i>arg</i>
+              Equivalent to <i>tcflush(fd, arg)</i>.
+              See <a href="../man3/tcflush.3.html">tcflush(3)</a> for the argument values <b>TCIFLUSH</b>, <b>TCOFLUSH</b>,
+              <b>TCIOFLUSH</b>.
+
+   <b>Faking input</b>
+       <b>TIOCSTI   const char *</b><i>argp</i>
+              Insert the given byte in the input queue.
+
+   <b>Redirecting console output</b>
+       <b>TIOCCONS  void</b>
+              Redirect output that would have gone to <i>/dev/console</i> or
+              <i>/dev/tty0</i> to the given terminal.  If that was a pseudoterminal
+              master, send it to the slave.  In Linux before version 2.6.10,
+              anybody can do this as long as the output was not redirected
+              yet; since version 2.6.10, only a process with the
+              <b>CAP_SYS_ADMIN </b>capability may do this.  If output was
+              redirected already <b>EBUSY </b>is returned, but redirection can be
+              stopped by using this ioctl with <i>fd</i> pointing at <i>/dev/console</i>
+              or <i>/dev/tty0</i>.
+
+   <b>Controlling terminal</b>
+       <b>TIOCSCTTY int </b><i>arg</i>
+              Make the given terminal the controlling terminal of the
+              calling process.  The calling process must be a session leader
+              and not have a controlling terminal already.  For this case,
+              <i>arg</i> should be specified as zero.
+
+              If this terminal is already the controlling terminal of a
+              different session group, then the ioctl fails with <b>EPERM</b>,
+              unless the caller has the <b>CAP_SYS_ADMIN </b>capability and <i>arg</i>
+              equals 1, in which case the terminal is stolen, and all
+              processes that had it as controlling terminal lose it.
+
+       <b>TIOCNOTTY void</b>
+              If the given terminal was the controlling terminal of the
+              calling process, give up this controlling terminal.  If the
+              process was session leader, then send <b>SIGHUP </b>and <b>SIGCONT </b>to
+              the foreground process group and all processes in the current
+              session lose their controlling terminal.
+
+   <b>Process group and session ID</b>
+       <b>TIOCGPGRP pid_t *</b><i>argp</i>
+              When successful, equivalent to <i>*argp = tcgetpgrp(fd)</i>.
+              Get the process group ID of the foreground process group on
+              this terminal.
+
+       <b>TIOCSPGRP const pid_t *</b><i>argp</i>
+              Equivalent to <i>tcsetpgrp(fd, *argp)</i>.
+              Set the foreground process group ID of this terminal.
+
+       <b>TIOCGSID  pid_t *</b><i>argp</i>
+              Get the session ID of the given terminal.  This will fail with
+              <b>ENOTTY </b>in case the terminal is not a master pseudoterminal and
+              not our controlling terminal.  Strange.
+
+   <b>Exclusive mode</b>
+       <b>TIOCEXCL  void</b>
+              Put the terminal into exclusive mode.  No further <a href="open.2.html">open(2)</a>
+              operations on the terminal are permitted.  (They will fail
+              with <b>EBUSY</b>, except for a process with the <b>CAP_SYS_ADMIN</b>
+              capability.)
+
+       <b>TIOCGEXCL int *</b><i>argp</i>
+              If the terminal is currently in exclusive mode, place a
+              nonzero value in the location pointed to by <i>argp</i>; otherwise,
+              place zero in <i>*argp</i> (since Linux 3.8).
+
+       <b>TIOCNXCL  void</b>
+              Disable exclusive mode.
+
+   <b>Line discipline</b>
+       <b>TIOCGETD  int *</b><i>argp</i>
+              Get the line discipline of the terminal.
+
+       <b>TIOCSETD  const int *</b><i>argp</i>
+              Set the line discipline of the terminal.
+
+   <b>Pseudoterminal ioctls</b>
+       <b>TIOCPKT   const int *</b><i>argp</i>
+              Enable (when *<i>argp</i> is nonzero) or disable packet mode.  Can be
+              applied to the master side of a pseudoterminal only (and will
+              return <b>ENOTTY </b>otherwise).  In packet mode, each subsequent
+              <a href="read.2.html">read(2)</a> will return a packet that either contains a single
+              nonzero control byte, or has a single byte containing zero
+              (' ') followed by data written on the slave side of the
+              pseudoterminal.  If the first byte is not <b>TIOCPKT_DATA </b>(0), it
+              is an OR of one or more of the following bits:
+
+              TIOCPKT_FLUSHREAD   The read queue for the terminal is flushed.
+              TIOCPKT_FLUSHWRITE  The write queue for the terminal is flushed.
+              TIOCPKT_STOP        Output to the terminal is stopped.
+              TIOCPKT_START       Output to the terminal is restarted.
+              TIOCPKT_DOSTOP      The start and stop characters are <b>^S</b>/<b>^Q</b>.
+              TIOCPKT_NOSTOP      The start and stop characters are not <b>^S</b>/<b>^Q</b>.
+
+              While this mode is in use, the presence of control status
+              information to be read from the master side may be detected by
+              a <a href="select.2.html">select(2)</a> for exceptional conditions or a <a href="poll.2.html">poll(2)</a> for the
+              <i>POLLPRI</i> event.
+
+              This mode is used by <b>rlogin</b>(1) and <b>rlogind</b>(8) to implement a
+              remote-echoed, locally <b>^S</b>/<b>^Q </b>flow-controlled remote login.
+
+       <b>TIOCGPKT  const int *</b><i>argp</i>
+              Return the current packet mode setting in the integer pointed
+              to by <i>argp</i> (since Linux 3.8).
+
+       <b>TIOCSPTLCK     int *</b><i>argp</i>
+              Set (if <i>*argp</i> is nonzero) or remove (if <i>*argp</i> is zero) the
+              pseudoterminal slave device.  (See also <a href="../man3/unlockpt.3.html">unlockpt(3)</a>.)
+
+       <b>TIOCGPTLCK     int *</b><i>argp</i>
+              Place the current lock state of the pseudoterminal slave
+              device in the location pointed to by <i>argp</i> (since Linux 3.8).
+
+       The BSD ioctls <b>TIOCSTOP</b>, <b>TIOCSTART</b>, <b>TIOCUCNTL</b>, <b>TIOCREMOTE </b>have not
+       been implemented under Linux.
+
+   <b>Modem control</b>
+       <b>TIOCMGET  int *</b><i>argp</i>
+              Get the status of modem bits.
+
+       <b>TIOCMSET  const int *</b><i>argp</i>
+              Set the status of modem bits.
+
+       <b>TIOCMBIC  const int *</b><i>argp</i>
+              Clear the indicated modem bits.
+
+       <b>TIOCMBIS  const int *</b><i>argp</i>
+              Set the indicated modem bits.
+
+       The following bits are used by the above ioctls:
+
+       TIOCM_LE        DSR (data set ready/line enable)
+       TIOCM_DTR       DTR (data terminal ready)
+       TIOCM_RTS       RTS (request to send)
+       TIOCM_ST        Secondary TXD (transmit)
+       TIOCM_SR        Secondary RXD (receive)
+       TIOCM_CTS       CTS (clear to send)
+       TIOCM_CAR       DCD (data carrier detect)
+       TIOCM_CD         see TIOCM_CAR
+       TIOCM_RNG       RNG (ring)
+       TIOCM_RI         see TIOCM_RNG
+       TIOCM_DSR       DSR (data set ready)
+
+       <b>TIOCMIWAIT     int </b><i>arg</i>
+              Wait for any of the 4 modem bits (DCD, RI, DSR, CTS) to
+              change.  The bits of interest are specified as a bit mask in
+              <i>arg</i>, by ORing together any of the bit values, <b>TIOCM_RNG</b>,
+              <b>TIOCM_DSR</b>, <b>TIOCM_CD</b>, and <b>TIOCM_CTS</b>.  The caller should use
+              <b>TIOCGICOUNT </b>to see which bit has changed.
+
+       <b>TIOCGICOUNT    struct serial_icounter_struct *</b><i>argp</i>
+              Get counts of input serial line interrupts (DCD, RI, DSR,
+              CTS).  The counts are written to the <i>serial_icounter_struct</i>
+              structure pointed to by <i>argp</i>.
+
+              Note: both 1-&gt;0 and 0-&gt;1 transitions are counted, except for
+              RI, where only 0-&gt;1 transitions are counted.
+
+   <b>Marking a line as local</b>
+       <b>TIOCGSOFTCAR   int *</b><i>argp</i>
+              ("Get software carrier flag") Get the status of the CLOCAL
+              flag in the c_cflag field of the <i>termios</i> structure.
+
+       <b>TIOCSSOFTCAR   const int *</b><i>argp</i>
+              ("Set software carrier flag") Set the CLOCAL flag in the
+              <i>termios</i> structure when *<i>argp</i> is nonzero, and clear it
+              otherwise.
+
+       If the <b>CLOCAL </b>flag for a line is off, the hardware carrier detect
+       (DCD) signal is significant, and an <a href="open.2.html">open(2)</a> of the corresponding
+       terminal will block until DCD is asserted, unless the <b>O_NONBLOCK </b>flag
+       is given.  If <b>CLOCAL </b>is set, the line behaves as if DCD is always
+       asserted.  The software carrier flag is usually turned on for local
+       devices, and is off for lines with modems.
+
+   <b>Linux-specific</b>
+       For the <b>TIOCLINUX </b>ioctl, see <a href="ioctl_console.2.html">ioctl_console(2)</a>.
+
+   <b>Kernel debugging</b>
+       <b>#include &lt;linux/tty.h&gt;</b>
+
+       <b>TIOCTTYGSTRUCT struct tty_struct *</b><i>argp</i>
+              Get the <i>tty_struct</i> corresponding to <i>fd</i>.  This command was
+              removed in Linux 2.5.67.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <a href="ioctl.2.html">ioctl(2)</a> system call returns 0 on success.  On error, it returns
+       -1 and sets <i><a href="../man3/errno.3.html">errno</a></i> appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EINVAL </b>Invalid command parameter.
+
+       <b>ENOIOCTLCMD</b>
+              Unknown command.
+
+       <b>ENOTTY </b>Inappropriate <i>fd</i>.
+
+       <b>EPERM  </b>Insufficient permission.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Check the condition of DTR on the serial port.
+
+       #include &lt;termios.h&gt;
+       #include &lt;fcntl.h&gt;
+       #include &lt;sys/ioctl.h&gt;
+
+       int
+       main(void)
+       {
+           int fd, serial;
+
+           fd = open("/dev/ttyS0", O_RDONLY);
+           ioctl(fd, TIOCMGET, &amp;serial);
+           if (serial &amp; TIOCM_DTR)
+               puts("TIOCM_DTR is set");
+           else
+               puts("TIOCM_DTR is not set");
+           close(fd);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ldattach</b>(1), <a href="ioctl.2.html">ioctl(2)</a>, <a href="ioctl_console.2.html">ioctl_console(2)</a>, <a href="../man3/termios.3.html">termios(3)</a>, <a href="../man7/pty.7.html">pty(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                     IOCTL_TTY(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="ioctl.2.html">ioctl(2)</a>,&nbsp; 
+    <a href="ioctl_console.2.html">ioctl_console(2)</a>,&nbsp; 
+    <a href="poll.2.html">poll(2)</a>,&nbsp; 
+    <a href="select_tut.2.html">select_tut(2)</a>,&nbsp; 
+    <a href="../man3/termios.3.html">termios(3)</a>,&nbsp; 
+    <a href="../man4/tty.4.html">tty(4)</a>,&nbsp; 
+    <a href="../man7/pty.7.html">pty(7)</a>,&nbsp; 
+    <a href="../man7/termio.7.html">termio(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="ioctl_tty.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

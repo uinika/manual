@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="Network Time Protocol 就是 NTP 的全名。NTP 主机主要在提供网络上可以进行网络校时的主机功能！">
+	<title>鸟哥的 Linux 私房菜 -- NTP 时间服务器</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0440ntp.php">
+    <span class="text_head0">第十五章、时间服务器：<span class="text_head_en"> NTP </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/07/29</span>
+    </div>
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+15.2 <a href="#server">NTP 服务器的安装与设定</a><br>
+	<span class="text_h2">
+	　　15.2.1 <a href="#server_pkg">所需软件与软件结构</a><br>
+	　　15.2.2 <a href="#server_ntp.conf">主要配置文件 ntp.conf 的处理</a><br>
+	　　15.2.3 <a href="#server_start">NTP 的启动与观察</a>： <a href="#ntpstat">ntpstat</a>, <a href="#ntpq">ntpq</a><br>
+	　　15.2.4 <a href="#server_firewall">安全性设定</a><br>
+	</span>
+</span></div>
+<!-- 本文的正式部分 -->
+
+<hr><a name="server"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">15.2 NTP 服务器的安装与设定</span><br>
+<div class="block1">
+	<p>NTP 服务器也是一个很容易就可以架设成功的玩意儿，不过这个软件在不同的 distribution 上面可能有不一样的名称，
+	你要作的其实就是将他安装起来之后，规定一部上层 NTP 服务器来同步化你的时间即可啊！
+	如果你只是想要进行你自己单部主机的时间同步化，别架设 NTP ，直接使用 NTP 客户端软件即可喔！<br><br></p>
+
+	<hr><a name="server_pkg"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.2.1 所需软件与软件结构</span><br>
+	<div class="block2">
+		<p>在 CentOS 6.x 上头，你所需要的软件其实仅有 ntp 这个玩意儿而已，请自行使用 rpm 去找找看，若没有安装，请利用 
+		yum install ntp 即可啊！不过，我们还需要时区相关的数据文件，所以你需要的软件有：</p>
+
+		<ul>
+		<li><span class="text_import1">ntp</span>： 就是 NTP 服务器的主要软件啦，包括配置文件以及执行档等等。</li>
+		<li><span class="text_import1">tzdata</span>： 软件名称为『 Time Zone data 』的缩写，提供各时区对应的显示格式。</li>
+		</ul>
+
+		<p>与时间及 NTP 服务器设定相关的配置文件与重要数据文件有底下几个：</p>
+
+		<ul>
+		<li><span class="text_import1">/etc/ntp.conf</span>： 就是 NTP 服务器的主要配置文件，也是唯一的一个；<br><br></li>
+
+		<li><span class="text_import1">/usr/share/zoneinfo/</span>： 由 tzdata 所提供，为各时区的时间格式对应档。
+		例如台湾地区的时区格式对应档案在 /usr/share/zoneinfo/Asia/Taipei 就是了！这个目录里面的档案与底下要谈的两个档案 
+		(clock 与 localtime) 是有关系的喔！<br><br></li>
+
+		<li><span class="text_import1">/etc/sysconfig/clock</span>： 设定时区与是否使用 UTC 时间钟的配置文件。
+		每次开机后 Linux 会自动的读取这个档案来设定自己系统所默认要显示的时间说！举个例子来说，
+		在我们台湾地区的本地时间设定中，这个档案内应该会出现一行『<span class="text_import2">ZONE="Asia/Taipei"</span>』的字样，
+		这表示我们的时间配置文件案『要取用 /usr/share/zoneinfo/Asia/Taipei 那个档案』的意思！<br><br></li>
+
+		<li><span class="text_import1">/etc/localtime</span>： 
+		这个档案就是『本地端的时间配置文件』啦！刚刚那个 clock 档案里面规定了使用的时间配置文件 (ZONE) 为 
+		/usr/share/zoneinfo/Asia/Taipei ，所以说这就是本地端的时间了，此时 Linux 系统就会将 Taipei 
+		那个档案复制一份成为 /etc/localtime ，所以未来我们的时间显示就会以 Taipei 那个时间配置文件案为准。</li>
+		</ul>
+
+		<p>至于在常用于时间服务器与修改时间的指令方面，主要有底下这几个啦：</p>
+
+		<ul>
+		<li><span class="text_import1">/bin/date</span>： 用于 Linux 时间 (软件时钟) 的修改与显示的指令；<br><br></li>
+
+		<li><span class="text_import1">/sbin/hwclock</span>： 用于 BIOS 时钟 (硬件时钟) 的修改与显示的指令。
+		这是一个 root 才能执行的指令，因为 Linux 系统上面 BIOS 时间与 Linux 系统时间是分开的，所以使用 date 
+		这个指令调整了时间之后，还需要使用 hwclock 才能将修改过后的时间写入 BIOS 当中！<br><br></li>
+
+		<li><span class="text_import1">/usr/sbin/ntpd</span>： 主要提供 NTP 服务的程序啰！配置文件为 /etc/ntp.conf<br><br></li>
+
+		<li><span class="text_import1">/usr/sbin/ntpdate</span>： 用于客户端的时间校正，如果你没有要启用 NTP 
+		而仅想要使用 NTP Client 功能的话，那么只会用到这个指令而已啦！<br><br></li>
+		</ul>
+
+<table width="95%" border="1" cellpadding="5" cellspacing="0"><tbody><tr><td>
+例题：<div class="block2">
+假设你的笔记本电脑安装 CentOS 这套系统，而且选择的时区为台湾。现在，你将有一个月的时间要出差到美国的纽约去，
+你会带着这个笔电，那么到了美国之后，时间会不一致啊！你该如何手动的调整时间参数呢？
+</div>
+答：<div class="block2">
+因为时区数据文件在 /usr/share/zoneinfo 内，在该目录内会找到 /usr/share/zoneinfo/America/New_York 这个时区档。
+而时区配置文件在 /etc/sysconfig/clock ，且目前的时间格式在 /etc/localtime ，所以你应该这样做：
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">date</span>
+Thu Jul 28 15:08:39 <span class="term_write">CST</span> 2011  <span class="term_note">&lt;==重点是 CST 这个时区喔！</span>
+
+[root@www ~]# <span class="term_command">vim /etc/sysconfig/clock</span>
+ZONE="<span class="term_write">America/New_York</span>"       <span class="term_note">&lt;==改的是这里啦！</span>
+
+[root@www ~]# <span class="term_command">cp /usr/share/zoneinfo/America/New_York /etc/localtime</span>
+[root@www ~]# <span class="term_command">date</span>
+Thu Jul 28 03:09:21 <span class="term_write">EDT</span> 2011  <span class="term_note">&lt;==时区与时间都改变了！</span>
+</pre></td></tr></tbody></table>
+这个范例做完之后，记得将这两个档案改回来！不然以后你的时间都是美国时间啦！
+</div>
+</td></tr></tbody></table>
+
+		<p>接下来，我们先来谈一谈如何设计那个 /etc/ntp.conf 吧！</p>
+	</div>
+
+	<hr><a name="server_ntp.conf"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.2.2 主要配置文件 ntp.conf 的处理</span><br>
+	<div class="block2">
+		<p>由于 NTP 服务器的设定需要有上游服务器的支持才行，因此请回头参考一下 <a href="#theory_NTP">15.1.4</a>
+		及 <a href="#theory_stratum">15.1.5</a> 的介绍，这样才能够理解为何底下的设定是这样呦！好了，我假设俺的 NTP 
+		服务器所需要设定的架构如下：</p>
+
+		<ul>
+		<li>我的上层 NTP 服务器共有 tock.stdtime.gov.tw, tick.stdtime.gov.tw, time.stdtime.gov.tw 
+			三部，其中以 tock.stdtime.gov.tw 最优先使用 (prefer)；</li>
+		<li>不对 Internet 提供服务，仅允许来自内部网域 192.168.100.0/24 的查询而已；</li>
+		<li>侦测一些 BIOS 时钟与 Linux 系统时间的差异并写入 /var/lib/ntp/drift 档案当中。</li>
+		</ul>
+
+		<p>好了，先让我们谈一谈如何在 ntp.conf 里面设定权限控制吧！<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>利用 restrict 来管理权限控制</li></ul>
+
+		<p>在 ntp.conf 档案内可以利用『 restrict 』来控管权限，这个参数的设定方式为：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>restrict [你的IP] mask [netmask_IP] [parameter]
+</pre></td></tr></tbody></table>
+
+		<p>其中 parameter 的参数主要有底下这些：</p>
+
+		<ul>
+		<li><span class="text_import2">ignore</span>： 拒绝所有类型的 NTP 联机；</li>
+		<li><span class="text_import2">nomodify</span>： 客户端不能使用 ntpc 与 ntpq 这两支程序来修改服务器的时间参数，
+		但客户端仍可透过这部主机来进行网络校时的；</li>
+		<li><span class="text_import2">noquery</span>： 客户端不能够使用 ntpq, ntpc 等指令来查询时间服务器，等于不提供 NTP 
+		的网络校时啰；</li>
+		<li><span class="text_import2">notrap</span>： 不提供 trap 这个远程事件登录 (remote event logging) 的功能。</li>
+		<li><span class="text_import2">notrust</span>： 拒绝没有认证的客户端。</li>
+		</ul>
+
+		<p>那如果你没有在 parameter 的地方加上任何参数的话，这表示『<span class="text_import2">该 IP 
+		或网段不受任何限制</span>』的意思喔！一般来说，我们可以先关闭 NTP 
+		的权限，然后再一个一个的启用允许登入的网段。<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>利用 server 设定上层 NTP 服务器</li></ul>
+
+		<p>上层 NTP 服务器的设定方式为：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>server [IP or hostname] [prefer]
+</pre></td></tr></tbody></table>
+
+		<p>在 server 后端可以接 IP 或主机名，鸟哥个人比较喜欢使用 IP 来设定说！至于那个 perfer 
+		表示『优先使用』的服务器啰～有够简单吧！<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>以  driftfile 记录时间差异</li></ul>
+
+		<p>设定的方式如下：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>driftfile [可以被 ntpd 写入的目录与档案]
+</pre></td></tr></tbody></table>
+
+		<p>因为预设的 NTP Server 本身的时间计算是依据 BIOS 的芯片震荡周期频率来计算的，但是这个数值与上层 
+		Time Server 不见得会一致啊！所以 NTP 这个 daemon (ntpd) 会自动的去计算我们自己主机的频率与上层 
+		Time server 的频率，并且将两个频率的误差记录下来，记录下来的档案就是在 driftfile 
+		后面接的完整档名当中了！关于档名你必须要知道：</p>
+
+		<ul class="text_import2">
+		<li>driftfile 后面接的档案需要使用完整路径文件名；</li>
+		<li>该档案不能是连结档；</li>
+		<li>该档案需要设定成 ntpd 这个 daemon 可以写入的权限。</li>
+		<li>该档案所记录的数值单位为：百万分之一秒 (ppm)。</li>
+		</ul>
+
+		<p>driftfile 后面接的档案会被 ntpd 自动更新，所以他的权限一定要能够让 ntpd 写入才行。在 CentOS 6.x 
+		预设的 NTP 服务器中，使用的 ntpd 的 owner 是 ntp ，这部份可以查阅 /etc/sysconfig/ntpd 就可以知道啦！<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>keys [key_file]</li></ul>
+
+		<p>除了以 restrict 来限制客户端的联机之外，我们也可以透过密钥系统来给客户端认证，
+		如此一来可以让主机端更放心了。不过在这个章节里面我们暂不讨论这个部分，有兴趣的朋友可以参考 ntp-keygen 
+		这个指令的相关说明喔！<br><br></p><hr>
+
+		<p>根据上面的说明，我们最终可以取得这样的配置文件案内容喔 (底下仅修改部分数据，保留大部分的设定值喔)！</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /etc/ntp.conf</span>
+<span class="term_hd"># 1. 先处理权限方面的问题，包括放行上层服务器以及开放区网用户来源：</span>
+restrict default kod nomodify notrap nopeer noquery     <span class="term_note">&lt;==拒绝 IPv4 的用户</span>
+restrict -6 default kod nomodify notrap nopeer noquery  <span class="term_note">&lt;==拒绝 IPv6 的用户</span>
+<span class="term_write">restrict 220.130.158.71   <span class="term_note">&lt;==放行 tock.stdtime.gov.tw 进入本 NTP 服务器</span>
+restrict 59.124.196.83    <span class="term_note">&lt;==放行 tick.stdtime.gov.tw 进入本 NTP 服务器</span>
+restrict 59.124.196.84</span>    <span class="term_note">&lt;==放行 time.stdtime.gov.tw 进入本 NTP 服务器</span>
+restrict 127.0.0.1        <span class="term_note">&lt;==底下两个是默认值，放行本机来源</span>
+restrict -6 ::1
+<span class="term_write">restrict 192.168.100.0 mask 255.255.255.0 nomodify</span> <span class="term_note">&lt;==放行区网来源</span>
+
+<span class="term_hd"># 2. 设定主机来源，请先将原本的 [0|1|2].centos.pool.ntp.org 的设定批注掉：</span>
+<span class="term_write">server 220.130.158.71 prefer  <span class="term_note">&lt;==以这部主机为最优先</span>
+server 59.124.196.83
+server 59.124.196.84</span>
+
+<span class="term_hd"># 3.预设时间差异分析档案与暂不用到的 keys 等，不需要更动它：</span>
+driftfile /var/lib/ntp/drift
+keys      /etc/ntp/keys
+</pre></td></tr></tbody></table>
+
+		<p>这样就设定妥当了，准备来启动 NTP 服务吧！</p>
+	</div>
+
+	<hr><a name="server_start"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.2.3 NTP 的启动与观察</span><br>
+	<div class="block2">
+		<p>设定完 ntp.conf 之后就可以启动 ntp 服务器了。启动与观察的方式如下：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre><span class="term_hd"># 1. 启动 NTP </span>
+[root@www ~]# <span class="term_command">/etc/init.d/ntpd start</span>
+[root@www ~]# <span class="term_command">chkconfig ntpd on</span>
+[root@www ~]# <span class="term_command">tail /var/log/messages</span>  <span class="term_note">&lt;==自行检查看看有无错误</span>
+
+<span class="term_hd"># 2. 观察启动的埠口看看：</span>
+[root@www ~]# <span class="term_command">netstat -tlunp | grep ntp</span>
+Proto Recv-Q Send-Q Local Address       Foreign Address  PID/Program name
+udp        0      0 192.168.100.254:123 0.0.0.0:*        3492/ntpd
+udp        0      0 192.168.1.100:123   0.0.0.0:*        3492/ntpd
+udp        0      0 127.0.0.1:123       0.0.0.0:*        3492/ntpd
+udp        0      0 0.0.0.0:123         0.0.0.0:*        3492/ntpd
+udp        0      0 ::1:123             :::*             3492/ntpd
+udp        0      0 :::123              :::*             3492/ntpd
+<span class="term_say"># 主要是 UDP 封包，且在 port 123 这个埠口的啦！</span>
+</pre></td></tr></tbody></table>
+
+		<p>这样就表示我们的 NTP 服务器已经启动了，不过要与上层 NTP 服务器联机则还需要一些时间，
+		<span class="text_import2">通常启动 NTP 后约在 15 分钟内才会和上层 NTP 服务器顺利连接上。</span>
+		那要如何确认我们的 NTP 服务器有顺利的更新自己的时间呢？你可以使用底下几个指令来查阅喔
+		(请自行等待数分钟后再以下列指令查阅)：</p>
+
+<a name="ntpstat"></a>
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">ntpstat</span>
+synchronised to NTP server (220.130.158.71) at stratum 3
+   time correct to within 538 ms
+   polling server every 128 s
+</pre></td></tr></tbody></table>
+
+		<p>这个指令可以列出我们的 NTP 服务器有跟上层联机否。由上述的输出结果可以知道，时间有校正约 
+		538 * 10^(-3) 秒，且每隔 64 秒会主动去更新时间喔！</p>
+
+<a name="ntpq"></a>
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">ntpq -p</span>
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+*tock.stdtime.go 59.124.196.87    2 u   19  128  377   12.092   -0.953   0.942
++59-124-196-83.H 59.124.196.86    2 u    8  128  377   14.154    7.616   1.533
++59-124-196-84.H 59.124.196.86    2 u    2  128  377   14.524    4.354   1.079
+</pre></td></tr></tbody></table>
+
+		<p>这个 ntpq -p 可以列出目前我们的 NTP 与相关的上层 NTP 的状态，上头的几个字段的意义为：</p>
+
+		<ul>
+		<li><a name="20110218"></a><span class="text_import2">remote</span>：亦即是 NTP 主机的 IP 或主机名啰～注意最左边的符号
+			<ul>
+			<li>如果有『 * 』代表目前正在作用当中的上层 NTP</li>
+			<li>如果是『 + 』代表也有连上线，而且可作为下一个提供时间更新的候选者。</li>
+			</ul></li>
+		<li><span class="text_import2">refid</span>：参考的上一层 NTP 主机的地址</li>
+		<li><span class="text_import2">st</span>：就是 stratum 阶层啰！</li>
+		<li><span class="text_import2">when</span>：几秒钟前曾经做过时间同步化更新的动作；</li>
+		<li><span class="text_import2">poll</span>：下一次更新在几秒钟之后；</li>
+		<li><span class="text_import2">reach</span>：已经向上层 NTP 服务器要求更新的次数</li>
+		<li><span class="text_import2">delay</span>：网络传输过程当中延迟的时间，单位为 10^(-6) 秒</li>
+		<li><a name="20090427"></a><span class="text_import2">offset</span>：时间补偿的结果，单位与 10^(-3) 秒</li>
+		<li><span class="text_import2">jitter</span>：Linux 系统时间与 BIOS 硬件时间的差异时间，
+		单位为 10^(-6) 秒。</li>
+		</ul>
+
+		<p>事实上这个输出的结果告诉我们，时间真的很准了啦！因为差异都在 0.001 秒以内，
+		可以符合我们的一般使用了。另外，你也可以检查一下你的 BIOS 时间与 Linux 系统时间的差异，
+		就是 /var/lib/ntp/drift 这个档案的内容，就能了解到咱们的 Linux 系统时间与 BIOS
+		硬件时钟到底差多久？单位为 10^(-6) 秒啦！</p>
+
+		<p>要让你的 NTP Server/Client 真的能运作，在上述的动作中得注意：</p>
+		<ul class="text_import2">
+		<li>上述的 ntpstat 以及 ntpq -p 的输出结果中，你的 NTP 服务器真的要能够连结上层 NTP 才行喔！
+		否则你的客户端将无法对你的 NTP 服务器进行同步更新的！重要重要！<br><br></li>
+		<li>你的 NTP 服务器时间不可与上层差异太多。举例来说，鸟哥测试 NTP 服务器约在 2011/7/28 下午，
+		如果我的服务器时间原本是错误的 2010/7/28，足足差了一年，那么上层服务器恐怕就不会将正确的时间传给我！
+		这时就会造成困扰了！<br><br></li>
+		<li>服务器防火墙在 UDP port 123 有没有开啊？要特别注意的呢！<br><br></li>
+		<li>等待的时间够不够长？鸟哥设定 NTP 等过最久的时间大约是一小时！你有等这么久过否？</li>
+		</ul>
+	</div>
+
+	<hr><a name="server_firewall"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.2.4 安全性设定</span><br>
+	<div class="block2">
+		<p>NTP 服务器在安全的相关性方面，其实刚刚我们在 /etc/ntp.conf 里面的 restrict 
+		参数中就已经设定了 NTP 这个 daemon 的服务限制范围了！不过，在防火墙 iptables 
+		的部分，还是需要开启联机监听的啦！所以，在你的 iptables 规则的 scripts 当中，需要加入这一段 
+		(我是以开放 192.168.100.0/24 这个网域作为范例的！)</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /usr/local/virus/iptables/iptables.allow</span>
+<span class="term_write">iptables -A INPUT -i $EXTIF -p udp -s 192.168.100.0/24 --dport 123 -j ACCEPT</span>
+
+[root@www ~]# <span class="term_command">/usr/local/virus/iptables/iptables.rule</span>
+</pre></td></tr></tbody></table>
+
+		<p>若还要开放其他的网段或者客户端主机，请自行修改 /etc/ntpd.conf 以及你的防火墙机制咯！</p>
+	</div>
+</div>
+
+<hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

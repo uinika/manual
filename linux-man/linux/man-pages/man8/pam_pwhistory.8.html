@@ -1,0 +1,256 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pam_pwhistory(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#MODULE_TYPES_PROVIDED">MODULE&nbsp;TYPES&nbsp;PROVIDED</a> | <a href="#RETURN_VALUES">RETURN&nbsp;VALUES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PAM_PWHISTORY(8)              Linux-PAM Manual              PAM_PWHISTORY(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_pwhistory - PAM module to remember last passwords
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pam_pwhistory.so </b>[debug] [use_authtok] [enforce_for_root]
+                        [remember=<i>N</i>] [retry=<i>N</i>] [authtok_type=<i>STRING</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This module saves the last passwords for each user in order to force
+       password change history and keep the user from alternating between
+       the same password too frequently.
+
+       This module does not work together with kerberos. In general, it does
+       not make much sense to use this module in conjunction with NIS or
+       LDAP, since the old passwords are stored on the local machine and are
+       not available on another machine for password history checking.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>debug</b>
+           Turns on debugging via <a href="../man3/syslog.3.html">syslog(3)</a>.
+
+       <b>use_authtok</b>
+           When password changing enforce the module to use the new password
+           provided by a previously stacked <b>password </b>module (this is used in
+           the example of the stacking of the <b>pam_cracklib </b>module documented
+           below).
+
+       <b>enforce_for_root</b>
+           If this option is set, the check is enforced for root, too.
+
+       <b>remember=</b><i>N</i>
+           The last <i>N</i> passwords for each user are saved in
+           /etc/security/opasswd. The default is <i>10</i>. Value of <i>0</i> makes the
+           module to keep the existing contents of the opasswd file
+           unchanged.
+
+       <b>retry=</b><i>N</i>
+           Prompt user at most <i>N</i> times before returning with error. The
+           default is <i>1</i>.
+
+       <b>authtok_type=</b><i>STRING</i>
+           See <a href="../man3/pam_get_authtok.3.html">pam_get_authtok(3)</a> for more details.
+</pre>
+<h2><a id="MODULE_TYPES_PROVIDED" href="#MODULE_TYPES_PROVIDED"></a>MODULE TYPES PROVIDED  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Only the <b>password </b>module type is provided.
+</pre>
+<h2><a id="RETURN_VALUES" href="#RETURN_VALUES"></a>RETURN VALUES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       PAM_AUTHTOK_ERR
+           No new password was entered, the user aborted password change or
+           new password couldn't be set.
+
+       PAM_IGNORE
+           Password history was disabled.
+
+       PAM_MAXTRIES
+           Password was rejected too often.
+
+       PAM_USER_UNKNOWN
+           User is not known to system.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       An example password section would be:
+
+           #%PAM-1.0
+           password     required       pam_pwhistory.so
+           password     required       pam_unix.so        use_authtok
+
+       In combination with <b>pam_cracklib</b>:
+
+           #%PAM-1.0
+           password     required       pam_cracklib.so    retry=3
+           password     required       pam_pwhistory.so   use_authtok
+           password     required       pam_unix.so        use_authtok
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /etc/security/opasswd
+           File with password history
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man5/pam.conf.5.html">pam.conf(5)</a>, <a href="../man5/pam.d.5.html">pam.d(5)</a>, <a href="pam.8-2.html">pam(8)</a><a href="../man3/pam_get_authtok.3.html">pam_get_authtok(3)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_pwhistory was written by Thorsten Kukuk &lt;kukuk@thkukuk.de&gt;
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>linux-pam</i> (Pluggable Authentication Modules
+       for Linux) project.  Information about the project can be found at 
+       ⟨<a href="http://www.linux-pam.org/">http://www.linux-pam.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨//www.linux-pam.org/⟩.  This page was obtained from the
+       tarball Linux-PAM-1.3.0.tar.gz fetched from 
+       ⟨<a href="http://www.linux-pam.org/library/">http://www.linux-pam.org/library/</a>⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Linux-PAM Manual                 04/01/2016                 PAM_PWHISTORY(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

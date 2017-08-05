@@ -1,0 +1,251 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>curs_getstr.3x - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#NOTES">NOTES</a> | <a href="#PORTABILITY">PORTABILITY</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">curs_getstr(3X)                                              curs_getstr(3X)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>getstr</b>, <b>getnstr</b>, <b>wgetstr</b>, <b>wgetnstr</b>, <b>mvgetstr</b>, <b>mvgetnstr</b>, <b>mvwgetstr</b>,
+       <b>mvwgetnstr </b>- accept character strings from <b>curses </b>terminal keyboard
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;curses.h&gt;</b>
+
+       <b>int getstr(char *str);</b>
+       <b>int getnstr(char *str, int n);</b>
+       <b>int wgetstr(WINDOW *win, char *str);</b>
+       <b>int wgetnstr(WINDOW *win, char *str, int n);</b>
+       <b>int mvgetstr(int y, int x, char *str);</b>
+       <b>int mvwgetstr(WINDOW *win, int y, int x, char *str);</b>
+       <b>int mvgetnstr(int y, int x, char *str, int n);</b>
+       <b>int mvwgetnstr(WINDOW *, int y, int x, char *str, int n);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The function <b>getstr </b>is equivalent to a series of calls to <b>getch</b>,
+       until a newline or carriage return is received (the terminating
+       character is not included in the returned string).  The resulting
+       value is placed in the area pointed to by the character pointer <i>str</i>.
+
+       <b>wgetnstr </b>reads at most <i>n</i> characters, thus preventing a possible
+       overflow of the input buffer.  Any attempt to enter more characters
+       (other than the terminating newline or carriage return) causes a
+       beep.  Function keys also cause a beep and are ignored.  The <b>getnstr</b>
+       function reads from the <i>stdscr</i> default window.
+
+       The user's erase and kill characters are interpreted.  If keypad mode
+       is on for the window, <b>KEY_LEFT </b>and <b>KEY_BACKSPACE </b>are both considered
+       equivalent to the user's kill character.
+
+       Characters input are echoed only if <b>echo </b>is currently on.  In that
+       case, backspace is echoed as deletion of the previous character
+       (typically a left motion).
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All routines return the integer <b>ERR </b>upon failure and an <b>OK </b>(SVr4
+       specifies only “an integer value other than <b>ERR</b>”) upon successful
+       completion.
+
+       X/Open defines no error conditions.
+
+       In this implementation, these functions return an error if the window
+       pointer is null, or if its timeout expires without having any data.
+
+       This implementation provides an extension as well.  If a <b>SIGWINCH</b>
+       interrupts the function, it will return <b>KEY_RESIZE </b>rather than <b>OK </b>or
+       <b>ERR</b>.
+
+       Functions with a “mv” prefix first perform a cursor movement using
+       <b>wmove</b>, and return an error if the position is outside the window, or
+       if the window pointer is null.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Note that <b>getstr</b>, <b>mvgetstr</b>, and <b>mvwgetstr </b>may be macros.
+</pre>
+<h2><a id="PORTABILITY" href="#PORTABILITY"></a>PORTABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are described in the XSI Curses standard, Issue 4.
+       They read single-byte characters only.  The standard does not define
+       any error conditions.  This implementation returns ERR if the window
+       pointer is null, or if the lower-level <b>wgetch</b>(3X) call returns an
+       ERR.
+
+       SVr3 and early SVr4 curses implementations did not reject function
+       keys; the SVr4.0 documentation claimed that “special keys” (such as
+       function keys, “home” key, “clear” key, <i>etc</i>.) are “interpreted”,
+       without giving details.  It lied.  In fact, the “character” value
+       appended to the string by those implementations was predictable but
+       not useful (being, in fact, the low-order eight bits of the key's
+       KEY_ value).
+
+       The functions <b>getnstr</b>, <b>mvgetnstr</b>, and <b>mvwgetnstr </b>were present but not
+       documented in SVr4.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>curses</b>(3X), <b>curs_getch</b>(3X), <b>curs_variables</b>(3X).
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>ncurses</i> (new curses) project.  Information
+       about the project can be found at 
+       ⟨<a href="https://www.gnu.org/software/ncurses/ncurses.html">https://www.gnu.org/software/ncurses/ncurses.html</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       bug-ncurses-request@gnu.org.  This page was obtained from the
+       project's upstream Git mirror of the CVS repository 
+       ⟨git://ncurses.scripts.mit.edu/ncurses.git⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                                             curs_getstr(3X)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

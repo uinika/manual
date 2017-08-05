@@ -1,0 +1,483 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="Network Time Protocol 就是 NTP 的全名。NTP 主机主要在提供网络上可以进行网络校时的主机功能！">
+	<title>鸟哥的 Linux 私房菜 -- NTP 时间服务器</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0440ntp.php">
+    <span class="text_head0">第十五章、时间服务器：<span class="text_head_en"> NTP </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/07/29</span>
+    </div>
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+15.1 <a href="#theory">关于时区与网络校时的通讯协议</a><br>
+	<span class="text_h2">
+	　　15.1.1 <a href="#theory_timezone">什么是时区？全球有多少时区？GMT 在那个时区？</a><br>
+	　　15.1.2 <a href="#theory_summer">什么是夏季节约时间 (daylight savings)？</a><br>
+	　　15.1.3 <a href="#theory_UTC">Coordinated Universal Time (UTC)与系统时间的误差 </a><br>
+	　　15.1.4 <a href="#theory_NTP">NTP 通讯协议</a><br>
+	　　15.1.5 <a href="#theory_stratum">NTP 服务器的阶层概念</a><br>
+	</span>
+</span></div>
+<!-- 本文的正式部分 -->
+<hr><a name="theory"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">15.1 关于时区与网络校时的通讯协议</span><br>
+<div class="block1">
+	<p>时间对于现代人来说是很重要的，因为『 Time is money 』。既然时间如此重要，对于因特网来说应该也是很重要吧？
+	为什么呢？还记得我们在基础学习篇第三版<a href="http://linux.vbird.org/linux_basic/0570syslog.php#syslogd_server">第十九章、登录档分析</a>吧？
+	如果你架设了一个登录档服务器的话，那么总得要分析每个主机所传来的登录文件信息吧？如果每一部主机的时间都不相同，
+	那如何判断问题发生的时间点？所以啰，『<span class="text_import2">每一部主机的时间同步化</span>』就很重要了。</p>
+
+	<p>每一部主机时间同步化的重要性当然不只如此，包括之前谈到的 DHCP 客户端/服务器端所需要的租约时间限制、
+	网络侦测时所需要注意的时间点、刚刚谈到的登录文件分析功能、具有相关性的主机彼此之间的错误侦测、前一章谈到的丛集计算机群等等，
+	都需要具有相同的时间才能够捉出问题呢。好了，底下咱们就来聊一聊，如何利用网络来进行主机的时间同步化吧！<br><br></p>
+
+	<hr><a name="theory_timezone"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.1.1 什么是时区？全球有多少时区？GMT 
+	在那个时区？</span><br>
+	<div class="block2">
+		<p>因为地球是圆的，所以同一个时刻，在地球的一边是白天，一边是黑夜。而因为人类使用一天 24 
+		小时的制度，所以，在地球对角的两边就应该差了 12 个小时才对。由于同一个时间点上面，
+		整个地球表面的时间应该都不一样，为了解决这个问题，所以可以想见的，地球就被分成 24 个时区了！</p>
+
+		<p>那么这 24 个时区是依据什么来划分的呢？由于地球被人类以『经纬度』坐标来进行定位，
+		而经度为零的地点在英国『格林威治』这个城市所在的纵剖面上，
+		(注：所谓的纵剖面就是由南极切到北极的直线，而横切面就是与赤道平行的切线)，如下图所示：</p>
+
+		<a name="fig15.1-1"></a>
+		<center><img src="0440ntp_files/time.gif" alt="地球的子午线、经纬度与时区的分隔概念" title="地球的子午线、经纬度与时区的分隔概念" border="0"><br>
+		图 15.1-1、地球的子午线、经纬度与时区的分隔概念<br></center>
+
+		<p>因为绕地球一圈是 360 度角，这 360 度角共分为 24 个时区，当然一个时区就是 15 度角啦！
+		又由于是以<span class="text_import2">格林威治时间为标准时间 (Greenwich Mean Time, GMT 
+		时间)</span>，加上地球自转的关系，因此，在格林威治以东的区域时间是比较快的(+小时)，而以西的地方当然就是较慢啰！</p>
+
+		<p>以台湾为例，因为台湾所在地约为东经 120 度北纬 25 度左右，又因为台湾在格林威治的东方 
+		(废话！因为是东经嘛！ ^_^)，因此<span class="text_import2">台湾本地时间 (local time) 会比 GMT 时间快 8 小时 
+		(GMT + 8)</span>。当格林威治时间为零点，台湾就已经是早上八点了！底下约略列出各个时区的名称与所在经度，以及与 
+		GMT 时间的时差：</p>
+
+
+<table width="95%" bgcolor="lightyellow" border="1" cellpadding="3" cellspacing="0">
+<tbody><tr bgcolor="#182448">
+	<td style="font-family: '细明体'; text-align: center;" width="60%"><font color="#FFFFFF">标准时区</font></td>
+	<td style="font-family: '细明体'; text-align: center;" width="20%"><font color="#FFFFFF">经度</font></td>
+	<td style="font-family: '细明体'; text-align: center;" width="20%"><font color="#FFFFFF">时差</font></td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">GMT , Greenwich Mean Time</td>
+	<td style="font-family: '细明体';">0&nbsp;&nbsp; W/E</td>
+	<td style="font-family: '细明体';">标准时间</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">CET , Central European</td>
+	<td style="font-family: '细明体';">15&nbsp; E</td>
+	<td style="font-family: '细明体';">+1&nbsp; 东一区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">EET , Eastern European</td>
+	<td style="font-family: '细明体';">30&nbsp; E</td>
+	<td style="font-family: '细明体';">+2&nbsp; 东二区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">BT&nbsp; , Baghdad</td>
+	<td style="font-family: '细明体';">45&nbsp; E</td>
+	<td style="font-family: '细明体';">+3&nbsp; 东三区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">USSR, Zone 3&nbsp;</td>
+	<td style="font-family: '细明体';">60&nbsp; E</td>
+	<td style="font-family: '细明体';">+4&nbsp; 东四区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">USSR, Zone 4</td>
+	<td style="font-family: '细明体';">75&nbsp; E</td>
+	<td style="font-family: '细明体';">+5&nbsp; 东五区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">Indian, First</td>
+	<td style="font-family: '细明体';">82.3E</td>
+	<td style="font-family: '细明体';">+5.5东五半区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">USSR, Zone 5</td>
+	<td style="font-family: '细明体';">90&nbsp; E</td>
+	<td style="font-family: '细明体';">+6&nbsp; 东六区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">SST , South Sumatra</td>
+	<td style="font-family: '细明体';">105 E</td>
+	<td style="font-family: '细明体';">+7&nbsp; 东七区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">JT&nbsp; , Java</td>
+	<td style="font-family: '细明体';">112 E</td>
+	<td style="font-family: '细明体';">+7.5东七半区</td>
+</tr>
+<tr bgcolor="#182448">
+	<td style="font-family: '细明体';"><font color="#FFFFFF">CCT , China Coast <b>(台湾所在地)</b></font></td>
+	<td style="font-family: '细明体';"><font color="#FFFFFF">120 E</font></td>
+	<td style="font-family: '细明体';"><font color="#FFFFFF">+8&nbsp; 东八区</font></td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">JST , Japan</td>
+	<td style="font-family: '细明体';">135 E</td>
+	<td style="font-family: '细明体';">+9&nbsp; 东九区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">SAST, South Australia</td>
+	<td style="font-family: '细明体';">142 E</td>
+	<td style="font-family: '细明体';">+9.5东九半区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">GST , Guam</td>
+	<td style="font-family: '细明体';">150 E</td>
+	<td style="font-family: '细明体';">+10 东十区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">NZT , New Zealand</td>
+	<td style="font-family: '细明体';">180 E</td>
+	<td style="font-family: '细明体';">+12 东十二区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">Int'l Date Line</td>
+	<td style="font-family: '细明体';">180 E/W</td>
+	<td style="font-family: '细明体';">国际日期变更线</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">BST , Bering</td>
+	<td style="font-family: '细明体';">165 W</td>
+	<td style="font-family: '细明体';">-11 西十一区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">SHST, Alaska/Hawaiian</td>
+	<td style="font-family: '细明体';">150 W</td>
+	<td style="font-family: '细明体';">-10 西十区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">YST , Yukon</td>
+	<td style="font-family: '细明体';">135 W</td>
+	<td style="font-family: '细明体';">-9&nbsp; 西九区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">PST , Pacific</td>
+	<td style="font-family: '细明体';">120 W</td>
+	<td style="font-family: '细明体';">-8&nbsp; 西八区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">MST , Mountain</td>
+	<td style="font-family: '细明体';">105 W</td>
+	<td style="font-family: '细明体';">-7&nbsp; 西七区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">CST , Central</td>
+	<td style="font-family: '细明体';">90&nbsp; W</td>
+	<td style="font-family: '细明体';">-6&nbsp; 西六区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">EST , Eastern</td>
+	<td style="font-family: '细明体';">75&nbsp; W</td>
+	<td style="font-family: '细明体';">-5&nbsp; 西五区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">AST , Atlantic</td>
+	<td style="font-family: '细明体';">60&nbsp; W</td>
+	<td style="font-family: '细明体';">-4&nbsp; 西四区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">Brazil, Zone 2</td>
+	<td style="font-family: '细明体';">45&nbsp; W</td>
+	<td style="font-family: '细明体';">-3&nbsp; 西三区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">AT&nbsp; , Azores</td>
+	<td style="font-family: '细明体';">30&nbsp; W</td>
+	<td style="font-family: '细明体';">-2&nbsp; 西二区</td>
+</tr>
+<tr>
+	<td style="font-family: '细明体';">WAT , West Africa</td>
+	<td style="font-family: '细明体';">15&nbsp; W</td>
+	<td style="font-family: '细明体';">-1&nbsp; 西一区</td>
+</tr>
+</tbody></table><br>
+
+		<p>所以啰，台湾时间是 GMT + 8 就很容易推算出来了吧！要特别留意的是，很多朋友在安装 Linux 的时候，
+		<span class="text_import2">总是会发现目前的时间慢或者快了 8 小时，不要怀疑，绝对与时区有关</span>！
+		赶紧给他查一下如何调整时区吧！ ^_^。</p>
+
+		<p>另外，在上表中有个比较有趣的时区，那就是在太平洋上面的国际日期变更线了！我们刚刚说，在格林威治的东边时间会较快，
+		而在西边时间会较慢，但是两边各走了 180 度之后就会碰头啊！那不就刚好差了 24 小时吗？没错啦！
+		所以才订定为『国际日期变更线』啊！国际日期变更线刚好在太平洋上面，因此，如果你有坐飞机到美国的经验应该会发现，咦！
+		怎么出发的时间是星期六下午，坐了 13 个小时的飞机到了美国还是星期六！因为刚好通过了国际日期变更线，
+		日期减少了一天喔！如果反过来，由美国到台湾，日期就会多加一天喔！ ^_^ </p>
+	</div>
+
+	<hr><a name="theory_summer"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.1.2 什么是夏季节约时间
+	(daylight savings)？ </span><br>
+	<div class="block2">
+		<p>时区的概念先建立起来之后，现在再来谈一谈，那么什么是『<span class="text_import2">夏季节约时间
+		(或称日光节约时间)</span>』？既然是『夏季节约时间』当然主要是与夏天有关啦！
+		因为地球在运行的时候是呈现一个倾斜角在绕太阳运转的，所以才有春夏秋冬 
+		(这个大家应该都知道啦)，在夏天的时候，白天的时间会比较长，所以为了节约用电，
+		因此在夏天的时候某些地区会将他们的时间定早一小时，也就是说，原本时区是 8 点好了，
+		但是因为夏天太阳比较早出现，因此把时间向前挪，在原本 8 点的时候，订定为该天的 9 点 (时间提早一小时)～如此一来，
+		我们就可以利用阳光照明，省去了花费电力的时间，因此才会称之为夏季节约时间！</p>
+
+		<p>因为台湾实在是太小了，并没有横跨两个时区，因此，夏季节约时间对我们来说，虽然还是有帮助啦！
+		不过，似乎没有特别推行的样子说～ </p>
+	</div>
+
+	<hr><a name="theory_UTC"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.1.3 Coordinated Universal Time 
+	(UTC)与系统时间的误差</span><br>
+	<div class="block2">
+		<p>了解了一些时区的概念之后，这里要谈的是『<span class="text_import2">什么是正确的时间</span>』。
+		在 1880 年代的时间标准是以 GMT 时间为主的，但是 GMT 时间是以太阳通过格林威治的那一刻来作为计时的标准。
+		然而我们都知道啊，地球自转的轨道以及公转的轨道并非正圆，加上地球的自转速度好像有逐年递减的问题，
+		所以这个 GMT 时间与我们目前计时的时间就有点不一样了。(<a href="#ps1">注1</a>)</p>
+
+		<p>在计算时间的时候，最准确的计算应该是使用『<span class="text_import2">原子震荡周期</span>』所计算的物理时钟了
+		(Atomic Clock, 也被称为原子钟)，这也被定义为标准时间 (International Atomic Time)。而我们常常看见的 
+		UTC 也就是 <span class="text_import2">Coordinated Universal Time (协和标准时间)</span>就是利用这种 
+		Atomic Clock 为基准所定义出来的正确时间。例如 1999 年在美国启用的原子钟 NIST F-1，
+		他所产生的时间误差每两千年才差一秒钟！真的是很准吶！这个 UTC 标准时间虽然与 GMT 时间放在同一个时区为基准，
+		不过由于计时的方式不同，UTC 时间与 GMT 时间有差不多 16 分钟的误差呢！(<a href="#ps2">注2</a>)</p>
+
+		<p>事实上，在我们的身边就有很多的原子钟，例如石英表，还有计算机主机上面的 BIOS 
+		内部就含有一个原子钟在纪录与计算时间的进行吶！不过由于原子钟主要是利用计算芯片 (crystal) 
+		的原子震荡周期去计时的，这是因为每种芯片都有自己的独特的震荡周期之故。
+		然而因为这种芯片的震荡周期在不同的芯片之间多多少少都会有点差异性，甚至同一批芯片也可能会或多或少有些许的差异
+		(就连温度也可能造成这样的误差呢)，因此也就造成了 BIOS 的时间会经常的给他快了几秒或者慢了几秒。</p>
+
+		<p>或许你会认为，BIOS 定时器每天快个五秒也没有什么了不起的，不过如果你再仔细的算一算，会发现，一天快五秒，那么一个月快 
+		2.5 分钟，一年就快了 75 分钟了！所以说，呵呵！时间差是真的会存在的！那么如果你的计算机真的有这样的情况，
+		那要怎么来重新校正时间呢？那就需要『网络校时』(Network Time Protocol, NTP) 的功能了！底下我们就谈一谈那个 
+		NTP 的 daemon 吧！</p>
+	</div>
+
+	<hr><a name="theory_NTP"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.1.4 NTP 通讯协议</span><br>
+	<div class="block2">
+		<p>老实说， Linux 操作系统的计时方式主要是由 1970/01/01 开始计算总秒数，因此，如果你还记得 date 这个指令的话，
+		会发现它有个 +%s 的参数，可以取得总秒数，这个就是软件时钟。但，如同前面说的，计算机硬件主要是以 BIOS 
+		内部的时间为主要的时间依据 (硬件时钟)，而偏偏这个时间可能因为 BIOS 内部芯片本身的问题，而导致 BIOS 
+		时间与标准时间 (UTC) 有一点点的差异存在！所以为了避免主机时间因为长期运作下所导致的时间偏差，进行时间同步 
+		(synchronize) 的工作就显的很重要了！</p>
+
+		<ul class="text_import2">
+		<li>软件时钟：由 Linux 操作系统根据 1970/01/01 开始计算的总秒数；</li>
+		<li>硬件时钟：主机硬件系统上面的时钟，例如 BIOS 记录的时间；</li>
+		</ul>
+
+		<p>那么怎么让时间同步化呢？想一想，如果我们选择几部主要主机 (Primary server) 调校时间，让这些 
+		Primary Servers 的时间同步之后，再开放网络服务来让 Client 端联机，并且提供 Client 
+		端调整自己的时间，不就可以达到全部的计算机时间同步化的运作了吗！那么什么协议可以达到这样的功能呢？那就是 
+		<span class="text_import2">Network Time Protocol</span> ，另外还有 
+		Digital Time Synchronization Protocol (DTSS) 也可以达到相同的功能！
+		不过，到底 NTP 这个 daemon 是如何让 Server 与 Client 同步他们的时间呢？</p>
+
+		<ol class="text_import2">
+		<li>首先，主机当然需要启动这个 daemon ，之后，</li>
+		<li>Client 会向 NTP Server 发送出调校时间的 message ，</li>
+		<li>然后 NTP Server 会送出目前的标准时间给 Client ，</li>
+		<li>Client 接收了来自 Server 的时间后，会据以调整自己的时间，就达成了网络校时咯！</li>
+		</ol>
+
+		<p>在上面的步骤中你有没有想到一件事啊，那就是<span class="text_import2">如果 Client 到 Server 
+		的讯息传送时间过长怎么办</span>？举例来说，我在台湾以 ADSL 的 PC 主机，联机到美国的 NTP Server 
+		主机进行时间同步化要求，而美国 NTP Server 收到我的要求之后，就发送当时的正确时间给我，不过，
+		由美国将数据传送回我的 PC 时，时间可能已经延迟了 10 秒钟去了！这样一来，我的 PC 
+		校正的时间是 10 秒钟前的标准时间喔！此外，如果美国那么 NTP 主机有太多的人喜欢上去进行网络校时了，所以 
+		loading (负荷) 太重啦！导致讯息的回传又延迟的更为严重！那怎么办？</p>
+
+		<p>为了这些延迟的问题，有一些 program 已经开发了自动计算时间传送过程的误差，以更准确的校准自己的时间！当然啦，在 
+		daemon 的部分，也同时以 server/client 及 master/slave 的架构来提供用户进行网络校时的动作！所谓的 
+		master/slave 就有点类似 DNS 的系统咯！举例来说，台湾的标准时间主机去国际标准时间的主机校时，
+		然后各大专院校再到台湾的标准时间校时，然后我们再到各大专院校的标准时间校时！这样一来，那几部国际标准时间主机 
+		(Time server) 的 loading 就不至于太大，而我们也可以很快速的达到正确的网络校时的目的呢！台湾常见的 
+		Time Server 有 (<a href="#ps3">注3</a>)：</p>
+
+		<ul class="text_import2" style="font-family: '细明体'">
+		<li>tick.stdtime.gov.tw</li>
+		<li>tock.stdtime.gov.tw</li>
+		<li>time.stdtime.gov.tw</li>
+		<li>clock.stdtime.gov.tw</li>
+		<li>watch.stdtime.gov.tw</li>
+		</ul>
+
+		<p>至于 ntp 这个 daemon 是以 port 123 为连结的埠口 (使用 UDP 封包)，所以我们要利用 Time server 
+		来进行时间的同步更新时，就得要使用 NTP 软件提供的 ntpdate 来进行 port 123 
+		的联机喔！关于网络校时更多的说明，可以到 NTP 的官方网站 (<a href="#ps4">注4</a>) 上察看喔！</p>
+	</div>
+
+	<hr><a name="theory_stratum"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">15.1.5 NTP 服务器的阶层概念</span><br>
+	<div class="block2">
+		<p>如前所述，由于 NTP 时间服务器采用类似阶层架构 (stratum) 来处理时间的同步化，
+		所以他使用的是类似一般 server/client 的主从架构。网络社会上面有提供一些主要与次要的时间服务器，
+		这些均属于第一阶及第二阶的时间服务器 (stratum-1, stratum-2) ，如下所示：</p>
+
+		<ul>
+		<li>主要时间服务器： <a href="http://support.ntp.org/bin/view/Servers/StratumOneTimeServers" target="_blank">http://support.ntp.org/bin/view/Servers/StratumOneTimeServers</a></li>
+		<li>次要时间服务器： <a href="http://support.ntp.org/bin/view/Servers/StratumTwoTimeServers" target="_blank">http://support.ntp.org/bin/view/Servers/StratumTwoTimeServers</a></li>
+		</ul>
+
+		<p>由于这些时间服务器大多在国外，所以我们是否要使用这些服务器来同步化自己的时间呢？
+		其实如果台湾地区已经有标准时间服务器的话，用那部即可，不需要联机到国外啦！浪费带宽与时间啊！
+		而如前面提到的，台湾地区已经有标准的时间服务器了，所以当然我们可以直接选择台湾地区的 NTP 主机即可。</p>
+
+		<p>如果你评估一下，确定有架设 NTP 的需求时，我们可以直接选择台湾地区的上层 NTP 来同步化时间即可。
+		举例来说 tock.stdtime.gov.tw 这个国家单位的主机应该是比较适合的。一般来说，我们在进行 NTP 
+		主机的设定时，都会先选择多部上层的 Time Server 来做为我们这一部 NTP Server 
+		的校正之用，选择多部的原因是因为<span class="text_import2">可以避免因为某部时间服务器突然挂点时，
+		其他主机仍然可以提供我们的 NTP 主机来自我更新啊！然后我们的 NTP Server 才提供给自己的 Client 
+		端更新时间</span>。如此一来，国家单位的 tock.stdtime.gov.tw 负载才不会太大，而我们的 Client 
+		也可以很快速的达到校时的动作！</p>
+
+		<div style="padding: 10pt 0pt 10pt 0pt ;" align="right"><table width="90%"><tbody><tr><td><b>Tips:</b><br><span style="color : #009000"><font size="-1">		其实 NTP 的阶层概念与 DNS 很类似啦，当你架设一部 NTP 主机，这部 NTP 所向上要求同步化的那部主要主机为 
+		stratum-1 时，那么你的 NTP 就是 stratum-2 啰！举例来说，如果我们的 NTP 是向台湾的 tock.stdtime.gov.tw 
+		这部 stratum-2 的主机要求时间同步化，那我们的主机即为 stratum-3 ，如果还有其他的 NTP 主机向我们要求时间同步，
+		那么该部主机则会是 stratum-4 啦！就这样啊～
+		那最多可以有几个阶层？<span class="text_import2">最多可达 15 个阶层喔！</span><br><br>
+		</font></span></td><td><img src="0440ntp_files/vbird_face.gif" alt="鸟哥的图示" title="鸟哥的图示"></td></tr></tbody></table></div>	</div>
+</div>
+<hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

@@ -1,0 +1,343 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>personality(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PERSONALITY(2)            Linux Programmer's Manual           PERSONALITY(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       personality - set the process execution domain
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/personality.h&gt;</b>
+
+       <b>int personality(unsigned long </b><i>persona</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Linux supports different execution domains, or personalities, for
+       each process.  Among other things, execution domains tell Linux how
+       to map signal numbers into signal actions.  The execution domain
+       system allows Linux to provide limited support for binaries compiled
+       under other UNIX-like operating systems.
+
+       If <i>persona</i> is not 0xffffffff, then <b>personality</b>() sets the caller's
+       execution domain to the value specified by <i>persona</i>.  Specifying
+       <i>persona</i> as 0xffffffff provides a way of retrieving the current
+       persona without changing it.
+
+       A list of the available execution domains can be found in
+       <i>&lt;sys/personality.h&gt;</i>.  The execution domain is a 32-bit value in which
+       the top three bytes are set aside for flags that cause the kernel to
+       modify the behavior of certain system calls so as to emulate
+       historical or architectural quirks.  The least significant byte is
+       value defining the personality the kernel should assume.  The flag
+       values are as follows:
+
+       <b>ADDR_COMPAT_LAYOUT </b>(since Linux 2.6.9)
+              With this flag set, provide legacy virtual address space
+              layout.
+
+       <b>ADDR_NO_RANDOMIZE </b>(since Linux 2.6.12)
+              With this flag set, disable address-space-layout
+              randomization.
+
+       <b>ADDR_LIMIT_32BIT </b>(since Linux 2.2)
+              Limit the address space to 32 bits.
+
+       <b>ADDR_LIMIT_3GB </b>(since Linux 2.4.0)
+              With this flag set, use 0xc0000000 as the offset at which to
+              search a virtual memory chunk on <a href="mmap.2.html">mmap(2)</a>; otherwise use
+              0xffffe000.
+
+       <b>FDPIC_FUNCPTRS </b>(since Linux 2.6.11)
+              User-space function pointers to signal handlers point (on
+              certain architectures) to descriptors.
+
+       <b>MMAP_PAGE_ZERO </b>(since Linux 2.4.0)
+              Map page 0 as read-only (to support binaries that depend on
+              this SVr4 behavior).
+
+       <b>READ_IMPLIES_EXEC </b>(since Linux 2.6.8)
+              With this flag set, <b>PROT_READ </b>implies <b>PROT_EXEC </b>for <a href="mmap.2.html">mmap(2)</a>.
+
+       <b>SHORT_INODE </b>(since Linux 2.4.0)
+              No effects(?).
+
+       <b>STICKY_TIMEOUTS </b>(since Linux 1.2.0)
+              With this flag set, <a href="select.2.html">select(2)</a>, <a href="pselect.2.html">pselect(2)</a>, and <a href="ppoll.2.html">ppoll(2)</a> do not
+              modify the returned timeout argument when interrupted by a
+              signal handler.
+
+       <b>UNAME26 </b>(since Linux 3.1)
+              Have <a href="uname.2.html">uname(2)</a> report a 2.6.40+ version number rather than a
+              3.x version number.  Added as a stopgap measure to support
+              broken applications that could not handle the kernel version-
+              numbering switch from 2.6.x to 3.x.
+
+       <b>WHOLE_SECONDS </b>(since Linux 1.2.0)
+              No effects(?).
+
+       The available execution domains are:
+
+       <b>PER_BSD </b>(since Linux 1.2.0)
+              BSD. (No effects.)
+
+       <b>PER_HPUX </b>(since Linux 2.4)
+              Support for 32-bit HP/UX.  This support was never complete,
+              and was dropped so that since Linux 4.0, this value has no
+              effect.
+
+       <b>PER_IRIX32 </b>(since Linux 2.2)
+              IRIX 5 32-bit.  Never fully functional; support dropped in
+              Linux 2.6.27.  Implies <b>STICKY_TIMEOUTS</b>.
+
+       <b>PER_IRIX64 </b>(since Linux 2.2)
+              IRIX 6 64-bit.  Implies <b>STICKY_TIMEOUTS</b>; otherwise no effects.
+
+       <b>PER_IRIXN32 </b>(since Linux 2.2)
+              IRIX 6 new 32-bit.  Implies <b>STICKY_TIMEOUTS</b>; otherwise no
+              effects.
+
+       <b>PER_ISCR4 </b>(since Linux 1.2.0)
+              Implies <b>STICKY_TIMEOUTS</b>; otherwise no effects.
+
+       <b>PER_LINUX </b>(since Linux 1.2.0)
+              Linux.
+
+       <b>PER_LINUX32 </b>(since Linux 2.2)
+              [To be documented.]
+
+       <b>PER_LINUX32_3GB </b>(since Linux 2.4)
+              Implies <b>ADDR_LIMIT_3GB</b>.
+
+       <b>PER_LINUX_32BIT </b>(since Linux 2.0)
+              Implies <b>ADDR_LIMIT_32BIT</b>.
+
+       <b>PER_LINUX_FDPIC </b>(since Linux 2.6.11)
+              Implies <b>FDPIC_FUNCPTRS</b>.
+
+       <b>PER_OSF4 </b>(since Linux 2.4)
+              OSF/1 v4.  On alpha, clear top 32 bits of iov_len in the
+              user's buffer for compatibility with old versions of OSF/1
+              where iov_len was defined as.  <i>int</i>.
+
+       <b>PER_OSR5 </b>(since Linux 2.4)
+              Implies <b>STICKY_TIMEOUTS </b>and <b>WHOLE_SECONDS</b>; otherwise no
+              effects.
+
+       <b>PER_RISCOS </b>(since Linux 2.2)
+              [To be documented.]
+
+       <b>PER_SCOSVR3 </b>(since Linux 1.2.0)
+              Implies <b>STICKY_TIMEOUTS</b>, <b>WHOLE_SECONDS</b>, and <b>SHORT_INODE</b>;
+              otherwise no effects.
+
+       <b>PER_SOLARIS </b>(since Linux 2.4)
+              Implies <b>STICKY_TIMEOUTS</b>; otherwise no effects.
+
+       <b>PER_SUNOS </b>(since Linux 2.4.0)
+              Implies <b>STICKY_TIMEOUTS</b>.  Divert library and dynamic linker
+              searches to <i>/usr/gnemul</i>.  Buggy, largely unmaintained, and
+              almost entirely unused; support was removed in Linux 2.6.26.
+
+       <b>PER_SVR3 </b>(since Linux 1.2.0)
+              Implies <b>STICKY_TIMEOUTS </b>and <b>SHORT_INODE</b>; otherwise no effects.
+
+       <b>PER_SVR4 </b>(since Linux 1.2.0)
+              Implies <b>STICKY_TIMEOUTS </b>and <b>MMAP_PAGE_ZERO</b>; otherwise no
+              effects.
+
+       <b>PER_UW7 </b>(since Linux 2.4)
+              Implies <b>STICKY_TIMEOUTS </b>and <b>MMAP_PAGE_ZERO</b>; otherwise no
+              effects.
+
+       <b>PER_WYSEV386 </b>(since Linux 1.2.0)
+              Implies <b>STICKY_TIMEOUTS </b>and <b>SHORT_INODE</b>; otherwise no effects.
+
+       <b>PER_XENIX </b>(since Linux 1.2.0)
+              Implies <b>STICKY_TIMEOUTS </b>and <b>SHORT_INODE</b>; otherwise no effects.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, the previous <i>persona</i> is returned.  On error, -1 is
+       returned, and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EINVAL </b>The kernel was unable to change the personality.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This system call first appeared in Linux 1.1.20 (and thus first in a
+       stable kernel release with Linux 1.2.0); library support was added in
+       glibc 2.3.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>personality</b>() is Linux-specific and should not be used in programs
+       intended to be portable.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/setarch.8.html">setarch(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-03-15                   PERSONALITY(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="mprotect.2.html">mprotect(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man5/systemd.unit.5.html">systemd.unit(5)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="personality.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,275 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>times(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">TIMES(2)                  Linux Programmer's Manual                 TIMES(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       times - get process times
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/times.h&gt;</b>
+
+       <b>clock_t times(struct tms *</b><i>buf</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>times</b>() stores the current process times in the <i>struct tms</i> that <i>buf</i>
+       points to.  The <i>struct tms</i> is as defined in <i>&lt;sys/times.h&gt;</i>:
+
+           struct tms {
+               clock_t tms_utime;  /* user time */
+               clock_t tms_stime;  /* system time */
+               clock_t tms_cutime; /* user time of children */
+               clock_t tms_cstime; /* system time of children */
+           };
+
+       The <i>tms_utime</i> field contains the CPU time spent executing
+       instructions of the calling process.  The <i>tms_stime</i> field contains
+       the CPU time spent in the system while executing tasks on behalf of
+       the calling process.  The <i>tms_cutime</i> field contains the sum of the
+       <i>tms_utime</i> and <i>tms_cutime</i> values for all waited-for terminated
+       children.  The <i>tms_cstime</i> field contains the sum of the <i>tms_stime</i> and
+       <i>tms_cstime</i> values for all waited-for terminated children.
+
+       Times for terminated children (and their descendants) are added in at
+       the moment <a href="wait.2.html">wait(2)</a> or <a href="waitpid.2.html">waitpid(2)</a> returns their process ID.  In
+       particular, times of grandchildren that the children did not wait for
+       are never seen.
+
+       All times reported are in clock ticks.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>times</b>() returns the number of clock ticks that have elapsed since an
+       arbitrary point in the past.  The return value may overflow the
+       possible range of type <i>clock_t</i>.  On error, <i>(clock_t) -1</i> is returned,
+       and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b><i>tms</i> points outside the process's address space.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The number of clock ticks per second can be obtained using:
+
+           sysconf(_SC_CLK_TCK);
+
+       In POSIX.1-1996 the symbol <b>CLK_TCK </b>(defined in <i>&lt;time.h&gt;</i>) is mentioned
+       as obsolescent.  It is obsolete now.
+
+       In Linux kernel versions before 2.6.9, if the disposition of <b>SIGCHLD</b>
+       is set to <b>SIG_IGN</b>, then the times of terminated children are
+       automatically included in the <i>tms_cstime</i> and <i>tms_cutime</i> fields,
+       although POSIX.1-2001 says that this should happen only if the
+       calling process <a href="wait.2.html">wait(2)</a>s on its children.  This nonconformance is
+       rectified in Linux 2.6.9 and later.
+
+       On Linux, the <i>buf</i> argument can be specified as NULL, with the result
+       that <b>times</b>() just returns a function result.  However, POSIX does not
+       specify this behavior, and most other UNIX implementations require a
+       non-NULL value for <i>buf</i>.
+
+       Note that <a href="../man3/clock.3.html">clock(3)</a> also returns a value of type <i>clock_t</i>, but this
+       value is measured in units of <b>CLOCKS_PER_SEC</b>, not the clock ticks
+       used by <b>times</b>().
+
+       On Linux, the "arbitrary point in the past" from which the return
+       value of <b>times</b>() is measured has varied across kernel versions.  On
+       Linux 2.4 and earlier, this point is the moment the system was
+       booted.  Since Linux 2.6, this point is <i>(2^32/HZ) - 300</i> seconds
+       before system boot time.  This variability across kernel versions
+       (and across UNIX implementations), combined with the fact that the
+       returned value may overflow the range of <i>clock_t</i>, means that a
+       portable application would be wise to avoid using this value.  To
+       measure changes in elapsed time, use <a href="clock_gettime.2.html">clock_gettime(2)</a> instead.
+
+   <b>Historical</b>
+       SVr1-3 returns <i>long</i> and the struct members are of type <i>time_t</i>
+       although they store clock ticks, not seconds since the Epoch.  V7
+       used <i>long</i> for the struct members, because it had no type <i>time_t</i> yet.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A limitation of the Linux system call conventions on some
+       architectures (notably i386) means that on Linux 2.6 there is a small
+       time window (41 seconds) soon after boot when <b>times</b>() can return -1,
+       falsely indicating that an error occurred.  The same problem can
+       occur when the return value wraps past the maximum value that can be
+       stored in <b>clock_t</b>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/time.1.html">time(1)</a>, <a href="getrusage.2.html">getrusage(2)</a>, <a href="wait.2.html">wait(2)</a>, <a href="../man3/clock.3.html">clock(3)</a>, <a href="../man3/sysconf.3.html">sysconf(3)</a>, <a href="../man7/time.7.html">time(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-03-15                         TIMES(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/time.1.html">time(1)</a>,&nbsp; 
+    <a href="fork.2.html">fork(2)</a>,&nbsp; 
+    <a href="getrusage.2.html">getrusage(2)</a>,&nbsp; 
+    <a href="sigaction.2.html">sigaction(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/clock.3.html">clock(3)</a>,&nbsp; 
+    <a href="../man3/getauxval.3.html">getauxval(3)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man7/pthreads.7.html">pthreads(7)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>,&nbsp; 
+    <a href="../man7/time.7.html">time(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="times.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

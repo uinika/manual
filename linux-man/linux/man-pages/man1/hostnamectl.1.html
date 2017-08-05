@@ -1,0 +1,322 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>hostnamectl(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">HOSTNAMECTL(1)                   hostnamectl                  HOSTNAMECTL(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       hostnamectl - Control the system hostname
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>hostnamectl </b>[OPTIONS...] {COMMAND}
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>hostnamectl </b>may be used to query and change the system hostname and
+       related settings.
+
+       This tool distinguishes three different hostnames: the high-level
+       "pretty" hostname which might include all kinds of special characters
+       (e.g. "Lennart's Laptop"), the static hostname which is used to
+       initialize the kernel hostname at boot (e.g. "lennarts-laptop"), and
+       the transient hostname which is a fallback value received from
+       network configuration. If a static hostname is set, and is valid
+       (something other than localhost), then the transient hostname is not
+       used.
+
+       Note that the pretty hostname has little restrictions on the
+       characters and length used, while the static and transient hostnames
+       are limited to the usually accepted characters of Internet domain
+       names, and 64 characters at maximum (the latter being a Linux
+       limitation).
+
+       The static hostname is stored in /etc/hostname, see <a href="../man5/hostname.5.html">hostname(5)</a> for
+       more information. The pretty hostname, chassis type, and icon name
+       are stored in /etc/machine-info, see <a href="../man5/machine-info.5.html">machine-info(5)</a>.
+
+       Use <a href="systemd-firstboot.1.html">systemd-firstboot(1)</a> to initialize the system host name for
+       mounted (but not booted) system images.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following options are understood:
+
+       <b>--no-ask-password</b>
+           Do not query the user for authentication for privileged
+           operations.
+
+       <b>--static</b>, <b>--transient</b>, <b>--pretty</b>
+           If <b>status </b>is invoked (or no explicit command is given) and one of
+           these switches is specified, <b>hostnamectl </b>will print out just this
+           selected hostname.
+
+           If used with <b>set-hostname</b>, only the selected hostname(s) will be
+           updated. When more than one of these switches are specified, all
+           the specified hostnames will be updated.
+
+       <b>-H</b>, <b>--host=</b>
+           Execute the operation remotely. Specify a hostname, or a username
+           and hostname separated by "@", to connect to. The hostname may
+           optionally be suffixed by a container name, separated by ":",
+           which connects directly to a specific container on the specified
+           host. This will use SSH to talk to the remote machine manager
+           instance. Container names may be enumerated with <b>machinectl -H</b>
+           <i>HOST</i>.
+
+       <b>-M</b>, <b>--machine=</b>
+           Execute operation on a local container. Specify a container name
+           to connect to.
+
+       <b>-h</b>, <b>--help</b>
+           Print a short help text and exit.
+
+       <b>--version</b>
+           Print a short version string and exit.
+
+       The following commands are understood:
+
+       <b>status</b>
+           Show current system hostname and related information.
+
+       <b>set-hostname </b><i>NAME</i>
+           Set the system hostname to <i>NAME</i>. By default, this will alter the
+           pretty, the static, and the transient hostname alike; however, if
+           one or more of <b>--static</b>, <b>--transient</b>, <b>--pretty </b>are used, only the
+           selected hostnames are changed. If the pretty hostname is being
+           set, and static or transient are being set as well, the specified
+           hostname will be simplified in regards to the character set used
+           before the latter are updated. This is done by removing special
+           characters and spaces. This ensures that the pretty and the
+           static hostname are always closely related while still following
+           the validity rules of the specific name. This simplification of
+           the hostname string is not done if only the transient and/or
+           static host names are set, and the pretty host name is left
+           untouched.
+
+           Pass the empty string "" as the hostname to reset the selected
+           hostnames to their default (usually "localhost").
+
+       <b>set-icon-name </b><i>NAME</i>
+           Set the system icon name to <i>NAME</i>. The icon name is used by some
+           graphical applications to visualize this host. The icon name
+           should follow the <b>Icon Naming Specification</b><b></b>[1].
+
+           Pass an empty string to reset the icon name to the default value,
+           which is determined from chassis type (see below) and possibly
+           other parameters.
+
+       <b>set-chassis </b><i>TYPE</i>
+           Set the chassis type to <i>TYPE</i>. The chassis type is used by some
+           graphical applications to visualize the host or alter user
+           interaction. Currently, the following chassis types are defined:
+           "desktop", "laptop", "convertible", "server", "tablet",
+           "handset", "watch", "embedded", as well as the special chassis
+           types "vm" and "container" for virtualized systems that lack an
+           immediate physical chassis.
+
+           Pass an empty string to reset the chassis type to the default
+           value which is determined from the firmware and possibly other
+           parameters.
+
+       <b>set-deployment </b><i>ENVIRONMENT</i>
+           Set the deployment environment description.  <i>ENVIRONMENT</i> must be
+           a single word without any control characters. One of the
+           following is suggested: "development", "integration", "staging",
+           "production".
+
+           Pass an empty string to reset to the default empty value.
+
+       <b>set-location </b><i>LOCATION</i>
+           Set the location string for the system, if it is known.  <i>LOCATION</i>
+           should be a human-friendly, free-form string describing the
+           physical location of the system, if it is known and applicable.
+           This may be as generic as "Berlin, Germany" or as specific as
+           "Left Rack, 2nd Shelf".
+
+           Pass an empty string to reset to the default empty value.
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, 0 is returned, a non-zero failure code otherwise.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="systemd.1.html">systemd(1)</a>, <a href="hostname.1.html">hostname(1)</a>, <a href="../man5/hostname.5.html">hostname(5)</a>, <a href="../man5/machine-info.5.html">machine-info(5)</a>, <a href="systemctl.1.html">systemctl(1)</a>,
+       <a href="../man8/systemd-hostnamed.service.8.html">systemd-hostnamed.service(8)</a>, <a href="systemd-firstboot.1.html">systemd-firstboot(1)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. Icon Naming Specification
+           <a href="http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html">http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                   HOSTNAMECTL(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="systemd-firstboot.1.html">systemd-firstboot(1)</a>,&nbsp; 
+    <a href="../man5/hostname.5.html">hostname(5)</a>,&nbsp; 
+    <a href="../man5/machine-info.5.html">machine-info(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man8/systemd-hostnamed.service.8.html">systemd-hostnamed.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

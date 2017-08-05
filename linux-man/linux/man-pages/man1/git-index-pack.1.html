@@ -1,0 +1,265 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-index-pack(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#NOTE">NOTE</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-INDEX-PACK(1)                Git Manual                GIT-INDEX-PACK(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-index-pack - Build pack index file for an existing packed archive
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git index-pack</i> [-v] [-o &lt;index-file&gt;] &lt;pack-file&gt;
+       <i>git index-pack</i> --stdin [--fix-thin] [--keep] [-v] [-o &lt;index-file&gt;]
+                        [&lt;pack-file&gt;]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Reads a packed archive (.pack) from the specified file, and builds a
+       pack index file (.idx) for it. The packed archive together with the
+       pack index can then be placed in the objects/pack/ directory of a Git
+       repository.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -v
+           Be verbose about what is going on, including progress status.
+
+       -o &lt;index-file&gt;
+           Write the generated pack index into the specified file. Without
+           this option the name of pack index file is constructed from the
+           name of packed archive file by replacing .pack with .idx (and the
+           program fails if the name of packed archive does not end with
+           .pack).
+
+       --stdin
+           When this flag is provided, the pack is read from stdin instead
+           and a copy is then written to &lt;pack-file&gt;. If &lt;pack-file&gt; is not
+           specified, the pack is written to objects/pack/ directory of the
+           current Git repository with a default name determined from the
+           pack content. If &lt;pack-file&gt; is not specified consider using
+           --keep to prevent a race condition between this process and <i>git</i>
+           <i>repack</i>.
+
+       --fix-thin
+           Fix a "thin" pack produced by <b>git pack-objects --thin </b>(see
+           <a href="git-pack-objects.1.html">git-pack-objects(1)</a> for details) by adding the excluded objects
+           the deltified objects are based on to the pack. This option only
+           makes sense in conjunction with --stdin.
+
+       --keep
+           Before moving the index into its final destination create an
+           empty .keep file for the associated pack file. This option is
+           usually necessary with --stdin to prevent a simultaneous <i>git</i>
+           <i>repack</i> process from deleting the newly constructed pack and index
+           before refs can be updated to use objects contained in the pack.
+
+       --keep=&lt;msg&gt;
+           Like --keep create a .keep file before moving the index into its
+           final destination, but rather than creating an empty file place
+           <i>&lt;msg&gt;</i> followed by an LF into the .keep file. The <i>&lt;msg&gt;</i> message
+           can later be searched for within all .keep files to locate any
+           which have outlived their usefulness.
+
+       --index-version=&lt;version&gt;[,&lt;offset&gt;]
+           This is intended to be used by the test suite only. It allows to
+           force the version for the generated pack index, and to force
+           64-bit index entries on objects located above the given offset.
+
+       --strict
+           Die, if the pack contains broken objects or links.
+
+       --check-self-contained-and-connected
+           Die if the pack contains broken links. For internal use only.
+
+       --threads=&lt;n&gt;
+           Specifies the number of threads to spawn when resolving deltas.
+           This requires that index-pack be compiled with pthreads otherwise
+           this option is ignored with a warning. This is meant to reduce
+           packing time on multiprocessor machines. The required amount of
+           memory for the delta search window is however multiplied by the
+           number of threads. Specifying 0 will cause Git to auto-detect the
+           number of CPU’s and use maximum 3 threads.
+
+       --max-input-size=&lt;size&gt;
+           Die, if the pack is larger than &lt;size&gt;.
+</pre>
+<h2><a id="NOTE" href="#NOTE"></a>NOTE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Once the index has been created, the list of object names is sorted
+       and the SHA-1 hash of that list is printed to stdout. If --stdin was
+       also used then this is prefixed by either "pack\t", or "keep\t" if a
+       new .keep file was successfully created. This is useful to remove a
+       .keep file used as a lock to prevent the race with <i>git repack</i>
+       mentioned above.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.10.1.352.g0cf361           10/04/2016                GIT-INDEX-PACK(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="git-pack-objects.1.html">git-pack-objects(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

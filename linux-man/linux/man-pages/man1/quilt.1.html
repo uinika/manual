@@ -1,0 +1,1096 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>quilt(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#QUILT_COMMANDS_REFERENCE">QUILT&nbsp;COMMANDS&nbsp;REFERENCE</a> | <a href="#COMMON_OPTIONS_TO_ALL_COMMANDS">COMMON&nbsp;OPTIONS&nbsp;TO&nbsp;ALL&nbsp;COMMANDS</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#EXAMPLE_OF_WORKING_TREE">EXAMPLE&nbsp;OF&nbsp;WORKING&nbsp;TREE</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#CONFIGURATION_FILE">CONFIGURATION&nbsp;FILE</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">quilt(1)                   General Commands Manual                  quilt(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       quilt - tool to manage series of patches
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>quilt </b>[-h] command [options]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Quilt is a tool to manage large sets of patches by keeping track of
+       the changes each patch makes. Patches can be applied, un-applied,
+       refreshed, etc. The key philosophical concept is that your primary
+       output is patches.
+
+       With quilt, all work occurs within a single directory tree. Commands
+       can be invoked from anywhere within the source tree. They are of the
+       form <b>quilt cmd </b>similar to CVS, svn or git commands. They can be
+       abbreviated as long as the specified part of the command is unique.
+       All commands print some help text with <b>quilt cmd -h.</b>
+
+       Quilt manages a stack of patches. Patches are applied incrementally
+       on top of the base tree plus all preceding patches. They can be
+       pushed on top of the stack (<b>quilt push</b>), and popped off the stack
+       (<b>quilt pop</b>).  Commands are available for querying the contents of the
+       series file (<b>quilt series</b>, see below), the contents of the stack
+       (<b>quilt applied</b>, <b>quilt previous</b>, <b>quilt top</b>), and the patches that are
+       not applied at a particular moment (<b>quilt next</b>, <b>quilt unapplied</b>).  By
+       default, most commands apply to the topmost patch on the stack.
+
+       Patch files are located in the <i>patches</i> sub-directory of the source
+       tree (see EXAMPLE OF WORKING TREE below). The <i>QUILT_PATCHES</i>
+       environment variable can be used to override this location. When not
+       found in the current directory, that subdirectory is searched
+       recursively in the parent directories (this is similar to the way <i>git</i>
+       searches for its configuration files). The <i>patches</i> directory may
+       contain sub-directories. It may also be a symbolic link instead of a
+       directory.
+
+       A file called <i>series</i> contains a list of patch file names that defines
+       the order in which patches are applied. Unless there are means by
+       which series files can be generated automatically, it is usually
+       provided along with a set of patches. In this file, each patch file
+       name is on a separate line. Patch files are identified by path names
+       that are relative to the <i>patches</i> directory; patches may be in sub-
+       directories below this directory. Lines in the series file that start
+       with a hash character (#) are ignored.  You can also add a comment
+       after each patch file name, introduced by a space  followed by a hash
+       character. When quilt adds, removes, or renames patches, it
+       automatically updates the series file. Users of quilt can modify
+       series files while some patches are applied, as long as the applied
+       patches remain in their original order.
+
+       Different series files can be used to assemble patches in different
+       ways, corresponding for example to different development branches.
+
+       Before a patch is applied (or ``pushed on the stack''), copies of all
+       files the patch modifies are saved to the .pc/<i>patch</i> directory. The
+       patch is added to the list of currently applied patches (.pc/applied-
+       patches). Later when a patch is regenerated (<b>quilt refresh</b>), the
+       backup copies in .pc/<i>patch</i> are compared with the current versions of
+       the files in the source tree using GNU diff.
+
+       Documentation related to a patch can be put at the beginning of a
+       patch file.  Quilt is careful to preserve all text that precedes the
+       actual patch when doing a refresh. (This is limited to patches in
+       unified format; see <b>diff </b>documentation).
+
+       The series file is looked up in the .pc directory, in the root of the
+       source tree, and in the patches directory.  The first series file
+       that is found is used. This may also be a symbolic link, or a file
+       with multiple hard links.  Usually, only one series file is used for
+       a set of patches, so the patches sub-directory is a convenient
+       location.
+
+       The .pc directory and its sub-directories cannot be relocated, but it
+       can be a symbolic link. While patches are applied to the source tree,
+       this directory is essential for many operations, including taking
+       patches off the stack (<b>quilt pop</b>), and refreshing patches (<b>quilt</b>
+       <b>refresh</b>).  Files in the .pc directory are automatically removed when
+       they are no longer needed, so there is no need to clean up manually.
+</pre>
+<h2><a id="QUILT_COMMANDS_REFERENCE" href="#QUILT_COMMANDS_REFERENCE"></a>QUILT COMMANDS REFERENCE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>add </b>[-P patch] {file} ...
+
+           Add one or more files to the topmost or named patch.  Files must
+           be added to the patch before being modified.  Files that are
+           modified by patches already applied on top of the specified patch
+           cannot be added.
+
+           -P patch
+
+               Patch to add files to.
+
+       <b>annotate </b>[-P patch] {file}
+
+           Print an annotated listing of the specified file showing which
+           patches modify which lines. Only applied patches are included.
+
+           -P patch
+
+               Stop checking for changes at the specified rather than the
+               topmost patch.
+
+       <b>applied </b>[patch]
+
+           Print a list of applied patches, or all patches up to and
+           including the specified patch in the file series.
+
+       <b>delete </b>[-r] [--backup] [patch|-n]
+
+           Remove the specified or topmost patch from the series file.  If
+           the patch is applied, quilt will attempt to remove it first.
+           (Only the topmost patch can be removed right now.)
+
+           -n  Delete the next patch after topmost, rather than the
+               specified or topmost patch.
+
+           -r  Remove the deleted patch file from the patches directory as
+               well.
+
+           --backup
+
+               Rename the patch file to patch~ rather than deleting it.
+               Ignored if not used with `-r'.
+
+       <b>diff </b>[-p n|-p ab] [-u|-U num|-c|-C num] [--combine patch|-z] [-R] [-P
+       patch] [--snapshot] [--diff=utility] [--no-timestamps] [--no-index]
+       [--sort] [--color[=always|auto|never]] [file ...]
+
+           Produces a diff of the specified file(s) in the topmost or
+           specified patch.  If no files are specified, all files that are
+           modified are included.
+
+           -p n
+               Create a -p n style patch (-p0 or -p1 are supported).
+
+           -p ab
+               Create a -p1 style patch, but use a/file and b/file as the
+               original and new filenames instead of the default
+               dir.orig/file and dir/file names.
+
+           -u, -U num, -c, -C num
+
+               Create a unified diff (-u, -U) with num lines of context.
+               Create a context diff (-c, -C) with num lines of context. The
+               number of context lines defaults to 3.
+
+           --no-timestamps
+
+               Do not include file timestamps in patch headers.
+
+           --no-index
+
+               Do not output Index: lines.
+
+           -z  Write to standard output the changes that have been made
+               relative to the topmost or specified patch.
+
+           -R  Create a reverse diff.
+
+           -P patch
+
+               Create a diff for the specified patch.  (Defaults to the
+               topmost patch.)
+
+           --combine patch
+
+               Create a combined diff for all patches between this patch and
+               the patch specified with -P. A patch name of `-' is
+               equivalent to specifying the first applied patch.
+
+           --snapshot
+
+               Diff against snapshot (see `quilt snapshot -h').
+
+           --diff=utility
+
+               Use the specified utility for generating the diff. The
+               utility is invoked with the original and new file name as
+               arguments.
+
+           --color[=always|auto|never]
+
+               Use syntax coloring (auto activates it only if the output is
+               a tty).
+
+           --sort
+               Sort files by their name instead of preserving the original
+               order.
+
+       <b>edit </b>file ...
+
+           Edit the specified file(s) in $EDITOR after adding it (them) to
+           the topmost patch.
+
+       <b>files </b>[-v] [-a] [-l] [--combine patch] [patch]
+
+           Print the list of files that the topmost or specified patch
+           changes.
+
+           -a  List all files in all applied patches.
+
+           -l  Add patch name to output.
+
+           -v  Verbose, more user friendly output.
+
+           --combine patch
+
+               Create a listing for all patches between this patch and the
+               topmost or specified patch. A patch name of `-' is equivalent
+               to specifying the first applied patch.
+
+       <b>fold </b>[-R] [-q] [-f] [-p strip-level]
+
+           Integrate the patch read from standard input into the topmost
+           patch: After making sure that all files modified are part of the
+           topmost patch, the patch is applied with the specified strip
+           level (which defaults to 1).
+
+           -R  Apply patch in reverse.
+
+           -q  Quiet operation.
+
+           -f  Force apply, even if the patch has rejects. Unless in quiet
+               mode, apply the patch interactively: the patch utility may
+               ask questions.
+
+           -p strip-level
+
+               The number of pathname components to strip from file names
+               when applying patchfile.
+
+       <b>fork </b>[new_name]
+
+           Fork the topmost patch.  Forking a patch means creating a
+           verbatim copy of it under a new name, and use that new name
+           instead of the original one in the current series.  This is
+           useful when a patch has to be modified, but the original version
+           of it should be preserved, e.g.  because it is used in another
+           series, or for the history.  A typical sequence of commands would
+           be: fork, edit, refresh.
+
+           If new_name is missing, the name of the forked patch will be the
+           current patch name, followed by `-2'.  If the patch name already
+           ends in a dash-and-number, the number is further incremented
+           (e.g., patch.diff, patch-2.diff, patch-3.diff).
+
+       <b>graph </b>[--all] [--reduce] [--lines[=num]] [--edge-labels=files] [-T
+       ps] [patch]
+
+           Generate a dot(1) directed graph showing the dependencies between
+           applied patches. A patch depends on another patch if both touch
+           the same file or, with the --lines option, if their modifications
+           overlap. Unless otherwise specified, the graph includes all
+           patches that the topmost patch depends on.  When a patch name is
+           specified, instead of the topmost patch, create a graph for the
+           specified patch. The graph will include all other patches that
+           this patch depends on, as well as all patches that depend on this
+           patch.
+
+           --all
+               Generate a graph including all applied patches and their
+               dependencies. (Unapplied patches are not included.)
+
+           --reduce
+
+               Eliminate transitive edges from the graph.
+
+           --lines[=num]
+
+               Compute dependencies by looking at the lines the patches
+               modify.  Unless a different num is specified, two lines of
+               context are included.
+
+           --edge-labels=files
+
+               Label graph edges with the file names that the adjacent
+               patches modify.
+
+           -T ps
+               Directly produce a PostScript output file.
+
+       <b>grep </b>[-h|options] {pattern}
+
+           Grep through the source files, recursively, skipping patches and
+           quilt meta-information. If no filename argument is given, the
+           whole source tree is searched. Please see the grep(1) manual page
+           for options.
+
+           -h  Print this help. The grep -h option can be passed after a
+               double-dash (--). Search expressions that start with a dash
+               can be passed after a second double-dash (-- --).
+
+       <b>header </b>[-a|-r|-e] [--backup] [--strip-diffstat] [--strip-trailing-
+       whitespace] [patch]
+
+           Print or change the header of the topmost or specified patch.
+
+           -a, -r, -e
+
+               Append to (-a) or replace (-r) the exiting patch header, or
+               edit (-e) the header in $EDITOR. If none of these options is
+               given, print the patch header.
+
+           --strip-diffstat
+
+               Strip diffstat output from the header.
+
+           --strip-trailing-whitespace
+
+               Strip trailing whitespace at the end of lines of the header.
+
+           --backup
+
+               Create a backup copy of the old version of a patch as patch~.
+
+       <b>import </b>[-p num] [-R] [-P patch] [-f] [-d {o|a|n}] patchfile ...
+
+           Import external patches.  The patches will be inserted following
+           the current top patch, and must be pushed after import to apply
+           them.
+
+           -p num
+
+               Number of directory levels to strip when applying (default=1)
+
+           -R
+
+               Apply patch in reverse.
+
+           -P patch
+
+               Patch filename to use inside quilt. This option can only be
+               used when importing a single patch.
+
+           -f  Overwrite/update existing patches.
+
+           -d {o|a|n}
+
+               When overwriting in existing patch, keep the old (o), all
+               (a), or new (n) patch header. If both patches include
+               headers, this option must be specified. This option is only
+               effective when -f is used.
+
+       <b>mail </b>{--mbox file|--send} [-m text] [-M file] [--prefix prefix]
+       [--sender ...] [--from ...] [--to ...] [--cc ...] [--bcc ...]
+       [--subject ...] [--reply-to message] [--charset ...] [--signature
+       file] [first_patch [last_patch]]
+
+           Create mail messages from a specified range of patches, or all
+           patches in the series file, and either store them in a mailbox
+           file, or send them immediately. The editor is opened with a
+           template for the introduction.  Please see
+           /usr/local/share/doc/quilt/README.MAIL for details.  When
+           specifying a range of patches, a first patch name of `-' denotes
+           the first, and a last patch name of `-' denotes the last patch in
+           the series.
+
+           -m text
+
+               Text to use as the text in the introduction. When this option
+               is used, the editor will not be invoked, and the patches will
+               be processed immediately.
+
+           -M file
+
+               Like the -m option, but read the introduction from file.
+
+           --prefix prefix
+
+               Use an alternate prefix in the bracketed part of the subjects
+               generated. Defaults to `patch'.
+
+           --mbox file
+
+               Store all messages in the specified file in mbox format. The
+               mbox can later be sent using formail, for example.
+
+           --send
+
+               Send the messages directly.
+
+           --sender
+
+               The envelope sender address to use. The address must be of
+               the form `user@domain.name'. No display name is allowed.
+
+           --from, --subject
+
+               The values for the From and Subject headers to use. If no
+               --from option is given, the value of the --sender option is
+               used.
+
+           --to, --cc, --bcc
+
+               Append a recipient to the To, Cc, or Bcc header.
+
+           --charset
+
+               Specify a particular message encoding on systems which don't
+               use UTF-8 or ISO-8859-15. This character encoding must match
+               the one used in the patches.
+
+           --signature file
+
+               Append the specified signature to messages (defaults to
+               ~/.signature if found; use `-' for no signature).
+
+           --reply-to message
+
+               Add the appropriate headers to reply to the specified
+               message.
+
+       <b>new </b>[-p n|-p ab] {patchname}
+
+           Create a new patch with the specified file name, and insert it
+           after the topmost patch. The name can be prefixed with a sub-
+           directory name, allowing for grouping related patches together.
+
+           -p n
+               Create a -p n style patch (-p0 or -p1 are supported).
+
+           -p ab
+               Create a -p1 style patch, but use a/file and b/file as the
+               original and new filenames instead of the default
+               dir.orig/file and dir/file names.
+
+               Quilt can be used in sub-directories of a source tree. It
+               determines the root of a source tree by searching for a
+               patches directory above the current working directory. Create
+               a patches directory in the intended root directory if quilt
+               chooses a top-level directory that is too high up in the
+               directory tree.
+
+       <b>next </b>[patch]
+
+           Print the name of the next patch after the specified or topmost
+           patch in the series file.
+
+       <b>patches </b>[-v] [--color[=always|auto|never]] {file} [files...]
+
+           Print the list of patches that modify any of the specified files.
+           (Uses a heuristic to determine which files are modified by
+           unapplied patches.  Note that this heuristic is much slower than
+           scanning applied patches.)
+
+           -v  Verbose, more user friendly output.
+
+           --color[=always|auto|never]
+
+               Use syntax coloring (auto activates it only if the output is
+               a tty).
+
+       <b>pop </b>[-afRqv] [--refresh] [num|patch]
+
+           Remove patch(es) from the stack of applied patches.  Without
+           options, the topmost patch is removed.  When a number is
+           specified, remove the specified number of patches.  When a patch
+           name is specified, remove patches until the specified patch end
+           up on top of the stack.  Patch names may include the patches/
+           prefix, which means that filename completion can be used.
+
+           -a  Remove all applied patches.
+
+           -f  Force remove. The state before the patch(es) were applied
+               will be restored from backup files.
+
+           -R  Always verify if the patch removes cleanly; don't rely on
+               timestamp checks.
+
+           -q  Quiet operation.
+
+           -v  Verbose operation.
+
+           --refresh
+
+               Automatically refresh every patch before it gets unapplied.
+
+       <b>previous </b>[patch]
+
+           Print the name of the previous patch before the specified or
+           topmost patch in the series file.
+
+       <b>push </b>[-afqvm] [--fuzz=N] [--merge[=merge|diff3]] [--leave-rejects]
+       [--color[=always|auto|never]] [--refresh] [num|patch]
+
+           Apply patch(es) from the series file.  Without options, the next
+           patch in the series file is applied.  When a number is specified,
+           apply the specified number of patches.  When a patch name is
+           specified, apply all patches up to and including the specified
+           patch.  Patch names may include the patches/ prefix, which means
+           that filename completion can be used.
+
+           -a  Apply all patches in the series file.
+
+           -q  Quiet operation.
+
+           -f  Force apply, even if the patch has rejects.
+
+           -v  Verbose operation.
+
+           --fuzz=N
+
+               Set the maximum fuzz factor (default: 2).
+
+           -m, --merge[=merge|diff3]
+
+               Merge the patch file into the original files (see patch(1)).
+
+           --leave-rejects
+
+               Leave around the reject files patch produced, even if the
+               patch is not actually applied.
+
+           --color[=always|auto|never]
+
+               Use syntax coloring (auto activates it only if the output is
+               a tty).
+
+           --refresh
+
+               Automatically refresh every patch after it was successfully
+               applied.
+
+       <b>refresh </b>[-p n|-p ab] [-u|-U num|-c|-C num] [-z[new_name]] [-f] [--no-
+       timestamps] [--no-index] [--diffstat] [--sort] [--backup] [--strip-
+       trailing-whitespace] [patch]
+
+           Refreshes the specified patch, or the topmost patch by default.
+           Documentation that comes before the actual patch in the patch
+           file is retained.
+
+           It is possible to refresh patches that are not on top.  If any
+           patches on top of the patch to refresh modify the same files, the
+           script aborts by default.  Patches can still be refreshed with
+           -f.  In that case this script will print a warning for each
+           shadowed file, changes by more recent patches will be ignored,
+           and only changes in files that have not been modified by any more
+           recent patches will end up in the specified patch.
+
+           -p n
+               Create a -p n style patch (-p0 or -p1 supported).
+
+           -p ab
+               Create a -p1 style patch, but use a/file and b/file as the
+               original and new filenames instead of the default
+               dir.orig/file and dir/file names.
+
+           -u, -U num, -c, -C num
+
+               Create a unified diff (-u, -U) with num lines of context.
+               Create a context diff (-c, -C) with num lines of context. The
+               number of context lines defaults to 3.
+
+           -z[new_name]
+
+               Create a new patch containing the changes instead of
+               refreshing the topmost patch. If no new name is specified,
+               `-2' is added to the original patch name, etc. (See the fork
+               command.)
+
+           --no-timestamps
+
+               Do not include file timestamps in patch headers.
+
+           --no-index
+
+               Do not output Index: lines.
+
+           --diffstat
+
+               Add a diffstat section to the patch header, or replace the
+               existing diffstat section.
+
+           -f  Enforce refreshing of a patch that is not on top.
+
+           --backup
+
+               Create a backup copy of the old version of a patch as patch~.
+
+           --sort
+               Sort files by their name instead of preserving the original
+               order.
+
+           --strip-trailing-whitespace
+
+               Strip trailing whitespace at the end of lines.
+
+       <b>remove </b>[-P patch] {file} ...
+
+           Remove one or more files from the topmost or named patch.  Files
+           that are modified by patches on top of the specified patch cannot
+           be removed.
+
+           -P patch
+
+               Remove named files from the named patch.
+
+       <b>rename </b>[-P patch] new_name
+
+           Rename the topmost or named patch.
+
+           -P patch
+
+               Patch to rename.
+
+       <b>revert </b>[-P patch] {file} ...
+
+           Revert uncommitted changes to the topmost or named patch for the
+           specified file(s): after the revert, 'quilt diff -z' will show no
+           differences for those files. Changes to files that are modified
+           by patches on top of the specified patch cannot be reverted.
+
+           -P patch
+
+               Revert changes in the named patch.
+
+       <b>series </b>[--color[=always|auto|never]] [-v]
+
+           Print the names of all patches in the series file.
+
+           --color[=always|auto|never]
+
+               Use syntax coloring (auto activates it only if the output is
+               a tty).
+
+           -v  Verbose, more user friendly output.
+
+       <b>setup </b>[-d path-prefix] [-v] [--sourcedir dir] [--fuzz=N]
+       [--slow|--fast] {specfile|seriesfile}
+
+           Initializes a source tree from an rpm spec file or a quilt series
+           file.
+
+           -d  Optional path prefix for the resulting source tree.
+
+           --sourcedir
+
+               Directory that contains the package sources. Defaults to `.'.
+
+           -v  Verbose debug output.
+
+           --fuzz=N
+
+               Set the maximum fuzz factor (needs rpm 4.6 or later).
+
+           --slow
+               Use the original, slow method to process the spec file. This
+               is the default for now, but that might change in the future.
+               In this mode, rpmbuild generates a working tree in a
+               temporary directory while all its actions are recorded, and
+               then everything is replayed from scratch in the target
+               directory.
+
+           --fast
+               Use an alternative, faster method to process the spec file.
+               In this mode, rpmbuild is told to generate a working tree
+               directly in the target directory. If the input is a series
+               file, it is assumed that all archives have been extracted
+               manually beforehand.
+
+       <b>snapshot </b>[-d]
+
+           Take a snapshot of the current working state.  After taking the
+           snapshot, the tree can be modified in the usual ways, including
+           pushing and popping patches.  A diff against the tree at the
+           moment of the snapshot can be generated with `quilt diff
+           --snapshot'.
+
+           -d  Only remove current snapshot.
+
+       <b>top</b>
+
+           Print the name of the topmost patch on the current stack of
+           applied patches.
+
+       <b>unapplied </b>[patch]
+
+           Print a list of patches that are not applied, or all patches that
+           follow the specified patch in the series file.
+
+       <b>upgrade</b>
+
+           Upgrade the meta-data in a working tree from an old version of
+           quilt to the current version. This command is only needed when
+           the quilt meta-data format has changed, and the working tree
+           still contains old-format meta-data. In that case, quilt will
+           request to run `quilt upgrade'.
+</pre>
+<h2><a id="COMMON_OPTIONS_TO_ALL_COMMANDS" href="#COMMON_OPTIONS_TO_ALL_COMMANDS"></a>COMMON OPTIONS TO ALL COMMANDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>--trace</b>
+
+               Runs the command in bash trace mode (-x). For internal
+               debugging.
+
+       <b>--quiltrc </b>file
+
+               Use the specified configuration file instead of ~/.quiltrc
+               (or /etc/quilt.quiltrc if ~/.quiltrc does not exist).  See
+               the pdf documentation for details about its possible
+               contents.  The special value "-" causes quilt not to read any
+               configuration file.
+
+       <b>--version</b>
+
+               Print the version number and exit immediately.
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The exit status is 0 if the sub-command was successfully executed,
+       and 1 in case of error.
+
+       An exit status of 2 denotes that quilt did not do anything to
+       complete the command.  This happens in particular when asking to push
+       when the whole stack is already pushed, or asking to pop when the
+       whole stack is already popped.  This behavior is intended to ease the
+       scripting around quilt.
+</pre>
+<h2><a id="EXAMPLE_OF_WORKING_TREE" href="#EXAMPLE_OF_WORKING_TREE"></a>EXAMPLE OF WORKING TREE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+              work/
+              ├── patches/
+              │    ├── series         (list of patches to apply)
+              │    ├── patch1.diff    (one particular patch)
+              │    ├── patch2.diff
+              │    └── ...
+              ├── .pc/
+              │    ├── .quilt_patches (content of QUILT_PATCHES)
+              │    ├── .quilt_series  (content of QUILT_SERIES)
+              │    ├── patch1.diff/   (copy of patched files)
+              │    │    └── ...
+              │    ├── patch2.diff/
+              │    │    └── ...
+              │    └── ...
+              └── ...
+
+       The patches/ directory is precious as it contains all your patches as
+       well as the order in which it should be applied.
+
+       The .pc/ directory contains some metadata about the current state of
+       your patch serie. Changing its content is not advised. This directory
+       can usually be regenerated from the initial files and the content of
+       the patches/ directory (provided that all patches were regenerated
+       before the removal).
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Please refer to the pdf documentation for a full example of use.
+</pre>
+<h2><a id="CONFIGURATION_FILE" href="#CONFIGURATION_FILE"></a>CONFIGURATION FILE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Upon startup, quilt evaluates the file .quiltrc in the user's home
+       directory, or the file specified with the --quiltrc option.  This
+       file is a regular bash script. Default options can be passed to any
+       COMMAND by defining a QUILT_${COMMAND}_ARGS variable.  For example,
+       QUILT_DIFF_ARGS="--color=auto" causes the output of quilt diff to be
+       syntax colored when writing to a terminal.
+
+       In addition to that, quilt recognizes the following variables:
+
+       EDITOR
+
+           The program to run to edit files.  If it isn't redefined in the
+           configuration file, $EDITOR as defined in the environment will be
+           used.
+
+       LESS
+
+           The arguments used to invoke the pager.  Inherits the existing
+           value of $LESS if LESS is already set in the environment,
+           otherwise defaults to "-FRSX".
+
+       QUILT_DIFF_OPTS
+
+           Additional options that quilt shall pass to GNU diff when
+           generating patches. A useful setting for C source code is "-p",
+           which causes GNU diff to show in the resulting patch which
+           function a change is in.
+
+       QUILT_PATCH_OPTS
+
+           Additional options that quilt shall pass to GNU patch when
+           applying patches.  For example, recent versions of GNU patch
+           support the "--reject-format=unified" option for generating
+           reject files in unified diff style (older patch versions used
+           "--unified-reject-files" for that).
+
+           You may also want to add the "-E" option if you have issues with
+           quilt not deleting empty files when you think it should. The
+           documentation of GNU patch says that "normally this option is
+           unnecessary", but when patch is in POSIX mode or if the patch
+           format doesn't allow to distinguish empty files from deleted
+           files, patch deletes empty files only if the -E option is given.
+           Beware that when passing -E to patch, quilt will no longer be
+           able to deal with empty files, which is why using -E is no longer
+           the default.
+
+       QUILT_DIFFSTAT_OPTS
+
+           Additional options that quilt shall pass to diffstat when
+           generating patch statistics. For example, "-f0" can be used for
+           an alternative output format. Recent versions of diffstat also
+           support alternative rounding methods ("-r1", "-r2").
+
+       QUILT_PATCHES
+
+           The location of patch files, defaulting to "patches".
+
+       QUILT_SERIES
+
+           The name of the series file, defaulting to "series". Unless an
+           absolute path is used, the search algorithm described above
+           applies.
+
+       QUILT_PATCHES_PREFIX
+
+           If set to anything, quilt will prefix patch names it prints with
+           their directory (QUILT_PATCHES).
+
+       QUILT_NO_DIFF_INDEX
+
+           By default, quilt prepends an Index: line to the patches it
+           generates.  If this variable is set to anything, no line is
+           prepended.  This is a shortcut to adding --no-index to both
+           QUILT_DIFF_ARGS and QUILT_REFRESH_ARGS.
+
+       QUILT_NO_DIFF_TIMESTAMPS
+
+           By default, quilt includes timestamps in headers when generating
+           patches.  If this variable is set to anything, no timestamp will
+           be included.  This is a shortcut to adding --no-timestamps to
+           both QUILT_DIFF_ARGS and QUILT_REFRESH_ARGS.
+
+       QUILT_PAGER
+
+           The pager quilt shall use for commands which produce paginated
+           output. If unset, the values of GIT_PAGER or PAGER is used.  If
+           none of these variables is set, "less -R" is used.  An empty
+           value indicates that no pager should be used.
+
+       QUILT_COLORS
+
+           By default, quilt uses its predefined color set in order to be
+           more comprehensible when distiguishing various types of patches,
+           eg.  applied/unapplied, failed, etc.
+
+           To override one or more color settings, set the QUILT_COLORS
+           variable in following syntax - colon (:) separated list of
+           elements, each being of the form &lt;format name&gt;=&lt;foreground
+           color&gt;[;&lt;background color&gt;]
+
+           Format names with their respective default values are listed
+           below, along with their usage(s).  Color codes(values) are
+           standard bash coloring escape codes.  See more at
+           <a href="http://tldp.org/LDP/abs/html/colorizing.html#AEN20229">http://tldp.org/LDP/abs/html/colorizing.html#AEN20229</a>
+
+           <b>diff_hdr  </b>Used in 'quilt diff' to color the index line. Defaults
+                     to 32 (green).
+
+           <b>diff_add  </b>Used in 'quilt diff' to color added lines. Defaults to
+                     36 (azure).
+
+           <b>diff_mod  </b>Used in 'quilt diff' to color modified lines. Defaults
+                     to 35 (purple).
+
+           <b>diff_rem  </b>Used in 'quilt diff' to color removed lines. Defaults
+                     to 35 (purple).
+
+           <b>diff_hunk </b>Used in 'quilt diff' to color hunk header. Defaults to
+                     33 (brown/orange).
+
+           <b>diff_ctx  </b>Used in 'quilt diff' to color the text after end of
+                     hunk header (diff --show-c-function generates this).
+                     Defaults to 35 (purple).
+
+           <b>diff_cctx </b>Used in 'quilt diff' to color the 15-asterisk sequence
+                     before or after a hunk. Defaults to 33 (brown/orange).
+
+           <b>patch_fuzz</b>
+                     Used in 'quilt push' to color the patch fuzz
+                     information. Defaults to 35 (purple).
+
+           <b>patch_fail</b>
+                     Used in 'quilt push' to color the fail message.
+                     Defaults to 31 (red).
+
+           <b>series_app</b>
+                     Used in 'quilt series' and 'quilt patches' to color the
+                     applied patch names. Defaults to 32 (green).
+
+           <b>series_top</b>
+                     Used in 'quilt series' and 'quilt patches' to color the
+                     top patch name. Defaults to 33 (brown/orange).
+
+           <b>series_una</b>
+                     Used in 'quilt series' and 'quilt patches' to color
+                     unapplied patch names. Defaults to 0 (no special
+                     color).
+
+           In addition, the <b>clear </b>format name is used to turn off special
+           coloring. Its value is 0; it is not advised to modify it.
+
+           The content of QUILT_COLORS supersedes default values. So the
+           value diff_hdr=35;44 will get you the diff headers in magenta
+           over blue instead of the default green over unchanged background.
+           For that, add the following content to ~/.quiltrc (or
+           /etc/quilt.quiltrc):
+
+           QUILT_DIFF_ARGS="--color"
+           QUILT_COLORS='diff_hdr=35;44'
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Quilt started as a series of scripts written by Andrew Morton (patch-
+       scripts). Based on Andrew's ideas, Andreas Gruenbacher completely
+       rewrote the scripts, with the help of several other contributors (see
+       AUTHORS file in the distribution).
+
+       This man page was written by Martin Quinson, based on information
+       found in the pdf documentation, and in the help messages of each
+       commands.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The pdf documentation, which should be under
+       /usr/local/share/doc/quilt/quilt.pdf.  Note that some distributors
+       compress this file.  <b>zxpdf</b>(<b>1</b>) can be used to display compressed pdf
+       files.
+
+       <b>diff</b>(<b>1</b>), <b>patch</b>(<b>1</b>).
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>quilt</i> (tool to manage series of patches)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://savannah.nongnu.org/projects/quilt">http://savannah.nongnu.org/projects/quilt</a>⟩.  If you have a bug report
+       for this manual page, see 
+       ⟨<a href="http://savannah.nongnu.org/bugs/?group=quilt">http://savannah.nongnu.org/bugs/?group=quilt</a>⟩.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨git://git.savannah.nongnu.org/quilt.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">quilt                           Dec 17, 2013                        quilt(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

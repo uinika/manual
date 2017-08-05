@@ -1,0 +1,433 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>cryptsetup-reencrypt(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#RETURN_CODES">RETURN&nbsp;CODES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#REPORTING_BUGS">REPORTING&nbsp;BUGS</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#COPYRIGHT">COPYRIGHT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">CRYPTSETUP-REENCRYPT(8)     Maintenance Commands     CRYPTSETUP-REENCRYPT(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       cryptsetup-reencrypt - tool for offline LUKS device re-encryption
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>cryptsetup-reencrypt &lt;options&gt; &lt;device&gt;</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Cryptsetup-reencrypt can be used to change reencryption parameters
+       which otherwise require full on-disk data change (re-encryption).
+
+       You can regenerate <b>volume key </b>(the real key used in on-disk
+       encryption unclocked by passphrase), <b>cipher</b>, <b>cipher mode</b>.
+
+       Cryptsetup-reencrypt reencrypts data on LUKS device in-place. During
+       reencryption process the LUKS device is marked unavailable.
+
+       <i>WARNING</i>: The cryptsetup-reencrypt program is not resistant to
+       hardware or kernel failures during reencryption (you can lose you
+       data in this case).
+
+       <i>ALWAYS BE SURE YOU HAVE RELIABLE BACKUP BEFORE USING THIS TOOL.</i>
+       The reencryption can be temporarily suspended (by TERM signal or by
+       using ctrl+c) but you need to retain temporary files named
+       LUKS-&lt;uuid&gt;.[log|org|new].  LUKS device is unavailable until
+       reencryption is finished though.
+
+       Current working directory must by writable and temporary files
+       created during reencryption must be present.
+
+       For more info about LUKS see cryptsetup(8).
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       To start (or continue) re-encryption for &lt;device&gt; use:
+
+       <i>cryptsetup-reencrypt</i> &lt;device&gt;
+
+       <b>&lt;options&gt; </b>can be [--batch-mode, --block-size, --cipher, --debug,
+       --device-size, --hash, --iter-time, --use-random | --use-urandom,
+       --keep-key, --key-size, --key-file, --key-slot, --keyfile-offset,
+       --keyfile-size, --tries, --use-directio, --use-fsync, --verbose,
+       --write-log, --uuid]
+
+       To encrypt data on (not yet encrypted) device, use <i>--new</i> with
+       combination with <i>--reduce-device-size</i>.
+
+       To remove encryption from device, use <i>--decrypt</i>.
+
+       For detailed description of encryption and key file options see
+       <a href="cryptsetup.8.html">cryptsetup(8)</a> man page.
+
+       <b>--verbose, -v</b>
+              Print more information on command execution.
+
+       <b>--debug</b>
+              Run in debug mode with full diagnostic logs. Debug output
+              lines are always prefixed by '#'.
+
+       <b>--cipher, -c </b><i>&lt;cipher-spec&gt;</i>
+              Set the cipher specification string.
+
+       <b>--key-size, -s </b><i>&lt;bits&gt;</i>
+              Set key size in bits. The argument has to be a multiple of  8.
+
+              The possible key-sizes are limited by the cipher and mode
+              used.
+
+              If you are increasing key size, there must be enough space in
+              the LUKS header for enlarged keyslots (data offset must be
+              large enough) or reencryption cannot be performed.
+
+              If there is not enough space for keyslots with new key size,
+              you can destructively shrink device with --reduce-device-size
+              option.
+
+       <b>--hash, -h </b><i>&lt;hash-spec&gt;</i>
+              Specifies the hash used in the LUKS key setup scheme and
+              volume key digest.
+
+              <b>NOTE: </b>if this parameter is not specified, default hash
+              algorithm is always used for new device header.
+
+       <b>--iter-time, -i </b><i>&lt;milliseconds&gt;</i>
+              The number of milliseconds to spend with PBKDF2 passphrase
+              processing for the new LUKS header.
+
+       <b>--use-random</b>
+
+       <b>--use-urandom</b>
+              Define which kernel random number generator will be used to
+              create the volume key.
+
+       <b>--key-file, -d </b><i>name</i>
+              Read the passphrase from file.
+
+              <b>WARNING: </b>--key-file option can be used only if there only one
+              active keyslot, or alternatively, also if --key-slot option is
+              specified (then all other keyslots will be disabled in new
+              LUKS device).
+
+              If this option is not used, cryptsetup-reencrypt will ask for
+              all active keyslot passphrases.
+
+       <b>--key-slot, -S &lt;0-7&gt;</b>
+              Specify which key slot is used.
+
+              <b>WARNING: </b>All other keyslots will be disabled if this option is
+              used.
+
+       <b>--keyfile-offset </b><i>value</i>
+              Skip <i>value</i> bytes at the beginning of the key file.
+
+       <b>--keyfile-size, -l</b>
+              Read a maximum of <i>value</i> bytes from the key file.  Default is
+              to read the whole file up to the compiled-in maximum.
+
+       <b>--keep-key</b>
+              Do not change encryption key, just reencrypt the LUKS header
+              and keyslots.
+
+              This option can be combined only with <i>--hash</i> or <i>--iter-time</i>
+              options.
+
+       <b>--tries, -T</b>
+              Number of retries for invalid passphrase entry.
+
+       <b>--block-size, -B </b><i>value</i>
+              Use re-encryption block size of &lt;value&gt; in MiB.
+
+              Values can be between 1 and 64 MiB.
+
+       <b>--device-size </b><i>size[units]</i>
+              Instead of real device size, use specified value.
+
+              It means that only specified area (from the start of the
+              device to the specified size) will be reencrypted.
+
+              <b>WARNING: </b>This is destructive operation.
+
+              If no unit suffix is specified, the size is in bytes.
+
+              Unit suffix can be S for 512 byte sectors, K/M/G/T (or
+              KiB,MiB,GiB,TiB) for units with 1024 base or KB/MB/GB/TB for
+              1000 base (SI scale).
+
+              <b>WARNING: </b>This is destructive operation.
+
+       <b>--reduce-device-size </b><i>size[units]</i>
+              Enlarge data offset to specified value by shrinking device
+              size.
+
+              This means that last sectors on the original device will be
+              lost, ciphertext data will be effectively shifted by specified
+              number of sectors.
+
+              It can be useful if you e.g. added some space to underlying
+              partition (so last sectors contains no data).
+
+              For units suffix see --device-size parameter description.
+
+              <b>WARNING: </b>This is destructive operation and cannot be reverted.
+              Use with extreme care - shrinked filesystems are usually
+              unrecoverable.
+
+              You cannot shrink device more than by 64 MiB (131072 sectors).
+
+       <b>--new, -N</b>
+              Create new header (encrypt not yet encrypted device).
+
+              This option must be used together with --reduce-device-size.
+
+              <b>WARNING: </b>This is destructive operation and cannot be reverted.
+
+       <b>--decrypt</b>
+              Remove encryption (decrypt already encrypted device and remove
+              LUKS header).
+
+              <b>WARNING: </b>This is destructive operation and cannot be reverted.
+
+       <b>--use-directio</b>
+              Use direct-io (O_DIRECT) for all read/write data operations
+              related to block device undergoing reencryption.
+
+              Useful if direct-io operations perform better than normal
+              buffered operations (e.g. in virtual environments).
+
+       <b>--use-fsync</b>
+              Use fsync call after every written block. This applies for
+              reencryption log files as well.
+
+       <b>--write-log</b>
+              Update log file after every block write. This can slow down
+              reencryption but will minimize data loss in the case of system
+              crash.
+
+       <b>--uuid </b><i>&lt;uuid&gt;</i>
+              Use only while resuming an interrupted decryption process (see
+              --decrypt).
+
+              To find out what <i>&lt;uuid&gt;</i> to pass look for temporary files
+              LUKS-&lt;uuid&gt;.[|log|org|new] of the interrupted decryption
+              process.
+
+       <b>--batch-mode, -q</b>
+              Suppresses all warnings and reencryption progress output.
+
+       <b>--version</b>
+              Show the program version.
+</pre>
+<h2><a id="RETURN_CODES" href="#RETURN_CODES"></a>RETURN CODES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Cryptsetup-reencrypt returns 0 on success and a non-zero value on
+       error.
+
+       Error codes are: 1 wrong parameters, 2 no permission, 3 out of
+       memory, 4 wrong device specified, 5 device already exists or device
+       is busy.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Reencrypt /dev/sdb1 (change volume key)
+              cryptsetup-reencrypt /dev/sdb1
+
+       Reencrypt and also change cipher and cipher mode
+              cryptsetup-reencrypt /dev/sdb1 -c aes-xts-plain64
+
+       Add LUKS encryption to not yet encrypted device
+
+              First, be sure you have space added to disk.
+
+              Or alternatively shrink filesystem in advance.
+              Here we need 4096 512-bytes sectors (enough for 2x128 bit
+              key).
+
+              fdisk -u /dev/sdb # move sdb1 partition end + 4096 sectors (or
+              use resize2fs or tool for your filesystem and shrink it)
+
+              cryptsetup-reencrypt /dev/sdb1 --new --reduce-device-size
+              4096S
+
+       Remove LUKS encryption completely
+
+              cryptsetup-reencrypt /dev/sdb1 --decrypt
+</pre>
+<h2><a id="REPORTING_BUGS" href="#REPORTING_BUGS"></a>REPORTING BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Report bugs, including ones in the documentation, on the cryptsetup
+       mailing list at &lt;dm-crypt@saout.de&gt; or in the 'Issues' section on
+       LUKS website.  Please attach the output of the failed command with
+       the --debug option added.
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Cryptsetup-reencrypt was written by Milan Broz &lt;gmazyland@gmail.com&gt;.
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Copyright © 2012-2017 Milan Broz
+       Copyright © 2012-2017 Red Hat, Inc.
+
+       This is free software; see the source for copying conditions.  There
+       is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+       PARTICULAR PURPOSE.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The project website at <b><a href="https://gitlab.com/cryptsetup/cryptsetup">https://gitlab.com/cryptsetup/cryptsetup</a> </b>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>Cryptsetup</i> ((open-source disk encryption))
+       project.  Information about the project can be found at 
+       ⟨<a href="https://gitlab.com/cryptsetup/cryptsetup">https://gitlab.com/cryptsetup/cryptsetup</a>⟩.  If you have a bug report
+       for this manual page, send it to dm-crypt@saout.de.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨<a href="https://gitlab.com/cryptsetup/cryptsetup.git">https://gitlab.com/cryptsetup/cryptsetup.git</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">cryptsetup-reencrypt             March 2017          CRYPTSETUP-REENCRYPT(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

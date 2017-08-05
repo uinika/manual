@@ -1,0 +1,317 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>capget(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">CAPGET(2)                 Linux Programmer's Manual                CAPGET(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       capget, capset - set/get capabilities of thread(s)
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/capability.h&gt;</b>
+
+       <b>int capget(cap_user_header_t </b><i>hdrp</i><b>, cap_user_data_t </b><i>datap</i><b>);</b>
+
+       <b>int capset(cap_user_header_t </b><i>hdrp</i><b>, const cap_user_data_t </b><i>datap</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       As of Linux 2.2, the power of the superuser (root) has been
+       partitioned into a set of discrete capabilities.  Each thread has a
+       set of effective capabilities identifying which capabilities (if any)
+       it may currently exercise.  Each thread also has a set of inheritable
+       capabilities that may be passed through an <a href="execve.2.html">execve(2)</a> call, and a set
+       of permitted capabilities that it can make effective or inheritable.
+
+       These two system calls are the raw kernel interface for getting and
+       setting thread capabilities.  Not only are these system calls
+       specific to Linux, but the kernel API is likely to change and use of
+       these system calls (in particular the format of the <i>cap_user_*_t</i>
+       types) is subject to extension with each kernel revision, but old
+       programs will keep working.
+
+       The portable interfaces are <a href="../man3/cap_set_proc.3.html">cap_set_proc(3)</a> and <a href="../man3/cap_get_proc.3.html">cap_get_proc(3)</a>; if
+       possible, you should use those interfaces in applications.  If you
+       wish to use the Linux extensions in applications, you should use the
+       easier-to-use interfaces <a href="../man3/capsetp.3.html">capsetp(3)</a> and <a href="../man3/capgetp.3.html">capgetp(3)</a>.
+
+   <b>Current details</b>
+       Now that you have been warned, some current kernel details.  The
+       structures are defined as follows.
+
+           #define _LINUX_CAPABILITY_VERSION_1  0x19980330
+           #define _LINUX_CAPABILITY_U32S_1     1
+
+                   /* V2 added in Linux 2.6.25; deprecated */
+           #define _LINUX_CAPABILITY_VERSION_2  0x20071026
+           #define _LINUX_CAPABILITY_U32S_2     2
+
+                   /* V3 added in Linux 2.6.26 */
+           #define _LINUX_CAPABILITY_VERSION_3  0x20080522
+           #define _LINUX_CAPABILITY_U32S_3     2
+
+           typedef struct __user_cap_header_struct {
+              __u32 version;
+              int pid;
+           } *cap_user_header_t;
+
+           typedef struct __user_cap_data_struct {
+              __u32 effective;
+              __u32 permitted;
+              __u32 inheritable;
+           } *cap_user_data_t;
+
+       The <i>effective</i>, <i>permitted</i>, and <i>inheritable</i> fields are bit masks of the
+       capabilities defined in <a href="../man7/capabilities.7.html">capabilities(7)</a>.  Note that the <b>CAP_* </b>values
+       are bit indexes and need to be bit-shifted before ORing into the bit
+       fields.  To define the structures for passing to the system call, you
+       have to use the <i>struct __user_cap_header_struct</i> and <i>struct</i>
+       <i>__user_cap_data_struct</i> names because the typedefs are only pointers.
+
+       Kernels prior to 2.6.25 prefer 32-bit capabilities with version
+       <b>_LINUX_CAPABILITY_VERSION_1</b>.  Linux 2.6.25 added 64-bit capability
+       sets, with version <b>_LINUX_CAPABILITY_VERSION_2</b>.  There was, however,
+       an API glitch, and Linux 2.6.26 added <b>_LINUX_CAPABILITY_VERSION_3 </b>to
+       fix the problem.
+
+       Note that 64-bit capabilities use <i>datap</i>[0] and <i>datap</i>[1], whereas
+       32-bit capabilities use only <i>datap</i>[0].
+
+       On kernels that support file capabilities (VFS capability support),
+       these system calls behave slightly differently.  This support was
+       added as an option in Linux 2.6.24, and became fixed (nonoptional) in
+       Linux 2.6.33.
+
+       For <b>capget</b>() calls, one can probe the capabilities of any process by
+       specifying its process ID with the <i>hdrp-&gt;pid</i> field value.
+
+   <b>With VFS capability support</b>
+       VFS Capability support creates a file-attribute method for adding
+       capabilities to privileged executables.  This privilege model
+       obsoletes kernel support for one process asynchronously setting the
+       capabilities of another.  That is, with VFS support, for <b>capset</b>()
+       calls the only permitted values for <i>hdrp-&gt;pid</i> are 0 or <a href="gettid.2.html">gettid(2)</a>,
+       which are equivalent.
+
+   <b>Without VFS capability support</b>
+       When the kernel does not support VFS capabilities, <b>capset</b>() calls can
+       operate on the capabilities of the thread specified by the <i>pid</i> field
+       of <i>hdrp</i> when that is nonzero, or on the capabilities of the calling
+       thread if <i>pid</i> is 0.  If <i>pid</i> refers to a single-threaded process, then
+       <i>pid</i> can be specified as a traditional process ID; operating on a
+       thread of a multithreaded process requires a thread ID of the type
+       returned by <a href="gettid.2.html">gettid(2)</a>.  For <b>capset</b>(), <i>pid</i> can also be: -1, meaning
+       perform the change on all threads except the caller and <a href="../man1/init.1.html">init(1)</a>; or a
+       value less than -1, in which case the change is applied to all
+       members of the process group whose ID is -<i>pid</i>.
+
+       For details on the data, see <a href="../man7/capabilities.7.html">capabilities(7)</a>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set appropriately.
+
+       The calls will fail with the error <b>EINVAL</b>, and set the <i>version</i> field
+       of <i>hdrp</i> to the kernel preferred value of <b>_LINUX_CAPABILITY_VERSION_?</b>
+       when an unsupported <i>version</i> value is specified.  In this way, one can
+       probe what the current preferred capability revision is.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b>Bad memory address.  <i>hdrp</i> must not be NULL.  <i>datap</i> may be NULL
+              only when the user is trying to determine the preferred
+              capability version format supported by the kernel.
+
+       <b>EINVAL </b>One of the arguments was invalid.
+
+       <b>EPERM  </b>An attempt was made to add a capability to the Permitted set,
+              or to set a capability in the Effective or Inheritable sets
+              that is not in the Permitted set.
+
+       <b>EPERM  </b>The caller attempted to use <b>capset</b>() to modify the
+              capabilities of a thread other than itself, but lacked
+              sufficient privilege.  For kernels supporting VFS
+              capabilities, this is never permitted.  For kernels lacking
+              VFS support, the <b>CAP_SETPCAP </b>capability is required.  (A bug
+              in kernels before 2.6.11 meant that this error could also
+              occur if a thread without this capability tried to change its
+              own capabilities by specifying the <i>pid</i> field as a nonzero
+              value (i.e., the value returned by <a href="getpid.2.html">getpid(2)</a>) instead of 0.)
+
+       <b>ESRCH  </b>No such thread.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls are Linux-specific.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The portable interface to the capability querying and setting
+       functions is provided by the <i>libcap</i> library and is available here:
+       ⟨<a href="http://git.kernel.org/cgit/linux/kernel/git/morgan/libcap.git">http://git.kernel.org/cgit/linux/kernel/git/morgan/libcap.git</a>⟩
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="clone.2.html">clone(2)</a>, <a href="gettid.2.html">gettid(2)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-07-23                        CAPGET(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="gettid.2.html">gettid(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/capng_apply.3.html">capng_apply(3)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="capget.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

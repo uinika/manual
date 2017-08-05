@@ -1,0 +1,384 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>init_module(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">INIT_MODULE(2)            Linux Programmer's Manual           INIT_MODULE(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       init_module, finit_module - load a kernel module
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>int init_module(void *</b><i>module_image</i><b>, unsigned long </b><i>len</i><b>,</b>
+                       <b>const char *</b><i>param_values</i><b>);</b>
+
+       <b>int finit_module(int </b><i>fd</i><b>, const char *</b><i>param_values</i><b>,</b>
+                        <b>int </b><i>flags</i><b>);</b>
+
+       <i>Note</i>: glibc provides no header file declaration of <b>init_module</b>() and
+       no wrapper function for <b>finit_module</b>(); see NOTES.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>init_module</b>() loads an ELF image into kernel space, performs any
+       necessary symbol relocations, initializes module parameters to values
+       provided by the caller, and then runs the module's <i>init</i> function.
+       This system call requires privilege.
+
+       The <i>module_image</i> argument points to a buffer containing the binary
+       image to be loaded; <i>len</i> specifies the size of that buffer.  The
+       module image should be a valid ELF image, built for the running
+       kernel.
+
+       The <i>param_values</i> argument is a string containing space-delimited
+       specifications of the values for module parameters (defined inside
+       the module using <b>module_param</b>() and <b>module_param_array</b>()).  The
+       kernel parses this string and initializes the specified parameters.
+       Each of the parameter specifications has the form:
+
+               <i>name</i>[<b>=</b><i>value</i>[<b>,</b><i>value</i>...]]
+
+       The parameter <i>name</i> is one of those defined within the module using
+       <i>module_param</i>() (see the Linux kernel source file
+       <i>include/linux/moduleparam.h</i>).  The parameter <i>value</i> is optional in the
+       case of <i>bool</i> and <i>invbool</i> parameters.  Values for array parameters are
+       specified as a comma-separated list.
+
+   <b>finit_module()</b>
+       The <b>finit_module</b>() system call is like <b>init_module</b>(), but reads the
+       module to be loaded from the file descriptor <i>fd</i>.  It is useful when
+       the authenticity of a kernel module can be determined from its
+       location in the filesystem; in cases where that is possible, the
+       overhead of using cryptographically signed modules to determine the
+       authenticity of a module can be avoided.  The <i>param_values</i> argument
+       is as for <b>init_module</b>().
+
+       The <i>flags</i> argument modifies the operation of <b>finit_module</b>().  It is a
+       bit mask value created by ORing together zero or more of the
+       following flags:
+
+       <b>MODULE_INIT_IGNORE_MODVERSIONS</b>
+              Ignore symbol version hashes.
+
+       <b>MODULE_INIT_IGNORE_VERMAGIC</b>
+              Ignore kernel version magic.
+
+       There are some safety checks built into a module to ensure that it
+       matches the kernel against which it is loaded.  These checks are
+       recorded when the module is built and verified when the module is
+       loaded.  First, the module records a "vermagic" string containing the
+       kernel version number and prominent features (such as the CPU type).
+       Second, if the module was built with the <b>CONFIG_MODVERSIONS</b>
+       configuration option enabled, a version hash is recorded for each
+       symbol the module uses.  This hash is based on the types of the
+       arguments and return value for the function named by the symbol.  In
+       this case, the kernel version number within the "vermagic" string is
+       ignored, as the symbol version hashes are assumed to be sufficiently
+       reliable.
+
+       Using the <b>MODULE_INIT_IGNORE_VERMAGIC </b>flag indicates that the
+       "vermagic" string is to be ignored, and the
+       <b>MODULE_INIT_IGNORE_MODVERSIONS </b>flag indicates that the symbol version
+       hashes are to be ignored.  If the kernel is built to permit forced
+       loading (i.e., configured with <b>CONFIG_MODULE_FORCE_LOAD</b>), then
+       loading will continue, otherwise it will fail with <b>ENOEXEC </b>as
+       expected for malformed modules.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, these system calls return 0.  On error, -1 is returned
+       and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EBADMSG </b>(since Linux 3.7)
+              Module signature is misformatted.
+
+       <b>EBUSY  </b>Timeout while trying to resolve a symbol reference by this
+              module.
+
+       <b>EFAULT </b>An address argument referred to a location that is outside the
+              process's accessible address space.
+
+       <b>ENOKEY </b>(since Linux 3.7)
+              Module signature is invalid or the kernel does not have a key
+              for this module.  This error is returned only if the kernel
+              was configured with <b>CONFIG_MODULE_SIG_FORCE</b>; if the kernel was
+              not configured with this option, then an invalid or unsigned
+              module simply taints the kernel.
+
+       <b>ENOMEM </b>Out of memory.
+
+       <b>EPERM  </b>The caller was not privileged (did not have the <b>CAP_SYS_MODULE</b>
+              capability), or module loading is disabled (see
+              <i>/proc/sys/kernel/modules_disabled</i> in <a href="../man5/proc.5.html">proc(5)</a>).
+
+       The following errors may additionally occur for <b>init_module</b>():
+
+       <b>EEXIST </b>A module with this name is already loaded.
+
+       <b>EINVAL </b><i>param_values</i> is invalid, or some part of the ELF image in
+              <i>module_image</i> contains inconsistencies.
+
+       <b>ENOEXEC</b>
+              The binary image supplied in <i>module_image</i> is not an ELF image,
+              or is an ELF image that is invalid or for a different
+              architecture.
+
+       The following errors may additionally occur for <b>finit_module</b>():
+
+       <b>EBADF  </b>The file referred to by <i>fd</i> is not opened for reading.
+
+       <b>EFBIG  </b>The file referred to by <i>fd</i> is too large.
+
+       <b>EINVAL </b><i>flags</i> is invalid.
+
+       <b>ENOEXEC</b>
+              <i>fd</i> does not refer to an open file.
+
+       In addition to the above errors, if the module's <i>init</i> function is
+       executed and returns an error, then <b>init_module</b>() or <b>finit_module</b>()
+       fails and <i><a href="../man3/errno.3.html">errno</a></i> is set to the value returned by the <i>init</i> function.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>finit_module</b>() is available since Linux 3.8.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>init_module</b>() and <b>finit_module</b>() are Linux-specific.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>init_module</b>() system call is not supported by glibc.  No
+       declaration is provided in glibc headers, but, through a quirk of
+       history, glibc versions before 2.23 did export an ABI for this system
+       call.  Therefore, in order to employ this system call, it is (before
+       glibc 2.23) sufficient to manually declare the interface in your
+       code; alternatively, you can invoke the system call using <a href="syscall.2.html">syscall(2)</a>.
+
+       Glibc does not provide a wrapper for <b>finit_module</b>(); call it using
+       <a href="syscall.2.html">syscall(2)</a>.
+
+       Information about currently loaded modules can be found in
+       <i>/proc/modules</i> and in the file trees under the per-module
+       subdirectories under <i>/sys/module</i>.
+
+       See the Linux kernel source file <i>include/linux/module.h</i> for some
+       useful background information.
+
+   <b>Linux 2.4 and earlier</b>
+       In Linux 2.4 and earlier, the <b>init_module</b>() system call was rather
+       different:
+
+           <b>#include &lt;linux/module.h&gt;</b>
+
+           <b>int init_module(const char *</b><i>name</i><b>, struct module *</b><i>image</i><b>);</b>
+
+       (User-space applications can detect which version of <b>init_module</b>() is
+       available by calling <b>query_module</b>(); the latter call fails with the
+       error <b>ENOSYS </b>on Linux 2.6 and later.)
+
+       The older version of the system call loads the relocated module image
+       pointed to by <i>image</i> into kernel space and runs the module's <i>init</i>
+       function.  The caller is responsible for providing the relocated
+       image (since Linux 2.6, the <b>init_module</b>() system call does the
+       relocation).
+
+       The module image begins with a module structure and is followed by
+       code and data as appropriate.  Since Linux 2.2, the module structure
+       is defined as follows:
+
+           struct module {
+               unsigned long         size_of_struct;
+               struct module        *next;
+               const char           *name;
+               unsigned long         size;
+               long                  usecount;
+               unsigned long         flags;
+               unsigned int          nsyms;
+               unsigned int          ndeps;
+               struct module_symbol *syms;
+               struct module_ref    *deps;
+               struct module_ref    *refs;
+               int                 (*init)(void);
+               void                (*cleanup)(void);
+               const struct exception_table_entry *ex_table_start;
+               const struct exception_table_entry *ex_table_end;
+           #ifdef __alpha__
+               unsigned long gp;
+           #endif
+           };
+
+       All of the pointer fields, with the exception of <i>next</i> and <i>refs</i>, are
+       expected to point within the module body and be initialized as
+       appropriate for kernel space, that is, relocated with the rest of the
+       module.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="create_module.2.html">create_module(2)</a>, <a href="delete_module.2.html">delete_module(2)</a>, <a href="query_module.2.html">query_module(2)</a>, <a href="../man8/lsmod.8.html">lsmod(8)</a>,
+       <a href="../man8/modprobe.8.html">modprobe(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-03-15                   INIT_MODULE(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="create_module.2.html">create_module(2)</a>,&nbsp; 
+    <a href="delete_module.2.html">delete_module(2)</a>,&nbsp; 
+    <a href="get_kernel_syms.2.html">get_kernel_syms(2)</a>,&nbsp; 
+    <a href="query_module.2.html">query_module(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="unimplemented.2.html">unimplemented(2)</a>,&nbsp; 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="init_module.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

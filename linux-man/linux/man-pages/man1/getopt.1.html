@@ -1,0 +1,470 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getopt(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#PARSING">PARSING</a> | <a href="#OUTPUT">OUTPUT</a> | <a href="#QUOTING">QUOTING</a> | <a href="#SCANNING_MODES">SCANNING&nbsp;MODES</a> | <a href="#COMPATIBILITY">COMPATIBILITY</a> | <a href="#RETURN_CODES">RETURN&nbsp;CODES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#BUGS">BUGS</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETOPT(1)                       User Commands                      GETOPT(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getopt - parse command options (enhanced)
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>getopt </b><i>optstring parameters</i>
+       <b>getopt </b>[options] [<b>--</b>] <i>optstring parameters</i>
+       <b>getopt </b>[options] <b>-o</b>|<b>--options </b><i>optstring</i> [options] [<b>--</b>] <i>parameters</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>getopt </b>is used to break up (<i>parse</i>) options in command lines for easy
+       parsing by shell procedures, and to check for legal options.  It uses
+       the GNU <a href="../man3/getopt.3.html">getopt(3)</a> routines to do this.
+
+       The parameters <b>getopt </b>is called with can be divided into two parts:
+       options which modify the way <b>getopt </b>will do the parsing (the <i>options</i>
+       and the <i>optstring</i> in the <b>SYNOPSIS</b>), and the parameters which are to
+       be parsed (<i>parameters</i> in the <b>SYNOPSIS</b>).  The second part will start
+       at the first non-option parameter that is not an option argument, or
+       after the first occurrence of '<b>--</b>'.  If no '<b>-o</b>' or '<b>--options</b>' option
+       is found in the first part, the first parameter of the second part is
+       used as the short options string.
+
+       If the environment variable <b>GETOPT_COMPATIBLE </b>is set, or if the first
+       <i>parameter</i> is not an option (does not start with a '<b>-</b>', the first
+       format in the <b>SYNOPSIS</b>), <b>getopt </b>will generate output that is
+       compatible with that of other versions of <a href="getopt.1.html">getopt(1)</a>.  It will still
+       do parameter shuffling and recognize optional arguments (see section
+       <b>COMPATIBILITY </b>for more information).
+
+       Traditional implementations of <a href="getopt.1.html">getopt(1)</a> are unable to cope with
+       whitespace and other (shell-specific) special characters in arguments
+       and non-option parameters.  To solve this problem, this
+       implementation can generate quoted output which must once again be
+       interpreted by the shell (usually by using the <b>eval </b>command).  This
+       has the effect of preserving those characters, but you must call
+       <b>getopt </b>in a way that is no longer compatible with other versions (the
+       second or third format in the <b>SYNOPSIS</b>).  To determine whether this
+       enhanced version of <a href="getopt.1.html">getopt(1)</a> is installed, a special test option
+       (<b>-T</b>) can be used.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-a</b>, <b>--alternative</b>
+              Allow long options to start with a single '<b>-</b>'.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.  No other output is generated.
+
+       <b>-l</b>, <b>--longoptions </b><i>longopts</i>
+              The long (multi-character) options to be recognized.  More
+              than one option name may be specified at once, by separating
+              the names with commas.  This option may be given more than
+              once, the <i>longopts</i> are cumulative.  Each long option name in
+              <i>longopts</i> may be followed by one colon to indicate it has a
+              required argument, and by two colons to indicate it has an
+              optional argument.
+
+       <b>-n</b>, <b>--name </b><i>progname</i>
+              The name that will be used by the <a href="../man3/getopt.3.html">getopt(3)</a> routines when it
+              reports errors.  Note that errors of <a href="getopt.1.html">getopt(1)</a> are still
+              reported as coming from getopt.
+
+       <b>-o</b>, <b>--options </b><i>shortopts</i>
+              The short (one-character) options to be recognized.  If this
+              option is not found, the first parameter of <b>getopt </b>that does
+              not start with a '<b>-</b>' (and is not an option argument) is used
+              as the short options string.  Each short option character in
+              <i>shortopts</i> may be followed by one colon to indicate it has a
+              required argument, and by two colons to indicate it has an
+              optional argument.  The first character of shortopts may be
+              '<b>+</b>' or '<b>-</b>' to influence the way options are parsed and output
+              is generated (see section <b>SCANNING MODES </b>for details).
+
+       <b>-q</b>, <b>--quiet</b>
+              Disable error reporting by getopt(3).
+
+       <b>-Q</b>, <b>--quiet-output</b>
+              Do not generate normal output.  Errors are still reported by
+              <a href="../man3/getopt.3.html">getopt(3)</a>, unless you also use <b>-q</b>.
+
+       <b>-s</b>, <b>--shell </b><i>shell</i>
+              Set quoting conventions to those of <i>shell</i>.  If the <b>-s </b>option
+              is not given, the BASH conventions are used.  Valid arguments
+              are currently '<b>sh</b>' '<b>bash</b>', '<b>csh</b>', and '<b>tcsh</b>'.
+
+       <b>-T</b>, <b>--test</b>
+              Test if your <a href="getopt.1.html">getopt(1)</a> is this enhanced version or an old
+              version.  This generates no output, and sets the error status
+              to 4.  Other implementations of <a href="getopt.1.html">getopt(1)</a>, and this version if
+              the environment variable <b>GETOPT_COMPATIBLE </b>is set, will return
+              '<b>--</b>' and error status 0.
+
+       <b>-u</b>, <b>--unquoted</b>
+              Do not quote the output.  Note that whitespace and special
+              (shell-dependent) characters can cause havoc in this mode
+              (like they do with other <a href="getopt.1.html">getopt(1)</a> implementations).
+
+       <b>-V</b>, <b>--version</b>
+              Display version information and exit.  No other output is
+              generated.
+</pre>
+<h2><a id="PARSING" href="#PARSING"></a>PARSING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This section specifies the format of the second part of the
+       parameters of <b>getopt </b>(the <i>parameters</i> in the <b>SYNOPSIS</b>).  The next
+       section (<b>OUTPUT</b>) describes the output that is generated.  These
+       parameters were typically the parameters a shell function was called
+       with.  Care must be taken that each parameter the shell function was
+       called with corresponds to exactly one parameter in the parameter
+       list of <b>getopt </b>(see the <b>EXAMPLES</b>).  All parsing is done by the GNU
+       <a href="../man3/getopt.3.html">getopt(3)</a> routines.
+
+       The parameters are parsed from left to right.  Each parameter is
+       classified as a short option, a long option, an argument to an
+       option, or a non-option parameter.
+
+       A simple short option is a '<b>-</b>' followed by a short option character.
+       If the option has a required argument, it may be written directly
+       after the option character or as the next parameter (i.e. separated
+       by whitespace on the command line).  If the option has an optional
+       argument, it must be written directly after the option character if
+       present.
+
+       It is possible to specify several short options after one '<b>-</b>', as
+       long as all (except possibly the last) do not have required or
+       optional arguments.
+
+       A long option normally begins with '<b>--</b>' followed by the long option
+       name.  If the option has a required argument, it may be written
+       directly after the long option name, separated by '<b>=</b>', or as the next
+       argument (i.e. separated by whitespace on the command line).  If the
+       option has an optional argument, it must be written directly after
+       the long option name, separated by '<b>=</b>', if present (if you add the
+       '<b>=</b>' but nothing behind it, it is interpreted as if no argument was
+       present; this is a slight bug, see the <b>BUGS</b>).  Long options may be
+       abbreviated, as long as the abbreviation is not ambiguous.
+
+       Each parameter not starting with a '<b>-</b>', and not a required argument
+       of a previous option, is a non-option parameter.  Each parameter
+       after a '<b>--</b>' parameter is always interpreted as a non-option
+       parameter.  If the environment variable <b>POSIXLY_CORRECT </b>is set, or if
+       the short option string started with a '<b>+</b>', all remaining parameters
+       are interpreted as non-option parameters as soon as the first
+       non-option parameter is found.
+</pre>
+<h2><a id="OUTPUT" href="#OUTPUT"></a>OUTPUT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Output is generated for each element described in the previous
+       section.  Output is done in the same order as the elements are
+       specified in the input, except for non-option parameters.  Output can
+       be done in <i>compatible</i> (<i>unquoted</i>) mode, or in such way that whitespace
+       and other special characters within arguments and non-option
+       parameters are preserved (see <b>QUOTING</b>).  When the output is processed
+       in the shell script, it will seem to be composed of distinct elements
+       that can be processed one by one (by using the shift command in most
+       shell languages).  This is imperfect in unquoted mode, as elements
+       can be split at unexpected places if they contain whitespace or
+       special characters.
+
+       If there are problems parsing the parameters, for example because a
+       required argument is not found or an option is not recognized, an
+       error will be reported on stderr, there will be no output for the
+       offending element, and a non-zero error status is returned.
+
+       For a short option, a single '<b>-</b>' and the option character are
+       generated as one parameter.  If the option has an argument, the next
+       parameter will be the argument.  If the option takes an optional
+       argument, but none was found, the next parameter will be generated
+       but be empty in quoting mode, but no second parameter will be
+       generated in unquoted (compatible) mode.  Note that many other
+       <a href="getopt.1.html">getopt(1)</a> implementations do not support optional arguments.
+
+       If several short options were specified after a single '<b>-</b>', each will
+       be present in the output as a separate parameter.
+
+       For a long option, '<b>--</b>' and the full option name are generated as one
+       parameter.  This is done regardless whether the option was
+       abbreviated or specified with a single '<b>-</b>' in the input.  Arguments
+       are handled as with short options.
+
+       Normally, no non-option parameters output is generated until all
+       options and their arguments have been generated.  Then '<b>--</b>' is
+       generated as a single parameter, and after it the non-option
+       parameters in the order they were found, each as a separate
+       parameter.  Only if the first character of the short options string
+       was a '<b>-</b>', non-option parameter output is generated at the place they
+       are found in the input (this is not supported if the first format of
+       the <b>SYNOPSIS </b>is used; in that case all preceding occurrences of '<b>-</b>'
+       and '<b>+</b>' are ignored).
+</pre>
+<h2><a id="QUOTING" href="#QUOTING"></a>QUOTING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In compatible mode, whitespace or 'special' characters in arguments
+       or non-option parameters are not handled correctly.  As the output is
+       fed to the shell script, the script does not know how it is supposed
+       to break the output into separate parameters.  To circumvent this
+       problem, this implementation offers quoting.  The idea is that output
+       is generated with quotes around each parameter.  When this output is
+       once again fed to the shell (usually by a shell <b>eval </b>command), it is
+       split correctly into separate parameters.
+
+       Quoting is not enabled if the environment variable <b>GETOPT_COMPATIBLE</b>
+       is set, if the first form of the <b>SYNOPSIS </b>is used, or if the option
+       '<b>-u</b>' is found.
+
+       Different shells use different quoting conventions.  You can use the
+       '<b>-s</b>' option to select the shell you are using.  The following shells
+       are currently supported: '<b>sh</b>', '<b>bash</b>', '<b>csh</b>' and '<b>tcsh</b>'.  Actually,
+       only two 'flavors' are distinguished: sh-like quoting conventions and
+       csh-like quoting conventions.  Chances are that if you use another
+       shell script language, one of these flavors can still be used.
+</pre>
+<h2><a id="SCANNING_MODES" href="#SCANNING_MODES"></a>SCANNING MODES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The first character of the short options string may be a '<b>-</b>' or a '<b>+</b>'
+       to indicate a special scanning mode.  If the first calling form in
+       the <b>SYNOPSIS </b>is used they are ignored; the environment variable
+       <b>POSIXLY_CORRECT </b>is still examined, though.
+
+       If the first character is '<b>+</b>', or if the environment variable
+       <b>POSIXLY_CORRECT </b>is set, parsing stops as soon as the first non-option
+       parameter (i.e. a parameter that does not start with a '<b>-</b>') is found
+       that is not an option argument.  The remaining parameters are all
+       interpreted as non-option parameters.
+
+       If the first character is a '<b>-</b>', non-option parameters are outputted
+       at the place where they are found; in normal operation, they are all
+       collected at the end of output after a '<b>--</b>' parameter has been
+       generated.  Note that this '<b>--</b>' parameter is still generated, but it
+       will always be the last parameter in this mode.
+</pre>
+<h2><a id="COMPATIBILITY" href="#COMPATIBILITY"></a>COMPATIBILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This version of <a href="getopt.1.html">getopt(1)</a> is written to be as compatible as possible
+       to other versions.  Usually you can just replace them with this
+       version without any modifications, and with some advantages.
+
+       If the first character of the first parameter of getopt is not a '<b>-</b>',
+       <b>getopt </b>goes into compatibility mode.  It will interpret its first
+       parameter as the string of short options, and all other arguments
+       will be parsed.  It will still do parameter shuffling (i.e. all
+       non-option parameters are output at the end), unless the environment
+       variable <b>POSIXLY_CORRECT </b>is set.
+
+       The environment variable <b>GETOPT_COMPATIBLE </b>forces <b>getopt </b>into
+       compatibility mode.  Setting both this environment variable and
+       <b>POSIXLY_CORRECT </b>offers 100% compatibility for 'difficult' programs.
+       Usually, though, neither is needed.
+
+       In compatibility mode, leading '<b>-</b>' and '<b>+</b>' characters in the short
+       options string are ignored.
+</pre>
+<h2><a id="RETURN_CODES" href="#RETURN_CODES"></a>RETURN CODES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>getopt </b>returns error code <b>0 </b>for successful parsing, <b>1 </b>if <a href="../man3/getopt.3.html">getopt(3)</a>
+       returns errors, <b>2 </b>if it does not understand its own parameters, <b>3 </b>if
+       an internal error occurs like out-of-memory, and <b>4 </b>if it is called
+       with <b>-T</b>.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Example scripts for (ba)sh and (t)csh are provided with the <a href="getopt.1.html">getopt(1)</a>
+       distribution, and are optionally installed in <i>/usr/share/getopt/</i> or
+       <i>/usr/share/doc/</i> in the util-linux subdirectory.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIXLY_CORRECT
+              This environment variable is examined by the <a href="../man3/getopt.3.html">getopt(3)</a>
+              routines.  If it is set, parsing stops as soon as a parameter
+              is found that is not an option or an option argument.  All
+              remaining parameters are also interpreted as non-option
+              parameters, regardless whether they start with a '<b>-</b>'.
+
+       GETOPT_COMPATIBLE
+              Forces <b>getopt </b>to use the first calling format as specified in
+              the <b>SYNOPSIS</b>.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man3/getopt.3.html">getopt(3)</a> can parse long options with optional arguments that are
+       given an empty optional argument (but cannot do this for short
+       options).  This <a href="getopt.1.html">getopt(1)</a> treats optional arguments that are empty as
+       if they were not present.
+
+       The syntax if you do not want any short option variables at all is
+       not very intuitive (you have to set them explicitly to the empty
+       string).
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Frodo Looijaard ⟨frodo@frodo.looijaard.name⟩
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="bash.1.html">bash(1)</a>, <b>tcsh</b>(1), <a href="../man3/getopt.3.html">getopt(3)</a>
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The getopt command is part of the util-linux package and is available
+       from Linux Kernel Archive 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                      December 2014                      GETOPT(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="getopt.1.html">getopt(1)</a>,&nbsp; 
+    <a href="git-rev-parse.1.html">git-rev-parse(1)</a>,&nbsp; 
+    <a href="groffer.1.html">groffer(1)</a>,&nbsp; 
+    <a href="../man3/getopt.3.html">getopt(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

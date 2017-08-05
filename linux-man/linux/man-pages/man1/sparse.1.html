@@ -1,0 +1,552 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sparse(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#WARNING_OPTIONS">WARNING&nbsp;OPTIONS</a> | <a href="#MISC_OPTIONS">MISC&nbsp;OPTIONS</a> | <a href="#DEBUG_OPTIONS">DEBUG&nbsp;OPTIONS</a> | <a href="#OTHER_OPTIONS">OTHER&nbsp;OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#HOMEPAGE">HOMEPAGE</a> | <a href="#MAILING_LIST">MAILING&nbsp;LIST</a> | <a href="#MAINTAINER">MAINTAINER</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">sparse(1)                  General Commands Manual                 sparse(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sparse - Semantic Parser for C
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sparse </b>[<i>WARNING OPTIONS</i>]... <i>file.c</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Sparse parses C source and looks for errors, producing warnings on
+       standard error.
+
+       Sparse accepts options controlling the set of warnings to generate.
+       To turn on warnings Sparse does not issue by default, use the
+       corresponding warning option <b>-Wsomething</b>.  Sparse issues some
+       warnings by default; to turn off those warnings, pass the negation of
+       the associated warning option, <b>-Wno-something</b>.
+</pre>
+<h2><a id="WARNING_OPTIONS" href="#WARNING_OPTIONS"></a>WARNING OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-Wsparse-all</b>
+              Turn on all sparse warnings, except for those explicitly
+              disabled via <b>-Wno-something</b>.
+
+       <b>-Wsparse-error</b>
+              Turn all sparse warnings into errors.
+
+       <b>-Waddress-space</b>
+              Warn about code which mixes pointers to different address
+              spaces.
+
+              Sparse allows an extended attribute
+              <b>__attribute__((address_space(</b><i>num</i><b>))) </b>on pointers, which
+              designates a pointer target in address space <i>num</i> (a constant
+              integer).  With <b>-Waddress-space</b>, Sparse treats pointers with
+              identical target types but different address spaces as
+              distinct types.  To override this warning, such as for
+              functions which convert pointers between address spaces, use a
+              type that includes <b>__attribute__((force))</b>.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-address-space</b>.
+
+       <b>-Wbitwise</b>
+              Warn about unsupported operations or type mismatches with
+              restricted integer types.
+
+              Sparse supports an extended attribute,
+              <b>__attribute__((bitwise))</b>, which creates a new restricted
+              integer type from a base integer type, distinct from the base
+              integer type and from any other restricted integer type not
+              declared in the same declaration or <b>typedef</b>.  For example,
+              this allows programs to create <b>typedef</b>s for integer types with
+              specific endianness.  With <b>-Wbitwise</b>, Sparse will warn on any
+              use of a restricted type in arithmetic operations other than
+              bitwise operations, and on any conversion of one restricted
+              type into another, except via a cast that includes
+              <b>__attribute__((force))</b>.
+
+              __bitwise ends up being a "stronger integer separation". That
+              one doesn't allow you to mix with non-bitwise integers, so now
+              it's much harder to lose the type by mistake.
+
+              __bitwise is for *unique types* that cannot be mixed with
+              other types, and that you'd never want to just use as a random
+              integer (the integer 0 is special, though, and gets silently
+              accepted iirc - it's kind of like "NULL" for pointers). So
+              "gfp_t" or the "safe endianness" types would be __bitwise: you
+              can only operate on them by doing specific operations that
+              know about *that* particular type.
+
+              Generally, you want bitwise if you are looking for type
+              safety. Sparse does not issue these warnings by default.
+
+       <b>-Wcast-to-as</b>
+              Warn about casts which add an address space to a pointer type.
+
+              A cast that includes <b>__attribute__((force)) </b>will suppress this
+              warning.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wcast-truncate</b>
+              Warn about casts that truncate constant values.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-cast-truncate</b>.
+
+       <b>-Wcontext</b>
+              Warn about potential errors in synchronization or other
+              delimited contexts.
+
+              Sparse supports several means of designating functions or
+              statements that delimit contexts, such as synchronization.
+              Functions with the extended attribute
+              <b>__attribute__((context(</b><i>expression</i><b>,</b><i>in_context</i><b>,</b><i>out_context</i><b>))</b>
+              require the context <i>expression</i> (for instance, a lock) to have
+              the value <i>in_context</i> (a constant nonnegative integer) when
+              called, and return with the value <i>out_context</i> (a constant
+              nonnegative integer).  For APIs defined via macros, use the
+              statement form <b>__context__(</b><i>expression</i><b>,</b><i>in_value</i><b>,</b><i>out_value</i><b>) </b>in
+              the body of the macro.
+
+              With <b>-Wcontext </b>Sparse will warn when it sees a function change
+              the context without indicating this with a <b>context </b>attribute,
+              either by decreasing a context below zero (such as by
+              releasing a lock without acquiring it), or returning with a
+              changed context (such as by acquiring a lock without releasing
+              it).  Sparse will also warn about blocks of code which may
+              potentially execute with different contexts.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-context</b>.
+
+       <b>-Wdecl </b>Warn about any non-<b>static </b>variable or function definition that
+              has no previous declaration.
+
+              Private symbols (functions and variables) internal to a given
+              source file should use <b>static</b>, to allow additional compiler
+              optimizations, allow detection of unused symbols, and prevent
+              other code from relying on these internal symbols.  Public
+              symbols used by other source files will need declarations
+              visible to those other source files, such as in a header file.
+              All declarations should fall into one of these two categories.
+              Thus, with <b>-Wdecl</b>, Sparse warns about any symbol definition
+              with neither <b>static </b>nor a declaration.  To fix this warning,
+              declare private symbols <b>static</b>, and ensure that the files
+              defining public symbols have the symbol declarations available
+              first (such as by including the appropriate header file).
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-decl</b>.
+
+       <b>-Wdeclaration-after-statement</b>
+              Warn about declarations that are not at the start of a block.
+
+              These declarations are permitted in C99 but not in C89.
+
+              Sparse issues these warnings by default only when the C
+              dialect is C89 (i.e. -ansi or -std=c89).  To turn them off,
+              use <b>-Wno-declaration-after-statement</b>.
+
+       <b>-Wdefault-bitfield-sign</b>
+              Warn about any bitfield with no explicit signedness.
+
+              Bitfields have no standard-specified default signedness. (C99
+              6.7.2) A bitfield without an explicit <b>signed </b>or <b>unsigned</b>
+              creates a portability problem for software that relies on the
+              available range of values.  To fix this, specify the bitfield
+              type as <b>signed </b>or <b>unsigned </b>explicitly.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wdesignated-init</b>
+              Warn about positional initialization of structs marked as
+              requiring designated initializers.
+
+              Sparse allows an attribute <b>__attribute__((designated_init))</b>
+              which marks a struct as requiring designated initializers.
+              Sparse will warn about positional initialization of a struct
+              variable or struct literal of a type that has this attribute.
+
+              Requiring designated initializers for a particular struct type
+              will insulate code using that struct type from changes to the
+              layout of the type, avoiding the need to change initializers
+              for that type unless they initialize a removed or incompatibly
+              changed field.
+
+              Common examples of this type of struct include collections of
+              function pointers for the implementations of a class of
+              related operations, for which the default NULL for an
+              unmentioned field in a designated initializer will correctly
+              indicate the absence of that operation.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-designated-init</b>.
+
+       <b>-Wdo-while</b>
+              Warn about do-while loops that do not delimit the loop body
+              with braces.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wenum-mismatch</b>
+              Warn about the use of an expression of an incorrect <b>enum </b>type
+              when initializing another <b>enum </b>type, assigning to another <b>enum</b>
+              type, or passing an argument to a function which expects
+              another <b>enum </b>type.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-enum-mismatch</b>.
+
+       <b>-Winit-cstring</b>
+              Warn about initialization of a char array with a too long
+              constant C string.
+
+              If the size of the char array and the length of the string is
+              the same, there is no space for the last nul char of the
+              string in the array:
+
+              char s[3] = "abc";
+
+              If the array is used as a byte array, not as C string, this
+              warning is just noise. However, if the array is passed to
+              functions dealing with C string like printf(%s) and strcmp, it
+              may cause a trouble.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wmemcpy-max-count</b>
+              Warn about call of <b>memcpy()</b>, <b>memset()</b>, <b>copy_from_user()</b>, or
+              <b>copy_to_user() </b>with a large compile-time byte count.
+
+              Sparse issues these warnings by default. To turn them off, use
+              <b>-Wno-memcpy-max-count</b>.
+
+              The limit can be changed with <b>-fmemcpy-max-count=COUNT</b>, the
+              default being <b>100000</b>.
+
+       <b>-Wnon-pointer-null</b>
+              Warn about the use of 0 as a NULL pointer.
+
+              0 has integer type.  NULL has pointer type.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-non-pointer-null</b>.
+
+       <b>-Wold-initializer</b>
+              Warn about the use of the pre-C99 GCC syntax for designated
+              initializers.
+
+              C99 provides a standard syntax for designated fields in <b>struct</b>
+              or <b>union </b>initializers:
+
+              struct structname var = { .field = value };
+
+              GCC also has an old, non-standard syntax for designated
+              initializers which predates C99:
+
+              struct structname var = { field: value };
+
+              Sparse will warn about the use of GCC's non-standard syntax
+              for designated initializers.  To fix this warning, convert
+              designated initializers to use the standard C99 syntax.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-old-initializer</b>.
+
+       <b>-Wone-bit-signed-bitfield</b>
+              Warn about any one-bit <b>signed </b>bitfields.
+
+              A one-bit <b>signed </b>bitfield can only have the values 0 and -1,
+              or with some compilers only 0; this results in unexpected
+              behavior for programs which expected the ability to store 0
+              and 1.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-one-bit-signed-bitfield</b>.
+
+       <b>-Wparen-string</b>
+              Warn about the use of a parenthesized string to initialize an
+              array.
+
+              Standard C syntax does not permit a parenthesized string as an
+              array initializer.  GCC allows this syntax as an extension.
+              With <b>-Wparen-string</b>, Sparse will warn about this syntax.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wptr-subtraction-blows</b>
+              Warn when subtracting two pointers to a type with a non-power-
+              of-two size.
+
+              Subtracting two pointers to a given type gives a difference in
+              terms of the number of items of that type.  To generate this
+              value, compilers will usually need to divide the difference by
+              the size of the type, an potentially expensive operation for
+              sizes other than powers of two.
+
+              Code written using pointer subtraction can often use another
+              approach instead, such as array indexing with an explicit
+              array index variable, which may allow compilers to generate
+              more efficient code.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wreturn-void</b>
+              Warn if a function with return type void returns a void
+              expression.
+
+              C99 permits this, and in some cases this allows for more
+              generic code in macros that use typeof or take a type as a
+              macro argument.  However, some programs consider this poor
+              style, and those programs can use <b>-Wreturn-void </b>to get
+              warnings about it.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wshadow</b>
+              Warn when declaring a symbol which shadows a declaration with
+              the same name in an outer scope.
+
+              Such declarations can lead to error-prone code.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wsizeof-bool</b>
+              Warn when checking the sizeof a _Bool.
+
+              C99 does not specify the sizeof a _Bool.  gcc uses 1.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wtransparent-union</b>
+              Warn about any declaration using the GCC extension
+              <b>__attribute__((transparent_union))</b>.
+
+              Sparse issues these warnings by default.  To turn them off,
+              use <b>-Wno-transparent-union</b>.
+
+       <b>-Wtypesign</b>
+              Warn when converting a pointer to an integer type into a
+              pointer to an integer type with different signedness.
+
+              Sparse does not issue these warnings by default.
+
+       <b>-Wundef</b>
+              Warn about preprocessor conditionals that use the value of an
+              undefined preprocessor symbol.
+
+              Standard C (C99 6.10.1) permits using the value of an
+              undefined preprocessor symbol in preprocessor conditionals,
+              and specifies it has have a value of 0.  However, this
+              behavior can lead to subtle errors.
+
+              Sparse does not issue these warnings by default.
+</pre>
+<h2><a id="MISC_OPTIONS" href="#MISC_OPTIONS"></a>MISC OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-gcc-base-dir </b><i>dir</i>
+              Look for compiler-provided system headers in <i>dir</i>/include/ and
+              <i>dir</i>/include-fixed/.
+
+       <b>-multiarch-dir </b><i>dir</i>
+              Look for system headers in the multiarch subdirectory <i>dir</i>.
+              The <i>dir</i> name would normally take the form of the target's
+              normalized GNU triplet. (e.g. i386-linux-gnu).
+</pre>
+<h2><a id="DEBUG_OPTIONS" href="#DEBUG_OPTIONS"></a>DEBUG OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-fdump-linearize[=only]</b>
+              Dump the IR code of a function directly after its
+              linearization, before any simplifications is made. If the
+              argument <b>=only </b>is also given no further processing is done on
+              the function.  <b>-fmem-report </b>Report some statistics about
+              memory allocation used by the tool.
+</pre>
+<h2><a id="OTHER_OPTIONS" href="#OTHER_OPTIONS"></a>OTHER OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-fmemcpy-max-count=COUNT</b>
+              Set the limit for the warnings given by <b>-Wmemcpy-max-count</b>.  A
+              COUNT of 0, useless in itself, will effectively disable the
+              warning.  The default limit is 100000.
+
+       <b>-ftabstop=WIDTH</b>
+              Set the distance between tab stops.  This helps sparse report
+              correct column numbers in warnings or errors.  If the value is
+              less than 1 or greater than 100, the option is ignored.  The
+              default is 8.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="cgcc.1.html">cgcc(1)</a>
+</pre>
+<h2><a id="HOMEPAGE" href="#HOMEPAGE"></a>HOMEPAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="http://www.kernel.org/pub/software/devel/sparse/">http://www.kernel.org/pub/software/devel/sparse/</a>
+</pre>
+<h2><a id="MAILING_LIST" href="#MAILING_LIST"></a>MAILING LIST  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       linux-sparse@vger.kernel.org
+</pre>
+<h2><a id="MAINTAINER" href="#MAINTAINER"></a>MAINTAINER  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Christopher Li &lt;sparse@chrisli.org&gt;
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>sparse</i> (a Semantic Parser for C) project.
+       Information about the project can be found at 
+       ⟨<a href="https://sparse.wiki.kernel.org/">https://sparse.wiki.kernel.org/</a>⟩.  If you have a bug report for this
+       manual page, send it to linux-sparse@vger.kernel.org.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨<a href="https://git.kernel.org/pub/scm/devel/sparse/sparse.git">https://git.kernel.org/pub/scm/devel/sparse/sparse.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">                                                                   sparse(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="cgcc.1.html">cgcc(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

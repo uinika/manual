@@ -1,0 +1,268 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-mergetool(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#TEMPORARY_FILES">TEMPORARY&nbsp;FILES</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-MERGETOOL(1)                 Git Manual                 GIT-MERGETOOL(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-mergetool - Run merge conflict resolution tools to resolve merge
+       conflicts
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git mergetool</i> [--tool=&lt;tool&gt;] [-y | --[no-]prompt] [&lt;file&gt;...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Use <b>git mergetool </b>to run one of several merge utilities to resolve
+       merge conflicts. It is typically run after <i>git merge</i>.
+
+       If one or more &lt;file&gt; parameters are given, the merge tool program
+       will be run to resolve differences on each file (skipping those
+       without conflicts). Specifying a directory will include all
+       unresolved files in that path. If no &lt;file&gt; names are specified, <i>git</i>
+       <i>mergetool</i> will run the merge tool program on every file with merge
+       conflicts.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -t &lt;tool&gt;, --tool=&lt;tool&gt;
+           Use the merge resolution program specified by &lt;tool&gt;. Valid
+           values include emerge, gvimdiff, kdiff3, meld, vimdiff, and
+           tortoisemerge. Run <b>git mergetool --tool-help </b>for the list of
+           valid &lt;tool&gt; settings.
+
+           If a merge resolution program is not specified, <i>git mergetool</i>
+           will use the configuration variable <b>merge.tool</b>. If the
+           configuration variable <b>merge.tool </b>is not set, <i>git mergetool</i> will
+           pick a suitable default.
+
+           You can explicitly provide a full path to the tool by setting the
+           configuration variable <b>mergetool.&lt;tool&gt;.path</b>. For example, you
+           can configure the absolute path to kdiff3 by setting
+           <b>mergetool.kdiff3.path</b>. Otherwise, <i>git mergetool</i> assumes the tool
+           is available in PATH.
+
+           Instead of running one of the known merge tool programs, <i>git</i>
+           <i>mergetool</i> can be customized to run an alternative program by
+           specifying the command line to invoke in a configuration variable
+           <b>mergetool.&lt;tool&gt;.cmd</b>.
+
+           When <i>git mergetool</i> is invoked with this tool (either through the
+           <b>-t </b>or <b>--tool </b>option or the <b>merge.tool </b>configuration variable) the
+           configured command line will be invoked with <b>$BASE </b>set to the
+           name of a temporary file containing the common base for the
+           merge, if available; <b>$LOCAL </b>set to the name of a temporary file
+           containing the contents of the file on the current branch;
+           <b>$REMOTE </b>set to the name of a temporary file containing the
+           contents of the file to be merged, and <b>$MERGED </b>set to the name of
+           the file to which the merge tool should write the result of the
+           merge resolution.
+
+           If the custom merge tool correctly indicates the success of a
+           merge resolution with its exit code, then the configuration
+           variable <b>mergetool.&lt;tool&gt;.trustExitCode </b>can be set to <b>true</b>.
+           Otherwise, <i>git mergetool</i> will prompt the user to indicate the
+           success of the resolution after the custom tool has exited.
+
+       --tool-help
+           Print a list of merge tools that may be used with <b>--tool</b>.
+
+       -y, --no-prompt
+           Don’t prompt before each invocation of the merge resolution
+           program. This is the default if the merge resolution program is
+           explicitly specified with the <b>--tool </b>option or with the
+           <b>merge.tool </b>configuration variable.
+
+       --prompt
+           Prompt before each invocation of the merge resolution program to
+           give the user a chance to skip the path.
+
+       -O&lt;orderfile&gt;
+           Process files in the order specified in the &lt;orderfile&gt;, which
+           has one shell glob pattern per line. This overrides the
+           <b>diff.orderFile </b>configuration variable (see <a href="git-config.1.html">git-config(1)</a>). To
+           cancel <b>diff.orderFile</b>, use <b>-O/dev/null</b>.
+</pre>
+<h2><a id="TEMPORARY_FILES" href="#TEMPORARY_FILES"></a>TEMPORARY FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>git mergetool </b>creates <b>*.orig </b>backup files while resolving merges.
+       These are safe to remove once a file has been merged and its <b>git</b>
+       <b>mergetool </b>session has completed.
+
+       Setting the <b>mergetool.keepBackup </b>configuration variable to <b>false</b>
+       causes <b>git mergetool </b>to automatically remove the backup as files are
+       successfully merged.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.11.0.22.g8d7a455           12/10/2016                 GIT-MERGETOOL(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="git-difftool.1.html">git-difftool(1)</a>,&nbsp; 
+    <a href="git-gui.1.html">git-gui(1)</a>,&nbsp; 
+    <a href="git-merge.1.html">git-merge(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

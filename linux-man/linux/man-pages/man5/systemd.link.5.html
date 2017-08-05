@@ -1,0 +1,479 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.link(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#[MATCH]_SECTION_OPTIONS">[MATCH]&nbsp;SECTION&nbsp;OPTIONS</a> | <a href="#[LINK]_SECTION_OPTIONS">[LINK]&nbsp;SECTION&nbsp;OPTIONS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.LINK(5)                 systemd.link                 SYSTEMD.LINK(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.link - Network device configuration
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>link</i>.link
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Network link configuration is performed by the <b>net_setup_link </b>udev
+       builtin.
+
+       The link files are read from the files located in the system network
+       directory /usr/lib/systemd/network, the volatile runtime network
+       directory /run/systemd/network, and the local administration network
+       directory /etc/systemd/network. Link files must have the extension
+       .link; other extensions are ignored. All link files are collectively
+       sorted and processed in lexical order, regardless of the directories
+       in which they live. However, files with identical filenames replace
+       each other. Files in /etc have the highest priority, files in /run
+       take precedence over files with the same name in /usr/lib. This can
+       be used to override a system-supplied link file with a local file if
+       needed. As a special case, an empty file (file size 0) or symlink
+       with the same name pointing to /dev/null disables the configuration
+       file entirely (it is "masked").
+
+       The link file contains a "[Match]" section, which determines if a
+       given link file may be applied to a given device, as well as a
+       "[Link]" section specifying how the device should be configured. The
+       first (in lexical order) of the link files that matches a given
+       device is applied. Note that a default file 99-default.link is
+       shipped by the system, any user-supplied .link should hence have a
+       lexically earlier name to be considered at all.
+
+       See <a href="../man8/udevadm.8.html">udevadm(8)</a> for diagnosing problems with .link files.
+</pre>
+<h2><a id="[MATCH]_SECTION_OPTIONS" href="#[MATCH]_SECTION_OPTIONS"></a>[MATCH] SECTION OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A link file is said to match a device if each of the entries in the
+       "[Match]" section matches, or if the section is empty. The following
+       keys are accepted:
+
+       <i>MACAddress=</i>
+           The hardware address.
+
+       <i>OriginalName=</i>
+           A whitespace-separated list of shell-style globs matching the
+           device name, as exposed by the udev property "INTERFACE". This
+           cannot be used to match on names that have already been changed
+           from userspace. Caution is advised when matching on
+           kernel-assigned names, as they are known to be unstable between
+           reboots.
+
+       <i>Path=</i>
+           A whitespace-separated list of shell-style globs matching the
+           persistent path, as exposed by the udev property "ID_PATH".
+
+       <i>Driver=</i>
+           A whitespace-separated list of shell-style globs matching the
+           driver currently bound to the device, as exposed by the udev
+           property "DRIVER" of its parent device, or if that is not set,
+           the driver as exposed by "ethtool -i" of the device itself.
+
+       <i>Type=</i>
+           A whitespace-separated list of shell-style globs matching the
+           device type, as exposed by the udev property "DEVTYPE".
+
+       <i>Host=</i>
+           Matches against the hostname or machine ID of the host. See
+           "ConditionHost=" in <a href="systemd.unit.5.html">systemd.unit(5)</a> for details.
+
+       <i>Virtualization=</i>
+           Checks whether the system is executed in a virtualized
+           environment and optionally test whether it is a specific
+           implementation. See "ConditionVirtualization=" in <a href="systemd.unit.5.html">systemd.unit(5)</a>
+           for details.
+
+       <i>KernelCommandLine=</i>
+           Checks whether a specific kernel command line option is set (or
+           if prefixed with the exclamation mark unset). See
+           "ConditionKernelCommandLine=" in <a href="systemd.unit.5.html">systemd.unit(5)</a> for details.
+
+       <i>Architecture=</i>
+           Checks whether the system is running on a specific architecture.
+           See "ConditionArchitecture=" in <a href="systemd.unit.5.html">systemd.unit(5)</a> for details.
+</pre>
+<h2><a id="[LINK]_SECTION_OPTIONS" href="#[LINK]_SECTION_OPTIONS"></a>[LINK] SECTION OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The "[Link]" section accepts the following keys:
+
+       <i>Description=</i>
+           A description of the device.
+
+       <i>Alias=</i>
+           The "ifalias" is set to this value.
+
+       <i>MACAddressPolicy=</i>
+           The policy by which the MAC address should be set. The available
+           policies are:
+
+           "persistent"
+               If the hardware has a persistent MAC address, as most
+               hardware should, and if it is used by the kernel, nothing is
+               done. Otherwise, a new MAC address is generated which is
+               guaranteed to be the same on every boot for the given machine
+               and the given device, but which is otherwise random. This
+               feature depends on ID_NET_NAME_* properties to exist for the
+               link. On hardware where these properties are not set, the
+               generation of a persistent MAC address will fail.
+
+           "random"
+               If the kernel is using a random MAC address, nothing is done.
+               Otherwise, a new address is randomly generated each time the
+               device appears, typically at boot. Either way, the random
+               address will have the "unicast" and "locally administered"
+               bits set.
+
+           "none"
+               Keeps the MAC address assigned by the kernel.
+
+       <i>MACAddress=</i>
+           The MAC address to use, if no "MACAddressPolicy=" is specified.
+
+       <i>NamePolicy=</i>
+           An ordered, space-separated list of policies by which the
+           interface name should be set.  "NamePolicy" may be disabled by
+           specifying "net.ifnames=0" on the kernel command line. Each of
+           the policies may fail, and the first successful one is used. The
+           name is not set directly, but is exported to udev as the property
+           "ID_NET_NAME", which is, by default, used by a udev rule to set
+           "NAME". If the name has already been set by userspace, no
+           renaming is performed. The available policies are:
+
+           "kernel"
+               If the kernel claims that the name it has set for a device is
+               predictable, then no renaming is performed.
+
+           "database"
+               The name is set based on entries in the udev's Hardware
+               Database with the key "ID_NET_NAME_FROM_DATABASE".
+
+           "onboard"
+               The name is set based on information given by the firmware
+               for on-board devices, as exported by the udev property
+               "ID_NET_NAME_ONBOARD".
+
+           "slot"
+               The name is set based on information given by the firmware
+               for hot-plug devices, as exported by the udev property
+               "ID_NET_NAME_SLOT".
+
+           "path"
+               The name is set based on the device's physical location, as
+               exported by the udev property "ID_NET_NAME_PATH".
+
+           "mac"
+               The name is set based on the device's persistent MAC address,
+               as exported by the udev property "ID_NET_NAME_MAC".
+
+       <i>Name=</i>
+           The interface name to use in case all the policies specified in
+           <i>NamePolicy=</i> fail, or in case <i>NamePolicy=</i> is missing or disabled.
+
+       <i>MTUBytes=</i>
+           The maximum transmission unit in bytes to set for the device. The
+           usual suffixes K, M, G, are supported and are understood to the
+           base of 1024.
+
+       <i>BitsPerSecond=</i>
+           The speed to set for the device, the value is rounded down to the
+           nearest Mbps. The usual suffixes K, M, G, are supported and are
+           understood to the base of 1000.
+
+       <i>Duplex=</i>
+           The duplex mode to set for the device. The accepted values are
+           "half" and "full".
+
+       <i>AutoNegotiation=</i>
+           Enables or disables automatic negotiation of transmission
+           parameters. Autonegotiation is a procedure by which two connected
+           ethernet devices choose common transmission parameters, such as
+           speed, duplex mode, and flow control. Takes a boolean value.
+           Unset by default, which means that the kernel default will be
+           used.
+
+           Note that if autonegotiation is enabled, speed and duplex
+           settings are read-only. If autonegotation is disabled, speed and
+           duplex settings are writable if the driver supports multiple link
+           modes.
+
+       <i>WakeOnLan=</i>
+           The Wake-on-LAN policy to set for the device. The supported
+           values are:
+
+           "phy"
+               Wake on PHY activity.
+
+           "magic"
+               Wake on receipt of a magic packet.
+
+           "off"
+               Never wake.
+
+       <i>Port=</i>
+           The port option is used to select the device port. The supported
+           values are:
+
+           "tp"
+               An Ethernet interface using Twisted-Pair cable as the medium.
+
+           "aui"
+               Attachment Unit Interface (AUI). Normally used with hubs.
+
+           "bnc"
+               An Ethernet interface using BNC connectors and co-axial
+               cable.
+
+           "mii"
+               An Ethernet interface using a Media Independent Interface
+               (MII).
+
+           "fibre"
+               An Ethernet interface using Optical Fibre as the medium.
+
+       <i>TCPSegmentationOffload=</i>
+           The TCP Segmentation Offload (TSO) when true enables TCP
+           segmentation offload. Takes a boolean value. Defaults to "unset".
+
+       <i>GenericSegmentationOffload=</i>
+           The Generic Segmentation Offload (GSO) when true enables generic
+           segmentation offload. Takes a boolean value. Defaults to "unset".
+
+       <i>UDPSegmentationOffload=</i>
+           The UDP Segmentation Offload (USO) when true enables UDP
+           segmentation offload. Takes a boolean value. Defaults to "unset".
+
+       <i>GenericReceiveOffload=</i>
+           The Generic Receive Offload (GRO) when true enables generic
+           receive offload. Takes a boolean value. Defaults to "unset".
+
+       <i>LargeReceiveOffload=</i>
+           The Large Receive Offload (LRO) when true enables large receive
+           offload. Takes a boolean value. Defaults to "unset".
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Example 1. /usr/lib/systemd/network/99-default.link</b>
+
+       The link file 99-default.link that is shipped with systemd defines
+       the default naming policy for links.
+
+           [Link]
+           NamePolicy=kernel database onboard slot path
+           MACAddressPolicy=persistent
+
+       <b>Example 2. /etc/systemd/network/10-dmz.link</b>
+
+       This example assigns the fixed name "dmz0" to the interface with the
+       MAC address 00:a0:de:63:7a:e6:
+
+           [Match]
+           MACAddress=00:a0:de:63:7a:e6
+
+           [Link]
+           Name=dmz0
+
+       <b>Example 3. /etc/systemd/network/10-internet.link</b>
+
+       This example assigns the fixed name "internet0" to the interface with
+       the device path "pci-0000:00:1a.0-*":
+
+           [Match]
+           Path=pci-0000:00:1a.0-*
+
+           [Link]
+           Name=internet0
+
+       <b>Example 4. /etc/systemd/network/25-wireless.link</b>
+
+       Here's an overly complex example that shows the use of a large number
+       of [Match] and [Link] settings.
+
+           [Match]
+           MACAddress=12:34:56:78:9a:bc
+           Driver=brcmsmac
+           Path=pci-0000:02:00.0-*
+           Type=wlan
+           Virtualization=no
+           Host=my-laptop
+           Architecture=x86-64
+
+           [Link]
+           Name=wireless0
+           MTUBytes=1450
+           BitsPerSecond=10M
+           WakeOnLan=magic
+           MACAddress=cb:a9:87:65:43:21
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/systemd-udevd.service.8.html">systemd-udevd.service(8)</a>, <a href="../man8/udevadm.8.html">udevadm(8)</a>, <a href="systemd.netdev.5.html">systemd.netdev(5)</a>,
+       <a href="systemd.network.5.html">systemd.network(5)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                  SYSTEMD.LINK(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="systemd.netdev.5.html">systemd.netdev(5)</a>,&nbsp; 
+    <a href="systemd.network.5.html">systemd.network(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man7/udev.7.html">udev(7)</a>,&nbsp; 
+    <a href="../man8/systemd-networkd.service.8.html">systemd-networkd.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

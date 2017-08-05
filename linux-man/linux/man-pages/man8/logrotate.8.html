@@ -1,0 +1,730 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>logrotate(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#CONFIGURATION_FILE">CONFIGURATION&nbsp;FILE</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LOGROTATE(8)            System Administrator's Manual           LOGROTATE(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       logrotate ‐ rotates, compresses, and mails system logs
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>logrotate </b>[<b>--debug</b>] [<b>--verbose</b>] [<b>--log </b><i>file</i>] [<b>--force</b>] [<b>--state </b><i>file</i>]
+       [<b>--mail </b><i>command</i>] <i>config_file</i> [<i>config_file2 ...</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>logrotate </b>is designed to ease administration of systems that generate
+       large numbers of log files.  It allows automatic rotation,
+       compression, removal, and mailing of log files.  Each log file may be
+       handled daily, weekly, monthly, or when it grows too large.
+
+       Normally, <b>logrotate </b>is run as a daily cron job.  It will not modify a
+       log more than once in one day unless the criterion for that log is
+       based on the log's size and <b>logrotate </b>is being run more than once
+       each day, or unless the <b>-f </b>or <b>--force </b>option is used.
+
+       Any number of config files may be given on the command line. Later
+       config files may override the options given in earlier files, so the
+       order in which the <b>logrotate </b>config files are listed is important.
+       Normally, a single config file which includes any other config files
+       which are needed should be used.  See below for more information on
+       how to use the <b>include </b>directive to accomplish this.  If a directory
+       is given on the command line, every file in that directory is used as
+       a config file.
+
+       If no command line arguments are given, <b>logrotate </b>will print version
+       and copyright information, along with a short usage summary.  If any
+       errors occur while rotating logs, <b>logrotate </b>will exit with non-zero
+       status.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-?</b>, <b>--help</b>
+              Prints help message.
+
+       <b>-d</b>, <b>--debug</b>
+              Turns on debug mode and implies <b>-v</b>.  In debug mode, no changes
+              will be made to the logs or to the <b>logrotate </b>state file.
+
+       <b>-f</b>, <b>--force</b>
+              Tells <b>logrotate </b>to force the rotation, even if it doesn't
+              think this is necessary.  Sometimes this is useful after
+              adding new entries to a <b>logrotate </b>config file, or if old log
+              files have been removed by hand, as the new files will be
+              created, and logging will continue correctly.
+
+       <b>-l</b>, <b>--log </b><i>file</i>
+              Tells <b>logrotate </b>to log verbose output into the log_file. The
+              verbose output logged to that file is the same as when running
+              <b>logrotate </b>with <b>-v </b>switch. The log file is overwritten on every
+              logrotate execution.
+
+       <b>-m</b>, <b>--mail </b><i>command</i>
+              Tells <b>logrotate </b>which command to use when mailing logs. This
+              command should accept two arguments:
+
+              1) the subject of the message
+              2) the recipient.
+
+              The command must then read a message on standard input and
+              mail it to the recipient. The default mail command is
+              <i>/bin/mail</i>.
+
+       <b>-s</b>, <b>--state </b><i>statefile</i>
+              Tells <b>logrotate </b>to use an alternate state file.  This is
+              useful if logrotate is being run as a different user for
+              various sets of log files.  The default state file is
+              <i>/var/lib/logrotate.status</i>.
+
+       <b>--usage</b>
+              Prints a short usage message.
+
+       <b>-v</b>, <b>--verbose</b>
+              Turns on verbose mode, for example to display messages during
+              rotation.
+</pre>
+<h2><a id="CONFIGURATION_FILE" href="#CONFIGURATION_FILE"></a>CONFIGURATION FILE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>logrotate </b>reads everything about the log files it should be handling
+       from the series of configuration files specified on the command line.
+       Each configuration file can set global options (local definitions
+       override global ones, and later definitions override earlier ones)
+       and specify logfiles to rotate. A simple configuration file looks
+       like this:
+
+       # sample logrotate configuration file
+       compress
+
+       /var/log/messages {
+           rotate 5
+           weekly
+           postrotate
+               /usr/bin/killall -HUP syslogd
+           endscript
+       }
+
+       "/var/log/httpd/access.log" /var/log/httpd/error.log {
+           rotate 5
+           mail recipient@example.org
+           size 100k
+           sharedscripts
+           postrotate
+               /usr/bin/killall -HUP httpd
+           endscript
+       }
+
+       /var/log/news/* {
+           monthly
+           rotate 2
+           olddir /var/log/news/old
+           missingok
+           postrotate
+               kill -HUP $(cat /var/run/inn.pid)
+           endscript
+           nocompress
+       }
+
+       ~/log/*.log {}
+
+       The first few lines set global options; in the example, logs are
+       compressed after they are rotated.  Note that comments may appear
+       anywhere in the config file as long as the first non-whitespace
+       character on the line is a <b>#</b>.
+
+       Values are separated from directives by whitespace and/or an optional
+       =.  Numbers must be specified in a format understood by <a href="../man3/strtoul.3.html">strtoul(3)</a>.
+
+       The next section of the config file defines how to handle the log
+       file <i>/var/log/messages</i>. The log will go through five weekly rotations
+       before being removed. After the log file has been rotated (but before
+       the old version of the log has been compressed), the command
+       <i>/usr/bin/killall -HUP syslogd</i> will be executed.
+
+       The next section defines the parameters for both
+       <i>/var/log/httpd/access.log</i> and <i>/var/log/httpd/error.log</i>.  Each is
+       rotated whenever it grows over 100k in size, and the old logs files
+       are mailed (uncompressed) to recipient@example.org after going
+       through 5 rotations, rather than being removed. The <b>sharedscripts</b>
+       means that the <b>postrotate </b>script will only be run once (after the old
+       logs have been compressed), not once for each log which is rotated.
+       Note that log file names may be enclosed in quotes (and that quotes
+       are required if the name contains spaces).  Normal shell quoting
+       rules apply, with <b>'</b>, <b>"</b>, and <b>\ </b>characters supported.
+
+       The next section defines the parameters for all of the files in
+       <i>/var/log/news</i>. Each file is rotated on a monthly basis.  This is
+       considered a single rotation directive and if errors occur for more
+       than one file, the log files are not compressed.
+
+       The last section uses tilde expansion to rotate log files in the home
+       directory of the current user. This is only available, if your glob
+       library supports tilde expansion. GNU glob does support this.
+
+       Please use wildcards with caution.  If you specify *, <b>logrotate </b>will
+       rotate all files, including previously rotated ones.  A way around
+       this is to use the <b>olddir </b>directive or a more exact wildcard (such as
+       *.log).
+
+       Here is more information on the directives which may be included in a
+       <b>logrotate </b>configuration file:
+
+   <b>DIRECTIVES</b>
+       These directives may be included in a <b>logrotate </b>configuration file:
+
+       <b>compress</b>
+              Old versions of log files are compressed with <b>gzip</b>(1) by
+              default. See also <b>nocompress</b>.
+
+       <b>compresscmd</b>
+              Specifies which command to use to compress log files.  The
+              default is <b>gzip</b>(1).  See also <b>compress</b>.
+
+       <b>uncompresscmd</b>
+              Specifies which command to use to uncompress log files.  The
+              default is <b>gunzip</b>(1).
+
+       <b>compressext</b>
+              Specifies which extension to use on compressed logfiles, if
+              compression is enabled.  The default follows that of the
+              configured compression command.
+
+       <b>compressoptions</b>
+              Command line options may be passed to the compression program,
+              if one is in use.  The default, for <b>gzip</b>(1), is "-6" (biased
+              towards high compression at the expense of speed).  If you use
+              a different compression command, you may need to change the
+              <b>compressoptions </b>to match.
+
+       <b>copy   </b>Make a copy of the log file, but don't change the original at
+              all.  This option can be used, for instance, to make a
+              snapshot of the current log file, or when some other utility
+              needs to truncate or parse the file.  When this option is
+              used, the <b>create </b>option will have no effect, as the old log
+              file stays in place.
+
+       <b>copytruncate</b>
+              Truncate the original log file to zero size in place after
+              creating a copy, instead of moving the old log file and
+              optionally creating a new one.  It can be used when some
+              program cannot be told to close its logfile and thus might
+              continue writing (appending) to the previous log file forever.
+              Note that there is a very small time slice between copying the
+              file and truncating it, so some logging data might be lost.
+              When this option is used, the <b>create </b>option will have no
+              effect, as the old log file stays in place.
+
+       <b>create </b><i>mode owner group</i>, <b>create </b><i>owner group</i>
+              Immediately after rotation (before the <b>postrotate </b>script is
+              run) the log file is created (with the same name as the log
+              file just rotated).  <i>mode</i> specifies the mode for the log file
+              in octal (the same as <a href="../man2/chmod.2.html">chmod(2)</a>), <i>owner</i> specifies the user name
+              who will own the log file, and <i>group</i> specifies the group the
+              log file will belong to. Any of the log file attributes may be
+              omitted, in which case those attributes for the new file will
+              use the same values as the original log file for the omitted
+              attributes. This option can be disabled using the <b>nocreate</b>
+              option.
+
+       <b>createolddir </b><i>mode owner group</i>
+              If the directory specified by <b>olddir </b>directive does not exist,
+              it is created. <i>mode</i> specifies the mode for the <b>olddir</b>
+              directory in octal (the same as <a href="../man2/chmod.2.html">chmod(2)</a>), <i>owner</i> specifies the
+              user name who will own the <b>olddir </b>directory, and <i>group</i>
+              specifies the group the <b>olddir </b>directory will belong to. This
+              option can be disabled using the <b>nocreateolddir </b>option.
+
+       <b>daily  </b>Log files are rotated every day.
+
+       <b>dateext</b>
+              Archive old versions of log files adding a date extension like
+              YYYYMMDD instead of simply adding a number. The extension may
+              be configured using the <b>dateformat </b>and <b>dateyesterday </b>options.
+
+       <b>dateformat </b><i>format_string</i>
+              Specify the extension for <b>dateext </b>using the notation similar
+              to <a href="../man3/strftime.3.html">strftime(3)</a> function. Only %Y %m %d %H %M %S %V and %s
+              specifiers are allowed.  The default value is -%Y%m%d except
+              hourly, which uses -%Y%m%d%H as default value.  Note that also
+              the character separating log name from the extension is part
+              of the dateformat string. The system clock must be set past
+              Sep 9th 2001 for %s to work correctly.  Note that the
+              datestamps generated by this format must be lexically sortable
+              (that is first the year, then the month then the day. For
+              example 2001/12/01 is ok, but 01/12/2001 is not, since
+              01/11/2002 would sort lower while it is later).  This is
+              because when using the <b>rotate </b>option, logrotate sorts all
+              rotated filenames to find out which logfiles are older and
+              should be removed.
+
+       <b>dateyesterday</b>
+              Use yesterday's instead of today's date to create the <b>dateext</b>
+              extension, so that the rotated log file has a date in its name
+              that is the same as the timestamps within it.
+
+       <b>delaycompress</b>
+              Postpone compression of the previous log file to the next
+              rotation cycle.  This only has effect when used in combination
+              with <b>compress</b>.  It can be used when some program cannot be
+              told to close its logfile and thus might continue writing to
+              the previous log file for some time.
+
+       <b>extension </b><i>ext</i>
+              Log files with <i>ext</i> extension can keep it after the rotation.
+              If compression  is  used,  the compression extension (normally
+              <i>.gz</i>) appears after <i>ext</i>. For example you have a logfile named
+              mylog.foo and want to rotate it to mylog.1.foo.gz instead of
+              mylog.foo.1.gz.
+
+       <b>hourly </b>Log files are rotated every hour. Note that usually <i>logrotate</i>
+              is configured to be run by cron daily. You have to change this
+              configuration and run <i>logrotate</i> hourly to be able to really
+              rotate logs hourly.
+
+       <b>addextension </b><i>ext</i>
+              Log files are given the final extension <i>ext</i> after rotation. If
+              the original file already ends with <i>ext</i>, the extension is not
+              duplicated, but merely moved to the end, that is both <b>filename</b>
+              and <b>filename</b><i>ext</i> would get rotated to filename.1<i>ext</i>. If
+              compression is used, the compression extension (normally <b>.gz</b>)
+              appears after <i>ext</i>.
+
+       <b>ifempty</b>
+              Rotate the log file even if it is empty, overriding the
+              <b>notifempty </b>option (<b>ifempty </b>is the default).
+
+       <b>include </b><i>file_or_directory</i>
+              Reads the file given as an argument as if it was included
+              inline where the <b>include </b>directive appears. If a directory is
+              given, most of the files in that directory are read in
+              alphabetic order before processing of the including file
+              continues. The only files which are ignored are files which
+              are not regular files (such as directories and named pipes)
+              and files whose names end with one of the taboo extensions or
+              patterns, as specified by the <b>tabooext </b>or <b>taboopat </b>directives,
+              respectively.
+
+       <b>mail </b><i>address</i>
+              When a log is rotated out of existence, it is mailed to
+              <i>address</i>. If no mail should be generated by a particular log,
+              the <b>nomail </b>directive may be used.
+
+       <b>mailfirst</b>
+              When using the <b>mail </b>command, mail the just-rotated file,
+              instead of the about-to-expire file.
+
+       <b>maillast</b>
+              When using the <b>mail </b>command, mail the about-to-expire file,
+              instead of the just-rotated file (this is the default).
+
+       <b>minage </b><i>count</i>
+              Do not rotate logs which are less than &lt;count&gt; days old.
+
+       <b>maxage </b><i>count</i>
+              Remove rotated logs older than &lt;count&gt; days. The age is only
+              checked if the logfile is to be rotated. The files are mailed
+              to the configured address if <b>maillast </b>and <b>mail </b>are configured.
+
+       <b>maxsize </b><i>size</i>
+              Log files are rotated when they grow bigger than <i>size</i> bytes
+              even before the additionally specified time interval (<b>daily</b>,
+              <b>weekly</b>, <b>monthly</b>, or <b>yearly</b>).  The related <b>size </b>option is
+              similar except that it is mutually exclusive with the time
+              interval options, and it causes log files to be rotated
+              without regard for the last rotation time.  When <b>maxsize </b>is
+              used, both the size and timestamp of a log file are
+              considered.
+
+       <b>minsize  </b><i>size</i>
+              Log files are rotated when they grow bigger than <i>size</i> bytes,
+              but not before the additionally specified time interval
+              (<b>daily</b>, <b>weekly</b>, <b>monthly</b>, or <b>yearly</b>).  The related <b>size </b>option
+              is similar except that it is mutually exclusive with the time
+              interval options, and it causes log files to be rotated
+              without regard for the last rotation time.  When <b>minsize </b>is
+              used, both the size and timestamp of a log file are
+              considered.
+
+       <b>missingok</b>
+              If the log file is missing, go on to the next one without
+              issuing an error message. See also <b>nomissingok</b>.
+
+       <b>monthly</b>
+              Log files are rotated the first time <b>logrotate </b>is run in a
+              month (this is normally on the first day of the month).
+
+       <b>nocompress</b>
+              Old versions of log files are not compressed. See also
+              <b>compress</b>.
+
+       <b>nocopy </b>Do not copy the original log file and leave it in place.
+              (this overrides the <b>copy </b>option).
+
+       <b>nocopytruncate</b>
+              Do not truncate the original log file in place after creating
+              a copy (this overrides the <b>copytruncate </b>option).
+
+       <b>nocreate</b>
+              New log files are not created (this overrides the <b>create</b>
+              option).
+
+       <b>nocreateolddir</b>
+              <b>olddir </b>directory is not created by logrotate when it does not
+              exist.
+
+       <b>nodelaycompress</b>
+              Do not postpone compression of the previous log file to the
+              next rotation cycle (this overrides the <b>delaycompress </b>option).
+
+       <b>nodateext</b>
+              Do not archive  old versions of log files with date extension
+              (this overrides the <b>dateext </b>option).
+
+       <b>nomail </b>Do not mail old log files to any address.
+
+       <b>nomissingok</b>
+              If a log file does not exist, issue an error. This is the
+              default.
+
+       <b>noolddir</b>
+              Logs are rotated in the directory they normally reside in
+              (this overrides the <b>olddir </b>option).
+
+       <b>nosharedscripts</b>
+              Run <b>prerotate </b>and <b>postrotate </b>scripts for every log file which
+              is rotated (this is the default, and overrides the
+              <b>sharedscripts </b>option). The absolute path to the log file is
+              passed as first argument to the script. If the scripts exit
+              with error, the remaining actions will not be executed for the
+              affected log only.
+
+       <b>noshred</b>
+              Do not use <b>shred </b>when deleting old log files. See also <b>shred</b>.
+
+       <b>notifempty</b>
+              Do not rotate the log if it is empty (this overrides the
+              <b>ifempty </b>option).
+
+       <b>olddir </b><i>directory</i>
+              Logs are moved into <i>directory</i> for rotation. The <i>directory</i> must
+              be on the same physical device as the log file being rotated,
+              unless <b>copy</b>, <b>copytruncate </b>or <b>renamecopy </b>option is used. The
+              <i>directory</i> is assumed to be relative to the directory holding
+              the log file unless an absolute path name is specified. When
+              this option is used all old versions of the log end up in
+              <i>directory</i>.  This option may be overridden by the <b>noolddir</b>
+              option.
+
+       <b>postrotate</b>/<b>endscript</b>
+              The lines between <b>postrotate </b>and <b>endscript </b>(both of which must
+              appear on lines by themselves) are executed (using <b>/bin/sh</b>)
+              after the log file is rotated. These directives may only
+              appear inside a log file definition. Normally, the absolute
+              path to the log file is passed as first argument to the
+              script. If <b>sharedscripts </b>is specified, whole pattern is passed
+              to the script.  See also <b>prerotate</b>. See <b>sharedscripts </b>and
+              <b>nosharedscripts </b>for error handling.
+
+       <b>prerotate</b>/<b>endscript</b>
+              The lines between <b>prerotate </b>and <b>endscript </b>(both of which must
+              appear on lines by themselves) are executed (using <b>/bin/sh</b>)
+              before the log file is rotated and only if the log will
+              actually be rotated. These directives may only appear inside a
+              log file definition. Normally, the absolute path to the log
+              file is passed as first argument to the script.  If
+              <b>sharedscripts </b>is specified, whole pattern is passed to the
+              script.  See also <b>postrotate</b>.  See <b>sharedscripts </b>and
+              <b>nosharedscripts </b>for error handling.
+
+       <b>firstaction</b>/<b>endscript</b>
+              The lines between <b>firstaction </b>and <b>endscript </b>(both of which
+              must appear on lines by themselves) are executed (using
+              <b>/bin/sh</b>) once before all log files that match the wildcarded
+              pattern are rotated, before prerotate script is run and only
+              if at least one log will actually be rotated.  These
+              directives may only appear inside a log file definition. Whole
+              pattern is passed to the script as first argument. If the
+              script exits with error, no further processing is done. See
+              also <b>lastaction</b>.
+
+       <b>lastaction</b>/<b>endscript</b>
+              The lines between <b>lastaction </b>and <b>endscript </b>(both of which must
+              appear on lines by themselves) are executed (using <b>/bin/sh</b>)
+              once after all log files that match the wildcarded pattern are
+              rotated, after postrotate script is run and only if at least
+              one log is rotated. These directives may only appear inside a
+              log file definition. Whole pattern is passed to the script as
+              first argument. If the script exits with error, just an error
+              message is shown (as this is the last action). See also
+              <b>firstaction</b>.
+
+       <b>preremove</b>/<b>endscript</b>
+              The lines between <b>preremove </b>and <b>endscript </b>(both of which must
+              appear on lines by themselves) are executed (using <b>/bin/sh</b>)
+              once just before removal of a log file.  The logrotate will
+              pass the name of file which is soon to be removed. See also
+              <b>firstaction</b>.
+
+       <b>rotate </b><i>count</i>
+              Log files are rotated <i>count</i> times before being removed or
+              mailed to the address specified in a <b>mail </b>directive. If <i>count</i>
+              is 0, old versions are removed rather than rotated. Default is
+              0.
+
+       <b>renamecopy</b>
+              Log file is renamed to temporary filename in the same
+              directory by adding ".tmp" extension to it. After that,
+              <b>postrotate </b>script is run and log file is copied from temporary
+              filename to final filename. This allows storing rotated log
+              files on the different devices using <b>olddir </b>directive. In the
+              end, temporary filename is removed.
+
+       <b>size </b><i>size</i>
+              Log files are rotated only if they grow bigger than <i>size</i>
+              bytes. If <i>size</i> is followed by <i>k</i>, the size is assumed to be in
+              kilobytes.  If the <i>M</i> is used, the size is in megabytes, and if
+              <i>G</i> is used, the size is in gigabytes. So <i>size 100</i>, <i>size 100k</i>,
+              <i>size 100M</i> and <i>size 100G</i> are all valid.
+
+       <b>sharedscripts</b>
+              Normally, <b>prerotate </b>and <b>postrotate </b>scripts are run for each
+              log which is rotated and the absolute path to the log file is
+              passed as first argument to the script. That means a single
+              script may be run multiple times for log file entries which
+              match multiple files (such as the <i>/var/log/news/*</i> example). If
+              <b>sharedscripts </b>is specified, the scripts are only run once, no
+              matter how many logs match the wildcarded pattern, and whole
+              pattern is passed to them.  However, if none of the logs in
+              the pattern require rotating, the scripts will not be run at
+              all. If the scripts exit with error, the remaining actions
+              will not be executed for any logs. This option overrides the
+              <b>nosharedscripts </b>option and implies <b>create </b>option.
+
+       <b>shred  </b>Delete log files using <b>shred </b>-u instead of unlink().  This
+              should ensure that logs are not readable after their scheduled
+              deletion; this is off by default.  See also <b>noshred</b>.
+
+       <b>shredcycles </b><i>count</i>
+              Asks GNU <a href="../man1/shred.1.html">shred(1)</a> to overwrite log files <b>count </b>times before
+              deletion.  Without this option, <b>shred</b>'s default will be used.
+
+       <b>start </b><i>count</i>
+              This is the number to use as the base for rotation. For
+              example, if you specify 0, the logs will be created with a .0
+              extension as they are rotated from the original log files.  If
+              you specify 9, log files will be created with a .9, skipping
+              0-8.  Files will still be rotated the number of times
+              specified with the <b>rotate </b>directive.
+
+       <b>su </b><i>user group</i>
+              Rotate log files set under this user and group instead of
+              using default user/group (usually root). <i>user</i> specifies the
+              user name used for rotation and <i>group</i> specifies the group used
+              for rotation. If the user/group you specify here does not have
+              sufficient privilege to make files with the ownership you've
+              specified in a <i>create</i> instruction, it will cause an error.
+
+       <b>tabooext </b>[+] <i>list</i>
+              The current taboo extension list is changed (see the <b>include</b>
+              directive for information on the taboo extensions). If a +
+              precedes the list of extensions, the current taboo extension
+              list is augmented, otherwise it is replaced. At startup, the
+              taboo extension list <i>,v</i>, <i>.cfsaved</i>, <i>.disabled</i>, <i>.dpkg-dist</i>,
+              <i>.dpkg-new</i>, <i>.dpkg-old</i>, <i>.rhn-cfg-tmp-*</i>, <i>.rpmnew</i>, <i>.rpmorig</i>,
+              <i>.rpmsave</i>, <i>.swp</i>, <i>.ucf-dist</i>, <i>.ucf-new</i>, <i>.ucf-old</i>, <i>~</i>
+
+       <b>taboopat </b>[+] <i>list</i>
+              The current taboo glob pattern list is changed (see the
+              <b>include </b>directive for information on the taboo extensions and
+              patterns). If a + precedes the list of patterns, the current
+              taboo pattern list is augmented, otherwise it is replaced. At
+              startup, the taboo pattern list is empty.
+
+       <b>weekly </b>[<i>weekday</i>]
+              Log files are rotated once each <i>weekday</i>, or if the date is
+              advanced by at least 7 days since the last rotation (while
+              ignoring the exact time).  The <i>weekday</i> intepretation is
+              following:  0 means Sunday, 1 means Monday, ..., 6 means
+              Saturday; the special value 7 means each 7 days,
+              irrespectively of weekday.  Defaults to 0 if the <i>weekday</i>
+              argument is omitted.
+
+       <b>yearly </b>Log files are rotated if the current year is not the same as
+              the last rotation.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/var/lib/logrotate.status</i>   Default state file.
+       <i>/etc/logrotate.conf</i>         Configuration options.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/chmod.2.html">chmod(2)</a>, <b>gunzip</b>(1), <b>gzip</b>(1), <b>mail</b>(1), <a href="../man1/shred.1.html">shred(1)</a>, <a href="../man3/strftime.3.html">strftime(3)</a>,
+       <a href="../man3/strtoul.3.html">strtoul(3)</a>, &lt;<a href="https://github.com/logrotate/logrotate">https://github.com/logrotate/logrotate</a>&gt;
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Erik Troan, Preston Brown, Jan Kaluza.
+
+       &lt;<a href="https://github.com/logrotate/logrotate">https://github.com/logrotate/logrotate</a>&gt;
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>logrotate</i> (simplify the administration of
+       log files) project.  Information about the project can be found at 
+       ⟨<a href="https://github.com/logrotate/logrotate">https://github.com/logrotate/logrotate</a>⟩.  If you have a bug report
+       for this manual page, see 
+       ⟨<a href="https://github.com/logrotate/logrotate/issues">https://github.com/logrotate/logrotate/issues</a>⟩.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/logrotate/logrotate.git">https://github.com/logrotate/logrotate.git</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Linux                           3.12.2.1_05e2                   LOGROTATE(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

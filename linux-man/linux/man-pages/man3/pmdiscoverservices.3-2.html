@@ -1,0 +1,317 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmdiscoverservices(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#PCP_ENVIRONMENT">PCP&nbsp;ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#DIAGNOSTICS">DIAGNOSTICS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMDISCOVERSERVICES(3)     Library Functions Manual     PMDISCOVERSERVICES(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmDiscoverServices </b>- discover PCP services on the network
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pcp/pmapi.h&gt;</b>
+
+       <b>int pmDiscoverServices(const char *</b><i>service</i><b>, const char *</b><i>mechanism</i><b>, char ***</b><i>urls</i><b>);</b>
+
+       <b>#include &lt;pcp/impl.h&gt;</b>
+
+       <b>int __pmDiscoverServicesWithOptions(const char *</b><i>service</i><b>, const char *</b><i>mechanism</i><b>, const char *</b><i>optionsString</i><b>, const volatile unsigned *</b><i>flags</i><b>, char ***</b><i>urls</i><b>);</b>
+
+       <b>cc ... -lpcp</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Given a PCP service name, as identified by <i>service</i>, and using the
+       type of discovery optionally specified in <i>mechanism</i>,
+       <b>pmDiscoverServices </b>returns, via <i>urls</i>, a list of URLs representing the
+       services discovered on the network.
+
+       The internal function <b>__pmDiscoverServicesWithOptions </b>performs the
+       same function and adds arguments for global options and a mechanism
+       for interrupting the discovery process.
+
+       The <a href="../man1/pmfind.1.html">pmfind(1)</a> utility provides command line access to both of these
+       interfaces.
+
+       Calling
+
+       pmDiscoverServices(<i>service</i>, <i>mechanism</i>, <i>urls</i>)
+
+       is equivalent to calling
+
+       __pmDiscoverServicesWithOptions(<i>service</i>, <i>mechanism</i>, NULL, NULL,
+       <i>urls</i>);
+
+       <i>service</i> specifies the PCP service to be discovered. Currently
+       supported services are <b>PM_SERVER_SERVICE_SPEC, PM_PROXY_SERVICE_SPEC</b>
+       and <b>PM_WEBD_SERVICE_SPEC, </b>which search for <a href="../man1/pmcd.1.html">pmcd(1)</a>, <a href="../man1/pmproxy.1.html">pmproxy(1)</a>, and
+       <a href="../man1/pmwebd.1.html">pmwebd(1)</a>, servers respectively.
+
+       <i>mechanism</i> specifies the style of discovery to be used.
+
+       The currently supported mechanisms are:
+
+       <b>avahi  </b>This searches for services which are broadcasting using mDNS
+              via <b>avahi-daemon</b>(8).  An optional suffix <b>",timeout=N" </b>may be
+              added to specify the discovery timeout in floating-point
+              multiples of one second.  The default timeout is 0.5 seconds,
+              which may be overridden by the <b>AVAHI_DISCOVERY_TIMEOUT</b>
+              environment variable, also specified in floating-point
+              multiples of one second. If both are specified, then the value
+              specified in the environment variable takes precedence.
+
+       <b>probe=&lt;net-address&gt;/&lt;mask-bits&gt;</b>
+              Actively probes the given subnet for the requested PCP
+              service(s).  &lt;net-address&gt; is an inet or ipv6 network address
+              and &lt;mask-bits&gt; is the number of bits used to define the
+              subnet. For example, 192.168.1.0/24 defines an 8 bit subnet
+              consisting of the addresses 192.168.1.0 through 192.168.1.255.
+              An optional suffix <b>",maxThreads=N" </b>may be added to limit the
+              number of threads used while probing. The default is no fixed
+              limit, which is to say that the process' rlimits for the
+              number of threads and open file descriptors will be respected.
+              An optional suffix <b>",timeout=N" </b>may be added to specify the
+              timeout for each connection attempt in floating-point
+              multiples of one second.  The default timeout is 20
+              milliseconds.
+
+       <i>mechanism</i> may also be NULL, which means to use all available
+       discovery mechanisms.
+
+       For <b>__pmDiscoverServicesWithOptions, </b><i>optionsString</i> specifies global
+       options to be applied to the discovery process. Options are comma-
+       separated and may be one or more of the following:
+
+       <b>resolve</b>
+              This requests that DNS name resolution be attempted for the
+              addresses of any discovered services.
+
+       <b>timeout=N</b>
+              This specifies a timeout period after which the discovery
+              process will be interrupted. N is a floating point number
+              representing the number of seconds before timing out.
+
+       <i>optionsString</i> may also be NULL, which means that no global options
+       are specified.
+
+       For <b>__pmDiscoverServicesWithOptions, </b><i>flags</i> specifies a pointer to an
+       object of type <i>unsigned</i> which is a bit mask of options/status flags
+       for the discovery process. The supported flags are:
+
+       <b>PM_SERVICE_DISCOVERY_RESOLVE</b>
+              Specifying this flag is equivalent to specifying <i>resolve</i> in
+              the <i>optionsString</i>
+
+       <b>PM_SERVICE_DISCOVERY_INTERRUPTED</b>
+              This flag must be unset when calling
+              <b>__pmDiscoverServicesWithOptions </b>but may be set asynchronously
+              (by an interrupt handler, for example) in order to interrupt
+              the service discovery process.
+
+       <i>flags</i> may also be NULL, which indicates that no flags are set.
+
+       <b>pmDiscoverServices </b>and <b>__pmDiscoverServicesWithOptions </b>will return
+       the number of services discovered, else a value less than zero for an
+       error.  The value zero indicates that no services were discovered.
+
+       The resulting list of pointers, <i>urls</i>, <b>and </b>the values (the URLs) that
+       the pointers reference will have been allocated by <b>pmDiscoverServices</b>
+       or <b>__pmDiscoverServicesWithOptions </b>with a single call to <a href="malloc.3.html">malloc(3)</a>,
+       and it is the responsibility of the <b>pmDiscoverServices </b>or
+       <b>__pmDiscoverServicesWithOptions </b>caller to <b>free</b>(<i>urls</i>) to release the
+       space when it is no longer required.
+
+       When an error occurs, or no services are discovered, <i>urls</i> is
+       undefined (no space will have been allocated, and so calling <a href="free.3.html">free(3)</a>
+       is a singularly bad idea).
+</pre>
+<h2><a id="PCP_ENVIRONMENT" href="#PCP_ENVIRONMENT"></a>PCP ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Environment variables with the prefix <b>PCP_ </b>are used to parameterize
+       the file and directory names used by PCP.  On each installation, the
+       file <i>/etc/pcp.conf</i> contains the local values for these variables.
+       The <b>$PCP_CONF </b>variable may be used to specify an alternative
+       configuration file, as described in <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>.  Values for these
+       variables may be obtained programmatically using the <a href="pmGetConfig.3.html">pmGetConfig(3)</a>
+       function.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PMAPI.3.html">PMAPI(3)</a>, <a href="../man1/pmcd.1.html">pmcd(1)</a>, <a href="../man1/pmproxy.1.html">pmproxy(1)</a>, <a href="../man1/pmwebd.1.html">pmwebd(1)</a>, <a href="../man1/pmfind.1.html">pmfind(1)</a>, <a href="pmGetConfig.3.html">pmGetConfig(3)</a>,
+       <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>, <a href="../man5/pcp.env.5.html">pcp.env(5)</a> and <b>avahi-daemon</b>(8).
+</pre>
+<h2><a id="DIAGNOSTICS" href="#DIAGNOSTICS"></a>DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-EINVAL</b>
+              An invalid argument has been specified.
+
+       <b>-ENOMEM</b>
+              Unable to allocate memory required to process the request.
+
+       <b>-EOPNOTSUPP</b>
+              The specified <i>mechanism</i> is not supported.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP               PMDISCOVERSERVICES(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pmfind.1.html">pmfind(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

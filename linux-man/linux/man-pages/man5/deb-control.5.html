@@ -1,0 +1,461 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>deb-control(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FIELDS">FIELDS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">deb-control(5)                   dpkg suite                   deb-control(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       deb-control - Debian binary packages' master control file format
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       control
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Each Debian binary package contains the master <i>control</i> file, which
+       contains a number of fields.  Each field begins with a tag, such as
+       <b>Package </b>or <b>Version </b>(case insensitive), followed by a colon, and the
+       body of the field.  Fields are delimited only by field tags. In other
+       words, field text may be multiple lines in length, but the
+       installation tools will generally join lines when processing the body
+       of the field (except in the case of the <b>Description </b>field, see
+       below).
+</pre>
+<h2><a id="FIELDS" href="#FIELDS"></a>FIELDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Package: </b><i>package-name</i> (required)
+              The value of this field determines the package name, and is
+              used to generate file names by most installation tools.
+
+       <b>Version: </b><i>version-string</i> (required)
+              Typically, this is the original package's version number in
+              whatever form the program's author uses. It may also include a
+              Debian revision number (for non-native packages). The exact
+              format and sorting algorithm are described in <a href="deb-version.5.html">deb-version(5)</a>.
+
+       <b>Maintainer: </b><i>fullname-email</i> (recommended)
+              Should be in the format “Joe Bloggs &lt;jbloggs@foo.com&gt;”, and is
+              typically the person who created the package, as opposed to
+              the author of the software that was packaged.
+
+       <b>Description: </b><i>short-description</i> (recommended)
+        <i>long-description</i>
+              The format for the package description is a short brief
+              summary on the first line (after the <b>Description </b>field). The
+              following lines should be used as a longer, more detailed
+              description. Each line of the long description must be
+              preceded by a space, and blank lines in the long description
+              must contain a single ‘<b>.</b>’ following the preceding space.
+
+       <b>Section: </b><i>section</i>
+              This is a general field that gives the package a category
+              based on the software that it installs.  Some common sections
+              are <b>utils</b>, <b>net</b>, <b>mail</b>, <b>text</b>, <b>x11</b>, etc.
+
+       <b>Priority: </b><i>priority</i>
+              Sets the importance of this package in relation to the system
+              as a whole.  Common priorities are <b>required</b>, <b>standard</b>,
+              <b>optional</b>, <b>extra</b>, etc.
+
+       The <b>Section </b>and <b>Priority </b>fields usually have a defined set of
+       accepted values based on the specific distribution policy.
+
+       <b>Installed-Size: </b>size
+              The approximate total size of the package's installed files,
+              in KiB units.
+
+       <b>Essential: yes</b>|<b>no</b>
+              This field is usually only needed when the answer is <b>yes</b>. It
+              denotes a package that is required for proper operation of the
+              system. Dpkg or any other installation tool will not allow an
+              <b>Essential </b>package to be removed (at least not without using
+              one of the force options).
+
+       <b>Build-Essential: yes</b>|<b>no</b>
+              This field is usually only needed when the answer is <b>yes</b>, and
+              is commonly injected by the archive software.  It denotes a
+              package that is required when building other packages.
+
+       <b>Architecture: </b><i>arch</i>|<b>all </b>(recommended)
+              The architecture specifies which type of hardware this package
+              was compiled for.  Common architectures are <b>amd64</b>, <b>armel</b>,
+              <b>i386</b>, <b>powerpc</b>, etc.  Note that the <b>all </b>value is meant for
+              packages that are architecture independent.  Some examples of
+              this are shell and Perl scripts, and documentation.
+
+       <b>Origin: </b><i>name</i>
+              The name of the distribution this package is originating from.
+
+       <b>Bugs: </b><i>url</i>
+              The <i>url</i> of the bug tracking system for this package. The
+              current used format is <i>bts-type</i><b>://</b><i>bts-address</i>, like
+              <b>debbugs://bugs.debian.org</b>.
+
+       <b>Homepage: </b><i>url</i>
+              The upstream project home page <i>url</i>.
+
+       <b>Tag: </b><i>tag-list</i>
+              List of tags describing the qualities of the package. The
+              description and list of supported tags can be found in the
+              <b>debtags </b>package.
+
+       <b>Multi-Arch: no</b>|<b>same</b>|<b>foreign</b>|<b>allowed</b>
+              This field is used to indicate how this package should behave
+              on a multi-arch installations.
+
+              <b>no     </b>This value is the default when the field is omitted, in
+                     which case adding the field with an explicit <b>no </b>value
+                     is generally not needed.
+
+              <b>same   </b>This package is co-installable with itself, but it must
+                     not be used to satisfy the dependency of any package of
+                     a different architecture from itself.
+
+              <b>foreign</b>
+                     This package is not co-installable with itself, but
+                     should be allowed to satisfy a non-arch-qualified
+                     dependency of a package of a different arch from itself
+                     (if a dependency has an explicit arch-qualifier then
+                     the value <b>foreign </b>is ignored).
+
+              <b>allowed</b>
+                     This allows reverse-dependencies to indicate in their
+                     <b>Depends </b>field that they accept this package from a
+                     foreign architecture by qualifying the package name
+                     with <b>:any</b>, but has no effect otherwise.
+
+       <b>Source: </b><i>source-name</i> [<b>(</b><i>source-version</i><b>)</b>]
+              The name of the source package that this binary package came
+              from, if it is different than the name of the package itself.
+              If the source version differs from the binary version, then
+              the <i>source-name</i> will be followed by a <i>source-version</i> in
+              parenthesis.  This can happen for example on a binary-only
+              non-maintainer upload, or when setting a different binary
+              version via «<b>dpkg-gencontrol -v</b>».
+
+       <b>Subarchitecture: </b><i>value</i>
+       <b>Kernel-Version: </b><i>value</i>
+       <b>Installer-Menu-Item: </b><i>value</i>
+              These fields are used by the debian-installer and are usually
+              not needed.  See
+              /usr/share/doc/debian-installer/devel/modules.txt from the
+              <b>debian-installer </b>package for more details about them.
+
+       <b>Depends: </b><i>package-list</i>
+              List of packages that are required for this package to provide
+              a non-trivial amount of functionality. The package maintenance
+              software will not allow a package to be installed if the
+              packages listed in its <b>Depends </b>field aren't installed (at
+              least not without using the force options).  In an
+              installation, the postinst scripts of packages listed in
+              <b>Depends </b>fields are run before those of the packages which
+              depend on them. On the opposite, in a removal, the prerm
+              script of a package is run before those of the packages listed
+              in its <b>Depends </b>field.
+
+       <b>Pre-Depends: </b><i>package-list</i>
+              List of packages that must be installed <b>and </b>configured before
+              this one can be installed. This is usually used in the case
+              where this package requires another package for running its
+              preinst script.
+
+       <b>Recommends: </b><i>package-list</i>
+              Lists packages that would be found together with this one in
+              all but unusual installations. The package maintenance
+              software will warn the user if they install a package without
+              those listed in its <b>Recommends </b>field.
+
+       <b>Suggests: </b><i>package-list</i>
+              Lists packages that are related to this one and can perhaps
+              enhance its usefulness, but without which installing this
+              package is perfectly reasonable.
+
+       The syntax of <b>Depends</b>, <b>Pre-Depends</b>, <b>Recommends </b>and <b>Suggests </b>fields is
+       a list of groups of alternative packages. Each group is a list of
+       packages separated by vertical bar (or “pipe”) symbols, ‘<b>|</b>’.  The
+       groups are separated by commas.  Commas are to be read as “AND”, and
+       pipes as “OR”, with pipes binding more tightly.  Each package name is
+       optionally followed by an architecture qualifier appended after a
+       colon ‘<b>:</b>’, optionally followed by a version number specification in
+       parentheses.
+
+       An architecture qualifier name can be a real Debian architecture name
+       (since dpkg 1.16.5) or <b>any </b>(since dpkg 1.16.2).  If omitted, the
+       default is the current binary package architecture.  A real Debian
+       architecture name will match exactly that architecture for that
+       package name, <b>any </b>will match any architecture for that package name
+       if the package has been marked as <b>Multi-Arch: allowed</b>.
+
+       A version number may start with a ‘<b>&gt;&gt;</b>’, in which case any later
+       version will match, and may specify or omit the Debian packaging
+       revision (separated by a hyphen).  Accepted version relationships are
+       ‘<b>&gt;&gt;</b>’ for greater than, ‘<b>&lt;&lt;</b>’ for less than, ‘<b>&gt;=</b>’ for greater than or
+       equal to, ‘<b>&lt;=</b>’ for less than or equal to, and ‘<b>=</b>’ for equal to.
+
+       <b>Breaks: </b><i>package-list</i>
+              Lists packages that this one breaks, for example by exposing
+              bugs when the named packages rely on this one. The package
+              maintenance software will not allow broken packages to be
+              configured; generally the resolution is to upgrade the
+              packages named in a <b>Breaks </b>field.
+
+       <b>Conflicts: </b><i>package-list</i>
+              Lists packages that conflict with this one, for example by
+              containing files with the same names. The package maintenance
+              software will not allow conflicting packages to be installed
+              at the same time. Two conflicting packages should each include
+              a <b>Conflicts </b>line mentioning the other.
+
+       <b>Replaces: </b><i>package-list</i>
+              List of packages files from which this one replaces. This is
+              used for allowing this package to overwrite the files of
+              another package and is usually used with the <b>Conflicts </b>field
+              to force removal of the other package, if this one also has
+              the same files as the conflicted package.
+
+       The syntax of <b>Breaks</b>, <b>Conflicts </b>and <b>Replaces </b>is a list of package
+       names, separated by commas (and optional whitespace).  In the <b>Breaks</b>
+       and <b>Conflicts </b>fields, the comma should be read as “OR”.  An optional
+       architecture qualifier can also be appended to the package name with
+       the same syntax as above, but the default is <b>any </b>instead of the
+       binary package architecture.  An optional version can also be given
+       with the same syntax as above for the <b>Breaks</b>, <b>Conflicts </b>and <b>Replaces</b>
+       fields.
+
+       <b>Provides: </b><i>package-list</i>
+              This is a list of virtual packages that this one provides.
+              Usually this is used in the case of several packages all
+              providing the same service.  For example, sendmail and exim
+              can serve as a mail server, so they provide a common package
+              (“mail-transport-agent”) on which other packages can depend.
+              This will allow sendmail or exim to serve as a valid option to
+              satisfy the dependency.  This prevents the packages that
+              depend on a mail server from having to know the package names
+              for all of them, and using ‘<b>|</b>’ to separate the list.
+
+       The syntax of <b>Provides </b>is a list of package names, separated by
+       commas (and optional whitespace).  An optional architecture qualifier
+       can also be appended to the package name with the same syntax as
+       above.  If omitted, the default is the current binary package
+       architecture.  An optional exact (equal to) version can also be given
+       with the same syntax as above (honored since dpkg 1.17.11).
+
+       <b>Built-Using: </b><i>package-list</i>
+              This field lists extra source packages that were used during
+              the build of this binary package.  This is an indication to
+              the archive maintenance software that these extra source
+              packages must be kept whilst this binary package is
+              maintained.  This field must be a list of source package names
+              with strict ‘<b>=</b>’ version relationships.  Note that the archive
+              maintenance software is likely to refuse to accept an upload
+              which declares a <b>Built-Using </b>relationship which cannot be
+              satisfied within the archive.
+
+       <b>Built-For-Profiles: </b><i>profile-list</i>
+              This field specifies a whitespace separated list of build
+              profiles that this binary packages was built with.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       # Comment
+       Package: grep
+       Essential: yes
+       Priority: required
+       Section: base
+       Maintainer: Wichert Akkerman &lt;wakkerma@debian.org&gt;
+       Architecture: sparc
+       Version: 2.4-1
+       Pre-Depends: libc6 (&gt;= 2.0.105)
+       Provides: rgrep
+       Conflicts: rgrep
+       Description: GNU grep, egrep and fgrep.
+        The GNU family of grep utilities may be the "fastest grep in the west".
+        GNU grep is based on a fast lazy-state deterministic matcher (about
+        twice as fast as stock Unix egrep) hybridized with a Boyer-Moore-Gosper
+        search for a fixed string that eliminates impossible text from being
+        considered by the full regexp matcher without necessarily having to
+        look at every character. The result is typically many times faster
+        than Unix grep or egrep. (Regular expressions containing backreferencing
+        will run more slowly, however).
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="deb.5.html">deb(5)</a>, <a href="deb-version.5.html">deb-version(5)</a>, <b>debtags</b>(1), <a href="../man1/dpkg.1.html">dpkg(1)</a>, <a href="../man1/dpkg-deb.1.html">dpkg-deb(1)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01                   deb-control(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/dpkg.1.html">dpkg(1)</a>,&nbsp; 
+    <a href="../man1/dpkg-deb.1.html">dpkg-deb(1)</a>,&nbsp; 
+    <a href="../man1/dpkg-gencontrol.1.html">dpkg-gencontrol(1)</a>,&nbsp; 
+    <a href="../man1/dpkg-name.1.html">dpkg-name(1)</a>,&nbsp; 
+    <a href="../man1/dpkg-parsechangelog.1.html">dpkg-parsechangelog(1)</a>,&nbsp; 
+    <a href="../man1/dpkg-split.1.html">dpkg-split(1)</a>,&nbsp; 
+    <a href="deb.5.html">deb(5)</a>,&nbsp; 
+    <a href="deb-old.5.html">deb-old(5)</a>,&nbsp; 
+    <a href="deb-shlibs.5.html">deb-shlibs(5)</a>,&nbsp; 
+    <a href="deb-src-control.5.html">deb-src-control(5)</a>,&nbsp; 
+    <a href="deb-version.5.html">deb-version(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

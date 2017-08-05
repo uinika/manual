@@ -1,0 +1,310 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>move_pages(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MOVE_PAGES(2)             Linux Programmer's Manual            MOVE_PAGES(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       move_pages - move individual pages of a process to another node
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;numaif.h&gt;</b>
+
+       <b>long move_pages(int </b><i>pid</i><b>, unsigned long count, void **</b><i>pages</i><b>,</b>
+                       <b>const int *</b><i>nodes</i><b>, int *</b><i>status</i><b>, int </b><i>flags</i><b>);</b>
+
+       Link with <i>-lnuma</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>move_pages</b>() moves the specified <i>pages</i> of the process <i>pid</i> to the
+       memory nodes specified by <i>nodes</i>.  The result of the move is reflected
+       in <i>status</i>.  The <i>flags</i> indicate constraints on the pages to be moved.
+
+       <i>pid</i> is the ID of the process in which pages are to be moved.  To move
+       pages in another process, the caller must be privileged
+       (<b>CAP_SYS_NICE</b>) or the real or effective user ID of the calling
+       process must match the real or saved-set user ID of the target
+       process.  If <i>pid</i> is 0, then <b>move_pages</b>() moves pages of the calling
+       process.
+
+       <i>count</i> is the number of pages to move.  It defines the size of the
+       three arrays <i>pages</i>, <i>nodes</i>, and <i>status</i>.
+
+       <i>pages</i> is an array of pointers to the pages that should be moved.
+       These are pointers that should be aligned to page boundaries.
+       Addresses are specified as seen by the process specified by <i>pid</i>.
+
+       <i>nodes</i> is an array of integers that specify the desired location for
+       each page.  Each element in the array is a node number.  <i>nodes</i> can
+       also be NULL, in which case <b>move_pages</b>() does not move any pages but
+       instead will return the node where each page currently resides, in
+       the <i>status</i> array.  Obtaining the status of each page may be necessary
+       to determine pages that need to be moved.
+
+       <i>status</i> is an array of integers that return the status of each page.
+       The array contains valid values only if <b>move_pages</b>() did not return
+       an error.
+
+       <i>flags</i> specify what types of pages to move.  <b>MPOL_MF_MOVE </b>means that
+       only pages that are in exclusive use by the process are to be moved.
+       <b>MPOL_MF_MOVE_ALL </b>means that pages shared between multiple processes
+       can also be moved.  The process must be privileged (<b>CAP_SYS_NICE</b>) to
+       use <b>MPOL_MF_MOVE_ALL</b>.
+
+   <b>Page states in the status array</b>
+       The following values can be returned in each element of the <i>status</i>
+       array.
+
+       <b>0..MAX_NUMNODES</b>
+              Identifies the node on which the page resides.
+
+       <b>-EACCES</b>
+              The page is mapped by multiple processes and can be moved only
+              if <b>MPOL_MF_MOVE_ALL </b>is specified.
+
+       <b>-EBUSY </b>The page is currently busy and cannot be moved.  Try again
+              later.  This occurs if a page is undergoing I/O or another
+              kernel subsystem is holding a reference to the page.
+
+       <b>-EFAULT</b>
+              This is a zero page or the memory area is not mapped by the
+              process.
+
+       <b>-EIO   </b>Unable to write back a page.  The page has to be written back
+              in order to move it since the page is dirty and the filesystem
+              does not provide a migration function that would allow the
+              move of dirty pages.
+
+       <b>-EINVAL</b>
+              A dirty page cannot be moved.  The filesystem does not provide
+              a migration function and has no ability to write back pages.
+
+       <b>-ENOENT</b>
+              The page is not present.
+
+       <b>-ENOMEM</b>
+              Unable to allocate memory on target node.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success <b>move_pages</b>() returns zero.  On error, it returns -1, and
+       sets <i><a href="../man3/errno.3.html">errno</a></i> to indicate the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>E2BIG  </b>Too many pages to move.
+
+       <b>EACCES </b>One of the target nodes is not allowed by the current cpuset.
+
+       <b>EFAULT </b>Parameter array could not be accessed.
+
+       <b>EINVAL </b>Flags other than <b>MPOL_MF_MOVE </b>and <b>MPOL_MF_MOVE_ALL </b>was
+              specified or an attempt was made to migrate pages of a kernel
+              thread.
+
+       <b>ENODEV </b>One of the target nodes is not online.
+
+       <b>ENOENT </b>No pages were found that require moving.  All pages are either
+              already on the target node, not present, had an invalid
+              address or could not be moved because they were mapped by
+              multiple processes.
+
+       <b>EPERM  </b>The caller specified <b>MPOL_MF_MOVE_ALL </b>without sufficient
+              privileges (<b>CAP_SYS_NICE</b>).  Or, the caller attempted to move
+              pages of a process belonging to another user but did not have
+              privilege to do so (<b>CAP_SYS_NICE</b>).
+
+       <b>ESRCH  </b>Process does not exist.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>move_pages</b>() first appeared on Linux in version 2.6.18.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This system call is Linux-specific.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For information on library support, see <a href="../man7/numa.7.html">numa(7)</a>.
+
+       Use <a href="get_mempolicy.2.html">get_mempolicy(2)</a> with the <b>MPOL_F_MEMS_ALLOWED </b>flag to obtain the
+       set of nodes that are allowed by the current cpuset.  Note that this
+       information is subject to change at any time by manual or automatic
+       reconfiguration of the cpuset.
+
+       Use of this function may result in pages whose location (node)
+       violates the memory policy established for the specified addresses
+       (See <a href="mbind.2.html">mbind(2)</a>) and/or the specified process (See <a href="set_mempolicy.2.html">set_mempolicy(2)</a>).
+       That is, memory policy does not constrain the destination nodes used
+       by <b>move_pages</b>().
+
+       The <i>&lt;numaif.h&gt;</i> header is not included with glibc, but requires
+       installing <i>libnuma-devel</i> or a similar package.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="get_mempolicy.2.html">get_mempolicy(2)</a>, <a href="mbind.2.html">mbind(2)</a>, <a href="set_mempolicy.2.html">set_mempolicy(2)</a>, <a href="../man3/numa.3.html">numa(3)</a>, <a href="../man5/numa_maps.5.html">numa_maps(5)</a>,
+       <a href="../man7/cpuset.7.html">cpuset(7)</a>, <a href="../man7/numa.7.html">numa(7)</a>, <a href="../man8/migratepages.8.html">migratepages(8)</a>, <a href="../man8/numastat.8.html">numastat(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2010-06-11                    MOVE_PAGES(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/numa.3.html">numa(3)</a>,&nbsp; 
+    <a href="../man5/numa_maps.5.html">numa_maps(5)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="../man7/numa.7.html">numa(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="move_pages.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

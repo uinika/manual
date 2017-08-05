@@ -1,0 +1,299 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getgrent_r(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETGRENT_R(3)             Linux Programmer's Manual            GETGRENT_R(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getgrent_r, fgetgrent_r - get group file entry reentrantly
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;grp.h&gt;</b>
+
+       <b>int getgrent_r(struct group *</b><i>gbuf</i><b>, char *</b><i>buf</i><b>,</b>
+                      <b>size_t </b><i>buflen</i><b>, struct group **</b><i>gbufp</i><b>);</b>
+
+       <b>int fgetgrent_r(FILE *</b><i>stream</i><b>, struct group *</b><i>gbuf</i><b>, char *</b><i>buf</i><b>,</b>
+                       <b>size_t </b><i>buflen</i><b>, struct group **</b><i>gbufp</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>getgrent_r</b>(): _GNU_SOURCE
+       <b>fgetgrent_r</b>():
+           Since glibc 2.19:
+               _DEFAULT_SOURCE
+           Glibc 2.19 and earlier:
+               _SVID_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The functions <b>getgrent_r</b>() and <b>fgetgrent_r</b>() are the reentrant
+       versions of <a href="getgrent.3.html">getgrent(3)</a> and <a href="fgetgrent.3.html">fgetgrent(3)</a>.  The former reads the next
+       group entry from the stream initialized by <a href="setgrent.3.html">setgrent(3)</a>.  The latter
+       reads the next group entry from <i>stream</i>.
+
+       The <i>group</i> structure is defined in <i>&lt;grp.h&gt;</i> as follows:
+
+           struct group {
+               char   *gr_name;        /* group name */
+               char   *gr_passwd;      /* group password */
+               gid_t   gr_gid;         /* group ID */
+               char  **gr_mem;         /* NULL-terminated array of pointers
+                                          to names of group members */
+           };
+
+       For more information about the fields of this structure, see
+       <a href="../man5/group.5.html">group(5)</a>.
+
+       The nonreentrant functions return a pointer to static storage, where
+       this static storage contains further pointers to group name, password
+       and members.  The reentrant functions described here return all of
+       that in caller-provided buffers.  First of all there is the buffer
+       <i>gbuf</i> that can hold a <i>struct group</i>.  And next the buffer <i>buf</i> of size
+       <i>buflen</i> that can hold additional strings.  The result of these
+       functions, the <i>struct group</i> read from the stream, is stored in the
+       provided buffer <i>*gbuf</i>, and a pointer to this <i>struct group</i> is returned
+       in <i>*gbufp</i>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, these functions return 0 and <i>*gbufp</i> is a pointer to the
+       <i>struct group</i>.  On error, these functions return an error value and
+       <i>*gbufp</i> is NULL.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ENOENT </b>No more entries.
+
+       <b>ERANGE </b>Insufficient buffer space supplied.  Try again with larger
+              buffer.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────┬───────────────┬─────────────────────────────┐
+       │<b>Interface     </b>│ <b>Attribute     </b>│ <b>Value                       </b>│
+       ├──────────────┼───────────────┼─────────────────────────────┤
+       │<b>getgrent_r</b>()  │ Thread safety │ MT-Unsafe race:grent locale │
+       ├──────────────┼───────────────┼─────────────────────────────┤
+       │<b>fgetgrent_r</b>() │ Thread safety │ MT-Safe                     │
+       └──────────────┴───────────────┴─────────────────────────────┘
+       In the above table, <i>grent</i> in <i>race:grent</i> signifies that if any of the
+       functions <b>setgrent</b>(), <b>getgrent</b>(), <b>endgrent</b>(), or <b>getgrent_r</b>() are
+       used in parallel in different threads of a program, then data races
+       could occur.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are GNU extensions, done in a style resembling the
+       POSIX version of functions like <a href="getpwnam_r.3.html">getpwnam_r(3)</a>.  Other systems use the
+       prototype
+
+           struct group *getgrent_r(struct group *grp, char *buf,
+                                    int buflen);
+
+       or, better,
+
+           int getgrent_r(struct group *grp, char *buf, int buflen,
+                          FILE **gr_fp);
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The function <b>getgrent_r</b>() is not really reentrant since it shares the
+       reading position in the stream with all other threads.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #define _GNU_SOURCE
+       #include &lt;grp.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #define BUFLEN 4096
+
+       int
+       main(void)
+       {
+           struct group grp, *grpp;
+           char buf[BUFLEN];
+           int i;
+
+           setgrent();
+           while (1) {
+               i = getgrent_r(&amp;grp, buf, BUFLEN, &amp;grpp);
+               if (i)
+                   break;
+               printf("%s (%d):", grpp-&gt;gr_name, grpp-&gt;gr_gid);
+               for (i = 0; ; i++) {
+                   if (grpp-&gt;gr_mem[i] == NULL)
+                       break;
+                   printf(" %s", grpp-&gt;gr_mem[i]);
+               }
+               printf("\n");
+           }
+           endgrent();
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="fgetgrent.3.html">fgetgrent(3)</a>, <a href="getgrent.3.html">getgrent(3)</a>, <a href="getgrgid.3.html">getgrgid(3)</a>, <a href="getgrnam.3.html">getgrnam(3)</a>, <a href="putgrent.3.html">putgrent(3)</a>,
+       <a href="../man5/group.5.html">group(5)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2016-03-15                    GETGRENT_R(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="fgetgrent.3.html">fgetgrent(3)</a>,&nbsp; 
+    <a href="getgrent.3.html">getgrent(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getgrent_r.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

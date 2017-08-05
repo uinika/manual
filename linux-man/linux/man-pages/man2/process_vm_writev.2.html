@@ -1,0 +1,353 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>process_vm_readv(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PROCESS_VM_READV(2)       Linux Programmer's Manual      PROCESS_VM_READV(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       process_vm_readv,  process_vm_writev  - transfer data between process
+       address spaces
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/uio.h&gt;</b>
+
+       <b>ssize_t process_vm_readv(pid_t </b><i>pid</i><b>,</b>
+                                <b>const struct iovec *</b><i>local_iov</i><b>,</b>
+                                <b>unsigned long </b><i>liovcnt</i><b>,</b>
+                                <b>const struct iovec *</b><i>remote_iov</i><b>,</b>
+                                <b>unsigned long </b><i>riovcnt</i><b>,</b>
+                                <b>unsigned long </b><i>flags</i><b>);</b>
+
+       <b>ssize_t process_vm_writev(pid_t </b><i>pid</i><b>,</b>
+                                 <b>const struct iovec *</b><i>local_iov</i><b>,</b>
+                                 <b>unsigned long </b><i>liovcnt</i><b>,</b>
+                                 <b>const struct iovec *</b><i>remote_iov</i><b>,</b>
+                                 <b>unsigned long </b><i>riovcnt</i><b>,</b>
+                                 <b>unsigned long </b><i>flags</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>process_vm_readv</b>(), <b>process_vm_writev</b>():
+           <b>_GNU_SOURCE</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls transfer data between the address space of the
+       calling process ("the local process") and the process identified by
+       <i>pid</i> ("the remote process").  The data moves directly between the
+       address spaces of the two processes, without passing through kernel
+       space.
+
+       The <b>process_vm_readv</b>() system call transfers data from the remote
+       process to the local process.  The data to be transferred is
+       identified by <i>remote_iov</i> and <i>riovcnt</i>: <i>remote_iov</i> is a pointer to an
+       array describing address ranges in the process <i>pid</i>, and <i>riovcnt</i>
+       specifies the number of elements in <i>remote_iov</i>.  The data is
+       transferred to the locations specified by <i>local_iov</i> and <i>liovcnt</i>:
+       <i>local_iov</i> is a pointer to an array describing address ranges in the
+       calling process, and <i>liovcnt</i> specifies the number of elements in
+       <i>local_iov</i>.
+
+       The <b>process_vm_writev</b>() system call is the converse of
+       <b>process_vm_readv</b>()—it transfers data from the local process to the
+       remote process.  Other than the direction of the transfer, the
+       arguments <i>liovcnt</i>, <i>local_iov</i>, <i>riovcnt</i>, and <i>remote_iov</i> have the same
+       meaning as for <b>process_vm_readv</b>().
+
+       The <i>local_iov</i> and <i>remote_iov</i> arguments point to an array of <i>iovec</i>
+       structures, defined in <i>&lt;sys/uio.h&gt;</i> as:
+
+           struct iovec {
+               void  *iov_base;    /* Starting address */
+               size_t iov_len;     /* Number of bytes to transfer */
+           };
+
+       Buffers are processed in array order.  This means that
+       <b>process_vm_readv</b>() completely fills <i>local_iov[0]</i> before proceeding to
+       <i>local_iov[1]</i>, and so on.  Likewise, <i>remote_iov[0]</i> is completely read
+       before proceeding to <i>remote_iov[1]</i>, and so on.
+
+       Similarly, <b>process_vm_writev</b>() writes out the entire contents of
+       <i>local_iov[0]</i> before proceeding to <i>local_iov[1]</i>, and it completely
+       fills <i>remote_iov[0]</i> before proceeding to <i>remote_iov[1]</i>.
+
+       The lengths of <i>remote_iov[i].iov_len</i> and <i>local_iov[i].iov_len</i> do not
+       have to be the same.  Thus, it is possible to split a single local
+       buffer into multiple remote buffers, or vice versa.
+
+       The <i>flags</i> argument is currently unused and must be set to 0.
+
+       The values specified in the <i>liovcnt</i> and <i>riovcnt</i> arguments must be
+       less than or equal to <b>IOV_MAX </b>(defined in <i>&lt;limits.h&gt;</i> or accessible
+       via the call <i>sysconf(_SC_IOV_MAX)</i>).
+
+       The count arguments and <i>local_iov</i> are checked before doing any
+       transfers.  If the counts are too big, or <i>local_iov</i> is invalid, or
+       the addresses refer to regions that are inaccessible to the local
+       process, none of the vectors will be processed and an error will be
+       returned immediately.
+
+       Note, however, that these system calls do not check the memory
+       regions in the remote process until just before doing the read/write.
+       Consequently, a partial read/write (see RETURN VALUE) may result if
+       one of the <i>remote_iov</i> elements points to an invalid memory region in
+       the remote process.  No further reads/writes will be attempted beyond
+       that point.  Keep this in mind when attempting to read data of
+       unknown length (such as C strings that are null-terminated) from a
+       remote process, by avoiding spanning memory pages (typically 4KiB) in
+       a single remote <i>iovec</i> element.  (Instead, split the remote read into
+       two <i>remote_iov</i> elements and have them merge back into a single write
+       <i>local_iov</i> entry.  The first read entry goes up to the page boundary,
+       while the second starts on the next page boundary.)
+
+       Permission to read from or write to another process is governed by a
+       ptrace access mode <b>PTRACE_MODE_ATTACH_REALCREDS </b>check; see <a href="ptrace.2.html">ptrace(2)</a>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>process_vm_readv</b>() returns the number of bytes read and
+       <b>process_vm_writev</b>() returns the number of bytes written.  This return
+       value may be less than the total number of requested bytes, if a
+       partial read/write occurred.  (Partial transfers apply at the
+       granularity of <i>iovec</i> elements.  These system calls won't perform a
+       partial transfer that splits a single <i>iovec</i> element.)  The caller
+       should check the return value to determine whether a partial
+       read/write occurred.
+
+       On error, -1 is returned and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b>The memory described by <i>local_iov</i> is outside the caller's
+              accessible address space.
+
+       <b>EFAULT </b>The memory described by <i>remote_iov</i> is outside the accessible
+              address space of the process <i>pid</i>.
+
+       <b>EINVAL </b>The sum of the <i>iov_len</i> values of either <i>local_iov</i> or
+              <i>remote_iov</i> overflows a <i>ssize_t</i> value.
+
+       <b>EINVAL </b><i>flags</i> is not 0.
+
+       <b>EINVAL </b><i>liovcnt</i> or <i>riovcnt</i> is too large.
+
+       <b>ENOMEM </b>Could not allocate memory for internal copies of the <i>iovec</i>
+              structures.
+
+       <b>EPERM  </b>The caller does not have permission to access the address
+              space of the process <i>pid</i>.
+
+       <b>ESRCH  </b>No process with ID <i>pid</i> exists.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls were added in Linux 3.2.  Support is provided in
+       glibc since version 2.15.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls are nonstandard Linux extensions.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The data transfers performed by <b>process_vm_readv</b>() and
+       <b>process_vm_writev</b>() are not guaranteed to be atomic in any way.
+
+       These system calls were designed to permit fast message passing by
+       allowing messages to be exchanged with a single copy operation
+       (rather than the double copy that would be required when using, for
+       example, shared memory or pipes).
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following code sample demonstrates the use of <b>process_vm_readv</b>().
+       It reads 20 bytes at the address 0x10000 from the process with PID 10
+       and writes the first 10 bytes into <i>buf1</i> and the second 10 bytes into
+       <i>buf2</i>.
+
+       #include &lt;sys/uio.h&gt;
+
+       int
+       main(void)
+       {
+           struct iovec local[2];
+           struct iovec remote[1];
+           char buf1[10];
+           char buf2[10];
+           ssize_t nread;
+           pid_t pid = 10;             /* PID of remote process */
+
+           local[0].iov_base = buf1;
+           local[0].iov_len = 10;
+           local[1].iov_base = buf2;
+           local[1].iov_len = 10;
+           remote[0].iov_base = (void *) 0x10000;
+           remote[0].iov_len = 20;
+
+           nread = process_vm_readv(pid, local, 2, remote, 1, 0);
+           if (nread != 20)
+               return 1;
+           else
+               return 0;
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="readv.2.html">readv(2)</a>, <a href="writev.2.html">writev(2)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-07-17              PROCESS_VM_READV(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="ptrace.2.html">ptrace(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="process_vm_readv.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

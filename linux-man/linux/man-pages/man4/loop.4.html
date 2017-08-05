@@ -1,0 +1,374 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>loop(4) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LOOP(4)                   Linux Programmer's Manual                  LOOP(4)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       loop, loop-control - loop devices
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;linux/loop.h&gt;
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The loop device is a block device that maps its data blocks not to a
+       physical device such as a hard disk or optical disk drive, but to the
+       blocks of a regular file in a filesystem or to another block device.
+       This can be useful for example to provide a block device for a
+       filesystem image stored in a file, so that it can be mounted with the
+       <a href="../man8/mount.8.html">mount(8)</a> command.  You could do
+
+              $ <b>dd if=/dev/zero of=file.img bs=1MiB count=10</b>
+              $ <b>sudo losetup /dev/loop4 file.img</b>
+              $ <b>sudo mkfs -t ext4 /dev/loop4</b>
+              $ <b>sudo mkdir /myloopdev</b>
+              $ <b>sudo mount /dev/loop4 /myloopdev</b>
+
+       See <a href="../man8/losetup.8.html">losetup(8)</a> for another example.
+
+       A transfer function can be specified for each loop device for
+       encryption and decryption purposes.
+
+       The following <a href="../man2/ioctl.2.html">ioctl(2)</a> operations are provided by the loop block
+       device:
+
+       <b>LOOP_SET_FD</b>
+              Associate the loop device with the open file whose file
+              descriptor is passed as the (third) <a href="../man2/ioctl.2.html">ioctl(2)</a> argument.
+
+       <b>LOOP_CLR_FD</b>
+              Disassociate the loop device from any file descriptor.
+
+       <b>LOOP_SET_STATUS</b>
+              Set the status of the loop device using the (third) <a href="../man2/ioctl.2.html">ioctl(2)</a>
+              argument.  This argument is a pointer to <i>loop_info</i> structure,
+              defined in <i>&lt;linux/loop.h&gt;</i> as:
+
+                  struct loop_info {
+                      int           lo_number;            /* ioctl r/o */
+                      dev_t         lo_device;            /* ioctl r/o */
+                      unsigned long lo_inode;             /* ioctl r/o */
+                      dev_t         lo_rdevice;           /* ioctl r/o */
+                      int           lo_offset;
+                      int           lo_encrypt_type;
+                      int           lo_encrypt_key_size;  /* ioctl w/o */
+                      int           lo_flags;             /* ioctl r/o */
+                      char          lo_name[LO_NAME_SIZE];
+                      unsigned char lo_encrypt_key[LO_KEY_SIZE];
+                                                          /* ioctl w/o */
+                      unsigned long lo_init[2];
+                      char          reserved[4];
+                  };
+
+              The encryption type (<i>lo_encrypt_type</i>) should be one of
+              <b>LO_CRYPT_NONE</b>, <b>LO_CRYPT_XOR</b>, <b>LO_CRYPT_DES</b>, <b>LO_CRYPT_FISH2</b>,
+              <b>LO_CRYPT_BLOW</b>, <b>LO_CRYPT_CAST128</b>, <b>LO_CRYPT_IDEA</b>,
+              <b>LO_CRYPT_DUMMY</b>, <b>LO_CRYPT_SKIPJACK</b>, or (since Linux 2.6.0)
+              <b>LO_CRYPT_CRYPTOAPI</b>.
+
+              The <i>lo_flags</i> field is a bit mask that can include zero or more
+              of the following:
+
+              <b>LO_FLAGS_READ_ONLY</b>
+                     The loopback device is read-only.
+
+              <b>LO_FLAGS_AUTOCLEAR </b>(since Linux 2.6.25)
+                     The loopback device will autodestruct on last close.
+
+              <b>LO_FLAGS_PARTSCAN </b>(since Linux 3.2)
+                     Allow automatic partition scanning.
+
+       <b>LOOP_GET_STATUS</b>
+              Get the status of the loop device.  The (third) <a href="../man2/ioctl.2.html">ioctl(2)</a>
+              argument must be a pointer to a <i>struct loop_info</i>.
+
+       <b>LOOP_CHANGE_FD </b>(since Linux 2.6.5)
+              Switch the backing store of the loop device to the new file
+              identified file descriptor specified in the (third) <a href="../man2/ioctl.2.html">ioctl(2)</a>
+              argument, which is an integer.  This operation is possible
+              only if the loop device is read-only and the new backing store
+              is the same size and type as the old backing store.
+
+       <b>LOOP_SET_CAPACITY </b>(since Linux 2.6.30)
+              Resize a live loop device.  One can change the size of the
+              underlying backing store and then use this operation so that
+              the loop driver learns about the new size.  This operation
+              takes no argument.
+
+       Since Linux 2.6, there are two new <a href="../man2/ioctl.2.html">ioctl(2)</a> operations:
+
+       <b>LOOP_SET_STATUS64</b>, <b>LOOP_GET_STATUS64</b>
+              These are similar to <b>LOOP_SET_STATUS </b>and <b>LOOP_GET_STATUS</b>
+              described above but use the <i>loop_info64</i> structure, which has
+              some additional fields and a larger range for some other
+              fields:
+
+                  struct loop_info64 {
+                      uint64_t lo_device;                   /* ioctl r/o */
+                      uint64_t lo_inode;                    /* ioctl r/o */
+                      uint64_t lo_rdevice;                  /* ioctl r/o */
+                      uint64_t lo_offset;
+                      uint64_t lo_sizelimit;/* bytes, 0 == max available */
+                      uint32_t lo_number;                   /* ioctl r/o */
+                      uint32_t lo_encrypt_type;
+                      uint32_t lo_encrypt_key_size;         /* ioctl w/o */
+                      uint32_t lo_flags;                    /* ioctl r/o */
+                      uint8_t  lo_file_name[LO_NAME_SIZE];
+                      uint8_t  lo_crypt_name[LO_NAME_SIZE];
+                      uint8_t  lo_encrypt_key[LO_KEY_SIZE]; /* ioctl w/o */
+                      uint64_t lo_init[2];
+                  };
+
+   <b>/dev/loop-control</b>
+       Since Linux 3.1, the kernel provides the <i>/dev/loop-control</i> device,
+       which permits an application to dynamically find a free device, and
+       to add and remove loop devices from the system.  To perform these
+       operations, one first opens <i>/dev/loop-control</i> and then employs one of
+       the following <a href="../man2/ioctl.2.html">ioctl(2)</a> operations:
+
+       <b>LOOP_CTL_GET_FREE</b>
+              Allocate or find a free loop device for use.  On success, the
+              device number is returned as the result of the call.  This
+              operation takes no argument.
+
+       <b>LOOP_CTL_ADD</b>
+              Add the new loop device whose device number is specified as a
+              long integer in the third <a href="../man2/ioctl.2.html">ioctl(2)</a> argument.  On success, the
+              device index is returned as the result of the call.  If the
+              device is already allocated, the call fails with the error
+              <b>EEXIST</b>.
+
+       <b>LOOP_CTL_REMOVE</b>
+              Remove the loop device whose device number is specified as a
+              long integer in the third <a href="../man2/ioctl.2.html">ioctl(2)</a> argument.  On success, the
+              device number is returned as the result of the call.  If the
+              device is in use, the call fails with the error <b>EBUSY</b>.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/dev/loop*</i>: the loop block special device files
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below uses the <i>/dev/loop-control</i> device to find a free
+       loop device, opens the loop device, opens a file to be used as the
+       underlying storage for the device, and then associates the loop
+       device with the backing store.  The following shell session
+       demonstrates the use of the program:
+
+           $ <b>dd if=/dev/zero of=file.img bs=1MiB count=10</b>
+           10+0 records in
+           10+0 records out
+           10485760 bytes (10 MB) copied, 0.00609385 s, 1.7 GB/s
+           $ <b>sudo ./mnt_loop file.img</b>
+           loopname = /dev/loop5
+
+   <b>Program source</b>
+
+       #include &lt;fcntl.h&gt;
+       #include &lt;linux/loop.h&gt;
+       #include &lt;sys/ioctl.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;unistd.h&gt;
+
+       #define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
+                               } while (0)
+
+       int
+       main(int argc, char *argv[])
+       {
+           int loopctlfd, loopfd, backingfile;
+           long devnr;
+           char loopname[4096];
+
+           if (argc != 2) {
+               fprintf(stderr, "Usage: %s backing-file\n", argv[0]);
+               exit(EXIT_FAILURE);
+           }
+
+           loopctlfd = open("/dev/loop-control", O_RDWR);
+           if (loopctlfd == -1)
+               errExit("open: /dev/loop-control");
+
+           devnr = ioctl(loopctlfd, LOOP_CTL_GET_FREE);
+           if (devnr == -1)
+               errExit("ioctl-LOOP_CTL_GET_FREE");
+
+           sprintf(loopname, "/dev/loop%ld", devnr);
+           printf("loopname = %s\n", loopname);
+
+           loopfd = open(loopname, O_RDWR);
+           if (loopfd == -1)
+               errExit("open: loopname");
+
+           backingfile = open(argv[1], O_RDWR);
+           if (backingfile == -1)
+               errExit("open: backing-file");
+
+           if (ioctl(loopfd, LOOP_SET_FD, backingfile) == -1)
+               errExit("ioctl-LOOP_SET_FD");
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/losetup.8.html">losetup(8)</a>, <a href="../man8/mount.8.html">mount(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                          LOOP(4)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+<p class="page-copyright"><a href="loop.4.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

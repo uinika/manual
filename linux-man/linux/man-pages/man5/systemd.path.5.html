@@ -1,0 +1,287 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.path(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#AUTOMATIC_DEPENDENCIES">AUTOMATIC&nbsp;DEPENDENCIES</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.PATH(5)                 systemd.path                 SYSTEMD.PATH(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.path - Path unit configuration
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>path</i>.path
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A unit configuration file whose name ends in ".path" encodes
+       information about a path monitored by systemd, for path-based
+       activation.
+
+       This man page lists the configuration options specific to this unit
+       type. See <a href="systemd.unit.5.html">systemd.unit(5)</a> for the common options of all unit
+       configuration files. The common configuration items are configured in
+       the generic [Unit] and [Install] sections. The path specific
+       configuration options are configured in the [Path] section.
+
+       For each path file, a matching unit file must exist, describing the
+       unit to activate when the path changes. By default, a service by the
+       same name as the path (except for the suffix) is activated. Example:
+       a path file foo.path activates a matching service foo.service. The
+       unit to activate may be controlled by <i>Unit=</i> (see below).
+
+       Internally, path units use the <a href="../man7/inotify.7.html">inotify(7)</a> API to monitor file
+       systems. Due to that, it suffers by the same limitations as inotify,
+       and for example cannot be used to monitor files or directories
+       changed by other machines on remote NFS file systems.
+</pre>
+<h2><a id="AUTOMATIC_DEPENDENCIES" href="#AUTOMATIC_DEPENDENCIES"></a>AUTOMATIC DEPENDENCIES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If a path unit is beneath another mount unit in the file system
+       hierarchy, both a requirement and an ordering dependency between both
+       units are created automatically.
+
+       An implicit <i>Before=</i> dependency is added between a path unit and the
+       unit it is supposed to activate.
+
+       Unless <i>DefaultDependencies=false</i> in the "[Unit]" section is used,
+       path units will implicitly have dependencies of type <i>Before=</i> on
+       paths.target, dependencies of type <i>After=</i> and <i>Requires=</i> on
+       sysinit.target, and have dependencies of type <i>Conflicts=</i> and <i>Before=</i>
+       on shutdown.target. These ensure that path units are terminated
+       cleanly prior to system shutdown. Only path units involved with early
+       boot or late system shutdown should disable this option.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Path files must include a [Path] section, which carries information
+       about the path(s) it monitors. The options specific to the [Path]
+       section of path units are the following:
+
+       <i>PathExists=</i>, <i>PathExistsGlob=</i>, <i>PathChanged=</i>, <i>PathModified=</i>,
+       <i>DirectoryNotEmpty=</i>
+           Defines paths to monitor for certain changes: <i>PathExists=</i> may be
+           used to watch the mere existence of a file or directory. If the
+           file specified exists, the configured unit is activated.
+           <i>PathExistsGlob=</i> works similar, but checks for the existence of at
+           least one file matching the globbing pattern specified.
+           <i>PathChanged=</i> may be used to watch a file or directory and
+           activate the configured unit whenever it changes. It is not
+           activated on every write to the watched file but it is activated
+           if the file which was open for writing gets closed.
+           <i>PathModified=</i> is similar, but additionally it is activated also
+           on simple writes to the watched file.  <i>DirectoryNotEmpty=</i> may be
+           used to watch a directory and activate the configured unit
+           whenever it contains at least one file.
+
+           The arguments of these directives must be absolute file system
+           paths.
+
+           Multiple directives may be combined, of the same and of different
+           types, to watch multiple paths. If the empty string is assigned
+           to any of these options, the list of paths to watch is reset, and
+           any prior assignments of these options will not have any effect.
+
+           If a path already exists (in case of <i>PathExists=</i> and
+           <i>PathExistsGlob=</i>) or a directory already is not empty (in case of
+           <i>DirectoryNotEmpty=</i>) at the time the path unit is activated, then
+           the configured unit is immediately activated as well. Something
+           similar does not apply to <i>PathChanged=</i> and <i>PathModified=</i>.
+
+           If the path itself or any of the containing directories are not
+           accessible, <b>systemd </b>will watch for permission changes and notice
+           that conditions are satisfied when permissions allow that.
+
+       <i>Unit=</i>
+           The unit to activate when any of the configured paths changes.
+           The argument is a unit name, whose suffix is not ".path". If not
+           specified, this value defaults to a service that has the same
+           name as the path unit, except for the suffix. (See above.) It is
+           recommended that the unit name that is activated and the unit
+           name of the path unit are named identical, except for the suffix.
+
+       <i>MakeDirectory=</i>
+           Takes a boolean argument. If true, the directories to watch are
+           created before watching. This option is ignored for <i>PathExists=</i>
+           settings. Defaults to <b>false</b>.
+
+       <i>DirectoryMode=</i>
+           If <i>MakeDirectory=</i> is enabled, use the mode specified here to
+           create the directories in question. Takes an access mode in octal
+           notation. Defaults to <b>0755</b>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man1/systemctl.1.html">systemctl(1)</a>, <a href="systemd.unit.5.html">systemd.unit(5)</a>, <a href="systemd.service.5.html">systemd.service(5)</a>,
+       <a href="../man7/inotify.7.html">inotify(7)</a>, <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                  SYSTEMD.PATH(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemd.1.html">systemd(1)</a>,&nbsp; 
+    <a href="systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="../man7/daemon.7.html">daemon(7)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man7/systemd.special.7.html">systemd.special(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

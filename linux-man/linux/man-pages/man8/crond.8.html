@@ -1,0 +1,352 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>cron(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SIGNALS">SIGNALS</a> | <a href="#CLUSTERING_SUPPORT">CLUSTERING&nbsp;SUPPORT</a> | <a href="#CAVEATS">CAVEATS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">CRON(8)                     System Administration                    CRON(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       crond - daemon to execute scheduled commands
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>crond </b>[<b>-c </b>| <b>-h </b>| <b>-i </b>| <b>-n </b>| <b>-p </b>| <b>-P </b>| <b>-s </b>| <b>-m</b><i>&lt;mail</i><b>command&gt;</b>]
+       <b>crond -x </b>[ext,sch,proc,pars,load,misc,test,bit]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>Cron</i> is started from <i>/etc/rc.d/init.d</i> or <i>/etc/init.d</i> when classical
+       sysvinit scripts are used. In case systemd is enabled, then unit file
+       is installed into <i>/lib/systemd/system/crond.service</i> and daemon is
+       started by <i>systemctl start crond.service</i> command. It returns
+       immediately, thus, there is no need to need to start it with the '&amp;'
+       parameter.
+
+       <i>Cron</i> searches <i>/var/spool/cron</i> for crontab files which are named after
+       accounts in <i>/etc/passwd;</i> The found crontabs are loaded into the
+       memory.  <i>Cron</i> also searches for <i>/etc/anacrontab</i> and any files in the
+       <i>/etc/cron.d</i> directory, which have a different format (see
+       <a href="../man5/crontab.5.html">crontab(5)</a>).  <i>Cron</i> examines all stored crontabs and checks each job
+       to see if it needs to be run in the current minute.  When executing
+       commands, any output is mailed to the owner of the crontab (or to the
+       user specified in the <i>MAILTO</i> environment variable in the crontab, if
+       such exists).  Any job output can also be sent to syslog by using the
+       <b>-s </b>option.
+
+       There are two ways how changes in crontables are checked.  The first
+       method is checking the modtime of a file.  The second method is using
+       the inotify support.  Using of inotify is logged in the <i>/var/log/cron</i>
+       log after the daemon is started.  The inotify support checks for
+       changes in all crontables and accesses the hard disk only when a
+       change is detected.
+
+       When using the modtime option, <i>Cron</i> checks its crontables' modtimes
+       every minute to check for any changes and reloads the crontables
+       which have changed.  There is no need to restart <i>Cron</i> after some of
+       the crontables were modified.  The modtime option is also used when
+       inotify can not be initialized.
+
+       <i>Cron</i> checks these files and directories:
+
+       <i>/etc/crontab</i>
+              system crontab.  Nowadays the file is empty by default.
+              Originally it was usually used to run daily, weekly, monthly
+              jobs.  By default these jobs are now run through anacron which
+              reads <i>/etc/anacrontab</i> configuration file.  See <a href="../man5/anacrontab.5.html">anacrontab(5)</a>
+              for more details.
+
+       <i>/etc/cron.d/</i>
+              directory that contains system cronjobs stored for different
+              users.
+
+       <i>/var/spool/cron</i>
+              directory that contains user crontables created by the <i>crontab</i>
+              command.
+
+       Note that the <a href="../man1/crontab.1.html">crontab(1)</a> command updates the modtime of the spool
+       directory whenever it changes a crontab.
+
+   <b>Daylight Saving Time and other time changes</b>
+       Local time changes of less than three hours, such as those caused by
+       the Daylight Saving Time changes, are handled in a special way.  This
+       only applies to jobs that run at a specific time and jobs that run
+       with a granularity greater than one hour.  Jobs that run more
+       frequently are scheduled normally.
+
+       If time was adjusted one hour forward, those jobs that would have run
+       in the interval that has been skipped will be run immediately.
+       Conversely, if time was adjusted backward, running the same job twice
+       is avoided.
+
+       Time changes of more than 3 hours are considered to be corrections to
+       the clock or the timezone, and the new time is used immediately.
+
+       It is possible to use different time zones for crontables.  See
+       <a href="../man5/crontab.5.html">crontab(5)</a> for more information.
+
+   <b>PAM Access Control</b>
+       <i>Cron</i> supports access control with PAM if the system has PAM
+       installed.  For more information, see <a href="pam.8-2.html">pam(8)</a>.  A PAM configuration
+       file for <i>crond</i> is installed in <i>/etc/pam.d/crond</i>.  The daemon loads
+       the PAM environment from the pam_env module.  This can be overridden
+       by defining specific settings in the appropriate crontab file.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-h     </b>Prints a help message and exits.
+
+       <b>-i     </b>Disables inotify support.
+
+       <b>-m     </b>This option allows you to specify a shell command to use for
+              sending <i>Cron</i> mail output instead of using <b>sendmail</b>(8) This
+              command must accept a fully formatted mail message (with
+              headers) on standard input and send it as a mail message to
+              the recipients specified in the mail headers.  Specifying the
+              string <i>off</i> (i.e., crond -m off) will disable the sending of
+              mail.
+
+       <b>-n     </b>Tells the daemon to run in the foreground.  This can be useful
+              when starting it out of init. With this option is needed to
+              change pam setting.  <i>/etc/pam.d/crond</i> must not enable
+              <i>pam_loginuid.so</i> module.
+
+       <b>-p     </b>Allows <i>Cron</i> to accept any user set crontables.
+
+       <b>-P     </b>Don't set PATH.  PATH is instead inherited from the
+              environment.
+
+       <b>-c     </b>This option enables clustering support, as described below.
+
+       <b>-s     </b>This option will direct <i>Cron</i> to send the job output to the
+              system log using <a href="../man3/syslog.3.html">syslog(3)</a>.  This is useful if your system
+              does not have <b>sendmail</b>(8), installed or if mail is disabled.
+
+       <b>-x     </b>This option allows you to set debug flags.
+</pre>
+<h2><a id="SIGNALS" href="#SIGNALS"></a>SIGNALS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When the <i>SIGHUP</i> is received, the <i>Cron</i> daemon will close and reopen
+       its log file.  This proves to be useful in scripts which rotate and
+       age log files.  Naturally, this is not relevant if <i>Cron</i> was built to
+       use <a href="../man3/syslog.3.html">syslog(3)</a>.
+</pre>
+<h2><a id="CLUSTERING_SUPPORT" href="#CLUSTERING_SUPPORT"></a>CLUSTERING SUPPORT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In this version of <i>Cron</i> it is possible to use a network-mounted
+       shared <i>/var/spool/cron</i> across a cluster of hosts and specify that
+       only one of the hosts should run the crontab jobs in this directory
+       at any one time.  This is done by starting <i>Cron</i> with the <b>-c </b>option,
+       and have the <i>/var/spool/cron/.cron.hostname</i> file contain just one
+       line, which represents the hostname of whichever host in the cluster
+       should run the jobs.  If this file does not exist, or the hostname in
+       it does not match that returned by <a href="../man2/gethostname.2.html">gethostname(2)</a>, then all crontab
+       files in this directory are ignored.  This has no effect on cron jobs
+       specified in the <i>/etc/crontab</i> file or on files in the <i>/etc/cron.d</i>
+       directory.  These files are always run and considered host-specific.
+
+       Rather than editing <i>/var/spool/cron/.cron.hostname</i> directly, use the
+       <b>-n </b>option of <a href="../man1/crontab.1.html">crontab(1)</a> to specify the host.
+
+       You should ensure that all hosts in a cluster, and the file server
+       from which they mount the shared crontab directory, have closely
+       synchronised clocks, e.g., using <b>ntpd</b>(8), otherwise the results will
+       be very unpredictable.
+
+       Using cluster sharing automatically disables inotify support, because
+       inotify cannot be relied on with network-mounted shared file systems.
+</pre>
+<h2><a id="CAVEATS" href="#CAVEATS"></a>CAVEATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All <b>crontab </b>files have to be regular files or symlinks to regular
+       files, they must not be executable or writable for anyone else but
+       the owner.  This requirement can be overridden by using the <b>-p </b>option
+       on the crond command line.  If inotify support is in use, changes in
+       the symlinked crontabs are not automatically noticed by the cron
+       daemon.  The cron daemon must receive a SIGHUP signal to reload the
+       crontabs.  This is a limitation of the inotify API.
+
+       The syslog output will be used instead of mail, when sendmail is not
+       installed.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/crontab.1.html">crontab(1)</a>, <a href="../man5/crontab.5.html">crontab(5)</a>, <a href="../man7/inotify.7.html">inotify(7)</a>, <a href="pam.8-2.html">pam(8)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Paul Vixie ⟨vixie@isc.org⟩
+       Marcela Mašláňová ⟨mmaslano@redhat.com⟩
+       Colin Dean ⟨colin@colin-dean.org⟩
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>cronie</i> (crond daemon) project.  Information
+       about the project can be found at 
+       ⟨<a href="https://github.com/cronie-crond/cronie">https://github.com/cronie-crond/cronie</a>⟩.  If you have a bug report
+       for this manual page, see 
+       ⟨<a href="https://github.com/cronie-crond/cronie/issues">https://github.com/cronie-crond/cronie/issues</a>⟩.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/cronie-crond/cronie.git">https://github.com/cronie-crond/cronie.git</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">cronie                           2013-09-26                          CRON(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/crontab.1.html">crontab(1)</a>,&nbsp; 
+    <a href="../man1/pmie_check.1.html">pmie_check(1)</a>,&nbsp; 
+    <a href="../man1/pmlogger_check.1.html">pmlogger_check(1)</a>,&nbsp; 
+    <a href="../man5/crontab.5.html">crontab(5)</a>,&nbsp; 
+    <a href="../man5/passwd.5.html">passwd(5)</a>,&nbsp; 
+    <a href="../man7/hier.7.html">hier(7)</a>,&nbsp; 
+    <a href="../man7/keyrings.7.html">keyrings(7)</a>,&nbsp; 
+    <a href="../man7/persistent-keyring.7.html">persistent-keyring(7)</a>,&nbsp; 
+    <a href="../man7/user-keyring.7.html">user-keyring(7)</a>,&nbsp; 
+    <a href="anacron.8.html">anacron(8)</a>,&nbsp; 
+    <a href="warnquota.8.html">warnquota(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

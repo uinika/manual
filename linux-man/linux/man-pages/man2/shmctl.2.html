@@ -1,0 +1,404 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>shmctl(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SHMCTL(2)                 Linux Programmer's Manual                SHMCTL(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       shmctl - System V shared memory control
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/ipc.h&gt;</b>
+       <b>#include &lt;sys/shm.h&gt;</b>
+
+       <b>int shmctl(int </b><i>shmid</i><b>, int </b><i>cmd</i><b>, struct shmid_ds *</b><i>buf</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>shmctl</b>() performs the control operation specified by <i>cmd</i> on the
+       System V shared memory segment whose identifier is given in <i>shmid</i>.
+
+       The <i>buf</i> argument is a pointer to a <i>shmid_ds</i> structure, defined in
+       <i>&lt;sys/shm.h&gt;</i> as follows:
+
+           struct shmid_ds {
+               struct ipc_perm shm_perm;    /* Ownership and permissions */
+               size_t          shm_segsz;   /* Size of segment (bytes) */
+               time_t          shm_atime;   /* Last attach time */
+               time_t          shm_dtime;   /* Last detach time */
+               time_t          shm_ctime;   /* Last change time */
+               pid_t           shm_cpid;    /* PID of creator */
+               pid_t           shm_lpid;    /* PID of last shmat(2)/shmdt(2) */
+               shmatt_t        shm_nattch;  /* No. of current attaches */
+               ...
+           };
+
+       The <i>ipc_perm</i> structure is defined as follows (the highlighted fields
+       are settable using <b>IPC_SET</b>):
+
+           struct ipc_perm {
+               key_t          __key;    /* Key supplied to shmget(2) */
+               uid_t          <b>uid</b>;      /* Effective UID of owner */
+               gid_t          <b>gid</b>;      /* Effective GID of owner */
+               uid_t          cuid;     /* Effective UID of creator */
+               gid_t          cgid;     /* Effective GID of creator */
+               unsigned short <b>mode</b>;     /* <b>Permissions </b>+ SHM_DEST and
+                                           SHM_LOCKED flags */
+               unsigned short __seq;    /* Sequence number */
+           };
+
+       Valid values for <i>cmd</i> are:
+
+       <b>IPC_STAT  </b>Copy information from the kernel data structure associated
+                 with <i>shmid</i> into the <i>shmid_ds</i> structure pointed to by <i>buf</i>.
+                 The caller must have read permission on the shared memory
+                 segment.
+
+       <b>IPC_SET   </b>Write the values of some members of the <i>shmid_ds</i> structure
+                 pointed to by <i>buf</i> to the kernel data structure associated
+                 with this shared memory segment, updating also its
+                 <i>shm_ctime</i> member.  The following fields can be changed:
+                 <i>shm_perm.uid</i>, <i>shm_perm.gid</i>, and (the least significant 9
+                 bits of) <i>shm_perm.mode</i>.  The effective UID of the calling
+                 process must match the owner (<i>shm_perm.uid</i>) or creator
+                 (<i>shm_perm.cuid</i>) of the shared memory segment, or the caller
+                 must be privileged.
+
+       <b>IPC_RMID  </b>Mark the segment to be destroyed.  The segment will
+                 actually be destroyed only after the last process detaches
+                 it (i.e., when the <i>shm_nattch</i> member of the associated
+                 structure <i>shmid_ds</i> is zero).  The caller must be the owner
+                 or creator of the segment, or be privileged.  The <i>buf</i>
+                 argument is ignored.
+
+                 If a segment has been marked for destruction, then the
+                 (nonstandard) <b>SHM_DEST </b>flag of the <i>shm_perm.mode</i> field in
+                 the associated data structure retrieved by <b>IPC_STAT </b>will be
+                 set.
+
+                 The caller <i>must</i> ensure that a segment is eventually
+                 destroyed; otherwise its pages that were faulted in will
+                 remain in memory or swap.
+
+                 See also the description of
+                 <i>/proc/sys/kernel/shm_rmid_forced</i> in <a href="../man5/proc.5.html">proc(5)</a>.
+
+       <b>IPC_INFO </b>(Linux-specific)
+                 Return information about system-wide shared memory limits
+                 and parameters in the structure pointed to by <i>buf</i>.  This
+                 structure is of type <i>shminfo</i> (thus, a cast is required),
+                 defined in <i>&lt;sys/shm.h&gt;</i> if the <b>_GNU_SOURCE </b>feature test
+                 macro is defined:
+
+                     struct shminfo {
+                         unsigned long shmmax; /* Maximum segment size */
+                         unsigned long shmmin; /* Minimum segment size;
+                                                  always 1 */
+                         unsigned long shmmni; /* Maximum number of segments */
+                         unsigned long shmseg; /* Maximum number of segments
+                                                  that a process can attach;
+                                                  unused within kernel */
+                         unsigned long shmall; /* Maximum number of pages of
+                                                  shared memory, system-wide */
+                     };
+
+                 The <i>shmmni</i>, <i>shmmax</i>, and <i>shmall</i> settings can be changed via
+                 <i>/proc</i> files of the same name; see <a href="../man5/proc.5.html">proc(5)</a> for details.
+
+       <b>SHM_INFO </b>(Linux-specific)
+                 Return a <i>shm_info</i> structure whose fields contain
+                 information about system resources consumed by shared
+                 memory.  This structure is defined in <i>&lt;sys/shm.h&gt;</i> if the
+                 <b>_GNU_SOURCE </b>feature test macro is defined:
+
+                     struct shm_info {
+                         int           used_ids; /* # of currently existing
+                                                    segments */
+                         unsigned long shm_tot;  /* Total number of shared
+                                                    memory pages */
+                         unsigned long shm_rss;  /* # of resident shared
+                                                    memory pages */
+                         unsigned long shm_swp;  /* # of swapped shared
+                                                    memory pages */
+                         unsigned long swap_attempts;
+                                                 /* Unused since Linux 2.4 */
+                         unsigned long swap_successes;
+                                                 /* Unused since Linux 2.4 */
+                     };
+
+       <b>SHM_STAT </b>(Linux-specific)
+                 Return a <i>shmid_ds</i> structure as for <b>IPC_STAT</b>.  However, the
+                 <i>shmid</i> argument is not a segment identifier, but instead an
+                 index into the kernel's internal array that maintains
+                 information about all shared memory segments on the system.
+
+       The caller can prevent or allow swapping of a shared memory segment
+       with the following <i>cmd</i> values:
+
+       <b>SHM_LOCK </b>(Linux-specific)
+                 Prevent swapping of the shared memory segment.  The caller
+                 must fault in any pages that are required to be present
+                 after locking is enabled.  If a segment has been locked,
+                 then the (nonstandard) <b>SHM_LOCKED </b>flag of the <i>shm_perm.mode</i>
+                 field in the associated data structure retrieved by
+                 <b>IPC_STAT </b>will be set.
+
+       <b>SHM_UNLOCK </b>(Linux-specific)
+                 Unlock the segment, allowing it to be swapped out.
+
+       In kernels before 2.6.10, only a privileged process could employ
+       <b>SHM_LOCK </b>and <b>SHM_UNLOCK</b>.  Since kernel 2.6.10, an unprivileged
+       process can employ these operations if its effective UID matches the
+       owner or creator UID of the segment, and (for <b>SHM_LOCK</b>) the amount of
+       memory to be locked falls within the <b>RLIMIT_MEMLOCK </b>resource limit
+       (see <a href="setrlimit.2.html">setrlimit(2)</a>).
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A successful <b>IPC_INFO </b>or <b>SHM_INFO </b>operation returns the index of the
+       highest used entry in the kernel's internal array recording
+       information about all shared memory segments.  (This information can
+       be used with repeated <b>SHM_STAT </b>operations to obtain information about
+       all shared memory segments on the system.)  A successful <b>SHM_STAT</b>
+       operation returns the identifier of the shared memory segment whose
+       index was given in <i>shmid</i>.  Other operations return 0 on success.
+
+       On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EACCES IPC_STAT </b>or <b>SHM_STAT </b>is requested and <i>shm_perm.mode</i> does not
+              allow read access for <i>shmid</i>, and the calling process does not
+              have the <b>CAP_IPC_OWNER </b>capability in the user namespace that
+              governs its IPC namespace.
+
+       <b>EFAULT </b>The argument <i>cmd</i> has value <b>IPC_SET </b>or <b>IPC_STAT </b>but the address
+              pointed to by <i>buf</i> isn't accessible.
+
+       <b>EIDRM  </b><i>shmid</i> points to a removed identifier.
+
+       <b>EINVAL </b><i>shmid</i> is not a valid identifier, or <i>cmd</i> is not a valid
+              command.  Or: for a <b>SHM_STAT </b>operation, the index value
+              specified in <i>shmid</i> referred to an array slot that is currently
+              unused.
+
+       <b>ENOMEM </b>(In kernels since 2.6.9), <b>SHM_LOCK </b>was specified and the size
+              of the to-be-locked segment would mean that the total bytes in
+              locked shared memory segments would exceed the limit for the
+              real user ID of the calling process.  This limit is defined by
+              the <b>RLIMIT_MEMLOCK </b>soft resource limit (see <a href="setrlimit.2.html">setrlimit(2)</a>).
+
+       <b>EOVERFLOW</b>
+              <b>IPC_STAT </b>is attempted, and the GID or UID value is too large
+              to be stored in the structure pointed to by <i>buf</i>.
+
+       <b>EPERM  IPC_SET </b>or <b>IPC_RMID </b>is attempted, and the effective user ID of
+              the calling process is not that of the creator (found in
+              <i>shm_perm.cuid</i>), or the owner (found in <i>shm_perm.uid</i>), and the
+              process was not privileged (Linux: did not have the
+              <b>CAP_SYS_ADMIN </b>capability).
+
+              Or (in kernels before 2.6.9), <b>SHM_LOCK </b>or <b>SHM_UNLOCK </b>was
+              specified, but the process was not privileged (Linux: did not
+              have the <b>CAP_IPC_LOCK </b>capability).  (Since Linux 2.6.9, this
+              error can also occur if the <b>RLIMIT_MEMLOCK </b>is 0 and the caller
+              is not privileged.)
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SVr4.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The inclusion of <i>&lt;sys/types.h&gt;</i> and <i>&lt;sys/ipc.h&gt;</i> isn't required on
+       Linux or by any version of POSIX.  However, some old implementations
+       required the inclusion of these header files, and the SVID also
+       documented their inclusion.  Applications intended to be portable to
+       such old systems may need to include these header files.
+
+       The <b>IPC_INFO</b>, <b>SHM_STAT </b>and <b>SHM_INFO </b>operations are used by the
+       <a href="../man1/ipcs.1.html">ipcs(1)</a> program to provide information on allocated resources.  In
+       the future, these may modified or moved to a <i>/proc</i> filesystem
+       interface.
+
+       Linux permits a process to attach (<a href="shmat.2.html">shmat(2)</a>) a shared memory segment
+       that has already been marked for deletion using <i>shmctl(IPC_RMID)</i>.
+       This feature is not available on other UNIX implementations; portable
+       applications should avoid relying on it.
+
+       Various fields in a <i>struct shmid_ds</i> were typed as <i>short</i> under Linux
+       2.2 and have become <i>long</i> under Linux 2.4.  To take advantage of this,
+       a recompilation under glibc-2.1.91 or later should suffice.  (The
+       kernel distinguishes old and new calls by an <b>IPC_64 </b>flag in <i>cmd</i>.)
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="mlock.2.html">mlock(2)</a>, <a href="setrlimit.2.html">setrlimit(2)</a>, <a href="shmget.2.html">shmget(2)</a>, <a href="shmop.2.html">shmop(2)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>,
+       <a href="../man7/svipc.7.html">svipc(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                        SHMCTL(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/ipcrm.1.html">ipcrm(1)</a>,&nbsp; 
+    <a href="getrlimit.2.html">getrlimit(2)</a>,&nbsp; 
+    <a href="ipc.2.html">ipc(2)</a>,&nbsp; 
+    <a href="mlock.2.html">mlock(2)</a>,&nbsp; 
+    <a href="shmget.2.html">shmget(2)</a>,&nbsp; 
+    <a href="shmop.2.html">shmop(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="../man7/svipc.7.html">svipc(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="shmctl.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

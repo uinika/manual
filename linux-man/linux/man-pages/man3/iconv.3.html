@@ -1,0 +1,303 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>iconv(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ICONV(3)                  Linux Programmer's Manual                 ICONV(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       iconv - perform character set conversion
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;iconv.h&gt;</b>
+
+       <b>size_t iconv(iconv_t </b><i>cd</i><b>,</b>
+                    <b>char **</b><i>inbuf</i><b>, size_t *</b><i>inbytesleft</i><b>,</b>
+                    <b>char **</b><i>outbuf</i><b>, size_t *</b><i>outbytesleft</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>iconv</b>() function converts a sequence of characters in one
+       character encoding to a sequence of characters in another character
+       encoding.  The <i>cd</i> argument is a conversion descriptor, previously
+       created by a call to <a href="iconv_open.3.html">iconv_open(3)</a>; the conversion descriptor defines
+       the character encodings that <b>iconv</b>() uses for the conversion.  The
+       <i>inbuf</i> argument is the address of a variable that points to the first
+       character of the input sequence; <i>inbytesleft</i> indicates the number of
+       bytes in that buffer.  The <i>outbuf</i> argument is the address of a
+       variable that points to the first byte available in the output
+       buffer; <i>outbytesleft</i> indicates the number of bytes available in the
+       output buffer.
+
+       The main case is when <i>inbuf</i> is not NULL and <i>*inbuf</i> is not NULL.  In
+       this case, the <b>iconv</b>() function converts the multibyte sequence
+       starting at <i>*inbuf</i> to a multibyte sequence starting at <i>*outbuf</i>.  At
+       most <i>*inbytesleft</i> bytes, starting at <i>*inbuf</i>, will be read.  At most
+       <i>*outbytesleft</i> bytes, starting at <i>*outbuf</i>, will be written.
+
+       The <b>iconv</b>() function converts one multibyte character at a time, and
+       for each character conversion it increments <i>*inbuf</i> and decrements
+       <i>*inbytesleft</i> by the number of converted input bytes, it increments
+       <i>*outbuf</i> and decrements <i>*outbytesleft</i> by the number of converted
+       output bytes, and it updates the conversion state contained in <i>cd</i>.
+       If the character encoding of the input is stateful, the <b>iconv</b>()
+       function can also convert a sequence of input bytes to an update to
+       the conversion state without producing any output bytes; such input
+       is called a <i>shift sequence</i>.  The conversion can stop for four
+       reasons:
+
+       1. An invalid multibyte sequence is encountered in the input.  In
+          this case, it sets <i><a href="errno.3.html">errno</a></i> to <b>EILSEQ </b>and returns <i>(size_t) -1</i>.
+          <i>*inbuf</i> is left pointing to the beginning of the invalid multibyte
+          sequence.
+
+       2. The input byte sequence has been entirely converted, that is,
+          <i>*inbytesleft</i> has gone down to 0.  In this case, <b>iconv</b>() returns
+          the number of nonreversible conversions performed during this
+          call.
+
+       3. An incomplete multibyte sequence is encountered in the input, and
+          the input byte sequence terminates after it.  In this case, it
+          sets <i><a href="errno.3.html">errno</a></i> to <b>EINVAL </b>and returns <i>(size_t) -1</i>.  <i>*inbuf</i> is left
+          pointing to the beginning of the incomplete multibyte sequence.
+
+       4. The output buffer has no more room for the next converted
+          character.  In this case, it sets <i><a href="errno.3.html">errno</a></i> to <b>E2BIG </b>and returns
+          <i>(size_t) -1</i>.
+
+       A different case is when <i>inbuf</i> is NULL or <i>*inbuf</i> is NULL, but <i>outbuf</i>
+       is not NULL and <i>*outbuf</i> is not NULL.  In this case, the <b>iconv</b>()
+       function attempts to set <i>cd</i>'s conversion state to the initial state
+       and store a corresponding shift sequence at <i>*outbuf</i>.  At most
+       <i>*outbytesleft</i> bytes, starting at <i>*outbuf</i>, will be written.  If the
+       output buffer has no more room for this reset sequence, it sets <i><a href="errno.3.html">errno</a></i>
+       to <b>E2BIG </b>and returns <i>(size_t) -1</i>.  Otherwise, it increments <i>*outbuf</i>
+       and decrements <i>*outbytesleft</i> by the number of bytes written.
+
+       A third case is when <i>inbuf</i> is NULL or <i>*inbuf</i> is NULL, and <i>outbuf</i> is
+       NULL or <i>*outbuf</i> is NULL.  In this case, the <b>iconv</b>() function sets
+       <i>cd</i>'s conversion state to the initial state.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>iconv</b>() function returns the number of characters converted in a
+       nonreversible way during this call; reversible conversions are not
+       counted.  In case of error, it sets <i><a href="errno.3.html">errno</a></i> and returns <i>(size_t) -1</i>.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following errors can occur, among others:
+
+       <b>E2BIG  </b>There is not sufficient room at <i>*outbuf</i>.
+
+       <b>EILSEQ </b>An invalid multibyte sequence has been encountered in the
+              input.
+
+       <b>EINVAL </b>An incomplete multibyte sequence has been encountered in the
+              input.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This function is available in glibc since version 2.1.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────┬───────────────┬─────────────────┐
+       │<b>Interface </b>│ <b>Attribute     </b>│ <b>Value           </b>│
+       ├──────────┼───────────────┼─────────────────┤
+       │<b>iconv</b>()   │ Thread safety │ MT-Safe race:cd │
+       └──────────┴───────────────┴─────────────────┘
+       The <b>iconv</b>() function is MT-Safe, as long as callers arrange for
+       mutual exclusion on the <i>cd</i> argument.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In each series of calls to <b>iconv</b>(), the last should be one with <i>inbuf</i>
+       or <i>*inbuf</i> equal to NULL, in order to flush out any partially
+       converted input.
+
+       Although <i>inbuf</i> and <i>outbuf</i> are typed as <i>char **</i>, this does not mean
+       that the objects they point can be interpreted as C strings or as
+       arrays of characters: the interpretation of character byte sequences
+       is handled internally by the conversion functions.  In some
+       encodings, a zero byte may be a valid part of a multibyte character.
+
+       The caller of <b>iconv</b>() must ensure that the pointers passed to the
+       function are suitable for accessing characters in the appropriate
+       character set.  This includes ensuring correct alignment on platforms
+       that have tight restrictions on alignment.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="iconv_close.3.html">iconv_close(3)</a>, <a href="iconv_open.3.html">iconv_open(3)</a>, <a href="../man8/iconvconfig.8.html">iconvconfig(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2015-12-28                         ICONV(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/iconv.1.html">iconv(1)</a>,&nbsp; 
+    <a href="iconv_close.3.html">iconv_close(3)</a>,&nbsp; 
+    <a href="iconv_open.3.html">iconv_open(3)</a>,&nbsp; 
+    <a href="mbsnrtowcs.3.html">mbsnrtowcs(3)</a>,&nbsp; 
+    <a href="mbsrtowcs.3.html">mbsrtowcs(3)</a>,&nbsp; 
+    <a href="wcsnrtombs.3.html">wcsnrtombs(3)</a>,&nbsp; 
+    <a href="wcsrtombs.3.html">wcsrtombs(3)</a>,&nbsp; 
+    <a href="wprintf.3.html">wprintf(3)</a>,&nbsp; 
+    <a href="../man7/locale.7.html">locale(7)</a>,&nbsp; 
+    <a href="../man8/iconvconfig.8.html">iconvconfig(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="iconv.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

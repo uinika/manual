@@ -1,0 +1,265 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>tc-sample(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SAMPLED_PACKETS_METADATA_FIELDS">SAMPLED&nbsp;PACKETS&nbsp;METADATA&nbsp;FIELDS</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">Packet sample action in tc(8)       Linux      Packet sample action in tc(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sample - packet sampling tc action
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>tc </b>... <b>action sample rate </b><i>RATE</i> <b>group </b><i>GROUP</i> [ <b>trunc </b><i>SIZE</i> ] [ <b>index</b>
+               <i>INDEX</i> ]
+
+       <b>tc </b>... <b>action sample index </b><i>INDEX</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>sample </b>action allows sampling packets matching classifier.
+
+       The packets are chosen randomly according to the <b>rate </b>parameter, and
+       are sampled using the <b>psample </b>generic netlink channel. The user can
+       also specify packet truncation to save user-kernel traffic. Each
+       sample includes some informative metadata about the original packet,
+       which is sent using netlink attributes, alongside the original packet
+       data.
+
+       The user can either specify the sample action parameters as presented
+       in the first form above, or use an existing sample action using its
+       index, as presented in the second form.
+</pre>
+<h2><a id="SAMPLED_PACKETS_METADATA_FIELDS" href="#SAMPLED_PACKETS_METADATA_FIELDS"></a>SAMPLED PACKETS METADATA FIELDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The metadata are delivered to userspace applications using the
+       <b>psample </b>generic netlink channel, where each sample includes the
+       following netlink attributes:
+
+       <b>PSAMPLE_ATTR_IIFINDEX</b>
+              The input interface index of the packet, if there is one.
+
+       <b>PSAMPLE_ATTR_OIFINDEX</b>
+              The output interface index of the packet. This field is not
+              relevant on ingress sampling
+
+       <b>PSAMPLE_ATTR_ORIGSIZE</b>
+              The size of the original packet (before truncation)
+
+       <b>PSAMPLE_ATTR_SAMPLE_GROUP</b>
+              The <b>psample </b>group the packet was sent to
+
+       <b>PSAMPLE_ATTR_GROUP_SEQ</b>
+              A sequence number of the sampled packet. This number is
+              incremented with each sampled packet of the current <b>psample</b>
+              group
+
+       <b>PSAMPLE_ATTR_SAMPLE_RATE</b>
+              The rate the packet was sampled with
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>rate </b><i>RATE</i>
+              The packet sample rate.  <i>RATE</i> is the expected ratio between
+              observed packets and sampled packets. For example, <i>RATE</i> of 100
+              will lead to an average of one sampled packet out of every 100
+              observed.
+
+       <b>trunc </b><i>SIZE</i>
+              Upon set, defines the maximum size of the sampled packets, and
+              causes truncation if needed
+
+       <b>group </b><i>GROUP</i>
+              The <b>psample </b>group the packet will be sent to. The <b>psample</b>
+              module defines the concept of groups, which allows the user to
+              match specific sampled packets in the case of multiple
+              sampling rules, thus identify only the packets that came from
+              a specific rule.
+
+       <b>index </b><i>INDEX</i>
+              Is a unique ID for an action. When creating new action
+              instance, this parameter allows to set the new action index.
+              When using existing action, this parameter allows to specify
+              the existing action index.  The index must 32bit unsigned
+              integer greater than zero.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Sample one of every 100 packets flowing into interface eth0 to
+       psample group 12:
+
+              tc qdisc add dev eth0 handle ffff: ingress
+              tc filter add dev eth0 parent ffff: matchall \
+                   action sample rate 100 group 12 index 19
+
+       Use the same action instance to sample eth1 too:
+
+              tc qdisc add dev eth1 handle ffff: ingress
+              tc filter add dev eth1 parent ffff: matchall \
+                   action sample index 19
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="tc.8.html">tc(8)</a>, <a href="tc-matchall.8.html">tc-matchall(8)</a> <b>psample</b>(1)
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>iproute2</i> (utilities for controlling TCP/IP
+       networking and traffic) project.  Information about the project can
+       be found at 
+       ⟨<a href="http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2">http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2</a>⟩.
+       If you have a bug report for this manual page, send it to
+       netdev@vger.kernel.org, shemminger@osdl.org.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git⟩
+       on 2017-07-05.  If you discover any rendering problems in this HTML
+       version of the page, or you believe there is a better or more up-to-
+       date source for the page, or you have corrections or improvements to
+       the information in this COLOPHON (which is <i>not</i> part of the original
+       manual page), send a mail to man-pages@man7.org
+
+<span class="footline">iproute2                         31 Jan 2017   Packet sample action in tc(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

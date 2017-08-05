@@ -1,0 +1,347 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>fstab(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#NOTES">NOTES</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#HISTORY">HISTORY</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">FSTAB(5)                        File Formats                        FSTAB(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       fstab - static information about the filesystems
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/etc/fstab</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The file <b>fstab </b>contains descriptive information about the filesystems
+       the system can mount.  <b>fstab </b>is only read by programs, and not
+       written; it is the duty of the system administrator to properly
+       create and maintain this file.  The order of records in <b>fstab </b>is
+       important because <a href="../man8/fsck.8.html">fsck(8)</a>, <a href="../man8/mount.8.html">mount(8)</a>, and <a href="../man8/umount.8.html">umount(8)</a> sequentially
+       iterate through <b>fstab </b>doing their thing.
+
+       Each filesystem is described on a separate line.  Fields on each line
+       are separated by tabs or spaces.  Lines starting with '#' are
+       comments.  Blank lines are ignored.
+
+       The following is a typical example of an <b>fstab </b>entry:
+
+              LABEL=t-home2   /home      ext4    defaults,auto_da_alloc
+              0  2
+
+       <b>The first field </b>(<i>fs_spec</i>).
+              This field describes the block special device or remote
+              filesystem to be mounted.
+
+              For ordinary mounts, it will hold (a link to) a block special
+              device node (as created by <b>mknod</b>(8)) for the device to be
+              mounted, like `/dev/cdrom' or `/dev/sdb7'.  For NFS mounts,
+              this field is &lt;host&gt;:&lt;dir&gt;, e.g., `knuth.aeb.nl:/'.  For
+              filesystems with no storage, any string can be used, and will
+              show up in <a href="../man1/df.1.html">df(1)</a> output, for example.  Typical usage is `proc'
+              for procfs; `mem', `none', or `tmpfs' for tmpfs.  Other
+              special filesystems, like udev and sysfs, are typically not
+              listed in <b>fstab</b>.
+
+              LABEL=&lt;label&gt; or UUID=&lt;uuid&gt; may be given instead of a device
+              name.  This is the recommended method, as device names are
+              often a coincidence of hardware detection order, and can
+              change when other disks are added or removed.  For example,
+              `LABEL=Boot' or `UUID=3e6be9de-8139-11d1-9106-a43f08d823a6'.
+              (Use a filesystem-specific tool like <a href="../man8/e2label.8.html">e2label(8)</a>, <a href="../man8/xfs_admin.8.html">xfs_admin(8)</a>,
+              or <b>fatlabel</b>(8) to set LABELs on filesystems).
+
+              It's also possible to use PARTUUID= and PARTLABEL=. These
+              partitions identifiers are supported for example for GUID
+              Partition Table (GPT).
+
+              See <a href="../man8/mount.8.html">mount(8)</a>, <a href="../man8/blkid.8.html">blkid(8)</a> or <a href="../man8/lsblk.8.html">lsblk(8)</a> for more details about
+              device identifiers.
+
+              Note that <a href="../man8/mount.8.html">mount(8)</a> uses UUIDs as strings. The string
+              representation of the UUID should be based on lower case
+              characters.
+
+       <b>The second field </b>(<i>fs_file</i>).
+              This field describes the mount point (target) for the
+              filesystem.  For swap partitions, this field should be
+              specified as `none'. If the name of the mount point contains
+              spaces these can be escaped as `\040'.
+
+       <b>The third field </b>(<i>fs_vfstype</i>).
+              This field describes the type of the filesystem.  Linux
+              supports many filesystem types: ext4, xfs, btrfs, f2fs, vfat,
+              ntfs, hfsplus, tmpfs, sysfs, proc, iso9660, udf, squashfs,
+              nfs, cifs, and many more.  For more details, see <a href="../man8/mount.8.html">mount(8)</a>.
+
+              An entry <i>swap</i> denotes a file or partition to be used for
+              swapping, cf. <a href="../man8/swapon.8.html">swapon(8)</a>.  An entry <i>none</i> is useful for bind or
+              move mounts.
+
+              More than one type may be specified in a comma-separated list.
+
+              <a href="../man8/mount.8.html">mount(8)</a> and <a href="../man8/umount.8.html">umount(8)</a> support filesystem <i>subtypes</i>.  The
+              subtype is defined by '.subtype' suffix.  For example
+              'fuse.sshfs'. It's recommended to use subtype notation rather
+              than add any prefix to the first fstab field (for example
+              'sshfs#example.com' is deprecated).
+
+       <b>The fourth field </b>(<i>fs_mntops</i>).
+              This field describes the mount options associated with the
+              filesystem.
+
+              It is formatted as a comma-separated list of options.  It
+              contains at least the type of mount (<b>ro </b>or <b>rw</b>), plus any
+              additional options appropriate to the filesystem type
+              (including performance-tuning options).  For details, see
+              <a href="../man8/mount.8.html">mount(8)</a> or <a href="../man8/swapon.8.html">swapon(8)</a>.
+
+              Basic filesystem-independent options are:
+
+              <b>defaults</b>
+                     use default options: rw, suid, dev, exec, auto, nouser,
+                     and async.
+
+              <b>noauto </b>do not mount when "mount -a" is given (e.g., at boot
+                     time)
+
+              <b>user   </b>allow a user to mount
+
+              <b>owner  </b>allow device owner to mount
+
+              <b>comment</b>
+                     or <b>x-&lt;name&gt; </b>for use by fstab-maintaining programs
+
+              <b>nofail </b>do not report errors for this device if it does not
+                     exist.
+
+       <b>The fifth field </b>(<i>fs_freq</i>).
+              This field is used by <b>dump</b>(8) to determine which filesystems
+              need to be dumped.  Defaults to zero (don't dump) if not
+              present.
+
+       <b>The sixth field </b>(<i>fs_passno</i>).
+              This field is used by <a href="../man8/fsck.8.html">fsck(8)</a> to determine the order in which
+              filesystem checks are done at boot time.  The root filesystem
+              should be specified with a <i>fs_passno</i> of 1.  Other filesystems
+              should have a <i>fs_passno</i> of 2.  Filesystems within a drive will
+              be checked sequentially, but filesystems on different drives
+              will be checked at the same time to utilize parallelism
+              available in the hardware.  Defaults to zero (don't fsck) if
+              not present.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The proper way to read records from <b>fstab </b>is to use the routines
+       <a href="../man3/getmntent.3.html">getmntent(3)</a> or <b>libmount</b>.
+
+       The keyword <b>ignore </b>as a filesystem type (3rd field) is no longer
+       supported by the pure libmount based mount utility (since util-linux
+       v2.22).
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/etc/fstab</i>, <i>&lt;fstab.h&gt;</i>
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man3/getmntent.3.html">getmntent(3)</a>, <a href="fs.5.html">fs(5)</a>, <a href="../man8/findmnt.8.html">findmnt(8)</a>, <a href="../man8/mount.8.html">mount(8)</a>, <a href="../man8/swapon.8.html">swapon(8)</a>
+</pre>
+<h2><a id="HISTORY" href="#HISTORY"></a>HISTORY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The ancestor of this <b>fstab </b>file format appeared in 4.0BSD.
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This man page is part of the util-linux package and is available from
+       <a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                      February 2015                       FSTAB(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/quota.1.html">quota(1)</a>,&nbsp; 
+    <a href="../man3/getfsent.3.html">getfsent(3)</a>,&nbsp; 
+    <a href="../man3/getmntent.3.html">getmntent(3)</a>,&nbsp; 
+    <a href="lxc.container.conf.5.html">lxc.container.conf(5)</a>,&nbsp; 
+    <a href="nfs.5.html">nfs(5)</a>,&nbsp; 
+    <a href="proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="systemd.automount.5.html">systemd.automount(5)</a>,&nbsp; 
+    <a href="systemd.mount.5.html">systemd.mount(5)</a>,&nbsp; 
+    <a href="systemd.swap.5.html">systemd.swap(5)</a>,&nbsp; 
+    <a href="../man7/bootparam.7.html">bootparam(7)</a>,&nbsp; 
+    <a href="../man7/kernel-command-line.7.html">kernel-command-line(7)</a>,&nbsp; 
+    <a href="../man7/systemd.generator.7.html">systemd.generator(7)</a>,&nbsp; 
+    <a href="../man8/findmnt.8.html">findmnt(8)</a>,&nbsp; 
+    <a href="../man8/fsck.8%40%40e2fsprogs.html">fsck(8@@e2fsprogs)</a>,&nbsp; 
+    <a href="../man8/fsck.8.html">fsck(8)</a>,&nbsp; 
+    <a href="../man8/fsck.btrfs.8.html">fsck.btrfs(8)</a>,&nbsp; 
+    <a href="../man8/fsck.xfs.8.html">fsck.xfs(8)</a>,&nbsp; 
+    <a href="../man8/mount.8.html">mount(8)</a>,&nbsp; 
+    <a href="../man8/quotacheck.8.html">quotacheck(8)</a>,&nbsp; 
+    <a href="../man8/quotaon.8.html">quotaon(8)</a>,&nbsp; 
+    <a href="../man8/swapon.8.html">swapon(8)</a>,&nbsp; 
+    <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-gpt-auto-generator.8.html">systemd-gpt-auto-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-hibernate-resume-generator.8.html">systemd-hibernate-resume-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-remount-fs.service.8.html">systemd-remount-fs.service(8)</a>,&nbsp; 
+    <a href="../man8/xfs_fsr.8.html">xfs_fsr(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

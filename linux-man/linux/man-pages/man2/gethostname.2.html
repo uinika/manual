@@ -1,0 +1,273 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>gethostname(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETHOSTNAME(2)            Linux Programmer's Manual           GETHOSTNAME(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       gethostname, sethostname - get/set hostname
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>int gethostname(char *</b><i>name</i><b>, size_t </b><i>len</i><b>);</b>
+       <b>int sethostname(const char *</b><i>name</i><b>, size_t </b><i>len</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>gethostname</b>():
+           Since glibc 2.12: _BSD_SOURCE || _XOPEN_SOURCE &gt;= 500
+           || /* Since glibc 2.12: */ _POSIX_C_SOURCE &gt;= 200112L
+       <b>sethostname</b>():
+           Since glibc 2.21:
+               _DEFAULT_SOURCE
+           In glibc 2.19 and 2.20:
+               _DEFAULT_SOURCE || (_XOPEN_SOURCE &amp;&amp; _XOPEN_SOURCE &lt; 500)
+           Up to and including glibc 2.19:
+               _BSD_SOURCE || (_XOPEN_SOURCE &amp;&amp; _XOPEN_SOURCE &lt; 500)
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls are used to access or to change the hostname of
+       the current processor.
+
+       <b>sethostname</b>() sets the hostname to the value given in the character
+       array <i>name</i>.  The <i>len</i> argument specifies the number of bytes in <i>name</i>.
+       (Thus, <i>name</i> does not require a terminating null byte.)
+
+       <b>gethostname</b>() returns the null-terminated hostname in the character
+       array <i>name</i>, which has a length of <i>len</i> bytes.  If the null-terminated
+       hostname is too large to fit, then the name is truncated, and no
+       error is returned (but see NOTES below).  POSIX.1 says that if such
+       truncation occurs, then it is unspecified whether the returned buffer
+       includes a terminating null byte.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b><i>name</i> is an invalid address.
+
+       <b>EINVAL </b><i>len</i> is negative or, for <b>sethostname</b>(), <i>len</i> is larger than the
+              maximum allowed size.
+
+       <b>ENAMETOOLONG</b>
+              (glibc <b>gethostname</b>()) <i>len</i> is smaller than the actual size.
+              (Before version 2.1, glibc uses <b>EINVAL </b>for this case.)
+
+       <b>EPERM  </b>For <b>sethostname</b>(), the caller did not have the <b>CAP_SYS_ADMIN</b>
+              capability in the user namespace associated with its UTS
+              namespace (see <a href="../man7/namespaces.7.html">namespaces(7)</a>).
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       SVr4, 4.4BSD  (these interfaces first appeared in 4.2BSD).
+       POSIX.1-2001 and POSIX.1-2008 specify <b>gethostname</b>() but not
+       <b>sethostname</b>().
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       SUSv2 guarantees that "Host names are limited to 255 bytes".  POSIX.1
+       guarantees that "Host names (not including the terminating null byte)
+       are limited to <b>HOST_NAME_MAX </b>bytes".  On Linux, <b>HOST_NAME_MAX </b>is
+       defined with the value 64, which has been the limit since Linux 1.0
+       (earlier kernels imposed a limit of 8 bytes).
+
+   <b>C library/kernel differences</b>
+       The GNU C library does not employ the <b>gethostname</b>() system call;
+       instead, it implements <b>gethostname</b>() as a library function that calls
+       <a href="uname.2.html">uname(2)</a> and copies up to <i>len</i> bytes from the returned <i>nodename</i> field
+       into <i>name</i>.  Having performed the copy, the function then checks if
+       the length of the <i>nodename</i> was greater than or equal to <i>len</i>, and if
+       it is, then the function returns -1 with <i><a href="../man3/errno.3.html">errno</a></i> set to <b>ENAMETOOLONG</b>;
+       in this case, a terminating null byte is not included in the returned
+       <i>name</i>.
+
+       Versions of glibc before 2.2 handle the case where the length of the
+       <i>nodename</i> was greater than or equal to <i>len</i> differently: nothing is
+       copied into <i>name</i> and the function returns -1 with <i><a href="../man3/errno.3.html">errno</a></i> set to
+       <b>ENAMETOOLONG</b>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/hostname.1.html">hostname(1)</a>, <a href="getdomainname.2.html">getdomainname(2)</a>, <a href="setdomainname.2.html">setdomainname(2)</a>, <a href="uname.2.html">uname(2)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                   GETHOSTNAME(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/crontab.1.html">crontab(1)</a>,&nbsp; 
+    <a href="../man1/hostname.1.html">hostname(1)</a>,&nbsp; 
+    <a href="../man1/logger.1.html">logger(1)</a>,&nbsp; 
+    <a href="../man1/pmhostname.1.html">pmhostname(1)</a>,&nbsp; 
+    <a href="../man1/pmsocks.1.html">pmsocks(1)</a>,&nbsp; 
+    <a href="clone.2.html">clone(2)</a>,&nbsp; 
+    <a href="getdomainname.2.html">getdomainname(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="uname.2.html">uname(2)</a>,&nbsp; 
+    <a href="../man3/gethostid.3.html">gethostid(3)</a>,&nbsp; 
+    <a href="../man3/rcmd.3.html">rcmd(3)</a>,&nbsp; 
+    <a href="../man3/sysconf.3.html">sysconf(3)</a>,&nbsp; 
+    <a href="../man5/hostname.5.html">hostname(5)</a>,&nbsp; 
+    <a href="../man5/systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="../man7/namespaces.7.html">namespaces(7)</a>,&nbsp; 
+    <a href="../man7/user_namespaces.7.html">user_namespaces(7)</a>,&nbsp; 
+    <a href="../man8/cron.8.html">cron(8)</a>,&nbsp; 
+    <a href="../man8/lsof.8.html">lsof(8)</a>,&nbsp; 
+    <a href="../man8/nss-myhostname.8.html">nss-myhostname(8)</a>,&nbsp; 
+    <a href="../man8/systemd-hostnamed.service.8.html">systemd-hostnamed.service(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="gethostname.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

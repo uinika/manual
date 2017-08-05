@@ -1,0 +1,609 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pcpintro(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#INTRODUCTION">INTRODUCTION</a> | <a href="#GENERAL_ERRORS">GENERAL&nbsp;ERRORS</a> | <a href="#CLIENT-PMCD_ERRORS">CLIENT-PMCD&nbsp;ERRORS</a> | <a href="#CLIENT-ARCHIVE_ERRORS">CLIENT-ARCHIVE&nbsp;ERRORS</a> | <a href="#TIME_CONTROL_ERRORS">TIME&nbsp;CONTROL&nbsp;ERRORS</a> | <a href="#NAMESPACE_ERRORS">NAMESPACE&nbsp;ERRORS</a> | <a href="#PMCD-PMDA_ERRORS">PMCD-PMDA&nbsp;ERRORS</a> | <a href="#PCP_ENVIRONMENT">PCP&nbsp;ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PCPINTRO(3)               Library Functions Manual               PCPINTRO(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>PCPIntro </b>- introduction to the Performance Co-Pilot (PCP) libraries
+</pre>
+<h2><a id="INTRODUCTION" href="#INTRODUCTION"></a>INTRODUCTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Performance Co-Pilot (PCP) is a toolkit designed for monitoring and
+       managing system-level performance.
+
+       The PCP libraries support the APIs required to create new performance
+       monitoring tools and new agents (or PMDAs) to export performance
+       data.  The <b>libpcp </b>library is used in both cases.  The <b>libpcp_pmda</b>
+       library is used only for PMDAs.
+
+       Individual library routines are documented in their own manual page
+       entries.
+
+       Most routines return an integer value; greater than equal to zero for
+       success and less than zero for an error.  The error codes have
+       symbolic names defined in <b>&lt;pcp/pmapi.h&gt;</b>.  Other negative values are
+       used to encode errors that can be mapped to the traditional <i><a href="errno.3.html">errno</a></i>
+       values defined in <b>&lt;errno.h&gt;</b>, with the value negated.  To translate
+       all PCP error codes into useful messages use either <a href="../man1/pmerr.1.html">pmerr(1)</a> or
+       <a href="pmErrStr.3.html">pmErrStr(3)</a>; the latter may also be used to decode the <i>-errno</i> cases.
+</pre>
+<h2><a id="GENERAL_ERRORS" href="#GENERAL_ERRORS"></a>GENERAL ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These common errors may occur in various PCP interactions.
+
+       <b>PM_ERR_TIMEOUT</b>
+           <i>Timeout waiting for a response from PMCD</i>
+           Many interactions between PCP applications involve synchronous
+           message passing, and these are subject to timeout constraints.
+           These errors are most frequently encountered when using network
+           connections with slow data rates or long latencies.
+
+           For client-<b>pmcd </b>timeouts, refer to <a href="../man1/PCPIntro.1.html">PCPIntro(1)</a> for environment
+           variables that may be used to modify the timeout thresholds.  For
+           <b>pmcd</b>-PMDA timeouts refer to the <b>-t </b>and <b>-q </b>options of <a href="../man1/pmcd.1.html">pmcd(1)</a> and
+           the PCP metric <b>pmcd.control.timeout </b>that can be dynamically
+           changed with <a href="../man1/pmstore.1.html">pmstore(1)</a>.
+
+       <b>PM_ERR_APPVERSION</b>
+           <i>Metric not supported by this version of monitored application</i>
+           Some performance metrics are unavailable from specific versions
+           of the associated PMDA, or may be unavailable because the
+           underlying instrumentation has changed or is not installed or is
+           not enabled.  This error is used in results from <a href="pmFetch.3.html">pmFetch(3)</a> to
+           indicate these situations.
+
+       <b>PM_ERR_IPC</b>
+           <i>IPC protocol failure</i>
+           Generic protocol failure on a pipe or socket connecting two PCP
+           applications, eg. client-<b>pmcd</b>, or client-<b>pmtime</b>, or PMDA-<b>pmcd </b>or
+           <b>pmlc</b>-<b>pmlogger</b>.
+
+       <b>PM_ERR_TEXT</b>
+           <i>Oneline or help text is not available</i>
+           Set by a PMDA, and passed back to a PCP client, to indicate that
+           the PMDA is unable to supply the requested metric or instance
+           domain help text.
+
+       <b>PM_ERR_VALUE</b>
+           <i>Missing metric value(s)</i>
+           This error is used for a number of conditions in which the value
+           of a performance metric is inappropriate for the context in which
+           it is being used, eg.
+
+           (a) Bad value for the metric <b>pmcd.timezone </b>when trying to set the
+               timezone via <a href="pmNewContextZone.3.html">pmNewContextZone(3)</a> for a remote or archive
+               context.
+
+           (b) Attempting to interpolate values for a metric with non-
+               numeric data type from a set of PCP archives.
+
+           (c) A bad <i>result</i> data structure passed to <a href="pmStore.3.html">pmStore(3)</a>.
+
+       <b>PM_ERR_NAME</b>
+           <i>Unknown metric name</i>
+           Just what the message says.
+
+       <b>PM_ERR_PMID</b>
+           <i>Unknown or illegal metric identifier</i>
+           Just what the message says.
+
+       <b>PM_ERR_INDOM</b>
+           <i>Unknown or illegal instance domain identifier</i>
+           A request nominates an instance domain that is unknown or
+           <b>PM_INDOM_NULL</b>.  May occur as a consequence of the instance domain
+           identifier passed by a PCP client to <a href="pmGetInDom.3.html">pmGetInDom(3)</a>,
+           <a href="pmLookupInDom.3.html">pmLookupInDom(3)</a>, <a href="pmNameInDom.3.html">pmNameInDom(3)</a>, <a href="pmGetInDomArchive.3.html">pmGetInDomArchive(3)</a>,
+           <a href="pmLookupInDomArchive.3.html">pmLookupInDomArchive(3)</a>, <a href="pmNameInDomArchive.3.html">pmNameInDomArchive(3)</a> or a request
+           passed from <a href="../man1/pmcd.1.html">pmcd(1)</a> to a PMDA.
+
+       <b>PM_ERR_EOF</b>
+           <i>IPC channel closed</i>
+           End of file on a pipe or socket connecting two PCP applications,
+           eg. client-<b>pmcd</b>, or client-<b>pmtime </b>or PMDA-<b>pmcd.</b>
+
+       <b>PM_ERR_NOCONTEXT</b>
+           <i>Attempt to use an illegal context</i>
+           Typically caused by a PCP client that tries to make calls before
+           calling <a href="pmNewContext.3.html">pmNewContext(3)</a> or after calling <a href="pmDestroyContext.3.html">pmDestroyContext(3)</a>.
+
+       <b>PM_ERR_PERMISSION</b>
+           <i>No permission to perform requested operation</i>
+           PCP-specific access controls apply to <a href="../man1/pmcd.1.html">pmcd(1)</a> and <a href="../man1/pmlogger.1.html">pmlogger(1)</a>.
+           Platform-specific permission errors are returned as <b>-EPERM</b>.
+
+       <b>PM_ERR_CONV</b>
+           <i>Impossible value or scale conversion</i>
+           Some value conversion requests are illegal, eg. bad debug flag
+           symbolic name for <b>-D </b>option, or asking <a href="pmExtractValue.3.html">pmExtractValue(3)</a> to
+           translate non-numeric data types to numbers and <i>vice versa</i>.
+
+       <b>PM_ERR_TRUNC</b>
+           <i>Truncation in value conversion</i>
+           Some conversion requests to <a href="pmExtractValue.3.html">pmExtractValue(3)</a> cannot be performed
+           based on the metric types and values involved, in this case
+           conversion would result in loss of precision.
+
+       <b>PM_ERR_SIGN</b>
+           <i>Negative value in conversion to unsigned</i>
+           Some conversion requests to <a href="pmExtractValue.3.html">pmExtractValue(3)</a> cannot be performed
+           based on the metric types and values involved, in this case
+           converting a negative value to an unsigned value.
+
+       <b>PM_ERR_TYPE</b>
+           <i>Unknown or illegal metric type</i>
+           The metric type is held in the metric descriptor and sometimes
+           encoded in the metric values returned from a call to <a href="pmFetch.3.html">pmFetch(3)</a>.
+           Legal values for the metric type are defined by the <b>PM_TYPE_*</b>
+           macros in <b>&lt;pcp/pmapi.h&gt;</b>.
+
+       <b>PM_ERR_UNIT</b>
+           <i>Illegal pmUnits specification</i>
+           Some conversion requests to <a href="pmConvScale.3.html">pmConvScale(3)</a> cannot be performed
+           due to illegal or incompatible specifications of the source and
+           destination units.
+
+       <b>PM_ERR_PROFILE</b>
+           <i>Explicit instance identifier(s) required</i>
+           Some PMDAs, especially the <b>proc </b>PMDA, will not return ``all
+           instances'' for a <a href="pmFetch.3.html">pmFetch(3)</a> request due to the cost.  The client
+           must explicitly built an instance profile using <a href="pmAddProfile.3.html">pmAddProfile(3)</a>
+           and/or <a href="pmDelProfile.3.html">pmDelProfile(3)</a> before calling <a href="pmFetch.3.html">pmFetch(3)</a>.  See also the
+           <b>-F </b>option to <a href="../man1/pminfo.1.html">pminfo(1)</a>.
+
+       <b>PM_ERR_INST</b>
+           <i>Unknown or illegal instance identifier</i>
+           A request to a PMDA nominates an instance that is unknown.  May
+           occur as a consequence of the profile established prior to a
+           <a href="pmFetch.3.html">pmFetch(3)</a> call, or an explicit instance name or identifier to
+           <a href="pmLookupInDom.3.html">pmLookupInDom(3)</a> or <a href="pmNameInDom.3.html">pmNameInDom(3)</a>.
+
+       <b>PM_ERR_MODE</b>
+           <i>Illegal mode specification</i>
+           Illegal <i>mode</i> argument to <a href="pmSetMode.3.html">pmSetMode(3)</a>.
+
+       <b>PM_ERR_PROFILESPEC</b>
+           <i>NULL pmInDom with non-NULL instlist</i>
+           Bad arguments passed from a PCP client to <a href="pmAddProfile.3.html">pmAddProfile(3)</a>.
+
+       <b>PM_ERR_TOOSMALL</b>
+           <i>Insufficient elements in list</i>
+           Parameter passing error by caller specifying a list with less
+           than one element to <a href="pmFetch.3.html">pmFetch(3)</a>, <a href="pmLookupName.3.html">pmLookupName(3)</a> or <a href="pmStore.3.html">pmStore(3)</a>.
+
+       <b>PM_ERR_THREAD</b>
+           <i>Operation not supported for multi-threaded applications</i>
+           As documented in <a href="PMAPI.3.html">PMAPI(3)</a> and elsewhere, some <b>libpcp </b>routines are
+           intended solely for use from single-threaded applications.
+
+       <b>PM_ERR_TOOBIG</b>
+           <i>Result size exceeded</i>
+           Indicates a fatal error in the message (or PDU) passing protocol
+           between two PCP applications.  This is an internal error, and
+           other than an exotic networking failure, should not occur.
+
+       <b>PM_ERR_RESET</b>
+           <i>PMCD reset or configuration change</i>
+           Not used.
+
+           Refer to <a href="pmFetch.3.html">pmFetch(3)</a> for an alternative mechanism that may be used
+           to notify a PCP client when <a href="../man1/pmcd.1.html">pmcd(1)</a> has experienced one or more
+           configuration changes since the last request from the client.
+           Usually these changes involve a change to the namespace exported
+           via <b>pmcd </b>and/or changes to the PMDAs under <b>pmcd</b>'s control.
+
+       <b>PM_ERR_FAULT</b>
+           <i>QA fault injected</i>
+           Used only for PCP Quality Assurance (QA) testing.
+
+       <b>PM_ERR_NYI</b>
+           <i>Functionality not yet implemented</i>
+           Self explanatory and rarely used.
+
+       <b>PM_ERR_GENERIC</b>
+           <i>Generic error, already reported above</i>
+           Rarely used, this error may be returned when the error condition
+           is a consequent of some earlier returned error and a more precise
+           characterization is not possible.
+</pre>
+<h2><a id="CLIENT-PMCD_ERRORS" href="#CLIENT-PMCD_ERRORS"></a>CLIENT-PMCD ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These errors may occur in the interactions between a PCP client and
+       <a href="../man1/pmcd.1.html">pmcd(1)</a> providing real-time performance data.
+
+       <b>PM_ERR_NOAGENT</b>
+              <i>No PMCD agent for domain of request</i>
+              A request sent to <a href="../man1/pmcd.1.html">pmcd(1)</a> requires information from an agent
+              or PMDA that does not exist.  Usually this means the namespace
+              being used by the client application contains metric names
+              from a previously installed PMDA.
+
+       <b>PM_ERR_CONNLIMIT</b>
+              <i>PMCD connection limit for this host exceeded</i>
+              The client connection limit for <a href="../man1/pmcd.1.html">pmcd(1)</a> is controlled by the
+              optional <b>access </b>controls in <i>$PCP_PMCDCONF_PATH</i>.  By default
+              there is no limit imposed by the PCP code, and this error
+              would not be seen.
+
+       <b>PM_ERR_AGAIN</b>
+              <i>Try again. Information not currently available</i>
+              Used to notify a PCP client that the PMDA responsible for
+              delivering the information is temporarily unavailable.  See
+              also <b>PM_ERR_PMDANOTREADY</b>.
+
+       <b>PM_ERR_NOPROFILE</b>
+              <i>Missing profile - protocol botch</i>
+              Internal error in the communication between a client
+              application and <a href="../man1/pmcd.1.html">pmcd(1)</a> - should not occur.
+</pre>
+<h2><a id="CLIENT-ARCHIVE_ERRORS" href="#CLIENT-ARCHIVE_ERRORS"></a>CLIENT-ARCHIVE ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These errors may occur in the interactions between a PCP client and
+       the library routines that provide historical performance data from
+       PCP archives created by <a href="../man1/pmlogger.1.html">pmlogger(1)</a>.
+
+       <b>PM_ERR_LOGFILE</b>
+              <i>Missing archive file</i>
+              Each PCP archive consists of multiple physical files as
+              described in <a href="../man1/pmlogger.1.html">pmlogger(1)</a>.  This error occurs when one of the
+              physical files is missing or cannot be opened for reading.
+
+       <b>PM_ERR_EOL</b>
+              <i>End of PCP archive log</i>
+              An attempt is made to read past the end file of the last
+              volume of a set of PCP archives, or past the end of the time
+              window (as specified with a <b>-T </b>option) for a set of PCP
+              archives.
+
+       <b>PM_ERR_NOTHOST</b>
+              <i>Operation requires context with host source of metrics</i>
+              Operations involving help text (ie. <a href="pmLookupText.3.html">pmLookupText(3)</a> and
+              <a href="pmLookupInDomText.3.html">pmLookupInDomText(3)</a>) or calls to <a href="pmStore.3.html">pmStore(3)</a> require a host
+              context and are not supported for PCP archives.
+
+       <b>PM_ERR_LOGREC</b>
+              <i>Corrupted record in a PCP archive log</i>
+              PCP archives can become corrupted for a variety of reasons,
+              but the most common is premature termination of <a href="../man1/pmlogger.1.html">pmlogger(1)</a>
+              without flushing its output buffers.
+
+       <b>PM_ERR_LABEL</b>
+              <i>Illegal label record at start of a PCP archive log file</i>
+              Each physical file in a PCP archive should begin with a common
+              label record.  This is a special case of <b>PM_ERR_LOGREC </b>errors.
+
+       <b>PM_ERR_NODATA</b>
+              <i>Empty archive log file</i>
+              An empty physical file can never be part of a valid PCP
+              archive (at least the label record should be present).  This
+              is a special case of <b>PM_ERR_LOGREC </b>errors.
+
+       <b>PM_ERR_NOTARCHIVE</b>
+              <i>Operation requires context with archive source of metrics</i>
+              A call to one of the archive variant routines, i.e.
+              <a href="pmFetchArchive.3.html">pmFetchArchive(3)</a>, <a href="pmGetInDomArchive.3.html">pmGetInDomArchive(3)</a>,
+              <a href="pmLookupInDomArchive.3.html">pmLookupInDomArchive(3)</a> or <a href="pmNameInDomArchive.3.html">pmNameInDomArchive(3)</a>, when the
+              current context is not associated with a set of PCP archives.
+
+       <b>PM_ERR_PMID_LOG</b>
+              <i>Metric not defined in the PCP archive log</i>
+              A PCP client has requested information about a metric, and
+              there is no corresponding information in the set of PCP
+              archives.  This should not happen for well-behaved PCP
+              clients.
+
+       <b>PM_ERR_INDOM_LOG</b>
+              <i>Instance domain identifier not defined in the PCP archive log</i>
+              A PCP client has requested information about an instance
+              domain for one or more performance metrics, and there is no
+              corresponding information in the set of PCP archives.  If the
+              client is using metric descriptors from the set of archives to
+              identify the instance domain, this is less likely to happen.
+
+              Because instance domains may vary over time, clients may need
+              to use the variant routines <a href="pmGetInDomArchive.3.html">pmGetInDomArchive(3)</a> or
+              <a href="pmLookupInDomArchive.3.html">pmLookupInDomArchive(3)</a> or <a href="pmNameInDomArchive.3.html">pmNameInDomArchive(3)</a> to manipulate
+              the union of the instances in an instance domain over the life
+              of an archive.
+
+       <b>PM_ERR_INST_LOG</b>
+              <i>Instance identifier not defined in the PCP archive log</i>
+              A PCP client has requested information about a specific
+              instance of a performance metric, and there is no
+              corresponding information in the set of PCP archives.  If the
+              client is using instance names from the instance domain in the
+              set of archives (rather than hard-coded instance names) and
+              instance identifiers from the results returned by <a href="pmFetch.3.html">pmFetch(3)</a>
+              or <a href="pmFetchArchive.3.html">pmFetchArchive(3)</a> this is less likely to happen.
+
+              Because instance domains may vary over time, clients may need
+              to use the variant routines <a href="pmLookupInDomArchive.3.html">pmLookupInDomArchive(3)</a> or
+              <a href="pmNameInDomArchive.3.html">pmNameInDomArchive(3)</a> to manipulate the union of the instances
+              in an instance domain over the life of an archive.
+
+       <b>PM_ERR_LOGOVERLAP</b>
+              <i>Archives overlap in time</i>
+              When using a context associated with a set of archives, the
+              archives in the set may not overlap in time.
+
+       <b>PM_ERR_LOGHOST</b>
+              <i>Archives differ by host</i>
+              When using a context associated with a set of archives, the
+              archives in the set must all have been generated on the same
+              host.
+
+       <b>PM_ERR_LOGTIMEZONE</b>
+              <i>Archives differ by time zone</i>
+              When using a context associated with a set of archives, the
+              archives in the set must all have been generated using the
+              same time zone.
+
+       <b>PM_ERR_LOGCHANGETYPE</b>
+              <i>The type of a metric differs among archives</i>
+              When using a context associated with a set of archives, the
+              type of each metric must be same in all of the archives.
+
+       <b>PM_ERR_LOGCHANGESEM</b>
+              <i>The semantics of a metric differs among archives</i>
+              When using a context associated with a set of archives, the
+              semantics of each metric must be same in all of the archives.
+
+       <b>PM_ERR_LOGCHANGEINDOM</b>
+              <i>The instance domain of a metric differs among archives</i>
+              When using a context associated with a set of archives, the
+              instance domain of each metric must be same in all of the
+              archives.
+
+       <b>PM_ERR_LOGCHANGEUNITS</b>
+              <i>The units of a metric differs among archives</i>
+              When using a context associated with a set of archives, the
+              units of each metric must be same in all of the archives.
+</pre>
+<h2><a id="TIME_CONTROL_ERRORS" href="#TIME_CONTROL_ERRORS"></a>TIME CONTROL ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These errors may occur in the interactions between a GUI PCP client
+       and the time control services provided by <a href="../man1/pmtime.1.html">pmtime(1)</a>.
+
+       <b>PM_ERR_ISCONN</b>
+              <i>Already Connected</i>
+              A PCP client application called <a href="pmTimeConnect.3.html">pmTimeConnect(3)</a> when already
+              connected to a <a href="../man1/pmtime.1.html">pmtime(1)</a> instance.
+
+       <b>PM_ERR_NOTCONN</b>
+              <i>Not Connected</i>
+              A PCP client application called one of the time control
+              routines <b>pmTime*</b>(3) when not currently connected to any
+              <a href="../man1/pmtime.1.html">pmtime(1)</a> instance.
+
+       <b>PM_ERR_NEEDPORT</b>
+              <i>A non-null port name is required</i>
+              If a shared <a href="../man1/pmtime.1.html">pmtime(1)</a> instance is being created the <i>port</i>
+              argument to <a href="pmTimeConnect.3.html">pmTimeConnect(3)</a> must not be invalid.
+</pre>
+<h2><a id="NAMESPACE_ERRORS" href="#NAMESPACE_ERRORS"></a>NAMESPACE ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These errors may occur in the processing of PCP namespace operations.
+       A PCP namespace, see <a href="../man5/pmns.5.html">pmns(5)</a>, provides the external names and the
+       internal identifiers for the available performance metrics.
+
+       <b>PM_ERR_NONLEAF</b>
+              <i>Metric name is not a leaf in PMNS</i>
+              The metric name passed to <a href="pmLookupName.3.html">pmLookupName(3)</a> names a non-terminal
+              path in the namespace, i.e. a group of metrics rather than a
+              single metric.
+
+       <b>PM_ERR_DUPPMNS</b>
+              <i>Attempt to reload the PMNS</i>
+              When using an explicit local namespace, it is illegal to call
+              either of <a href="pmLoadNameSpace.3.html">pmLoadNameSpace(3)</a> or <a href="pmLoadASCIINameSpace.3.html">pmLoadASCIINameSpace(3)</a> more
+              than once.
+
+       <b>PM_ERR_PMNS</b>
+              <i>Problems parsing PMNS definitions</i>
+              Only occurs when an ASCII namespace is explicitly loaded.
+
+       <b>PM_ERR_NOPMNS</b>
+              <i>PMNS not accessible</i>
+              Only occurs when an ASCII namespace is explicitly loaded.
+</pre>
+<h2><a id="PMCD-PMDA_ERRORS" href="#PMCD-PMDA_ERRORS"></a>PMCD-PMDA ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These error codes are used in the interactions between <a href="../man1/pmcd.1.html">pmcd(1)</a> and
+       the PMDAs that provide the performance data.
+
+       <b>PM_ERR_PMDANOTREADY</b>
+              <i>PMDA is not yet ready to respond to requests</i>
+              Some PMDAs have long initialization or reset times, and will
+              respond to <a href="../man1/pmcd.1.html">pmcd(1)</a> with this error if they are busy at the
+              moment.  This error translates to <b>PM_ERR_AGAIN </b>for the PCP
+              client who made the request to <b>pmcd </b>which caused the initial
+              request to the PMDA.  At some later time the PMDA will inform
+              <b>pmcd </b>(see <b>PM_ERR_PMDAREADY</b>) that it is now ready to process
+              requests, and client requests will begin to succeed.
+
+       <b>PM_ERR_PMDAREADY</b>
+              <i>PMDA is now responsive to requests</i>
+              Used by PMDAs to asynchronously inform <a href="../man1/pmcd.1.html">pmcd(1)</a> that they are
+              now willing to resume processing requests.  See also
+              <b>PM_ERR_PMDANOTREADY</b>.
+</pre>
+<h2><a id="PCP_ENVIRONMENT" href="#PCP_ENVIRONMENT"></a>PCP ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Environment variables with the prefix <b>PCP_ </b>are used to parameterize
+       the file and directory names used by PCP.  On each installation, the
+       file <i>/etc/pcp.conf</i> contains the local values for these variables.
+       The <b>$PCP_CONF </b>variable may be used to specify an alternative
+       configuration file, as described in <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>.  Values for these
+       variables may be obtained programmatically using the <a href="pmGetConfig.3.html">pmGetConfig(3)</a>
+       function.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/pmerr.1.html">pmerr(1)</a>, <a href="PMAPI.3.html">PMAPI(3)</a>, <a href="pmErrStr.3.html">pmErrStr(3)</a>, <a href="pmGetConfig.3.html">pmGetConfig(3)</a>, <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a> and
+       <a href="../man5/pcp.env.5.html">pcp.env(5)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                         PCPINTRO(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pmapi.3-2.html">pmapi(3)</a>,&nbsp; 
+    <a href="pmierrstr.3-2.html">pmierrstr(3)</a>,&nbsp; 
+    <a href="pmwebapi.3-2.html">pmwebapi(3)</a>,&nbsp; 
+    <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>,&nbsp; 
+    <a href="../man5/pcp.env.5.html">pcp.env(5)</a>,&nbsp; 
+    <a href="../man5/pmns.5.html">pmns(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

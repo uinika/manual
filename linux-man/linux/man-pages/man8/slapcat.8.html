@@ -1,0 +1,318 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>slapcat(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#LIMITATIONS">LIMITATIONS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SLAPCAT(8C)                                                      SLAPCAT(8C)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       slapcat - SLAPD database to LDIF utility
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>SBINDIR/slapcat </b>[<b>-a</b><i>filter</i>] [<b>-b</b><i>suffix</i>] [<b>-c</b>] [<b>-d</b><i>debug-level</i>]
+       [<b>-f</b><i>slapd.conf</i>] [<b>-F</b><i>confdir</i>] [<b>-g</b>] [<b>-H</b><i>URI</i>] [<b>-l</b><i>ldif-file</i>] [<b>-n</b><i>dbnum</i>]
+       [<b>-o</b><i>option</i>[<b>=</b><i>value</i>]] [<b>-s</b><i>subtree-dn</i>] [<b>-v</b>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Slapcat </b>is used to generate an LDAP Directory Interchange Format
+       (LDIF) output based upon the contents of a <a href="slapd.8.html">slapd(8)</a> database.  It
+       opens the given database determined by the database number or suffix
+       and writes the corresponding LDIF to standard output or the specified
+       file.  Databases configured as <b>subordinate </b>of this one are also
+       output, unless <b>-g </b>is specified.
+
+       The entry records are presented in database order, not superior first
+       order.  The entry records will include all (user and operational)
+       attributes stored in the database.  The entry records will not
+       include dynamically generated attributes (such as subschemaSubentry).
+
+       The output of slapcat is intended to be used as input to <a href="slapadd.8.html">slapadd(8)</a>.
+       The output of slapcat cannot generally be used as input to <a href="../man1/ldapadd.1.html">ldapadd(1)</a>
+       or other LDAP clients without first editing the output.  This editing
+       would normally include reordering the records into superior first
+       order and removing no-user-modification operational attributes.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-a </b><i>filter</i>
+              Only dump entries matching the asserted filter.  For example
+
+              slapcat -a \
+                  "(!(entryDN:dnSubtreeMatch:=ou=People,dc=example,dc=com))"
+
+              will dump all but the "ou=People,dc=example,dc=com" subtree of
+              the "dc=example,dc=com" database.  Deprecated; use <b>-H</b>
+              <i>ldap:///???(filter)</i> instead.
+
+       <b>-b </b><i>suffix</i>
+              Use the specified <i>suffix</i> to determine which database to
+              generate output for.  The <b>-b </b>cannot be used in conjunction
+              with the <b>-n </b>option.
+
+       <b>-c     </b>Enable continue (ignore errors) mode.  Multiple occorrences of
+              <b>-c </b>make <a href="slapcat.8.html">slapcat(8)</a> try harder.
+
+       <b>-d </b><i>debug-level</i>
+              Enable debugging messages as defined by the specified <i>debug-</i>
+              <i>level</i>; see <a href="slapd.8.html">slapd(8)</a> for details.
+
+       <b>-f </b><i>slapd.conf</i>
+              Specify an alternative <a href="../man5/slapd.conf.5.html">slapd.conf(5)</a> file.
+
+       <b>-F </b><i>confdir</i>
+              specify a config directory.  If both <b>-f </b>and <b>-F </b>are specified,
+              the config file will be read and converted to config directory
+              format and written to the specified directory.  If neither
+              option is specified, an attempt to read the default config
+              directory will be made before trying to use the default config
+              file. If a valid config directory exists then the default
+              config file is ignored.
+
+       <b>-g     </b>disable subordinate gluing.  Only the specified database will
+              be processed, and not its glued subordinates (if any).
+
+       <b>-H  URI</b>
+              use dn, scope and filter from URI to only handle matching
+              entries.
+
+       <b>-l </b><i>ldif-file</i>
+              Write LDIF to specified file instead of standard output.
+
+       <b>-n </b><i>dbnum</i>
+              Generate output for the <i>dbnum</i>-th database listed in the
+              configuration file. The config database <a href="../man5/slapd-config.5.html">slapd-config(5)</a>, is
+              always the first database, so use <b>-n 0 </b>to select it.
+
+              The <b>-n </b>cannot be used in conjunction with the <b>-b </b>option.
+
+       <b>-o </b><i>option</i>[<b>=</b><i>value</i>]
+              Specify an <i>option</i> with a(n optional) <i>value</i>.  Possible generic
+              options/values are:
+
+                     syslog=&lt;subsystems&gt;  (see `-s' in slapd(8))
+                     syslog-level=&lt;level&gt; (see `-S' in slapd(8))
+                     syslog-user=&lt;user&gt;   (see `-l' in slapd(8))
+
+                     ldif-wrap={no|&lt;n&gt;}
+
+              <i>n</i> is the number of columns allowed for the LDIF output
+              (<i>n</i> equal to <i>0</i> uses the default, corresponding to 78).
+              The minimum is 2, leaving space for one character and one
+              continuation character.
+              Use <i>no</i> for no wrap.
+
+       <b>-s </b><i>subtree-dn</i>
+              Only dump entries in the subtree specified by this DN.
+              Implies <b>-b </b><i>subtree-dn</i> if no
+              <b>-b</b>
+              or
+              <b>-n</b>
+              option is given.
+              Deprecated; use <b>-H </b><i>ldap:///subtree-dn</i> instead.
+
+       <b>-v     </b>Enable verbose mode.
+</pre>
+<h2><a id="LIMITATIONS" href="#LIMITATIONS"></a>LIMITATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For some backend types, your <a href="slapd.8.html">slapd(8)</a> should not be running (at
+       least, not in read-write mode) when you do this to ensure consistency
+       of the database. It is always safe to run <b>slapcat </b>with the
+       <a href="../man5/slapd-bdb.5.html">slapd-bdb(5)</a>, <a href="../man5/slapd-hdb.5.html">slapd-hdb(5)</a>, <a href="../man5/slapd-mdb.5.html">slapd-mdb(5)</a>, and <a href="../man5/slapd-null.5.html">slapd-null(5)</a> backends.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       To make a text backup of your SLAPD database and put it in a file
+       called <b>ldif</b>, give the command:
+
+            SBINDIR/slapcat -l ldif
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man3/ldap.3.html">ldap(3)</a>, <a href="../man5/ldif.5.html">ldif(5)</a>, <a href="slapadd.8.html">slapadd(8)</a>, <a href="../man1/ldapadd.1.html">ldapadd(1)</a>, <a href="slapd.8.html">slapd(8)</a>
+
+       "OpenLDAP Administrator's Guide" (<a href="http://www.openldap.org/doc/admin/">http://www.OpenLDAP.org/doc/admin/</a>)
+</pre>
+<h2><a id="ACKNOWLEDGEMENTS" href="#ACKNOWLEDGEMENTS"></a>ACKNOWLEDGEMENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>OpenLDAP Software </b>is developed and maintained by The OpenLDAP Project
+       &lt;<a href="http://www.openldap.org/">http://www.openldap.org/</a>&gt;.  <b>OpenLDAP Software </b>is derived from the
+       University of Michigan LDAP 3.3 Release.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>OpenLDAP</i> (an open source implementation of
+       the Lightweight Directory Access Protocol) project.  Information
+       about the project can be found at ⟨<a href="http://www.openldap.org/">http://www.openldap.org/</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="http://www.openldap.org/its/">http://www.openldap.org/its/</a>⟩.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.openldap.org/openldap.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">OpenLDAP LDVERSION               RELEASEDATE                     SLAPCAT(8C)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/ldif.5.html">ldif(5)</a>,&nbsp; 
+    <a href="../man5/slapd.access.5.html">slapd.access(5)</a>,&nbsp; 
+    <a href="../man5/slapd-bdb.5.html">slapd-bdb(5)</a>,&nbsp; 
+    <a href="../man5/slapd.conf.5.html">slapd.conf(5)</a>,&nbsp; 
+    <a href="../man5/slapd-config.5.html">slapd-config(5)</a>,&nbsp; 
+    <a href="../man5/slapd-mdb.5.html">slapd-mdb(5)</a>,&nbsp; 
+    <a href="../man5/slapd-ndb.5.html">slapd-ndb(5)</a>,&nbsp; 
+    <a href="../man5/slapd-null.5.html">slapd-null(5)</a>,&nbsp; 
+    <a href="../man5/slapd.plugin.5.html">slapd.plugin(5)</a>,&nbsp; 
+    <a href="../man5/slapd-wt.5.html">slapd-wt(5)</a>,&nbsp; 
+    <a href="slapadd.8.html">slapadd(8)</a>,&nbsp; 
+    <a href="slapcat.8.html">slapcat(8)</a>,&nbsp; 
+    <a href="slapd.8.html">slapd(8)</a>,&nbsp; 
+    <a href="slapmodify.8.html">slapmodify(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

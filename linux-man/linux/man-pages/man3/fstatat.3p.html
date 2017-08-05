@@ -1,0 +1,492 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>fstatat.3p - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#PROLOG">PROLOG</a> | <a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#APPLICATION_USAGE">APPLICATION&nbsp;USAGE</a> | <a href="#RATIONALE">RATIONALE</a> | <a href="#FUTURE_DIRECTIONS">FUTURE&nbsp;DIRECTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYRIGHT">COPYRIGHT</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">FSTATAT(3P)               POSIX Programmer's Manual              FSTATAT(3P)</span>
+</pre>
+<h2><a id="PROLOG" href="#PROLOG"></a>PROLOG  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page is part of the POSIX Programmer's Manual.  The Linux
+       implementation of this interface may differ (consult the
+       corresponding Linux manual page for details of Linux behavior), or
+       the interface may not be implemented on Linux.
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       fstatat, lstat, stat — get file status
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;sys/stat.h&gt;
+
+       int fstatat(int fd, const char *restrict <i>path</i>,
+           struct stat *restrict <i>buf</i>, int <i>flag</i>);
+       int lstat(const char *restrict <i>path</i>, struct stat *restrict <i>buf</i>);
+       int stat(const char *restrict <i>path</i>, struct stat *restrict <i>buf</i>);
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>stat</i>() function shall obtain information about the named file and
+       write it to the area pointed to by the <i>buf</i> argument. The <i>path</i>
+       argument points to a pathname naming a file. Read, write, or execute
+       permission of the named file is not required. An implementation that
+       provides additional or alternate file access control mechanisms may,
+       under implementation-defined conditions, cause <i>stat</i>() to fail. In
+       particular, the system may deny the existence of the file specified
+       by <i>path</i>.
+
+       If the named file is a symbolic link, the <i>stat</i>() function shall
+       continue pathname resolution using the contents of the symbolic link,
+       and shall return information pertaining to the resulting file if the
+       file exists.
+
+       The <i>buf</i> argument is a pointer to a <b>stat </b>structure, as defined in the
+       <i>&lt;sys/stat.h&gt;</i> header, into which information is placed concerning the
+       file.
+
+       The <i>stat</i>() function shall update any time-related fields (as
+       described in the Base Definitions volume of POSIX.1‐2008, <i>Section</i>
+       <i>4.8</i>, <i>File Times Update</i>), before writing into the <b>stat </b>structure.
+
+       If the named file is a shared memory object, the implementation shall
+       update in the <b>stat </b>structure pointed to by the <i>buf</i> argument the
+       <i>st_uid</i>, <i>st_gid</i>, <i>st_size</i>, and <i>st_mode</i> fields, and only the S_IRUSR,
+       S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH, and S_IWOTH file permission bits
+       need be valid. The implementation may update other fields and flags.
+
+       If the named file is a typed memory object, the implementation shall
+       update in the <b>stat </b>structure pointed to by the <i>buf</i> argument the
+       <i>st_uid</i>, <i>st_gid</i>, <i>st_size</i>, and <i>st_mode</i> fields, and only the S_IRUSR,
+       S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH, and S_IWOTH file permission bits
+       need be valid. The implementation may update other fields and flags.
+
+       For all other file types defined in this volume of POSIX.1‐2008, the
+       structure members <i>st_mode</i>, <i>st_ino</i>, <i>st_dev</i>, <i>st_uid</i>, <i>st_gid</i>, <i>st_atim</i>,
+       <i>st_ctim</i>, and <i>st_mtim</i> shall have meaningful values and the value of
+       the member <i>st_nlink</i> shall be set to the number of links to the file.
+
+       The <i>lstat</i>() function shall be equivalent to <i>stat</i>(), except when <i>path</i>
+       refers to a symbolic link. In that case <i>lstat</i>() shall return
+       information about the link, while <i>stat</i>() shall return information
+       about the file the link references.
+
+       For symbolic links, the <i>st_mode</i> member shall contain meaningful
+       information when used with the file type macros. The file mode bits
+       in <i>st_mode</i> are unspecified. The structure members <i>st_ino</i>, <i>st_dev</i>,
+       <i>st_uid</i>, <i>st_gid</i>, <i>st_atim</i>, <i>st_ctim</i>, and <i>st_mtim</i> shall have meaningful
+       values and the value of the <i>st_nlink</i> member shall be set to the
+       number of (hard) links to the symbolic link.  The value of the
+       <i>st_size</i> member shall be set to the length of the pathname contained
+       in the symbolic link not including any terminating null byte.
+
+       The <i>fstatat</i>() function shall be equivalent to the <i>stat</i>() or <i>lstat</i>()
+       function, depending on the value of <i>flag</i> (see below), except in the
+       case where <i>path</i> specifies a relative path. In this case the status
+       shall be retrieved from a file relative to the directory associated
+       with the file descriptor <i>fd</i> instead of the current working directory.
+       If the file descriptor was opened without O_SEARCH, the function
+       shall check whether directory searches are permitted using the
+       current permissions of the directory underlying the file descriptor.
+       If the file descriptor was opened with O_SEARCH, the function shall
+       not perform the check.
+
+       Values for <i>flag</i> are constructed by a bitwise-inclusive OR of flags
+       from the following list, defined in <i>&lt;fcntl.h&gt;</i>:
+
+       AT_SYMLINK_NOFOLLOW
+             If <i>path</i> names a symbolic link, the status of the symbolic link
+             is returned.
+
+       If <i>fstatat</i>() is passed the special value AT_FDCWD in the <i>fd</i>
+       parameter, the current working directory shall be used and the
+       behavior shall be identical to a call to <i>stat</i>() or <i>lstat</i>()
+       respectively, depending on whether or not the AT_SYMLINK_NOFOLLOW bit
+       is set in <i>flag</i>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Upon successful completion, these functions shall return 0.
+       Otherwise, these functions shall return −1 and set <i><a href="errno.3.html">errno</a></i> to indicate
+       the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions shall fail if:
+
+       <b>EACCES </b>Search permission is denied for a component of the path
+              prefix.
+
+       <b>EIO    </b>An error occurred while reading from the file system.
+
+       <b>ELOOP  </b>A loop exists in symbolic links encountered during resolution
+              of the <i>path</i> argument.
+
+       <b>ENAMETOOLONG</b>
+              The length of a component of a pathname is longer than
+              {NAME_MAX}.
+
+       <b>ENOENT </b>A component of <i>path</i> does not name an existing file or <i>path</i> is
+              an empty string.
+
+       <b>ENOTDIR</b>
+              A component of the path prefix names an existing file that is
+              neither a directory nor a symbolic link to a directory, or the
+              <i>path</i> argument contains at least one non-&lt;slash&gt; character and
+              ends with one or more trailing &lt;slash&gt; characters and the last
+              pathname component names an existing file that is neither a
+              directory nor a symbolic link to a directory.
+
+       <b>EOVERFLOW</b>
+              The file size in bytes or the number of blocks allocated to
+              the file or the file serial number cannot be represented
+              correctly in the structure pointed to by <i>buf</i>.
+
+       The <i>fstatat</i>() function shall fail if:
+
+       <b>EACCES </b><i>fd</i> was not opened with O_SEARCH and the permissions of the
+              directory underlying <i>fd</i> do not permit directory searches.
+
+       <b>EBADF  </b>The <i>path</i> argument does not specify an absolute path and the <i>fd</i>
+              argument is neither AT_FDCWD nor a valid file descriptor open
+              for reading or searching.
+
+       <b>ENOTDIR</b>
+              The <i>path</i> argument is not an absolute path and <i>fd</i> is a file
+              descriptor associated with a non-directory file.
+
+       These functions may fail if:
+
+       <b>ELOOP  </b>More than {SYMLOOP_MAX} symbolic links were encountered during
+              resolution of the <i>path</i> argument.
+
+       <b>ENAMETOOLONG</b>
+              The length of a pathname exceeds {PATH_MAX}, or pathname
+              resolution of a symbolic link produced an intermediate result
+              with a length that exceeds {PATH_MAX}.
+
+       <b>EOVERFLOW</b>
+              A value to be stored would overflow one of the members of the
+              <b>stat </b>structure.
+
+       The <i>fstatat</i>() function may fail if:
+
+       <b>EINVAL </b>The value of the <i>flag</i> argument is not valid.
+
+       <i>The following sections are informative.</i>
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Obtaining File Status Information</b>
+       The following example shows how to obtain file status information for
+       a file named <b>/home/cnd/mod1</b>.  The structure variable <i>buffer</i> is
+       defined for the <b>stat </b>structure.
+
+           <b>#include &lt;sys/types.h&gt;</b>
+           <b>#include &lt;sys/stat.h&gt;</b>
+           <b>#include &lt;fcntl.h&gt;</b>
+
+           struct stat buffer;
+           int         status;
+           ...
+           status = stat("/home/cnd/mod1", &amp;buffer);
+
+   <b>Getting Directory Information</b>
+       The following example fragment gets status information for each entry
+       in a directory. The call to the <i>stat</i>() function stores file
+       information in the <b>stat </b>structure pointed to by <i>statbuf</i>.  The lines
+       that follow the <i>stat</i>() call format the fields in the <b>stat </b>structure
+       for presentation to the user of the program.
+
+           <b>#include &lt;sys/types.h&gt;</b>
+           <b>#include &lt;sys/stat.h&gt;</b>
+           <b>#include &lt;dirent.h&gt;</b>
+           <b>#include &lt;pwd.h&gt;</b>
+           <b>#include &lt;grp.h&gt;</b>
+           <b>#include &lt;time.h&gt;</b>
+           <b>#include &lt;locale.h&gt;</b>
+           <b>#include &lt;langinfo.h&gt;</b>
+           <b>#include &lt;stdio.h&gt;</b>
+           <b>#include &lt;stdint.h&gt;</b>
+
+           struct dirent  *dp;
+           struct stat     statbuf;
+           struct passwd  *pwd;
+           struct group   *grp;
+           struct tm      *tm;
+           char            datestring[256];
+           ...
+           /* Loop through directory entries. */
+           while ((dp = readdir(dir)) != NULL) {
+
+               /* Get entry's information. */
+               if (stat(dp-&gt;d_name, &amp;statbuf) == -1)
+                   continue;
+
+               /* Print out type, permissions, and number of links. */
+               printf("%10.10s", sperm (statbuf.st_mode));
+               printf("%4d", statbuf.st_nlink);
+
+               /* Print out owner's name if it is found using getpwuid(). */
+               if ((pwd = getpwuid(statbuf.st_uid)) != NULL)
+                   printf(" %-8.8s", pwd-&gt;pw_name);
+               else
+                   printf(" %-8d", statbuf.st_uid);
+
+               /* Print out group name if it is found using getgrgid(). */
+               if ((grp = getgrgid(statbuf.st_gid)) != NULL)
+                   printf(" %-8.8s", grp-&gt;gr_name);
+               else
+                   printf(" %-8d", statbuf.st_gid);
+
+               /* Print size of file. */
+               printf(" %9jd", (intmax_t)statbuf.st_size);
+
+               tm = localtime(&amp;statbuf.st_mtime);
+
+               /* Get localized date string. */
+               strftime(datestring, sizeof(datestring), nl_langinfo(D_T_FMT), tm);
+
+               printf(" %s %s\n", datestring, dp-&gt;d_name);
+           }
+
+   <b>Obtaining Symbolic Link Status Information</b>
+       The following example shows how to obtain status information for a
+       symbolic link named <b>/modules/pass1</b>.  The structure variable <i>buffer</i> is
+       defined for the <b>stat </b>structure. If the <i>path</i> argument specified the
+       pathname for the file pointed to by the symbolic link
+       (<b>/home/cnd/mod1</b>), the results of calling the function would be the
+       same as those returned by a call to the <i>stat</i>() function.
+
+           <b>#include &lt;sys/stat.h&gt;</b>
+
+           struct stat buffer;
+           int status;
+           ...
+           status = lstat("/modules/pass1", &amp;buffer);
+</pre>
+<h2><a id="APPLICATION_USAGE" href="#APPLICATION_USAGE"></a>APPLICATION USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="RATIONALE" href="#RATIONALE"></a>RATIONALE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The intent of the paragraph describing ``additional or alternate file
+       access control mechanisms'' is to allow a secure implementation where
+       a process with a label that does not dominate the file's label cannot
+       perform a <i>stat</i>() function. This is not related to read permission; a
+       process with a label that dominates the file's label does not need
+       read permission.  An implementation that supports write-up operations
+       could fail <i>fstat</i>() function calls even though it has a valid file
+       descriptor open for writing.
+
+       The <i>lstat</i>() function is not required to update the time-related
+       fields if the named file is not a symbolic link. While the <i>st_uid</i>,
+       <i>st_gid</i>, <i>st_atim</i>, <i>st_mtim</i>, and <i>st_ctim</i> members of the <b>stat </b>structure
+       may apply to a symbolic link, they are not required to do so.  No
+       functions in POSIX.1‐2008 are required to maintain any of these time
+       fields.
+
+       The purpose of the <i>fstatat</i>() function is to obtain the status of
+       files in directories other than the current working directory without
+       exposure to race conditions. Any part of the path of a file could be
+       changed in parallel to a call to <i>stat</i>(), resulting in unspecified
+       behavior. By opening a file descriptor for the target directory and
+       using the <i>fstatat</i>() function it can be guaranteed that the file for
+       which status is returned is located relative to the desired
+       directory.
+</pre>
+<h2><a id="FUTURE_DIRECTIONS" href="#FUTURE_DIRECTIONS"></a>FUTURE DIRECTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="access.3p.html">access(3p)</a>, <a href="chmod.3p.html">chmod(3p)</a>, <a href="fdopendir.3p.html">fdopendir(3p)</a>, <a href="fstat.3p.html">fstat(3p)</a>, <a href="mknod.3p.html">mknod(3p)</a>,
+       <a href="readlink.3p.html">readlink(3p)</a>, <a href="symlink.3p.html">symlink(3p)</a>
+
+       The Base Definitions volume of POSIX.1‐2008, <i>Section 4.8</i>, <i>File Times</i>
+       <i>Update</i>, <a href="../man0/fcntl.h.0p.html">fcntl.h(0p)</a>, <a href="../man0/sys_stat.h.0p.html">sys_stat.h(0p)</a>, <a href="../man0/sys_types.h.0p.html">sys_types.h(0p)</a>
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Portions of this text are reprinted and reproduced in electronic form
+       from IEEE Std 1003.1, 2013 Edition, Standard for Information
+       Technology -- Portable Operating System Interface (POSIX), The Open
+       Group Base Specifications Issue 7, Copyright (C) 2013 by the
+       Institute of Electrical and Electronics Engineers, Inc and The Open
+       Group.  (This is POSIX.1-2008 with the 2013 Technical Corrigendum 1
+       applied.) In the event of any discrepancy between this version and
+       the original IEEE and The Open Group Standard, the original IEEE and
+       The Open Group Standard is the referee document. The original
+       Standard can be obtained online at <a href="http://www.unix.org/online.html">http://www.unix.org/online.html</a> .
+
+       Any typographical or formatting errors that appear in this page are
+       most likely to have been introduced during the conversion of the
+       source files to man page format. To report such errors, see
+       <a href="https://www.kernel.org/doc/man-pages/reporting_bugs.html">https://www.kernel.org/doc/man-pages/reporting_bugs.html</a> .
+
+<span class="footline">IEEE/The Open Group                 2013                         FSTATAT(3P)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man0/sys_stat.h.0p.html">sys_stat.h(0p)</a>,&nbsp; 
+    <a href="../man1/du.1p.html">du(1p)</a>,&nbsp; 
+    <a href="../man1/find.1p.html">find(1p)</a>,&nbsp; 
+    <a href="../man1/ls.1p.html">ls(1p)</a>,&nbsp; 
+    <a href="../man1/pax.1p.html">pax(1p)</a>,&nbsp; 
+    <a href="access.3p.html">access(3p)</a>,&nbsp; 
+    <a href="chmod.3p.html">chmod(3p)</a>,&nbsp; 
+    <a href="fchmod.3p.html">fchmod(3p)</a>,&nbsp; 
+    <a href="fdopendir.3p.html">fdopendir(3p)</a>,&nbsp; 
+    <a href="fstat.3p.html">fstat(3p)</a>,&nbsp; 
+    <a href="ftw.3p.html">ftw(3p)</a>,&nbsp; 
+    <a href="glob.3p.html">glob(3p)</a>,&nbsp; 
+    <a href="lstat.3p.html">lstat(3p)</a>,&nbsp; 
+    <a href="mknod.3p.html">mknod(3p)</a>,&nbsp; 
+    <a href="nftw.3p.html">nftw(3p)</a>,&nbsp; 
+    <a href="posix_spawn.3p.html">posix_spawn(3p)</a>,&nbsp; 
+    <a href="readdir.3p.html">readdir(3p)</a>,&nbsp; 
+    <a href="readlink.3p.html">readlink(3p)</a>,&nbsp; 
+    <a href="stat.3p.html">stat(3p)</a>,&nbsp; 
+    <a href="symlink.3p.html">symlink(3p)</a>,&nbsp; 
+    <a href="utime.3p.html">utime(3p)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,312 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>setpriv(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTION">OPTION</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SETPRIV(1)                      User Commands                     SETPRIV(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       setpriv - run a program with different Linux privilege settings
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>setpriv </b>[options] <i>program</i> [<i>arguments</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Sets or queries various Linux privilege settings that are inherited
+       across <a href="../man2/execve.2.html">execve(2)</a>.
+
+       The difference between the commands setpriv and su (or runuser) is
+       that setpriv does not use open PAM session and does not ask for
+       password.  It's simple non-set-user-ID wrapper around <b>execve </b>system
+       call.
+</pre>
+<h2><a id="OPTION" href="#OPTION"></a>OPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>--clear-groups</b>
+              Clear supplementary groups.
+
+       <b>-d</b>, <b>--dump</b>
+              Dump current privilege state.  Can be specified more than once
+              to show extra, mostly useless, information.  Incompatible with
+              all other options.
+
+       <b>--groups </b><i>group</i>...
+              Set supplementary groups.  The argument is a comma-separated
+              list.
+
+       <b>--inh-caps </b>(<b>+</b>|<b>-</b>)<i>cap</i>...  or  <b>--ambient-caps </b>(<b>+</b>|<b>-</b>)<i>cap</i>...  or
+       <b>--bounding-set </b>(<b>+</b>|<b>-</b>)<i>cap</i>...
+              Set the inheritable capabilities, ambient capabilities or the
+              capability bounding set.  See <a href="../man7/capabilities.7.html">capabilities(7)</a>.  The argument
+              is a comma-separated list of <b>+</b><i>cap</i> and <b>-</b><i>cap</i> entries, which add
+              or remove an entry respectively.  <b>+all </b>and <b>-all </b>can be used to
+              add or remove all caps.  The set of capabilities starts out as
+              the current inheritable set for <b>--inh-caps</b>, the current
+              ambient set for <b>--ambient-caps </b>and the current bounding set
+              for <b>--bounding-set</b>.  If you drop something from the bounding
+              set without also dropping it from the inheritable set, you are
+              likely to become confused.  Do not do that.
+
+       <b>--keep-groups</b>
+              Preserve supplementary groups.  Only useful in conjunction
+              with <b>--rgid</b>, <b>--egid</b>, or <b>--regid</b>.
+
+       <b>--init-groups</b>
+              Initialize supplementary groups using <a href="../man3/initgroups.3.html">initgroups(3)</a>.  Only
+              useful in conjunction with <b>--ruid </b>or <b>--reuid</b>.
+
+       <b>--list-caps</b>
+              List all known capabilities.  This option must be specified
+              alone.
+
+       <b>--no-new-privs</b>
+              Set the <i>no_new_privs</i> bit.  With this bit set, <a href="../man2/execve.2.html">execve(2)</a> will
+              not grant new privileges.  For example, the set-user-ID and
+              set-group-ID bits as well as file capabilities will be
+              disabled.  (Executing binaries with these bits set will still
+              work, but they will not gain privileges.  Certain LSMs,
+              especially AppArmor, may result in failures to execute certain
+              programs.)  This bit is inherited by child processes and
+              cannot be unset.  See <a href="../man2/prctl.2.html">prctl(2)</a> and <i>Documentation/prctl/no_new_</i>
+              <i>privs.txt</i> in the Linux kernel source.
+
+              The no_new_privs bit is supported since Linux 3.5.
+
+       <b>--rgid </b><i>gid</i>, <b>--egid </b><i>gid</i>, <b>--regid </b><i>gid</i>
+              Set the real, effective, or both GIDs.  The <i>gid</i> argument can
+              be given as textual group name.
+
+              For safety, you must specify one of <b>--clear-groups</b>, <b>--groups</b>,
+              or <b>--keep-groups </b>if you set any primary <i>gid</i>.
+
+       <b>--ruid </b><i>uid</i>, <b>--euid </b><i>uid</i>, <b>--reuid </b><i>uid</i>
+              Set the real, effective, or both UIDs.  The <i>uid</i> argument can
+              be given as textual login name.
+
+              Setting a <i>uid</i> or <i>gid</i> does not change capabilities, although
+              the exec call at the end might change capabilities.  This
+              means that, if you are root, you probably want to do something
+              like:
+
+                      <b>setpriv --reuid=1000 --regid=1000 --caps=-all</b>
+
+       <b>--securebits </b>(<b>+</b>|<b>-</b>)<i>securebit</i>...
+              Set or clear securebits.  The argument is a comma-separated
+              list.  The valid securebits are <i>noroot</i>, <i>noroot_locked</i>,
+              <i>no_setuid_fixup</i>, <i>no_setuid_fixup_locked</i>, and <i>keep_caps_locked</i>.
+              <i>keep_caps</i> is cleared by <a href="../man2/execve.2.html">execve(2)</a> and is therefore not
+              allowed.
+
+       <b>--selinux-label </b><i>label</i>
+              Request a particular SELinux transition (using a transition on
+              exec, not dyntrans).  This will fail and cause <a href="setpriv.1.html">setpriv(1)</a> to
+              abort if SELinux is not in use, and the transition may be
+              ignored or cause <a href="../man2/execve.2.html">execve(2)</a> to fail at SELinux's whim.  (In
+              particular, this is unlikely to work in conjunction with
+              <i>no_new_privs</i>.)  This is similar to <a href="runcon.1.html">runcon(1)</a>.
+
+       <b>--apparmor-profile </b><i>profile</i>
+              Request a particular AppArmor profile (using a transition on
+              exec).  This will fail and cause <a href="setpriv.1.html">setpriv(1)</a> to abort if
+              AppArmor is not in use, and the transition may be ignored or
+              cause <a href="../man2/execve.2.html">execve(2)</a> to fail at AppArmor's whim.
+
+       <b>-V</b>, <b>--version</b>
+              Display version information and exit.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If applying any specified option fails, <i>program</i> will not be run and
+       <b>setpriv </b>will return with exit code 127.
+
+       Be careful with this tool -- it may have unexpected security
+       consequences.  For example, setting no_new_privs and then execing a
+       program that is SELinux-confined (as this tool would do) may prevent
+       the SELinux restrictions from taking effect.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="runuser.1.html">runuser(1)</a>, <a href="su.1.html">su(1)</a>, <a href="../man2/prctl.2.html">prctl(2)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Andy Lutomirski ⟨luto@amacapital.net⟩
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>setpriv </b>command is part of the util-linux package and is
+       available from Linux Kernel Archive 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                        July 2014                       SETPRIV(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="runuser.1.html">runuser(1)</a>,&nbsp; 
+    <a href="setpriv.1.html">setpriv(1)</a>,&nbsp; 
+    <a href="su.1.html">su(1)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="../man7/credentials.7.html">credentials(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

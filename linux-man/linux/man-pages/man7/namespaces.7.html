@@ -1,0 +1,467 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>namespaces(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">NAMESPACES(7)             Linux Programmer's Manual            NAMESPACES(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       namespaces - overview of Linux namespaces
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A namespace wraps a global system resource in an abstraction that
+       makes it appear to the processes within the namespace that they have
+       their own isolated instance of the global resource.  Changes to the
+       global resource are visible to other processes that are members of
+       the namespace, but are invisible to other processes.  One use of
+       namespaces is to implement containers.
+
+       Linux provides the following namespaces:
+
+       <b>Namespace   Constant          Isolates</b>
+       Cgroup      <b>CLONE_NEWCGROUP   </b>Cgroup root directory
+       IPC         <b>CLONE_NEWIPC      </b>System V IPC, POSIX message queues
+       Network     <b>CLONE_NEWNET      </b>Network devices, stacks, ports, etc.
+       Mount       <b>CLONE_NEWNS       </b>Mount points
+       PID         <b>CLONE_NEWPID      </b>Process IDs
+       User        <b>CLONE_NEWUSER     </b>User and group IDs
+       UTS         <b>CLONE_NEWUTS      </b>Hostname and NIS domain name
+
+       This page describes the various namespaces and the associated <i>/proc</i>
+       files, and summarizes the APIs for working with namespaces.
+
+   <b>The namespaces API</b>
+       As well as various <i>/proc</i> files described below, the namespaces API
+       includes the following system calls:
+
+       <a href="../man2/clone.2.html">clone(2)</a>
+              The <a href="../man2/clone.2.html">clone(2)</a> system call creates a new process.  If the <i>flags</i>
+              argument of the call specifies one or more of the <b>CLONE_NEW*</b>
+              flags listed below, then new namespaces are created for each
+              flag, and the child process is made a member of those
+              namespaces.  (This system call also implements a number of
+              features unrelated to namespaces.)
+
+       <a href="../man2/setns.2.html">setns(2)</a>
+              The <a href="../man2/setns.2.html">setns(2)</a> system call allows the calling process to join an
+              existing namespace.  The namespace to join is specified via a
+              file descriptor that refers to one of the <i>/proc/[pid]/ns</i> files
+              described below.
+
+       <a href="../man2/unshare.2.html">unshare(2)</a>
+              The <a href="../man2/unshare.2.html">unshare(2)</a> system call moves the calling process to a new
+              namespace.  If the <i>flags</i> argument of the call specifies one or
+              more of the <b>CLONE_NEW* </b>flags listed below, then new namespaces
+              are created for each flag, and the calling process is made a
+              member of those namespaces.  (This system call also implements
+              a number of features unrelated to namespaces.)
+
+       Creation of new namespaces using <a href="../man2/clone.2.html">clone(2)</a> and <a href="../man2/unshare.2.html">unshare(2)</a> in most
+       cases requires the <b>CAP_SYS_ADMIN </b>capability.  User namespaces are the
+       exception: since Linux 3.8, no privilege is required to create a user
+       namespace.
+
+   <b>The /proc/[pid]/ns/ directory</b>
+       Each process has a <i>/proc/[pid]/ns/</i> subdirectory containing one entry
+       for each namespace that supports being manipulated by <a href="../man2/setns.2.html">setns(2)</a>:
+
+           $ <b>ls -l /proc/$$/ns</b>
+           total 0
+           lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 cgroup -&gt; cgroup:[4026531835]
+           lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 ipc -&gt; ipc:[4026531839]
+           lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 mnt -&gt; mnt:[4026531840]
+           lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 net -&gt; net:[4026531969]
+           lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 pid -&gt; pid:[4026531836]
+           lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 pid_for_children -&gt; pid:[4026531834]
+           lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 user -&gt; user:[4026531837]
+           lrwxrwxrwx. 1 mtk mtk 0 Apr 28 12:46 uts -&gt; uts:[4026531838]
+
+       Bind mounting (see <a href="../man2/mount.2.html">mount(2)</a>) one of the files in this directory to
+       somewhere else in the filesystem keeps the corresponding namespace of
+       the process specified by <i>pid</i> alive even if all processes currently in
+       the namespace terminate.
+
+       Opening one of the files in this directory (or a file that is bind
+       mounted to one of these files) returns a file handle for the
+       corresponding namespace of the process specified by <i>pid</i>.  As long as
+       this file descriptor remains open, the namespace will remain alive,
+       even if all processes in the namespace terminate.  The file
+       descriptor can be passed to <a href="../man2/setns.2.html">setns(2)</a>.
+
+       In Linux 3.7 and earlier, these files were visible as hard links.
+       Since Linux 3.8, they appear as symbolic links.  If two processes are
+       in the same namespace, then the inode numbers of their
+       <i>/proc/[pid]/ns/xxx</i> symbolic links will be the same; an application
+       can check this using the <i>stat.st_ino</i> field returned by <a href="../man2/stat.2.html">stat(2)</a>.  The
+       content of this symbolic link is a string containing the namespace
+       type and inode number as in the following example:
+
+           $ <b>readlink /proc/$$/ns/uts</b>
+           uts:[4026531838]
+
+       The symbolic links in this subdirectory are as follows:
+
+       <i>/proc/[pid]/ns/cgroup</i> (since Linux 4.6)
+              This file is a handle for the cgroup namespace of the process.
+
+       <i>/proc/[pid]/ns/ipc</i> (since Linux 3.0)
+              This file is a handle for the IPC namespace of the process.
+
+       <i>/proc/[pid]/ns/mnt</i> (since Linux 3.8)
+              This file is a handle for the mount namespace of the process.
+
+       <i>/proc/[pid]/ns/net</i> (since Linux 3.0)
+              This file is a handle for the network namespace of the
+              process.
+
+       <i>/proc/[pid]/ns/pid</i> (since Linux 3.8)
+              This file is a handle for the PID namespace of the process.
+              This handle is permanent for the lifetime of the process
+              (i.e., a process's PID namespace membership never changes).
+
+       <i>/proc/[pid]/ns/pid_for_children</i> (since Linux 4.12)
+              This file is a handle for the PID namespace of child processes
+              created by this process.  This can change as a consequence of
+              calls to <a href="../man2/unshare.2.html">unshare(2)</a> and <a href="../man2/setns.2.html">setns(2)</a> (see <a href="pid_namespaces.7.html">pid_namespaces(7)</a>), so
+              the file may differ from <i>/proc/[pid]/ns/pid</i>.
+
+       <i>/proc/[pid]/ns/user</i> (since Linux 3.8)
+              This file is a handle for the user namespace of the process.
+
+       <i>/proc/[pid]/ns/uts</i> (since Linux 3.0)
+              This file is a handle for the UTS namespace of the process.
+
+       Permission to dereference or read (<a href="../man2/readlink.2.html">readlink(2)</a>) these symbolic links
+       is governed by a ptrace access mode <b>PTRACE_MODE_READ_FSCREDS </b>check;
+       see <a href="../man2/ptrace.2.html">ptrace(2)</a>.
+
+   <b>The /proc/sys/user directory</b>
+       The files in the <i>/proc/sys/user</i> directory (which is present since
+       Linux 4.9) expose limits on the number of namespaces of various types
+       that can be created.  The files are as follows:
+
+       <i>max_cgroup_namespaces</i>
+              The value in this file defines a per-user limit on the number
+              of cgroup namespaces that may be created in the user
+              namespace.
+
+       <i>max_ipc_namespaces</i>
+              The value in this file defines a per-user limit on the number
+              of ipc namespaces that may be created in the user namespace.
+
+       <i>max_mnt_namespaces</i>
+              The value in this file defines a per-user limit on the number
+              of mount namespaces that may be created in the user namespace.
+
+       <i>max_net_namespaces</i>
+              The value in this file defines a per-user limit on the number
+              of network namespaces that may be created in the user
+              namespace.
+
+       <i>max_pid_namespaces</i>
+              The value in this file defines a per-user limit on the number
+              of pid namespaces that may be created in the user namespace.
+
+       <i>max_user_namespaces</i>
+              The value in this file defines a per-user limit on the number
+              of user namespaces that may be created in the user namespace.
+
+       <i>max_uts_namespaces</i>
+              The value in this file defines a per-user limit on the number
+              of user namespaces that may be created in the user namespace.
+
+       Note the following details about these files:
+
+       *  The values in these files are modifiable by privileged processes.
+
+       *  The values exposed by these files are the limits for the user
+          namespace in which the opening process resides.
+
+       *  The limits are per-user.  Each user in the same user namespace can
+          create namespaces up to the defined limit.
+
+       *  The limits apply to all users, including UID 0.
+
+       *  These limits apply in addition to any other per-namespace limits
+          (such as those for PID and user namespaces) that may be enforced.
+
+       *  Upon encountering these limits, <a href="../man2/clone.2.html">clone(2)</a> and <a href="../man2/unshare.2.html">unshare(2)</a> fail with
+          the error <b>ENOSPC</b>.
+
+       *  For the initial user namespace, the default value in each of these
+          files is half the limit on the number of threads that may be
+          created (<i>/proc/sys/kernel/threads-max</i>).  In all descendant user
+          namespaces, the default value in each file is <b>MAXINT</b>.
+
+       *  When a namespace is created, the object is also accounted against
+          ancestor namespaces.  More precisely:
+
+          +  Each user namespace has a creator UID.
+
+          +  When a namespace is created, it is accounted against the
+             creator UIDs in each of the ancestor user namespaces, and the
+             kernel ensures that the corresponding namespace limit for the
+             creator UID in the ancestor namespace is not exceeded.
+
+          +  The aforementioned point ensures that creating a new user
+             namespace cannot be used as a means to escape the limits in
+             force in the current user namespace.
+
+   <b>Cgroup namespaces (CLONE_NEWCGROUP)</b>
+       See <a href="cgroup_namespaces.7.html">cgroup_namespaces(7)</a>.
+
+   <b>IPC namespaces (CLONE_NEWIPC)</b>
+       IPC namespaces isolate certain IPC resources, namely, System V IPC
+       objects (see <a href="svipc.7.html">svipc(7)</a>) and (since Linux 2.6.30) POSIX message queues
+       (see <a href="mq_overview.7.html">mq_overview(7)</a>).  The common characteristic of these IPC
+       mechanisms is that IPC objects are identified by mechanisms other
+       than filesystem pathnames.
+
+       Each IPC namespace has its own set of System V IPC identifiers and
+       its own POSIX message queue filesystem.  Objects created in an IPC
+       namespace are visible to all other processes that are members of that
+       namespace, but are not visible to processes in other IPC namespaces.
+
+       The following <i>/proc</i> interfaces are distinct in each IPC namespace:
+
+       *  The POSIX message queue interfaces in <i>/proc/sys/fs/mqueue</i>.
+
+       *  The System V IPC interfaces in <i>/proc/sys/kernel</i>, namely: <i>msgmax</i>,
+          <i>msgmnb</i>, <i>msgmni</i>, <i>sem</i>, <i>shmall</i>, <i>shmmax</i>, <i>shmmni</i>, and <i>shm_rmid_forced</i>.
+
+       *  The System V IPC interfaces in <i>/proc/sysvipc</i>.
+
+       When an IPC namespace is destroyed (i.e., when the last process that
+       is a member of the namespace terminates), all IPC objects in the
+       namespace are automatically destroyed.
+
+       Use of IPC namespaces requires a kernel that is configured with the
+       <b>CONFIG_IPC_NS </b>option.
+
+   <b>Network namespaces (CLONE_NEWNET)</b>
+       Network namespaces provide isolation of the system resources
+       associated with networking: network devices, IPv4 and IPv6 protocol
+       stacks, IP routing tables, firewalls, the <i>/proc/net</i> directory, the
+       <i>/sys/class/net</i> directory, port numbers (sockets), and so on.  A
+       physical network device can live in exactly one network namespace.  A
+       virtual network device ("veth") pair provides a pipe-like abstraction
+       that can be used to create tunnels between network namespaces, and
+       can be used to create a bridge to a physical network device in
+       another namespace.
+
+       When a network namespace is freed (i.e., when the last process in the
+       namespace terminates), its physical network devices are moved back to
+       the initial network namespace (not to the parent of the process).
+
+       Use of network namespaces requires a kernel that is configured with
+       the <b>CONFIG_NET_NS </b>option.
+
+   <b>Mount namespaces (CLONE_NEWNS)</b>
+       See <a href="mount_namespaces.7.html">mount_namespaces(7)</a>.
+
+   <b>PID namespaces (CLONE_NEWPID)</b>
+       See <a href="pid_namespaces.7.html">pid_namespaces(7)</a>.
+
+   <b>User namespaces (CLONE_NEWUSER)</b>
+       See <a href="user_namespaces.7.html">user_namespaces(7)</a>.
+
+   <b>UTS namespaces (CLONE_NEWUTS)</b>
+       UTS namespaces provide isolation of two system identifiers: the
+       hostname and the NIS domain name.  These identifiers are set using
+       <a href="../man2/sethostname.2.html">sethostname(2)</a> and <a href="../man2/setdomainname.2.html">setdomainname(2)</a>, and can be retrieved using
+       <a href="../man2/uname.2.html">uname(2)</a>, <a href="../man2/gethostname.2.html">gethostname(2)</a>, and <a href="../man2/getdomainname.2.html">getdomainname(2)</a>.
+
+       Use of UTS namespaces requires a kernel that is configured with the
+       <b>CONFIG_UTS_NS </b>option.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       See <a href="user_namespaces.7.html">user_namespaces(7)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/nsenter.1.html">nsenter(1)</a>, <a href="../man1/readlink.1.html">readlink(1)</a>, <a href="../man1/unshare.1.html">unshare(1)</a>, <a href="../man2/clone.2.html">clone(2)</a>, <a href="../man2/ioctl_ns.2.html">ioctl_ns(2)</a>, <a href="../man2/setns.2.html">setns(2)</a>,
+       <a href="../man2/unshare.2.html">unshare(2)</a>, <a href="../man5/proc.5.html">proc(5)</a>, <a href="capabilities.7.html">capabilities(7)</a>, <a href="cgroup_namespaces.7.html">cgroup_namespaces(7)</a>,
+       <a href="cgroups.7.html">cgroups(7)</a>, <a href="credentials.7.html">credentials(7)</a>, <a href="pid_namespaces.7.html">pid_namespaces(7)</a>, <a href="user_namespaces.7.html">user_namespaces(7)</a>,
+       <a href="../man8/ip-netns.8.html">ip-netns(8)</a>, <a href="../man8/lsns.8.html">lsns(8)</a>, <a href="../man8/switch_root.8.html">switch_root(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                    NAMESPACES(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/nsenter.1.html">nsenter(1)</a>,&nbsp; 
+    <a href="../man1/systemd-detect-virt.1.html">systemd-detect-virt(1)</a>,&nbsp; 
+    <a href="../man1/unshare.1.html">unshare(1)</a>,&nbsp; 
+    <a href="../man2/clone.2.html">clone(2)</a>,&nbsp; 
+    <a href="../man2/getdomainname.2.html">getdomainname(2)</a>,&nbsp; 
+    <a href="../man2/gethostname.2.html">gethostname(2)</a>,&nbsp; 
+    <a href="../man2/ioctl_ns.2.html">ioctl_ns(2)</a>,&nbsp; 
+    <a href="../man2/setns.2.html">setns(2)</a>,&nbsp; 
+    <a href="../man2/uname.2.html">uname(2)</a>,&nbsp; 
+    <a href="../man2/unshare.2.html">unshare(2)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="cgroup_namespaces.7.html">cgroup_namespaces(7)</a>,&nbsp; 
+    <a href="cgroups.7.html">cgroups(7)</a>,&nbsp; 
+    <a href="credentials.7.html">credentials(7)</a>,&nbsp; 
+    <a href="mount_namespaces.7.html">mount_namespaces(7)</a>,&nbsp; 
+    <a href="mq_overview.7.html">mq_overview(7)</a>,&nbsp; 
+    <a href="pid_namespaces.7.html">pid_namespaces(7)</a>,&nbsp; 
+    <a href="svipc.7.html">svipc(7)</a>,&nbsp; 
+    <a href="user_namespaces.7.html">user_namespaces(7)</a>,&nbsp; 
+    <a href="../man8/lsns.8.html">lsns(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="namespaces.7.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

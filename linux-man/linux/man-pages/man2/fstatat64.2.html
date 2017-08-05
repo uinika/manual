@@ -1,0 +1,618 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>stat(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">STAT(2)                   Linux Programmer's Manual                  STAT(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       stat, fstat, lstat, fstatat - get file status
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/types.h&gt;</b>
+       <b>#include &lt;sys/stat.h&gt;</b>
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>int stat(const char *</b><i>pathname</i><b>, struct stat *</b><i>statbuf</i><b>);</b>
+       <b>int fstat(int </b><i>fd</i><b>, struct stat *</b><i>statbuf</i><b>);</b>
+       <b>int lstat(const char *</b><i>pathname</i><b>, struct stat *</b><i>statbuf</i><b>);</b>
+
+       <b>#include &lt;fcntl.h&gt;           </b>/* Definition of AT_* constants */
+       <b>#include &lt;sys/stat.h&gt;</b>
+
+       <b>int fstatat(int </b><i>dirfd</i><b>, const char *</b><i>pathname</i><b>, struct stat *</b><i>statbuf</i><b>,</b>
+                   <b>int </b><i>flags</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>lstat</b>():
+           /* glibc 2.19 and earlier */ _BSD_SOURCE
+               || /* Since glibc 2.20 */ _DEFAULT_SOURCE
+               || _XOPEN_SOURCE &gt;= 500
+               || /* Since glibc 2.10: */ _POSIX_C_SOURCE &gt;= 200112L
+
+       <b>fstatat</b>():
+           Since glibc 2.10:
+               _POSIX_C_SOURCE &gt;= 200809L
+           Before glibc 2.10:
+               _ATFILE_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions return information about a file, in the buffer
+       pointed to by <i>statbuf</i>.  No permissions are required on the file
+       itself, but—in the case of <b>stat</b>(), <b>fstatat</b>(), and <b>lstat</b>()—execute
+       (search) permission is required on all of the directories in <i>pathname</i>
+       that lead to the file.
+
+       <b>stat</b>() and <b>fstatat</b>() retrieve information about the file pointed to
+       by <i>pathname</i>; the differences for <b>fstatat</b>() are described below.
+
+       <b>lstat</b>() is identical to <b>stat</b>(), except that if <i>pathname</i> is a symbolic
+       link, then it returns information about the link itself, not the file
+       that it refers to.
+
+       <b>fstat</b>() is identical to <b>stat</b>(), except that the file about which
+       information is to be retrieved is specified by the file descriptor
+       <i>fd</i>.
+
+   <b>The stat structure</b>
+       All of these system calls return a <i>stat</i> structure, which contains the
+       following fields:
+
+           struct stat {
+               dev_t     st_dev;         /* ID of device containing file */
+               ino_t     st_ino;         /* Inode number */
+               mode_t    st_mode;        /* File type and mode */
+               nlink_t   st_nlink;       /* Number of hard links */
+               uid_t     st_uid;         /* User ID of owner */
+               gid_t     st_gid;         /* Group ID of owner */
+               dev_t     st_rdev;        /* Device ID (if special file) */
+               off_t     st_size;        /* Total size, in bytes */
+               blksize_t st_blksize;     /* Block size for filesystem I/O */
+               blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */
+
+               /* Since Linux 2.6, the kernel supports nanosecond
+                  precision for the following timestamp fields.
+                  For the details before Linux 2.6, see NOTES. */
+
+               struct timespec st_atim;  /* Time of last access */
+               struct timespec st_mtim;  /* Time of last modification */
+               struct timespec st_ctim;  /* Time of last status change */
+
+           #define st_atime st_atim.tv_sec      /* Backward compatibility */
+           #define st_mtime st_mtim.tv_sec
+           #define st_ctime st_ctim.tv_sec
+           };
+
+       <i>Note</i>: the order of fields in the <i>stat</i> structure varies somewhat
+       across architectures.  In addition, the definition above does not
+       show the padding bytes that may be present between some fields on
+       various architectures.  Consult the glibc and kernel source code if
+       you need to know the details.
+
+       <i>Note</i>: for performance and simplicity reasons, different fields in the
+       <i>stat</i> structure may contain state information from different moments
+       during the execution of the system call.  For example, if <i>st_mode</i> or
+       <i>st_uid</i> is changed by another process by calling <a href="chmod.2.html">chmod(2)</a> or <a href="chown.2.html">chown(2)</a>,
+       <b>stat</b>() might return the old <i>st_mode</i> together with the new <i>st_uid</i>, or
+       the old <i>st_uid</i> together with the new <i>st_mode</i>.
+
+       The fields in the <i>stat</i> structure are as follows:
+
+       <i>st_dev</i> This field describes the device on which this file resides.
+              (The <a href="../man3/major.3.html">major(3)</a> and <a href="../man3/minor.3.html">minor(3)</a> macros may be useful to decompose
+              the device ID in this field.)
+
+       <i>st_ino</i> This field contains the file's inode number.
+
+       <i>st_mode</i>
+              This field contains the file type and mode.  See <a href="../man7/inode.7.html">inode(7)</a> for
+              further information.
+
+       <i>st_nlink</i>
+              This field contains the number of hard links to the file.
+
+       <i>st_uid</i> This field contains the user ID of the owner of the file.
+
+       <i>st_gid</i> This field contains the ID of the group owner of the file.
+
+       <i>st_rdev</i>
+              This field describes the device that this file (inode)
+              represents.
+
+       <i>st_size</i>
+              This field gives the size of the file (if it is a regular file
+              or a symbolic link) in bytes.  The size of a symbolic link is
+              the length of the pathname it contains, without a terminating
+              null byte.
+
+       <i>st_blksize</i>
+              This field gives the "preferred" block size for efficient
+              filesystem I/O.
+
+       <i>st_blocks</i>
+              This field indicates the number of blocks allocated to the
+              file, in 512-byte units.  (This may be smaller than
+              <i>st_size</i>/512 when the file has holes.)
+
+       <i>st_atime</i>
+              This is the file's last access timestamp.
+
+       <i>st_mtime</i>
+              This is the file's last modification timestamp.
+
+       <i>st_ctime</i>
+              This is the file's last status change timestamp.
+
+       For further information on the above fields, see <a href="../man7/inode.7.html">inode(7)</a>.
+
+   <b>fstatat()</b>
+       The <b>fstatat</b>() system call operates in exactly the same way as <b>stat</b>(),
+       except for the differences described here.
+
+       If the pathname given in <i>pathname</i> is relative, then it is interpreted
+       relative to the directory referred to by the file descriptor <i>dirfd</i>
+       (rather than relative to the current working directory of the calling
+       process, as is done by <b>stat</b>() for a relative pathname).
+
+       If <i>pathname</i> is relative and <i>dirfd</i> is the special value <b>AT_FDCWD</b>, then
+       <i>pathname</i> is interpreted relative to the current working directory of
+       the calling process (like <b>stat</b>()).
+
+       If <i>pathname</i> is absolute, then <i>dirfd</i> is ignored.
+
+       <i>flags</i> can either be 0, or include one or more of the following flags
+       ORed:
+
+       <b>AT_EMPTY_PATH </b>(since Linux 2.6.39)
+              If <i>pathname</i> is an empty string, operate on the file referred
+              to by <i>dirfd</i> (which may have been obtained using the <a href="open.2.html">open(2)</a>
+              <b>O_PATH </b>flag).  In this case, <i>dirfd</i> can refer to any type of
+              file, not just a directory.  If <i>dirfd</i> is <b>AT_FDCWD</b>, the call
+              operates on the current working directory.  This flag is
+              Linux-specific; define <b>_GNU_SOURCE </b>to obtain its definition.
+
+       <b>AT_NO_AUTOMOUNT </b>(since Linux 2.6.38)
+              Don't automount the terminal ("basename") component of
+              <i>pathname</i> if it is a directory that is an automount point.
+              This allows the caller to gather attributes of an automount
+              point (rather than the location it would mount).  This flag
+              can be used in tools that scan directories to prevent mass-
+              automounting of a directory of automount points.  The
+              <b>AT_NO_AUTOMOUNT </b>flag has no effect if the mount point has
+              already been mounted over.  This flag is Linux-specific;
+              define <b>_GNU_SOURCE </b>to obtain its definition.
+
+       <b>AT_SYMLINK_NOFOLLOW</b>
+              If <i>pathname</i> is a symbolic link, do not dereference it: instead
+              return information about the link itself, like <b>lstat</b>().  (By
+              default, <b>fstatat</b>() dereferences symbolic links, like <b>stat</b>().)
+
+       See <a href="openat.2.html">openat(2)</a> for an explanation of the need for <b>fstatat</b>().
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EACCES </b>Search permission is denied for one of the directories in the
+              path prefix of <i>pathname</i>.  (See also <a href="../man7/path_resolution.7.html">path_resolution(7)</a>.)
+
+       <b>EBADF  </b><i>fd</i> is not a valid open file descriptor.
+
+       <b>EFAULT </b>Bad address.
+
+       <b>ELOOP  </b>Too many symbolic links encountered while traversing the path.
+
+       <b>ENAMETOOLONG</b>
+              <i>pathname</i> is too long.
+
+       <b>ENOENT </b>A component of <i>pathname</i> does not exist, or <i>pathname</i> is an
+              empty string and <b>AT_EMPTY_PATH </b>was not specified in <i>flags</i>.
+
+       <b>ENOMEM </b>Out of memory (i.e., kernel memory).
+
+       <b>ENOTDIR</b>
+              A component of the path prefix of <i>pathname</i> is not a directory.
+
+       <b>EOVERFLOW</b>
+              <i>pathname</i> or <i>fd</i> refers to a file whose size, inode number, or
+              number of blocks cannot be represented in, respectively, the
+              types <i>off_t</i>, <i>ino_t</i>, or <i>blkcnt_t</i>.  This error can occur when,
+              for example, an application compiled on a 32-bit platform
+              without <i>-D_FILE_OFFSET_BITS=64</i> calls <b>stat</b>() on a file whose
+              size exceeds <i>(1&lt;&lt;31)-1</i> bytes.
+
+       The following additional errors can occur for <b>fstatat</b>():
+
+       <b>EBADF  </b><i>dirfd</i> is not a valid file descriptor.
+
+       <b>EINVAL </b>Invalid flag specified in <i>flags</i>.
+
+       <b>ENOTDIR</b>
+              <i>pathname</i> is relative and <i>dirfd</i> is a file descriptor referring
+              to a file other than a directory.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>fstatat</b>() was added to Linux in kernel 2.6.16; library support was
+       added to glibc in version 2.4.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>stat</b>(), <b>fstat</b>(), <b>lstat</b>(): SVr4, 4.3BSD, POSIX.1-2001, POSIX.1.2008.
+
+       <b>fstatat</b>(): POSIX.1-2008.
+
+       According to POSIX.1-2001, <b>lstat</b>() on a symbolic link need return
+       valid information only in the <i>st_size</i> field and the file type of the
+       <i>st_mode</i> field of the <i>stat</i> structure.  POSIX.1-2008 tightens the
+       specification, requiring <b>lstat</b>() to return valid information in all
+       fields except the mode bits in <i>st_mode</i>.
+
+       Use of the <i>st_blocks</i> and <i>st_blksize</i> fields may be less portable.
+       (They were introduced in BSD.  The interpretation differs between
+       systems, and possibly on a single system when NFS mounts are
+       involved.)
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On Linux, <b>lstat</b>() will generally not trigger automounter action,
+       whereas <b>stat</b>() will (but see the description of <b>fstatat</b>()
+       <b>AT_NO_AUTOMOUNT </b>fag, above).
+
+   <b>Timestamp fields</b>
+       Older kernels and older standards did not support nanosecond
+       timestamp fields.  Instead, there were three timestamp fields—
+       <i>st_atime</i>, <i>st_mtime</i>, and <i>st_ctime</i>—typed as <i>time_t</i> that recorded
+       timestamps with one-second precision.
+
+       Since kernel 2.5.48, the <i>stat</i> structure supports nanosecond
+       resolution for the three file timestamp fields.  The nanosecond
+       components of each timestamp are available via names of the form
+       <i>st_atim.tv_nsec</i>, if suitable feature test macros are defined.
+       Nanosecond timestamps were standardized in POSIX.1-2008, and,
+       starting with version 2.12, glibc exposes the nanosecond component
+       names if <b>_POSIX_C_SOURCE </b>is defined with the value 200809L or
+       greater, or <b>_XOPEN_SOURCE </b>is defined with the value 700 or greater.
+       Up to and including glibc 2.19, the definitions of the nanoseconds
+       components are also defined if <b>_BSD_SOURCE </b>or <b>_SVID_SOURCE </b>is
+       defined.  If none of the aforementioned macros are defined, then the
+       nanosecond values are exposed with names of the form <i>st_atimensec</i>.
+
+   <b>C library/kernel differences</b>
+       Over time, increases in the size of the <i>stat</i> structure have led to
+       three successive versions of <b>stat</b>(): <i>sys_stat</i>() (slot <i>__NR_oldstat</i>),
+       <i>sys_newstat</i>() (slot <i>__NR_stat</i>), and <i>sys_stat64()</i> (slot <i>__NR_stat64</i>)
+       on 32-bit platforms such as i386.  The first two versions were
+       already present in Linux 1.0 (albeit with different names); the last
+       was added in Linux 2.4.  Similar remarks apply for <b>fstat</b>() and
+       <b>lstat</b>().
+
+       The kernel-internal versions of the <i>stat</i> structure dealt with by the
+       different versions are, respectively:
+
+       <i>__old_kernel_stat</i>
+              The original structure, with rather narrow fields, and no
+              padding.
+
+       <i>stat</i>   Larger <i>st_ino</i> field and padding added to various parts of the
+              structure to allow for future expansion.
+
+       <i>stat64</i> Even larger <i>st_ino</i> field, larger <i>st_uid</i> and <i>st_gid</i> fields to
+              accommodate the Linux-2.4 expansion of UIDs and GIDs to 32
+              bits, and various other enlarged fields and further padding in
+              the structure.  (Various padding bytes were eventually
+              consumed in Linux 2.6, with the advent of 32-bit device IDs
+              and nanosecond components for the timestamp fields.)
+
+       The glibc <b>stat</b>() wrapper function hides these details from
+       applications, invoking the most recent version of the system call
+       provided by the kernel, and repacking the returned information if
+       required for old binaries.
+
+       On modern 64-bit systems, life is simpler: there is a single <b>stat</b>()
+       system call and the kernel deals with a <i>stat</i> structure that contains
+       fields of a sufficient size.
+
+       The underlying system call employed by the glibc <b>fstatat</b>() wrapper
+       function is actually called <b>fstatat64</b>() or, on some architectures,
+       <b>newfstatat</b>().
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following program calls <b>stat</b>() and displays selected fields in
+       the returned <i>stat</i> structure.
+
+       #include &lt;sys/types.h&gt;
+       #include &lt;sys/stat.h&gt;
+       #include &lt;time.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;sys/sysmacros.h&gt;
+
+       int
+       main(int argc, char *argv[])
+       {
+           struct stat sb;
+
+           if (argc != 2) {
+               fprintf(stderr, "Usage: %s &lt;pathname&gt;\n", argv[0]);
+               exit(EXIT_FAILURE);
+           }
+
+           if (stat(argv[1], &amp;sb) == -1) {
+               perror("stat");
+               exit(EXIT_FAILURE);
+           }
+
+           printf("ID of containing device:  [%lx,%lx]\n",
+                (long) major(sb.st_dev), (long) minor(sb.st_dev));
+
+           printf("File type:                ");
+
+           switch (sb.st_mode &amp; S_IFMT) {
+           case S_IFBLK:  printf("block device\n");            break;
+           case S_IFCHR:  printf("character device\n");        break;
+           case S_IFDIR:  printf("directory\n");               break;
+           case S_IFIFO:  printf("FIFO/pipe\n");               break;
+           case S_IFLNK:  printf("symlink\n");                 break;
+           case S_IFREG:  printf("regular file\n");            break;
+           case S_IFSOCK: printf("socket\n");                  break;
+           default:       printf("unknown?\n");                break;
+           }
+
+           printf("I-node number:            %ld\n", (long) sb.st_ino);
+
+           printf("Mode:                     %lo (octal)\n",
+                   (unsigned long) sb.st_mode);
+
+           printf("Link count:               %ld\n", (long) sb.st_nlink);
+           printf("Ownership:                UID=%ld   GID=%ld\n",
+                   (long) sb.st_uid, (long) sb.st_gid);
+
+           printf("Preferred I/O block size: %ld bytes\n",
+                   (long) sb.st_blksize);
+           printf("File size:                %lld bytes\n",
+                   (long long) sb.st_size);
+           printf("Blocks allocated:         %lld\n",
+                   (long long) sb.st_blocks);
+
+           printf("Last status change:       %s", ctime(&amp;sb.st_ctime));
+           printf("Last file access:         %s", ctime(&amp;sb.st_atime));
+           printf("Last file modification:   %s", ctime(&amp;sb.st_mtime));
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/ls.1.html">ls(1)</a>, <a href="../man1/stat.1.html">stat(1)</a>, <a href="access.2.html">access(2)</a>, <a href="chmod.2.html">chmod(2)</a>, <a href="chown.2.html">chown(2)</a>, <a href="readlink.2.html">readlink(2)</a>, <a href="utime.2.html">utime(2)</a>,
+       <a href="../man7/capabilities.7.html">capabilities(7)</a>, <a href="../man7/inode.7.html">inode(7)</a>, <a href="../man7/symlink.7.html">symlink(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                          STAT(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/bash.1.html">bash(1)</a>,&nbsp; 
+    <a href="../man1/find.1.html">find(1)</a>,&nbsp; 
+    <a href="../man1/git-update-index.1.html">git-update-index(1)</a>,&nbsp; 
+    <a href="../man1/pv.1.html">pv(1)</a>,&nbsp; 
+    <a href="../man1/rsync.1.html">rsync(1)</a>,&nbsp; 
+    <a href="access.2.html">access(2)</a>,&nbsp; 
+    <a href="chmod.2.html">chmod(2)</a>,&nbsp; 
+    <a href="fallocate.2.html">fallocate(2)</a>,&nbsp; 
+    <a href="futimesat.2.html">futimesat(2)</a>,&nbsp; 
+    <a href="getxattr.2.html">getxattr(2)</a>,&nbsp; 
+    <a href="ioctl_ns.2.html">ioctl_ns(2)</a>,&nbsp; 
+    <a href="link.2.html">link(2)</a>,&nbsp; 
+    <a href="listxattr.2.html">listxattr(2)</a>,&nbsp; 
+    <a href="mkdir.2.html">mkdir(2)</a>,&nbsp; 
+    <a href="mknod.2.html">mknod(2)</a>,&nbsp; 
+    <a href="mount.2.html">mount(2)</a>,&nbsp; 
+    <a href="open.2.html">open(2)</a>,&nbsp; 
+    <a href="pivot_root.2.html">pivot_root(2)</a>,&nbsp; 
+    <a href="readlink.2.html">readlink(2)</a>,&nbsp; 
+    <a href="removexattr.2.html">removexattr(2)</a>,&nbsp; 
+    <a href="setxattr.2.html">setxattr(2)</a>,&nbsp; 
+    <a href="spu_create.2.html">spu_create(2)</a>,&nbsp; 
+    <a href="statfs.2.html">statfs(2)</a>,&nbsp; 
+    <a href="statx.2.html">statx(2)</a>,&nbsp; 
+    <a href="symlink.2.html">symlink(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="truncate.2.html">truncate(2)</a>,&nbsp; 
+    <a href="umask.2.html">umask(2)</a>,&nbsp; 
+    <a href="ustat.2.html">ustat(2)</a>,&nbsp; 
+    <a href="utime.2.html">utime(2)</a>,&nbsp; 
+    <a href="utimensat.2.html">utimensat(2)</a>,&nbsp; 
+    <a href="../man3/dirfd.3.html">dirfd(3)</a>,&nbsp; 
+    <a href="../man3/euidaccess.3.html">euidaccess(3)</a>,&nbsp; 
+    <a href="../man3/fseek.3.html">fseek(3)</a>,&nbsp; 
+    <a href="../man3/ftok.3.html">ftok(3)</a>,&nbsp; 
+    <a href="../man3/fts.3.html">fts(3)</a>,&nbsp; 
+    <a href="../man3/ftw.3.html">ftw(3)</a>,&nbsp; 
+    <a href="../man3/getfilecon.3.html">getfilecon(3)</a>,&nbsp; 
+    <a href="../man3/getseuserbyname.3.html">getseuserbyname(3)</a>,&nbsp; 
+    <a href="../man3/glob.3.html">glob(3)</a>,&nbsp; 
+    <a href="../man3/isatty.3.html">isatty(3)</a>,&nbsp; 
+    <a href="../man3/isfdtype.3.html">isfdtype(3)</a>,&nbsp; 
+    <a href="../man3/makedev.3.html">makedev(3)</a>,&nbsp; 
+    <a href="../man3/mkfifo.3.html">mkfifo(3)</a>,&nbsp; 
+    <a href="../man3/readdir.3.html">readdir(3)</a>,&nbsp; 
+    <a href="../man3/readline.3.html">readline(3)</a>,&nbsp; 
+    <a href="../man3/selabel_lookup_best_match.3.html">selabel_lookup_best_match(3)</a>,&nbsp; 
+    <a href="../man3/setfilecon.3.html">setfilecon(3)</a>,&nbsp; 
+    <a href="../man3/shm_open.3.html">shm_open(3)</a>,&nbsp; 
+    <a href="../man3/ttyname.3.html">ttyname(3)</a>,&nbsp; 
+    <a href="../man4/fuse.4.html">fuse(4)</a>,&nbsp; 
+    <a href="../man5/nfs.5.html">nfs(5)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man5/selabel_file.5.html">selabel_file(5)</a>,&nbsp; 
+    <a href="../man7/inode.7.html">inode(7)</a>,&nbsp; 
+    <a href="../man7/inotify.7.html">inotify(7)</a>,&nbsp; 
+    <a href="../man7/namespaces.7.html">namespaces(7)</a>,&nbsp; 
+    <a href="../man7/path_resolution.7.html">path_resolution(7)</a>,&nbsp; 
+    <a href="../man7/pipe.7.html">pipe(7)</a>,&nbsp; 
+    <a href="../man7/shm_overview.7.html">shm_overview(7)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>,&nbsp; 
+    <a href="../man7/spufs.7.html">spufs(7)</a>,&nbsp; 
+    <a href="../man7/symlink.7.html">symlink(7)</a>,&nbsp; 
+    <a href="../man7/time.7.html">time(7)</a>,&nbsp; 
+    <a href="../man7/user_namespaces.7.html">user_namespaces(7)</a>,&nbsp; 
+    <a href="../man7/xattr.7.html">xattr(7)</a>,&nbsp; 
+    <a href="../man8/lsof.8.html">lsof(8)</a>,&nbsp; 
+    <a href="../man8/umount.8.html">umount(8)</a>,&nbsp; 
+    <a href="../man8/xfs_db.8.html">xfs_db(8)</a>,&nbsp; 
+    <a href="../man8/xfs_io.8.html">xfs_io(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="stat.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

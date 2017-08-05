@@ -1,0 +1,288 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>msgget(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MSGGET(2)                 Linux Programmer's Manual                MSGGET(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       msgget - get a System V message queue identifier
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/types.h&gt;</b>
+       <b>#include &lt;sys/ipc.h&gt;</b>
+       <b>#include &lt;sys/msg.h&gt;</b>
+
+       <b>int msgget(key_t </b><i>key</i><b>, int </b><i>msgflg</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>msgget</b>() system call returns the System V message queue
+       identifier associated with the value of the <i>key</i> argument.  A new
+       message queue is created if <i>key</i> has the value <b>IPC_PRIVATE </b>or <i>key</i>
+       isn't <b>IPC_PRIVATE</b>, no message queue with the given key <i>key</i> exists,
+       and <b>IPC_CREAT </b>is specified in <i>msgflg</i>.
+
+       If <i>msgflg</i> specifies both <b>IPC_CREAT </b>and <b>IPC_EXCL </b>and a message queue
+       already exists for <i>key</i>, then <b>msgget</b>() fails with <i><a href="../man3/errno.3.html">errno</a></i> set to <b>EEXIST</b>.
+       (This is analogous to the effect of the combination <b>O_CREAT | O_EXCL</b>
+       for <a href="open.2.html">open(2)</a>.)
+
+       Upon creation, the least significant bits of the argument <i>msgflg</i>
+       define the permissions of the message queue.  These permission bits
+       have the same format and semantics as the permissions specified for
+       the <i>mode</i> argument of <a href="open.2.html">open(2)</a>.  (The execute permissions are not
+       used.)
+
+       If a new message queue is created, then its associated data structure
+       <i>msqid_ds</i> (see <a href="msgctl.2.html">msgctl(2)</a>) is initialized as follows:
+
+              <i>msg_perm.cuid</i> and <i>msg_perm.uid</i> are set to the effective user
+              ID of the calling process.
+
+              <i>msg_perm.cgid</i> and <i>msg_perm.gid</i> are set to the effective group
+              ID of the calling process.
+
+              The least significant 9 bits of <i>msg_perm.mode</i> are set to the
+              least significant 9 bits of <i>msgflg</i>.
+
+              <i>msg_qnum</i>, <i>msg_lspid</i>, <i>msg_lrpid</i>, <i>msg_stime</i>, and <i>msg_rtime</i> are
+              set to 0.
+
+              <i>msg_ctime</i> is set to the current time.
+
+              <i>msg_qbytes</i> is set to the system limit <b>MSGMNB</b>.
+
+       If the message queue already exists the permissions are verified, and
+       a check is made to see if it is marked for destruction.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If successful, the return value will be the message queue identifier
+       (a nonnegative integer), otherwise -1 with <i><a href="../man3/errno.3.html">errno</a></i> indicating the
+       error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On failure, <i><a href="../man3/errno.3.html">errno</a></i> is set to one of the following values:
+
+       <b>EACCES </b>A message queue exists for <i>key</i>, but the calling process does
+              not have permission to access the queue, and does not have the
+              <b>CAP_IPC_OWNER </b>capability in the user namespace that governs
+              its IPC namespace.
+
+       <b>EEXIST IPC_CREAT </b>and <b>IPC_EXCL </b>were specified in <i>msgflg</i>, but a message
+              queue already exists for <i>key</i>.
+
+       <b>ENOENT </b>No message queue exists for <i>key</i> and <i>msgflg</i> did not specify
+              <b>IPC_CREAT</b>.
+
+       <b>ENOMEM </b>A message queue has to be created but the system does not have
+              enough memory for the new data structure.
+
+       <b>ENOSPC </b>A message queue has to be created but the system limit for the
+              maximum number of message queues (<b>MSGMNI</b>) would be exceeded.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SVr4.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The inclusion of <i>&lt;sys/types.h&gt;</i> and <i>&lt;sys/ipc.h&gt;</i> isn't required on
+       Linux or by any version of POSIX.  However, some old implementations
+       required the inclusion of these header files, and the SVID also
+       documented their inclusion.  Applications intended to be portable to
+       such old systems may need to include these header files.
+
+       <b>IPC_PRIVATE </b>isn't a flag field but a <i>key_t</i> type.  If this special
+       value is used for <i>key</i>, the system call ignores everything but the
+       least significant 9 bits of <i>msgflg</i> and creates a new message queue
+       (on success).
+
+       The following is a system limit on message queue resources affecting
+       a <b>msgget</b>() call:
+
+       <b>MSGMNI </b>System-wide limit on the number of message queues.  Before
+              Linux 3.19, the default value for this limit was calculated
+              using a formula based on available system memory.  Since Linux
+              3.19, the default value is 32,000.  On Linux, this limit can
+              be read and modified via <i>/proc/sys/kernel/msgmni</i>.
+
+   <b>Linux notes</b>
+       Until version 2.3.20, Linux would return <b>EIDRM </b>for a <b>msgget</b>() on a
+       message queue scheduled for deletion.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The name choice <b>IPC_PRIVATE </b>was perhaps unfortunate, <b>IPC_NEW </b>would
+       more clearly show its function.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="msgctl.2.html">msgctl(2)</a>, <a href="msgrcv.2.html">msgrcv(2)</a>, <a href="msgsnd.2.html">msgsnd(2)</a>, <a href="../man3/ftok.3.html">ftok(3)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>,
+       <a href="../man7/mq_overview.7.html">mq_overview(7)</a>, <a href="../man7/svipc.7.html">svipc(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                        MSGGET(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/ipcrm.1.html">ipcrm(1)</a>,&nbsp; 
+    <a href="ipc.2.html">ipc(2)</a>,&nbsp; 
+    <a href="msgctl.2.html">msgctl(2)</a>,&nbsp; 
+    <a href="msgop.2.html">msgop(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="umask.2.html">umask(2)</a>,&nbsp; 
+    <a href="../man3/ftok.3.html">ftok(3)</a>,&nbsp; 
+    <a href="../man7/mq_overview.7.html">mq_overview(7)</a>,&nbsp; 
+    <a href="../man7/svipc.7.html">svipc(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="msgget.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

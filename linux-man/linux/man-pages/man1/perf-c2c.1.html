@@ -1,0 +1,427 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>perf-c2c(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RECORD_OPTIONS">RECORD&nbsp;OPTIONS</a> | <a href="#REPORT_OPTIONS">REPORT&nbsp;OPTIONS</a> | <a href="#C2C_RECORD">C2C&nbsp;RECORD</a> | <a href="#C2C_REPORT">C2C&nbsp;REPORT</a> | <a href="#NODE_INFO">NODE&nbsp;INFO</a> | <a href="#COALESCE">COALESCE</a> | <a href="#STDIO_OUTPUT">STDIO&nbsp;OUTPUT</a> | <a href="#TUI_OUTPUT">TUI&nbsp;OUTPUT</a> | <a href="#CREDITS">CREDITS</a> | <a href="#C2C_BLOG">C2C&nbsp;BLOG</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PERF-C2C(1)                      perf Manual                     PERF-C2C(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       perf-c2c - Shared Data C2C/HITM Analyzer.
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>perf c2c record</i> [&lt;options&gt;] &lt;command&gt;
+       <i>perf c2c record</i> [&lt;options&gt;] — [&lt;record command options&gt;] &lt;command&gt;
+       <i>perf c2c report</i> [&lt;options&gt;]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       C2C stands for Cache To Cache.
+
+       The perf c2c tool provides means for Shared Data C2C/HITM analysis.
+       It allows you to track down the cacheline contentions.
+
+       The tool is based on x86’s load latency and precise store facility
+       events provided by Intel CPUs. These events provide: - memory address
+       of the access - type of the access (load and store details) - latency
+       (in cycles) of the load access
+
+       The c2c tool provide means to record this data and report back access
+       details for cachelines with highest contention - highest number of
+       HITM accesses.
+
+       The basic workflow with this tool follows the standard record/report
+       phase. User uses the record command to record events data and report
+       command to display it.
+</pre>
+<h2><a id="RECORD_OPTIONS" href="#RECORD_OPTIONS"></a>RECORD OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -e, --event=
+           Select the PMU event. Use <i>perf mem record -e list</i> to list
+           available events.
+
+       -v, --verbose
+           Be more verbose (show counter open errors, etc).
+
+       -l, --ldlat
+           Configure mem-loads latency.
+
+       -k, --all-kernel
+           Configure all used events to run in kernel space.
+
+       -u, --all-user
+           Configure all used events to run in user space.
+</pre>
+<h2><a id="REPORT_OPTIONS" href="#REPORT_OPTIONS"></a>REPORT OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -k, --vmlinux=&lt;file&gt;
+           vmlinux pathname
+
+       -v, --verbose
+           Be more verbose (show counter open errors, etc).
+
+       -i, --input
+           Specify the input file to process.
+
+       -N, --node-info
+           Show extra node info in report (see NODE INFO section)
+
+       -c, --coalesce
+           Specify sorting fields for single cacheline display. Following
+           fields are available: tid,pid,iaddr,dso (see COALESCE)
+
+       -g, --call-graph
+           Setup callchains parameters. Please refer to perf-report man page
+           for details.
+
+       --stdio
+           Force the stdio output (see STDIO OUTPUT)
+
+       --stats
+           Display only statistic tables and force stdio mode.
+
+       --full-symbols
+           Display full length of symbols.
+
+       --no-source
+           Do not display Source:Line column.
+
+       --show-all
+           Show all captured HITM lines, with no regard to HITM % 0.0005
+           limit.
+
+       -f, --force
+           Don’t do ownership validation.
+
+       -d, --display
+           Switch to HITM type (rmt, lcl) to display and sort on. Total
+           HITMs as default.
+</pre>
+<h2><a id="C2C_RECORD" href="#C2C_RECORD"></a>C2C RECORD  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The perf c2c record command setup options related to HITM cacheline
+       analysis and calls standard perf record command.
+
+       Following perf record options are configured by default: (check perf
+       record man page for details)
+
+           -W,-d,--sample-cpu
+
+       Unless specified otherwise with <i>-e</i> option, following events are
+       monitored by default:
+
+           cpu/mem-loads,ldlat=30/P
+           cpu/mem-stores/P
+
+       User can pass any <i>perf record</i> option behind <i>--</i> mark, like (to enable
+       callchains and system wide monitoring):
+
+           $ perf c2c record -- -g -a
+
+       Please check RECORD OPTIONS section for specific c2c record options.
+</pre>
+<h2><a id="C2C_REPORT" href="#C2C_REPORT"></a>C2C REPORT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The perf c2c report command displays shared data analysis. It comes
+       in two display modes: stdio and tui (default).
+
+       The report command workflow is following: - sort all the data based
+       on the cacheline address - store access details for each cacheline -
+       sort all cachelines based on user settings - display data
+
+       In general perf report output consist of 2 basic views: 1) most
+       expensive cachelines list 2) offsets details for each cacheline
+
+       For each cacheline in the 1) list we display following data: (Both
+       stdio and TUI modes follow the same fields output)
+
+           Index
+           - zero based index to identify the cacheline
+
+           Cacheline
+           - cacheline address (hex number)
+
+           Total records
+           - sum of all cachelines accesses
+
+           Rmt/Lcl Hitm
+           - cacheline percentage of all Remote/Local HITM accesses
+
+           LLC Load Hitm - Total, Lcl, Rmt
+           - count of Total/Local/Remote load HITMs
+
+           Store Reference - Total, L1Hit, L1Miss
+             Total - all store accesses
+             L1Hit - store accesses that hit L1
+             L1Hit - store accesses that missed L1
+
+           Load Dram
+           - count of local and remote DRAM accesses
+
+           LLC Ld Miss
+           - count of all accesses that missed LLC
+
+           Total Loads
+           - sum of all load accesses
+
+           Core Load Hit - FB, L1, L2
+           - count of load hits in FB (Fill Buffer), L1 and L2 cache
+
+           LLC Load Hit - Llc, Rmt
+           - count of LLC and Remote load hits
+
+       For each offset in the 2) list we display following data:
+
+           HITM - Rmt, Lcl
+           - % of Remote/Local HITM accesses for given offset within cacheline
+
+           Store Refs - L1 Hit, L1 Miss
+           - % of store accesses that hit/missed L1 for given offset within cacheline
+
+           Data address - Offset
+           - offset address
+
+           Pid
+           - pid of the process responsible for the accesses
+
+           Tid
+           - tid of the process responsible for the accesses
+
+           Code address
+           - code address responsible for the accesses
+
+           cycles - rmt hitm, lcl hitm, load
+             - sum of cycles for given accesses - Remote/Local HITM and generic load
+
+           cpu cnt
+             - number of cpus that participated on the access
+
+           Symbol
+             - code symbol related to the 'Code address' value
+
+           Shared Object
+             - shared object name related to the 'Code address' value
+
+           Source:Line
+             - source information related to the 'Code address' value
+
+           Node
+             - nodes participating on the access (see NODE INFO section)
+</pre>
+<h2><a id="NODE_INFO" href="#NODE_INFO"></a>NODE INFO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>Node</i> field displays nodes that accesses given cacheline offset.
+       Its output comes in 3 flavors: - node IDs separated by <i>,</i> - node IDs
+       with stats for each ID, in following format: Node{cpus %hitms
+       %stores} - node IDs with list of affected CPUs in following format:
+       Node{cpu list}
+
+       User can switch between above flavors with -N option or use <i>n</i> key to
+       interactively switch in TUI mode.
+</pre>
+<h2><a id="COALESCE" href="#COALESCE"></a>COALESCE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       User can specify how to sort offsets for cacheline.
+
+       Following fields are available and governs the final output fields
+       set for caheline offsets output:
+
+           tid   - coalesced by process TIDs
+           pid   - coalesced by process PIDs
+           iaddr - coalesced by code address, following fields are displayed:
+                      Code address, Code symbol, Shared Object, Source line
+           dso   - coalesced by shared object
+
+       By default the coalescing is setup with <i>pid,iaddr</i>.
+</pre>
+<h2><a id="STDIO_OUTPUT" href="#STDIO_OUTPUT"></a>STDIO OUTPUT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The stdio output displays data on standard output.
+
+       Following tables are displayed: Trace Event Information - overall
+       statistics of memory accesses
+
+           Global Shared Cache Line Event Information
+           - overall statistics on shared cachelines
+
+           Shared Data Cache Line Table
+           - list of most expensive cachelines
+
+           Shared Cache Line Distribution Pareto
+           - list of all accessed offsets for each cacheline
+</pre>
+<h2><a id="TUI_OUTPUT" href="#TUI_OUTPUT"></a>TUI OUTPUT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The TUI output provides interactive interface to navigate through
+       cachelines list and to display offset details.
+
+       For details please refer to the help window by pressing <i>?</i> key.
+</pre>
+<h2><a id="CREDITS" href="#CREDITS"></a>CREDITS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Although Don Zickus, Dick Fowles and Joe Mario worked together to get
+       this implemented, we got lots of early help from Arnaldo Carvalho de
+       Melo, Stephane Eranian, Jiri Olsa and Andi Kleen.
+</pre>
+<h2><a id="C2C_BLOG" href="#C2C_BLOG"></a>C2C BLOG  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Check Joe’s blog on c2c tool for detailed use case explanation:
+       <b><a href="https://joemario.github.io/blog/2016/09/01/c2c-blog/">https://joemario.github.io/blog/2016/09/01/c2c-blog/</a> </b>
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="perf-record.1.html">perf-record(1)</a>, <a href="perf-mem.1.html">perf-mem(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>perf</i> (Performance analysis tools for Linux
+       (in Linux source tree)) project.  Information about the project can
+       be found at ⟨<a href="https://perf.wiki.kernel.org/index.php/Main_Page">https://perf.wiki.kernel.org/index.php/Main_Page</a>⟩.  If
+       you have a bug report for this manual page, send it to
+       linux-kernel@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨<a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git">http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">perf                             07/05/2017                      PERF-C2C(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

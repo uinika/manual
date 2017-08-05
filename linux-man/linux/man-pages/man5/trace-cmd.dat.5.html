@@ -1,0 +1,408 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>trace-cmd.dat(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#INITIAL_FORMAT">INITIAL&nbsp;FORMAT</a> | <a href="#HEADER_INFO_FORMAT">HEADER&nbsp;INFO&nbsp;FORMAT</a> | <a href="#FTRACE_EVENT_FORMATS">FTRACE&nbsp;EVENT&nbsp;FORMATS</a> | <a href="#EVENT_FORMATS">EVENT&nbsp;FORMATS</a> | <a href="#KALLSYMS_INFORMATION">KALLSYMS&nbsp;INFORMATION</a> | <a href="#TRACE_PRINTK_INFORMATION">TRACE_PRINTK&nbsp;INFORMATION</a> | <a href="#PROCESS_INFORMATION">PROCESS&nbsp;INFORMATION</a> | <a href="#REST_OF_TRACE-CMD_HEADER">REST&nbsp;OF&nbsp;TRACE-CMD&nbsp;HEADER</a> | <a href="#CPU_DATA">CPU&nbsp;DATA</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#RESOURCES">RESOURCES</a> | <a href="#COPYING">COPYING</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">TRACE-CMD.DAT(5)                                            TRACE-CMD.DAT(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       trace-cmd.dat - trace-cmd file format
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The trace-cmd(1) utility produces a "trace.dat" file. The file may
+       also be named anything depending if the user specifies a different
+       output name, but it must have a certain binary format. The file is
+       used by trace-cmd to save kernel traces into it and be able to
+       extract the trace from it at a later point (see <a href="../man1/trace-cmd-report.1.html">trace-cmd-report(1)</a>).
+</pre>
+<h2><a id="INITIAL_FORMAT" href="#INITIAL_FORMAT"></a>INITIAL FORMAT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           The first three bytes contain the magic value:
+
+           0x17 0x08  0x44
+
+           The next 7 bytes contain the characters:
+
+           "tracing"
+
+           The next set of characters contain a null '\0' terminated string
+           that contains the version of the file (for example):
+
+           "6\0"
+
+           The next 1 byte contains the flags for the file endianess:
+
+           0 = little endian
+           1 = big endian
+
+           The next byte contains the number of bytes per "long" value:
+
+           4 - 32-bit long values
+           8 - 64-bit long values
+
+           Note: This is the long size of the target's userspace. Not the
+           kernel space size.
+
+           [ Now all numbers are written in file defined endianess. ]
+
+           The next 4 bytes are a 32-bit word that defines what the traced
+           host machine page size was.
+</pre>
+<h2><a id="HEADER_INFO_FORMAT" href="#HEADER_INFO_FORMAT"></a>HEADER INFO FORMAT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           Directly after the initial format comes information about the
+           trace headers recorded from the target box.
+
+           The next 12 bytes contain the string:
+
+           "header_page\0"
+
+           The next 8 bytes are a 64-bit word containing the size of the
+           page header information stored next.
+
+           The next set of data is of the size read from the previous 8 bytes,
+           and contains the data retrieved from debugfs/tracing/events/header_page.
+
+           Note: The size of the second field \fBcommit\fR contains the target
+           kernel long size. For example:
+
+           field: local_t commit;        offset:8;       \fBsize:8;\fR   signed:1;
+
+           shows the kernel has a 64-bit long.
+
+           The next 13 bytes contain the string:
+
+           "header_event\0"
+
+           The next 8 bytes are a 64-bit word containing the size of the
+           event header information stored next.
+
+           The next set of data is of the size read from the previous 8 bytes
+           and contains the data retrieved from debugfs/tracing/events/header_event.
+
+           This data allows the trace-cmd tool to know if the ring buffer format
+           of the kernel made any changes.
+</pre>
+<h2><a id="FTRACE_EVENT_FORMATS" href="#FTRACE_EVENT_FORMATS"></a>FTRACE EVENT FORMATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           Directly after the header information comes the information about
+           the Ftrace specific events. These are the events used by the Ftrace plugins
+           and are not enabled by the event tracing.
+
+           The next 4 bytes contain a 32-bit word of the number of Ftrace event
+           format files that are stored in the file.
+
+           For the number of times defined by the previous 4 bytes is the
+           following:
+
+           8 bytes for the size of the Ftrace event format file.
+
+           The Ftrace event format file copied from the target machine:
+           debugfs/tracing/events/ftrace/&lt;event&gt;/format
+</pre>
+<h2><a id="EVENT_FORMATS" href="#EVENT_FORMATS"></a>EVENT FORMATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           Directly after the Ftrace formats comes the information about
+           the event layout.
+
+           The next 4 bytes are a 32-bit word containing the number of
+           event systems that are stored in the file. These are the
+           directories in debugfs/tracing/events excluding the \fBftrace\fR
+           directory.
+
+           For the number of times defined by the previous 4 bytes is the
+           following:
+
+           A null-terminated string containing the system name.
+
+           4 bytes containing a 32-bit word containing the number
+           of events within the system.
+
+           For the number of times defined in the previous 4 bytes is the
+           following:
+
+           8 bytes for the size of the event format file.
+
+           The event format file copied from the target machine:
+           debugfs/tracing/events/&lt;system&gt;/&lt;event&gt;/format
+</pre>
+<h2><a id="KALLSYMS_INFORMATION" href="#KALLSYMS_INFORMATION"></a>KALLSYMS INFORMATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           Directly after the event formats comes the information of the mapping
+           of function addresses to the function names.
+
+           The next 4 bytes are a 32-bit word containing the size of the
+           data holding the function mappings.
+
+           The next set of data is of the size defined by the previous 4 bytes
+           and contains the information from the target machine's file:
+           /proc/kallsyms
+</pre>
+<h2><a id="TRACE_PRINTK_INFORMATION" href="#TRACE_PRINTK_INFORMATION"></a>TRACE_PRINTK INFORMATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           If a developer used trace_printk() within the kernel, it may
+           store the format string outside the ring buffer.
+           This information can be found in:
+           debugfs/tracing/printk_formats
+
+           The next 4 bytes are a 32-bit word containing the size of the
+           data holding the printk formats.
+
+           The next set of data is of the size defined by the previous 4 bytes
+           and contains the information from debugfs/tracing/printk_formats.
+</pre>
+<h2><a id="PROCESS_INFORMATION" href="#PROCESS_INFORMATION"></a>PROCESS INFORMATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           Directly after the trace_printk formats comes the information mapping
+           a PID to a process name.
+
+           The next 8 bytes contain a 64-bit word that holds the size of the
+           data mapping the PID to a process name.
+
+           The next set of data is of the size defined by the previous 8 bytes
+           and contains the information from debugfs/tracing/saved_cmdlines.
+</pre>
+<h2><a id="REST_OF_TRACE-CMD_HEADER" href="#REST_OF_TRACE-CMD_HEADER"></a>REST OF TRACE-CMD HEADER  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           Directly after the process information comes the last bit of the
+           trace.dat file header.
+
+           The next 4 bytes are a 32-bit word defining the number of CPUs that
+           were discovered on the target machine (and has matching trace data
+           for it).
+
+           The next 10 bytes are one of the following:
+
+           "options  \0"
+
+           "latency  \0"
+
+           "flyrecord\0"
+
+           If it is "options  \0" then:
+
+           The next 2 bytes are a 16-bit word defining the current option.
+           If the the value is zero then there are no more options.
+
+           Otherwise, the next 4 bytes contain a 32-bit word containing the
+           option size. If the reader does not know how to handle the option
+           it can simply skip it. Currently there are no options defined,
+           but this is here to extend the data.
+
+           The next option will be directly after the previous option, and
+           the options ends with a zero in the option type field.
+
+           The next 10 bytes after the options are one of the following:
+
+           "latency  \0"
+
+           "flyrecord\0"
+
+           which would follow the same as if options were not present.
+
+           If the value is "latency  \0", then the rest of the file is
+           simply ASCII text that was taken from the target's:
+           debugfs/tracing/trace
+
+           If the value is "flyrecord\0", the following is present:
+
+           For the number of CPUs that were read earlier, the
+           following is present:
+
+           8 bytes that are a 64-bit word containing the offset into the file
+           that holds the data for the CPU.
+
+           8 bytes that are a 64-bit word containing the size of the CPU
+           data at that offset.
+</pre>
+<h2><a id="CPU_DATA" href="#CPU_DATA"></a>CPU DATA  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           The CPU data is located in the part of the file that is specified
+           in the end of the header. Padding is placed between the header and
+           the CPU data, placing the CPU data at a page aligned (target page) position
+           in the file.
+
+           This data is copied directly from the Ftrace ring buffer and is of the
+           same format as the ring buffer specified by the event header files
+           loaded in the header format file.
+
+           The trace-cmd tool will try to \fBmmap(2)\fR the data page by page with the
+           target's page size if possible. If it fails to mmap, it will just read the
+           data instead.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       trace-cmd(1), trace-cmd-record(1), trace-cmd-report(1),
+       trace-cmd-start(1), trace-cmd-stop(1), trace-cmd-extract(1),
+       trace-cmd-reset(1), trace-cmd-split(1), trace-cmd-list(1),
+       trace-cmd-listen(1), trace-cmd.dat(5)
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Written by Steven Rostedt, &lt;<b>rostedt@goodmis.org</b><b></b>[1]&gt;
+</pre>
+<h2><a id="RESOURCES" href="#RESOURCES"></a>RESOURCES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git
+</pre>
+<h2><a id="COPYING" href="#COPYING"></a>COPYING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Copyright (C) 2010 Red Hat, Inc. Free use of this software is granted
+       under the terms of the GNU Public License (GPL).
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. rostedt@goodmis.org
+           mailto:rostedt@goodmis.org
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>trace-cmd</i> (a front-end for Ftrace) project.
+       Information about the project can be found at [unknown -- if you
+       know, please contact man-pages@man7.org] If you have a bug report for
+       this manual page, send it to Steven Rostedt &lt;rostedt@goodmis.org&gt;.
+       This page was obtained from the project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git⟩
+       on 2017-07-05.  If you discover any rendering problems in this HTML
+       version of the page, or you believe there is a better or more up-to-
+       date source for the page, or you have corrections or improvements to
+       the information in this COLOPHON (which is <i>not</i> part of the original
+       manual page), send a mail to man-pages@man7.org
+
+<span class="footline">                                 12/17/2015                 TRACE-CMD.DAT(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dlinfo(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">DLINFO(3)                 Linux Programmer's Manual                DLINFO(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dlinfo - obtain information about a dynamically loaded object
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#define _GNU_SOURCE</b>
+       <b>#include &lt;link.h&gt;</b>
+       <b>#include &lt;dlfcn.h&gt;</b>
+
+       <b>int dlinfo(void *</b>handle<b>, int </b>request<b>, void *</b>info<b>);</b>
+
+       Link with <i>-ldl</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>dlinfo</b>() function obtains information about the dynamically
+       loaded object referred to by <i>handle</i> (typically obtained by an earlier
+       call to <a href="dlopen.3.html">dlopen(3)</a> or <a href="dlmopen.3.html">dlmopen(3)</a>).  The <i>request</i> argument specifies
+       which information is to be returned.  The <i>info</i> argument is a pointer
+       to a buffer used to store information returned by the call; the type
+       of this argument depends on <i>request</i>.
+
+       The following values are supported for <i>request</i> (with the
+       corresponding type for <i>info</i> shown in parentheses):
+
+       <b>RTLD_DI_LMID </b>(<i>Lmid_t *</i>)
+              Obtain the ID of the link-map list (namespace) in which <i>handle</i>
+              is loaded.
+
+       <b>RTLD_DI_LINKMAP </b>(<i>struct link_map **</i>)
+              Obtain a pointer to the <i>link_map</i> structure corresponding to
+              <i>handle</i>.  The <i>info</i> argument points to a pointer to a <i>link_map</i>
+              structure, defined in <i>&lt;link.h&gt;</i> as:
+
+                  struct link_map {
+                      ElfW(Addr) l_addr;  /* Difference between the
+                                             address in the ELF file and
+                                             the address in memory */
+                      char      *l_name;  /* Absolute pathname where
+                                             object was found */
+                      ElfW(Dyn) *l_ld;    /* Dynamic section of the
+                                             shared object */
+                      struct link_map *l_next, *l_prev;
+                                          /* Chain of loaded objects */
+
+                      /* Plus additional fields private to the
+                         implementation */
+                  };
+
+       <b>RTLD_DI_ORIGIN </b>(<i>char *</i>)
+              Copy the pathname of the origin of the shared object
+              corresponding to <i>handle</i> to the location pointed to by <i>info</i>.
+
+       <b>RTLD_DI_SERINFO </b>(<i>Dl_serinfo *</i>)
+              Obtain the library search paths for the shared object referred
+              to by <i>handle</i>.  The <i>info</i> argument is a pointer to a <i>Dl_serinfo</i>
+              that contains the search paths.  Because the number of search
+              paths may vary, the size of the structure pointed to by <i>info</i>
+              can vary.  The <b>RTLD_DI_SERINFOSIZE </b>request described below
+              allows applications to size the buffer suitably.  The caller
+              must perform the following steps:
+
+              1. Use a <b>RTLD_DI_SERINFOSIZE </b>request to populate a <i>Dl_serinfo</i>
+                 structure with the size (<i>dls_size</i>) of the structure needed
+                 for the subsequent <b>RTLD_DI_SERINFO </b>request.
+
+              2. Allocate a <i>Dl_serinfo</i> buffer of the correct size
+                 (<i>dls_size</i>).
+
+              3. Use a further <b>RTLD_DI_SERINFOSIZE </b>request to populate the
+                 <i>dls_size</i> and <i>dls_cnt</i> fields of the buffer allocated in the
+                 previous step.
+
+              4. Use a <b>RTLD_DI_SERINFO </b>to obtain the library search paths.
+
+              The <i>Dl_serinfo</i> structure is defined as follows:
+
+                  typedef struct {
+                      size_t dls_size;           /* Size in bytes of
+                                                    the whole buffer */
+                      unsigned int dls_cnt;      /* Number of elements
+                                                    in 'dls_serpath' */
+                      Dl_serpath dls_serpath[1]; /* Actually longer,
+                                                    'dls_cnt' elements */
+                  } Dl_serinfo;
+
+              Each of the <i>dls_serpath</i> elements in the above structure is a
+              structure of the following form:
+
+                  typedef struct {
+                      char *dls_name;            /* Name of library search
+                                                    path directory */
+                      unsigned int dls_flags;    /* Indicates where this
+                                                    directory came from */
+                  } Dl_serpath;
+
+              The <i>dls_flags</i> field is currently unused, and always contains
+              zero.
+
+       <b>RTLD_DI_SERINFOSIZE </b>(<i>Dl_serinfo *</i>)
+              Populate the <i>dls_size</i> and <i>dls_cnt</i> fields of the <i>Dl_serinfo</i>
+              structure pointed to by <i>info</i> with values suitable for
+              allocating a buffer for use in a subsequent <b>RTLD_DI_SERINFO</b>
+              request.
+
+       <b>RTLD_DI_TLS_MODID </b>(<i>size_t *</i>, since glibc 2.4)
+              Obtain the module ID of this shared object's TLS (thread-local
+              storage) segment, as used in TLS relocations.  If this object
+              does not define a TLS segment, zero is placed in <i>*info</i>.
+
+       <b>RTLD_DI_TLS_DATA </b>(<i>void **</i>, since glibc 2.4)
+              Obtain a pointer to the calling thread's TLS block
+              corresponding to this shared object's TLS segment.  If this
+              object does not define a PT_TLS segment, or if the calling
+              thread has not allocated a block for it, NULL is placed in
+              <i>*info</i>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>dlinfo</b>() returns 0.  On failure, it returns -1; the cause
+       of the error can be diagnosed using <a href="dlerror.3.html">dlerror(3)</a>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dlinfo</b>() first appeared in glibc 2.3.3.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────┬───────────────┬─────────┐
+       │<b>Interface </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├──────────┼───────────────┼─────────┤
+       │<b>dlinfo</b>()  │ Thread safety │ MT-Safe │
+       └──────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This function is a nonstandard GNU extension.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This function derives from the Solaris function of the same name and
+       also appears on some other systems.  The sets of requests supported
+       by the various implementations overlaps only partially.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below opens a shared objects using <a href="dlopen.3.html">dlopen(3)</a> and then
+       uses the <b>RTLD_DI_SERINFOSIZE </b>and <b>RTLD_DI_SERINFO </b>requests to obtain
+       the library search path list for the library.  Here is an example of
+       what we might see when running the program:
+
+           $ <b>./a.out /lib64/libm.so.6</b>
+           dls_serpath[0].dls_name = /lib64
+           dls_serpath[1].dls_name = /usr/lib64
+
+   <b>Program source</b>
+
+       #define _GNU_SOURCE
+       #include &lt;dlfcn.h&gt;
+       #include &lt;link.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+
+       int
+       main(int argc, char *argv[])
+       {
+           void *handle;
+           Dl_serinfo serinfo;
+           Dl_serinfo *sip;
+           int j;
+
+           if (argc != 2) {
+               fprintf(stderr, "Usage: %s &lt;libpath&gt;\n", argv[0]);
+               exit(EXIT_FAILURE);
+           }
+
+           /* Obtain a handle for shared objects specified on command line */
+
+           handle = dlopen(argv[1], RTLD_NOW);
+           if (handle == NULL) {
+               fprintf(stderr, "dlopen() failed: %s\n", dlerror());
+               exit(EXIT_FAILURE);
+           }
+
+           /* Discover the size of the buffer that we must pass to
+              RTLD_DI_SERINFO */
+
+           if (dlinfo(handle, RTLD_DI_SERINFOSIZE, &amp;serinfo) == -1) {
+               fprintf(stderr, "RTLD_DI_SERINFOSIZE failed: %s\n", dlerror());
+               exit(EXIT_FAILURE);
+           }
+
+           /* Allocate the buffer for use with RTLD_DI_SERINFO */
+
+           sip = malloc(serinfo.dls_size);
+           if (sip == NULL) {
+               perror("malloc");
+               exit(EXIT_FAILURE);
+           }
+
+           /* Initialize the 'dls_size' and 'dls_cnt' fields in the newly
+              allocated buffer */
+
+           if (dlinfo(handle, RTLD_DI_SERINFOSIZE, sip) == -1) {
+               fprintf(stderr, "RTLD_DI_SERINFOSIZE failed: %s\n", dlerror());
+               exit(EXIT_FAILURE);
+           }
+
+           /* Fetch and print library search list */
+
+           if (dlinfo(handle, RTLD_DI_SERINFO, sip) == -1) {
+               fprintf(stderr, "RTLD_DI_SERINFO failed: %s\n", dlerror());
+               exit(EXIT_FAILURE);
+           }
+
+           for (j = 0; j &lt; serinfo.dls_cnt; j++)
+               printf("dls_serpath[%d].dls_name = %s\n",
+                       j, sip-&gt;dls_serpath[j].dls_name);
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="dl_iterate_phdr.3.html">dl_iterate_phdr(3)</a>, <a href="dladdr.3.html">dladdr(3)</a>, <a href="dlerror.3.html">dlerror(3)</a>, <a href="dlopen.3.html">dlopen(3)</a>, <a href="dlsym.3.html">dlsym(3)</a>,
+       <a href="../man8/ld.so.8.html">ld.so(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-08-08                        DLINFO(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="dladdr.3.html">dladdr(3)</a>,&nbsp; 
+    <a href="dlerror.3.html">dlerror(3)</a>,&nbsp; 
+    <a href="dlopen.3.html">dlopen(3)</a>,&nbsp; 
+    <a href="dlsym.3.html">dlsym(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="dlinfo.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,316 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ausearch-expression(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#OVERVIEW">OVERVIEW</a> | <a href="#LEXICAL_STRUCTURE">LEXICAL&nbsp;STRUCTURE</a> | <a href="#EXPRESSION_SYNTAX">EXPRESSION&nbsp;SYNTAX</a> | <a href="#VIRTUAL_FIELDS">VIRTUAL&nbsp;FIELDS</a> | <a href="#SEMANTICS">SEMANTICS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#FUTURE_DIRECTIONS">FUTURE&nbsp;DIRECTIONS</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">AUSEARCH-EXPRESSION(5)           Linux Audit          AUSEARCH-EXPRESSION(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ausearch-expression - audit search expression format
+</pre>
+<h2><a id="OVERVIEW" href="#OVERVIEW"></a>OVERVIEW  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This man page describes the format of "ausearch expressions".
+       Parsing and evaluation of these expressions is provided by libauparse
+       and is common to applications that use this library.
+</pre>
+<h2><a id="LEXICAL_STRUCTURE" href="#LEXICAL_STRUCTURE"></a>LEXICAL STRUCTURE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       White space (ASCII space, tab and new-line characters) between tokens
+       is ignored.  The following tokens are recognized:
+
+       Punctuation
+              <b>( ) \</b>
+
+       Logical operators
+              <b>! &amp;&amp; ||</b>
+
+       Comparison operators
+              <b>&lt; &lt;= == &gt; &gt;= !== i= i!= r= r!=</b>
+
+       Unquoted strings
+              Any non-empty sequence of ASCII letters, digits, and the <b>_</b>
+              symbol.
+
+       Quoted strings
+              A sequence of characters surrounded by the <b>" </b>quotes.  The <b>\</b>
+              character starts an escape sequence.  The only defined escape
+              sequences are <b>\\ </b>and <b>\"</b>.  The semantics of other escape
+              sequences is undefined.
+
+       Regexps
+              A sequence of characters surrounded by the <b>/ </b>characters.  The
+              <b>\ </b>character starts an escape sequence.  The only defined
+              escape sequences are <b>\\ </b>and <b>\/</b>.  The semantics of other escape
+              sequences is undefined.
+
+       Anywhere an unquoted string is valid, a quoted string is valid as
+       well, and vice versa.  In particular, field names may be specified
+       using quoted strings, and field values may be specified using
+       unquoted strings.
+</pre>
+<h2><a id="EXPRESSION_SYNTAX" href="#EXPRESSION_SYNTAX"></a>EXPRESSION SYNTAX  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The primary expression has one of the following forms:
+
+              <i>field comparison-operator value</i>
+
+              <b>\regexp </b><i>string-or-regexp</i>
+
+       <i>field</i> is either a string, which specifies the first field with that
+       name within the current audit record, or the <b>\ </b>escape character
+       followed by a string, which specifies a virtual field with the
+       specified name (virtual fields are defined in a later section).
+
+       <i>field</i> is a string.  <i>operator</i> specifies the comparison to perform
+
+       <b>r= r!= </b>Get the "raw" string of <i>field</i>, and compare it to <i>value</i>.  For
+              fields in audit records, the "raw" string is the exact string
+              stored in the audit record (with all escaping and unprintable
+              character encoding left alone); applications can read the
+              "raw" string using <a href="../man3/auparse_get_field_str.3.html">auparse_get_field_str(3)</a>.  Each virtual
+              field may define a "raw" string.  If <i>field</i> is not present or
+              does not define a "raw" string, the result of the comparison
+              is <b>false </b>(regardless of the operator).
+
+       <b>i= i!= </b>Get the "interpreted" string of <i>field</i>, and compare it to
+              <i>value</i>.  For fields in audit records, the "interpreted" string
+              is an "user-readable" interpretation of the field value;
+              applications can read the "interpreted" string using
+              <a href="../man3/auparse_interpret_field.3.html">auparse_interpret_field(3)</a>.  Each virtual field may define an
+              "interpreted" string.  If <i>field</i> is not present or does not
+              define an "interpreted" string, the result of the comparison
+              is <b>false </b>(regardless of the operator).
+
+       <b>&lt; &lt;= == &gt; &gt;= !==</b>
+              Evaluate the "value" of <i>field</i>, and compare it to <i>value</i>.  A
+              "value" may be defined for any field or virtual field, but no
+              "value" is currently defined for any audit record field.  The
+              rules of parsing <i>value</i> for comparing it with the "value" of
+              <i>field</i> are specific for each <i>field</i>.  If <i>field</i> is not present,
+              the result of the comparison is <b>false </b>(regardless of the
+              operator).  If <i>field</i> does not define a "value", an error is
+              reported when parsing the expression.
+
+       In the special case of <b>\regexp </b><i>regexp-or-string</i>, the current audit
+       record is taken as a string (without interpreting field values), and
+       matched against <i>regexp-or-string</i>.  <i>regexp-or-string</i> is an extended
+       regular expression, using a string or regexp token (in other words,
+       delimited by <b>" </b>or <b>/</b>).
+
+       If <i>E1</i> and <i>E2</i> are valid expressions, then <b>!  </b><i>E1</i>, <i>E1</i> <b>&amp;&amp; </b><i>E2</i>, and <i>E1</i> <b>||</b>
+       <i>E2</i> are valid expressions as well, with the usual C semantics and
+       evaluation priorities.  Note that <b>!  </b><i>field op value</i> is interpreted as
+       <b>!(</b><i>field op value</i><b>)</b>, not as <b>(!</b><i>field</i><b>) </b><i>op value</i>.
+</pre>
+<h2><a id="VIRTUAL_FIELDS" href="#VIRTUAL_FIELDS"></a>VIRTUAL FIELDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following virtual fields are defined:
+
+       <b>\timestamp</b>
+              The value is the timestamp of the current event.  <i>value</i> must
+              have the <b>ts:</b><i>seconds</i>.<i>milli</i> format, where <i>seconds</i> and <i>milli</i> are
+              decimal numbers specifying the seconds and milliseconds part
+              of the timestamp, respectively.
+
+       <b>\record_type</b>
+              The value is the type of the current record.  <i>value</i> is either
+              the record type name, or a decimal number specifying the type.
+</pre>
+<h2><a id="SEMANTICS" href="#SEMANTICS"></a>SEMANTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The expression as a whole applies to a single record.  The expression
+       is <b>true </b>for a specified event if it is <b>true </b>for any record associated
+       with the event.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       As a demonstration of the semantics of handling missing fields, the
+       following expression is <b>true </b>if <i>field</i> is present:
+
+              <b>(</b><i>field</i> <b>r= "") || (</b><i>field</i> <b>r!= "")</b>
+
+       and the same expression surrounded by <b>!( </b>and <b>) </b>is <b>true </b>if <i>field</i> is
+       not present.
+</pre>
+<h2><a id="FUTURE_DIRECTIONS" href="#FUTURE_DIRECTIONS"></a>FUTURE DIRECTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       New escape sequences for quoted strings may be defined.
+
+       For currently defined virtual fields that do not define a "raw" or
+       "interpreted" string, the definition may be added.  Therefore, don't
+       rely on the fact that comparing the "raw" or "interpreted" string of
+       the field with any value is <b>false</b>.
+
+       New formats of value constants for the <b>\timestamp </b>virtual field may
+       be added.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Miloslav Trmac
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>audit</i> (Linux Audit) project.  Information
+       about the project can be found at 
+       ⟨<a href="http://people.redhat.com/sgrubb/audit/">http://people.redhat.com/sgrubb/audit/</a>⟩.  If you have a bug report
+       for this manual page, send it to linux-audit@redhat.com.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/linux-audit/audit-userspace.git">https://github.com/linux-audit/audit-userspace.git</a>⟩ on 2017-07-05.
+       If you discover any rendering problems in this HTML version of the
+       page, or you believe there is a better or more up-to-date source for
+       the page, or you have corrections or improvements to the information
+       in this COLOPHON (which is <i>not</i> part of the original manual page),
+       send a mail to man-pages@man7.org
+
+<span class="footline">Red Hat                           Feb 2008            AUSEARCH-EXPRESSION(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man3/ausearch_add_expression.3.html">ausearch_add_expression(3)</a>,&nbsp; 
+    <a href="../man3/ausearch_add_interpreted_item.3.html">ausearch_add_interpreted_item(3)</a>,&nbsp; 
+    <a href="../man3/ausearch_add_item.3.html">ausearch_add_item(3)</a>,&nbsp; 
+    <a href="../man3/ausearch_add_timestamp_item.3.html">ausearch_add_timestamp_item(3)</a>,&nbsp; 
+    <a href="../man3/ausearch_add_timestamp_item_ex.3.html">ausearch_add_timestamp_item_ex(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,586 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>githooks(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#HOOKS">HOOKS</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GITHOOKS(5)                      Git Manual                      GITHOOKS(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       githooks - Hooks used by Git
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       $GIT_DIR/hooks/* (or `git config core.hooksPath`/*)
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Hooks are programs you can place in a hooks directory to trigger
+       actions at certain points in git’s execution. Hooks that don’t have
+       the executable bit set are ignored.
+
+       By default the hooks directory is <b>$GIT_DIR/hooks</b>, but that can be
+       changed via the <b>core.hooksPath </b>configuration variable (see
+       <a href="../man1/git-config.1.html">git-config(1)</a>).
+
+       Before Git invokes a hook, it changes its working directory to either
+       $GIT_DIR in a bare repository or the root of the working tree in a
+       non-bare repository. An exception are hooks triggered during a push
+       (<i>pre-receive</i>, <i>update</i>, <i>post-receive</i>, <i>post-update</i>, <i>push-to-checkout</i>)
+       which are always executed in $GIT_DIR.
+
+       Hooks can get their arguments via the environment, command-line
+       arguments, and stdin. See the documentation for each hook below for
+       details.
+
+       <i>git init</i> may copy hooks to the new repository, depending on its
+       configuration. See the "TEMPLATE DIRECTORY" section in <a href="../man1/git-init.1.html">git-init(1)</a>
+       for details. When the rest of this document refers to "default hooks"
+       it’s talking about the default template shipped with Git.
+
+       The currently supported hooks are described below.
+</pre>
+<h2><a id="HOOKS" href="#HOOKS"></a>HOOKS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>applypatch-msg</b>
+       This hook is invoked by <i>git am</i>. It takes a single parameter, the name
+       of the file that holds the proposed commit log message. Exiting with
+       a non-zero status causes <i>git am</i> to abort before applying the patch.
+
+       The hook is allowed to edit the message file in place, and can be
+       used to normalize the message into some project standard format. It
+       can also be used to refuse the commit after inspecting the message
+       file.
+
+       The default <i>applypatch-msg</i> hook, when enabled, runs the <i>commit-msg</i>
+       hook, if the latter is enabled.
+
+   <b>pre-applypatch</b>
+       This hook is invoked by <i>git am</i>. It takes no parameter, and is invoked
+       after the patch is applied, but before a commit is made.
+
+       If it exits with non-zero status, then the working tree will not be
+       committed after applying the patch.
+
+       It can be used to inspect the current working tree and refuse to make
+       a commit if it does not pass certain test.
+
+       The default <i>pre-applypatch</i> hook, when enabled, runs the <i>pre-commit</i>
+       hook, if the latter is enabled.
+
+   <b>post-applypatch</b>
+       This hook is invoked by <i>git am</i>. It takes no parameter, and is invoked
+       after the patch is applied and a commit is made.
+
+       This hook is meant primarily for notification, and cannot affect the
+       outcome of <i>git am</i>.
+
+   <b>pre-commit</b>
+       This hook is invoked by <i>git commit</i>, and can be bypassed with the
+       <b>--no-verify </b>option. It takes no parameters, and is invoked before
+       obtaining the proposed commit log message and making a commit.
+       Exiting with a non-zero status from this script causes the <i>git commit</i>
+       command to abort before creating a commit.
+
+       The default <i>pre-commit</i> hook, when enabled, catches introduction of
+       lines with trailing whitespaces and aborts the commit when such a
+       line is found.
+
+       All the <i>git commit</i> hooks are invoked with the environment variable
+       <b>GIT_EDITOR=: </b>if the command will not bring up an editor to modify the
+       commit message.
+
+   <b>prepare-commit-msg</b>
+       This hook is invoked by <i>git commit</i> right after preparing the default
+       log message, and before the editor is started.
+
+       It takes one to three parameters. The first is the name of the file
+       that contains the commit log message. The second is the source of the
+       commit message, and can be: <b>message </b>(if a <b>-m </b>or <b>-F </b>option was given);
+       <b>template </b>(if a <b>-t </b>option was given or the configuration option
+       <b>commit.template </b>is set); <b>merge </b>(if the commit is a merge or a
+       <b>.git/MERGE_MSG </b>file exists); <b>squash </b>(if a <b>.git/SQUASH_MSG </b>file
+       exists); or <b>commit</b>, followed by a commit SHA-1 (if a <b>-c</b>, <b>-C </b>or
+       <b>--amend </b>option was given).
+
+       If the exit status is non-zero, <i>git commit</i> will abort.
+
+       The purpose of the hook is to edit the message file in place, and it
+       is not suppressed by the <b>--no-verify </b>option. A non-zero exit means a
+       failure of the hook and aborts the commit. It should not be used as
+       replacement for pre-commit hook.
+
+       The sample <b>prepare-commit-msg </b>hook that comes with Git comments out
+       the <b>Conflicts: </b>part of a merge’s commit message.
+
+   <b>commit-msg</b>
+       This hook is invoked by <i>git commit</i>, and can be bypassed with the
+       <b>--no-verify </b>option. It takes a single parameter, the name of the file
+       that holds the proposed commit log message. Exiting with a non-zero
+       status causes the <i>git commit</i> to abort.
+
+       The hook is allowed to edit the message file in place, and can be
+       used to normalize the message into some project standard format. It
+       can also be used to refuse the commit after inspecting the message
+       file.
+
+       The default <i>commit-msg</i> hook, when enabled, detects duplicate
+       "Signed-off-by" lines, and aborts the commit if one is found.
+
+   <b>post-commit</b>
+       This hook is invoked by <i>git commit</i>. It takes no parameters, and is
+       invoked after a commit is made.
+
+       This hook is meant primarily for notification, and cannot affect the
+       outcome of <i>git commit</i>.
+
+   <b>pre-rebase</b>
+       This hook is called by <i>git rebase</i> and can be used to prevent a branch
+       from getting rebased. The hook may be called with one or two
+       parameters. The first parameter is the upstream from which the series
+       was forked. The second parameter is the branch being rebased, and is
+       not set when rebasing the current branch.
+
+   <b>post-checkout</b>
+       This hook is invoked when a <i>git checkout</i> is run after having updated
+       the worktree. The hook is given three parameters: the ref of the
+       previous HEAD, the ref of the new HEAD (which may or may not have
+       changed), and a flag indicating whether the checkout was a branch
+       checkout (changing branches, flag=1) or a file checkout (retrieving a
+       file from the index, flag=0). This hook cannot affect the outcome of
+       <i>git checkout</i>.
+
+       It is also run after <i>git clone</i>, unless the --no-checkout (-n) option
+       is used. The first parameter given to the hook is the null-ref, the
+       second the ref of the new HEAD and the flag is always 1.
+
+       This hook can be used to perform repository validity checks,
+       auto-display differences from the previous HEAD if different, or set
+       working dir metadata properties.
+
+   <b>post-merge</b>
+       This hook is invoked by <i>git merge</i>, which happens when a <i>git pull</i> is
+       done on a local repository. The hook takes a single parameter, a
+       status flag specifying whether or not the merge being done was a
+       squash merge. This hook cannot affect the outcome of <i>git merge</i> and is
+       not executed, if the merge failed due to conflicts.
+
+       This hook can be used in conjunction with a corresponding pre-commit
+       hook to save and restore any form of metadata associated with the
+       working tree (e.g.: permissions/ownership, ACLS, etc). See
+       contrib/hooks/setgitperms.perl for an example of how to do this.
+
+   <b>pre-push</b>
+       This hook is called by <i>git push</i> and can be used to prevent a push
+       from taking place. The hook is called with two parameters which
+       provide the name and location of the destination remote, if a named
+       remote is not being used both values will be the same.
+
+       Information about what is to be pushed is provided on the hook’s
+       standard input with lines of the form:
+
+           &lt;local ref&gt; SP &lt;local sha1&gt; SP &lt;remote ref&gt; SP &lt;remote sha1&gt; LF
+
+       For instance, if the command <b>git push origin master:foreign </b>were run
+       the hook would receive a line like the following:
+
+           refs/heads/master 67890 refs/heads/foreign 12345
+
+       although the full, 40-character SHA-1s would be supplied. If the
+       foreign ref does not yet exist the <b>&lt;remote SHA-1&gt; </b>will be 40 <b>0</b>. If a
+       ref is to be deleted, the <b>&lt;local ref&gt; </b>will be supplied as <b>(delete)</b>
+       and the <b>&lt;local SHA-1&gt; </b>will be 40 <b>0</b>. If the local commit was specified
+       by something other than a name which could be expanded (such as
+       <b>HEAD~</b>, or a SHA-1) it will be supplied as it was originally given.
+
+       If this hook exits with a non-zero status, <i>git push</i> will abort
+       without pushing anything. Information about why the push is rejected
+       may be sent to the user by writing to standard error.
+
+   <b>pre-receive</b>
+       This hook is invoked by <i>git-receive-pack</i> on the remote repository,
+       which happens when a <i>git push</i> is done on a local repository. Just
+       before starting to update refs on the remote repository, the
+       pre-receive hook is invoked. Its exit status determines the success
+       or failure of the update.
+
+       This hook executes once for the receive operation. It takes no
+       arguments, but for each ref to be updated it receives on standard
+       input a line of the format:
+
+           &lt;old-value&gt; SP &lt;new-value&gt; SP &lt;ref-name&gt; LF
+
+       where <b>&lt;old-value&gt; </b>is the old object name stored in the ref,
+       <b>&lt;new-value&gt; </b>is the new object name to be stored in the ref and
+       <b>&lt;ref-name&gt; </b>is the full name of the ref. When creating a new ref,
+       <b>&lt;old-value&gt; </b>is 40 <b>0</b>.
+
+       If the hook exits with non-zero status, none of the refs will be
+       updated. If the hook exits with zero, updating of individual refs can
+       still be prevented by the <i>update</i> hook.
+
+       Both standard output and standard error output are forwarded to <i>git</i>
+       <i>send-pack</i> on the other end, so you can simply <b>echo </b>messages for the
+       user.
+
+       The number of push options given on the command line of <b>git push</b>
+       <b>--push-option=... </b>can be read from the environment variable
+       <b>GIT_PUSH_OPTION_COUNT</b>, and the options themselves are found in
+       <b>GIT_PUSH_OPTION_0</b>, <b>GIT_PUSH_OPTION_1</b>,... If it is negotiated to not
+       use the push options phase, the environment variables will not be
+       set. If the client selects to use push options, but doesn’t transmit
+       any, the count variable will be set to zero, <b>GIT_PUSH_OPTION_COUNT=0</b>.
+
+       See the section on "Quarantine Environment" in <a href="../man1/git-receive-pack.1.html">git-receive-pack(1)</a>
+       for some caveats.
+
+   <b>update</b>
+       This hook is invoked by <i>git-receive-pack</i> on the remote repository,
+       which happens when a <i>git push</i> is done on a local repository. Just
+       before updating the ref on the remote repository, the update hook is
+       invoked. Its exit status determines the success or failure of the ref
+       update.
+
+       The hook executes once for each ref to be updated, and takes three
+       parameters:
+
+       ·   the name of the ref being updated,
+
+       ·   the old object name stored in the ref,
+
+       ·   and the new object name to be stored in the ref.
+
+       A zero exit from the update hook allows the ref to be updated.
+       Exiting with a non-zero status prevents <i>git-receive-pack</i> from
+       updating that ref.
+
+       This hook can be used to prevent <i>forced</i> update on certain refs by
+       making sure that the object name is a commit object that is a
+       descendant of the commit object named by the old object name. That
+       is, to enforce a "fast-forward only" policy.
+
+       It could also be used to log the old..new status. However, it does
+       not know the entire set of branches, so it would end up firing one
+       e-mail per ref when used naively, though. The <i>post-receive</i> hook is
+       more suited to that.
+
+       In an environment that restricts the users' access only to git
+       commands over the wire, this hook can be used to implement access
+       control without relying on filesystem ownership and group membership.
+       See <a href="../man1/git-shell.1.html">git-shell(1)</a> for how you might use the login shell to restrict
+       the user’s access to only git commands.
+
+       Both standard output and standard error output are forwarded to <i>git</i>
+       <i>send-pack</i> on the other end, so you can simply <b>echo </b>messages for the
+       user.
+
+       The default <i>update</i> hook, when enabled—and with <b>hooks.allowunannotated</b>
+       config option unset or set to false—prevents unannotated tags to be
+       pushed.
+
+   <b>post-receive</b>
+       This hook is invoked by <i>git-receive-pack</i> on the remote repository,
+       which happens when a <i>git push</i> is done on a local repository. It
+       executes on the remote repository once after all the refs have been
+       updated.
+
+       This hook executes once for the receive operation. It takes no
+       arguments, but gets the same information as the <i>pre-receive</i> hook does
+       on its standard input.
+
+       This hook does not affect the outcome of <i>git-receive-pack</i>, as it is
+       called after the real work is done.
+
+       This supersedes the <i>post-update</i> hook in that it gets both old and new
+       values of all the refs in addition to their names.
+
+       Both standard output and standard error output are forwarded to <i>git</i>
+       <i>send-pack</i> on the other end, so you can simply <b>echo </b>messages for the
+       user.
+
+       The default <i>post-receive</i> hook is empty, but there is a sample script
+       <b>post-receive-email </b>provided in the <b>contrib/hooks </b>directory in Git
+       distribution, which implements sending commit emails.
+
+       The number of push options given on the command line of <b>git push</b>
+       <b>--push-option=... </b>can be read from the environment variable
+       <b>GIT_PUSH_OPTION_COUNT</b>, and the options themselves are found in
+       <b>GIT_PUSH_OPTION_0</b>, <b>GIT_PUSH_OPTION_1</b>,... If it is negotiated to not
+       use the push options phase, the environment variables will not be
+       set. If the client selects to use push options, but doesn’t transmit
+       any, the count variable will be set to zero, <b>GIT_PUSH_OPTION_COUNT=0</b>.
+
+   <b>post-update</b>
+       This hook is invoked by <i>git-receive-pack</i> on the remote repository,
+       which happens when a <i>git push</i> is done on a local repository. It
+       executes on the remote repository once after all the refs have been
+       updated.
+
+       It takes a variable number of parameters, each of which is the name
+       of ref that was actually updated.
+
+       This hook is meant primarily for notification, and cannot affect the
+       outcome of <i>git-receive-pack</i>.
+
+       The <i>post-update</i> hook can tell what are the heads that were pushed,
+       but it does not know what their original and updated values are, so
+       it is a poor place to do log old..new. The <i>post-receive</i> hook does get
+       both original and updated values of the refs. You might consider it
+       instead if you need them.
+
+       When enabled, the default <i>post-update</i> hook runs <i>git</i>
+       <i>update-server-info</i> to keep the information used by dumb transports
+       (e.g., HTTP) up-to-date. If you are publishing a Git repository that
+       is accessible via HTTP, you should probably enable this hook.
+
+       Both standard output and standard error output are forwarded to <i>git</i>
+       <i>send-pack</i> on the other end, so you can simply <b>echo </b>messages for the
+       user.
+
+   <b>push-to-checkout</b>
+       This hook is invoked by <i>git-receive-pack</i> on the remote repository,
+       which happens when a <i>git push</i> is done on a local repository, when the
+       push tries to update the branch that is currently checked out and the
+       <b>receive.denyCurrentBranch </b>configuration variable is set to
+       <b>updateInstead</b>. Such a push by default is refused if the working tree
+       and the index of the remote repository has any difference from the
+       currently checked out commit; when both the working tree and the
+       index match the current commit, they are updated to match the newly
+       pushed tip of the branch. This hook is to be used to override the
+       default behaviour.
+
+       The hook receives the commit with which the tip of the current branch
+       is going to be updated. It can exit with a non-zero status to refuse
+       the push (when it does so, it must not modify the index or the
+       working tree). Or it can make any necessary changes to the working
+       tree and to the index to bring them to the desired state when the tip
+       of the current branch is updated to the new commit, and exit with a
+       zero status.
+
+       For example, the hook can simply run <b>git read-tree -u -m HEAD "$1" </b>in
+       order to emulate <i>git fetch</i> that is run in the reverse direction with
+       <b>git push</b>, as the two-tree form of <b>read-tree -u -m </b>is essentially the
+       same as <b>git checkout </b>that switches branches while keeping the local
+       changes in the working tree that do not interfere with the difference
+       between the branches.
+
+   <b>pre-auto-gc</b>
+       This hook is invoked by <i>git gc --auto</i>. It takes no parameter, and
+       exiting with non-zero status from this script causes the <i>git gc</i>
+       <i>--auto</i> to abort.
+
+   <b>post-rewrite</b>
+       This hook is invoked by commands that rewrite commits (<b>git commit</b>
+       <b>--amend</b>, <i>git-rebase</i>; currently <i>git-filter-branch</i> does <i>not</i> call it!).
+       Its first argument denotes the command it was invoked by: currently
+       one of <b>amend </b>or <b>rebase</b>. Further command-dependent arguments may be
+       passed in the future.
+
+       The hook receives a list of the rewritten commits on stdin, in the
+       format
+
+           &lt;old-sha1&gt; SP &lt;new-sha1&gt; [ SP &lt;extra-info&gt; ] LF
+
+       The <i>extra-info</i> is again command-dependent. If it is empty, the
+       preceding SP is also omitted. Currently, no commands pass any
+       <i>extra-info</i>.
+
+       The hook always runs after the automatic note copying (see
+       "notes.rewrite.&lt;command&gt;" in <a href="../man1/git-config.1.html">git-config(1)</a>) has happened, and thus
+       has access to these notes.
+
+       The following command-specific comments apply:
+
+       rebase
+           For the <i>squash</i> and <i>fixup</i> operation, all commits that were
+           squashed are listed as being rewritten to the squashed commit.
+           This means that there will be several lines sharing the same
+           <i>new-sha1</i>.
+
+           The commits are guaranteed to be listed in the order that they
+           were processed by rebase.
+
+   <b>sendemail-validate</b>
+       This hook is invoked by <i>git send-email</i>. It takes a single parameter,
+       the name of the file that holds the e-mail to be sent. Exiting with a
+       non-zero status causes <i>git send-email</i> to abort before sending any
+       e-mails.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="../man1/git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.13.2.556.g5116f7           07/05/2017                      GITHOOKS(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/git.1.html">git(1)</a>,&nbsp; 
+    <a href="../man1/git-am.1.html">git-am(1)</a>,&nbsp; 
+    <a href="../man1/git-commit.1.html">git-commit(1)</a>,&nbsp; 
+    <a href="../man1/git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="../man1/git-gc.1.html">git-gc(1)</a>,&nbsp; 
+    <a href="../man1/git-init.1.html">git-init(1)</a>,&nbsp; 
+    <a href="../man1/git-push.1.html">git-push(1)</a>,&nbsp; 
+    <a href="../man1/git-rebase.1.html">git-rebase(1)</a>,&nbsp; 
+    <a href="../man1/git-send-email.1.html">git-send-email(1)</a>,&nbsp; 
+    <a href="../man1/git-send-pack.1.html">git-send-pack(1)</a>,&nbsp; 
+    <a href="gitrepository-layout.5.html">gitrepository-layout(5)</a>,&nbsp; 
+    <a href="../man7/gitcvs-migration.7.html">gitcvs-migration(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-fsck(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#DISCUSSION">DISCUSSION</a> | <a href="#EXTRACTED_DIAGNOSTICS">EXTRACTED&nbsp;DIAGNOSTICS</a> | <a href="#ENVIRONMENT_VARIABLES">ENVIRONMENT&nbsp;VARIABLES</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-FSCK(1)                      Git Manual                      GIT-FSCK(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-fsck - Verifies the connectivity and validity of the objects in
+       the database
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git fsck</i> [--tags] [--root] [--unreachable] [--cache] [--no-reflogs]
+                [--[no-]full] [--strict] [--verbose] [--lost-found]
+                [--[no-]dangling] [--[no-]progress] [--connectivity-only]
+                [--[no-]name-objects] [&lt;object&gt;*]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Verifies the connectivity and validity of the objects in the
+       database.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       &lt;object&gt;
+           An object to treat as the head of an unreachability trace.
+
+           If no objects are given, <i>git fsck</i> defaults to using the index
+           file, all SHA-1 references in <b>refs </b>namespace, and all reflogs
+           (unless --no-reflogs is given) as heads.
+
+       --unreachable
+           Print out objects that exist but that aren’t reachable from any
+           of the reference nodes.
+
+       --[no-]dangling
+           Print objects that exist but that are never <i>directly</i> used
+           (default).  <b>--no-dangling </b>can be used to omit this information
+           from the output.
+
+       --root
+           Report root nodes.
+
+       --tags
+           Report tags.
+
+       --cache
+           Consider any object recorded in the index also as a head node for
+           an unreachability trace.
+
+       --no-reflogs
+           Do not consider commits that are referenced only by an entry in a
+           reflog to be reachable. This option is meant only to search for
+           commits that used to be in a ref, but now aren’t, but are still
+           in that corresponding reflog.
+
+       --full
+           Check not just objects in GIT_OBJECT_DIRECTORY
+           ($GIT_DIR/objects), but also the ones found in alternate object
+           pools listed in GIT_ALTERNATE_OBJECT_DIRECTORIES or
+           $GIT_DIR/objects/info/alternates, and in packed Git archives
+           found in $GIT_DIR/objects/pack and corresponding pack
+           subdirectories in alternate object pools. This is now default;
+           you can turn it off with --no-full.
+
+       --connectivity-only
+           Check only the connectivity of tags, commits and tree objects. By
+           avoiding to unpack blobs, this speeds up the operation, at the
+           expense of missing corrupt objects or other problematic issues.
+
+       --strict
+           Enable more strict checking, namely to catch a file mode recorded
+           with g+w bit set, which was created by older versions of Git.
+           Existing repositories, including the Linux kernel, Git itself,
+           and sparse repository have old objects that triggers this check,
+           but it is recommended to check new projects with this flag.
+
+       --verbose
+           Be chatty.
+
+       --lost-found
+           Write dangling objects into .git/lost-found/commit/ or
+           .git/lost-found/other/, depending on type. If the object is a
+           blob, the contents are written into the file, rather than its
+           object name.
+
+       --name-objects
+           When displaying names of reachable objects, in addition to the
+           SHA-1 also display a name that describes <b>how </b>they are reachable,
+           compatible with <a href="git-rev-parse.1.html">git-rev-parse(1)</a>, e.g.
+           <b>HEAD@{1234567890}~25^2:src/</b>.
+
+       --[no-]progress
+           Progress status is reported on the standard error stream by
+           default when it is attached to a terminal, unless --no-progress
+           or --verbose is specified. --progress forces progress status even
+           if the standard error stream is not directed to a terminal.
+</pre>
+<h2><a id="DISCUSSION" href="#DISCUSSION"></a>DISCUSSION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-fsck tests SHA-1 and general object sanity, and it does full
+       tracking of the resulting reachability and everything else. It prints
+       out any corruption it finds (missing or bad objects), and if you use
+       the <b>--unreachable </b>flag it will also print out objects that exist but
+       that aren’t reachable from any of the specified head nodes (or the
+       default set, as mentioned above).
+
+       Any corrupt objects you will have to find in backups or other
+       archives (i.e., you can just remove them and do an <i>rsync</i> with some
+       other site in the hopes that somebody else has the object you have
+       corrupted).
+</pre>
+<h2><a id="EXTRACTED_DIAGNOSTICS" href="#EXTRACTED_DIAGNOSTICS"></a>EXTRACTED DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       expect dangling commits - potential heads - due to lack of head
+       information
+           You haven’t specified any nodes as heads so it won’t be possible
+           to differentiate between un-parented commits and root nodes.
+
+       missing sha1 directory <i>&lt;dir&gt;</i>
+           The directory holding the sha1 objects is missing.
+
+       unreachable &lt;type&gt; &lt;object&gt;
+           The &lt;type&gt; object &lt;object&gt;, isn’t actually referred to directly
+           or indirectly in any of the trees or commits seen. This can mean
+           that there’s another root node that you’re not specifying or that
+           the tree is corrupt. If you haven’t missed a root node then you
+           might as well delete unreachable nodes since they can’t be used.
+
+       missing &lt;type&gt; &lt;object&gt;
+           The &lt;type&gt; object &lt;object&gt;, is referred to but isn’t present in
+           the database.
+
+       dangling &lt;type&gt; &lt;object&gt;
+           The &lt;type&gt; object &lt;object&gt;, is present in the database but never
+           <i>directly</i> used. A dangling commit could be a root node.
+
+       sha1 mismatch &lt;object&gt;
+           The database has an object who’s sha1 doesn’t match the database
+           value. This indicates a serious data integrity problem.
+</pre>
+<h2><a id="ENVIRONMENT_VARIABLES" href="#ENVIRONMENT_VARIABLES"></a>ENVIRONMENT VARIABLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       GIT_OBJECT_DIRECTORY
+           used to specify the object database root (usually
+           $GIT_DIR/objects)
+
+       GIT_INDEX_FILE
+           used to specify the index file of the index
+
+       GIT_ALTERNATE_OBJECT_DIRECTORIES
+           used to specify additional object database roots (usually unset)
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.9.2.574.gc6b0597           08/07/2016                      GIT-FSCK(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-fsck-objects.1.html">git-fsck-objects(1)</a>,&nbsp; 
+    <a href="git-prune.1.html">git-prune(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,332 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd-bootchart(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#INVOCATION">INVOCATION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#OUTPUT">OUTPUT</a> | <a href="#HISTORY">HISTORY</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#BUGS">BUGS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD-BOOTCHART(1)          systemd-bootchart         SYSTEMD-BOOTCHART(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-bootchart - Boot performance graphing tool
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-bootchart </b>is a tool, usually run at system startup, that
+       collects the CPU load, disk load, memory usage, as well as
+       per-process information from a running system. Collected results are
+       output as an SVG graph. Normally, systemd-bootchart is invoked by the
+       kernel by passing <b>init=/usr/lib/systemd/systemd-bootchart </b>on the
+       kernel command line. systemd-bootchart will then fork the real init
+       off to resume normal system startup, while monitoring and logging
+       startup information in the background.
+
+       After collecting a certain amount of data (usually 15–30 seconds,
+       default 20 s) the logging stops and a graph is generated from the
+       logged information. This graph contains vital clues as to which
+       resources are being used, in which order, and where possible problems
+       exist in the startup sequence of the system. It is essentially a more
+       detailed version of the <b>systemd-analyze plot </b>function.
+
+       Of course, bootchart can also be used at any moment in time to
+       collect and graph some data for an amount of time. It is recommended
+       to use the <b>--rel </b>switch in this case.
+
+       Bootchart does not require root privileges, and will happily run as a
+       normal user.
+
+       Bootchart graphs are by default written time-stamped in /run/log and
+       saved to the journal with
+       <i>MESSAGE_ID=9f26aa562cf440c2b16c773d0479b518</i>. Journal field <i>BOOTCHART=</i>
+       contains the bootchart in SVG format.
+</pre>
+<h2><a id="INVOCATION" href="#INVOCATION"></a>INVOCATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-bootchart </b>can be invoked in several different ways:
+
+       <i>Kernel invocation</i>
+           The kernel can invoke <b>systemd-bootchart </b>instead of the init
+           process. In turn, <b>systemd-bootchart </b>will invoke
+           <b>/usr/lib/systemd/systemd</b>.
+
+       <i>Started as a standalone program</i>
+           One can execute <b>systemd-bootchart </b>as normal application from the
+           command line. In this mode, it is highly recommended to pass the
+           <b>-r </b>flag in order to not graph the time elapsed since boot and
+           before systemd-bootchart was started, as it may result in
+           extremely large graphs. The time elapsed since boot might also
+           include any time that the system was suspended.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These options can also be set in the /etc/systemd/bootchart.conf
+       file. See <a href="../man5/bootchart.conf.5.html">bootchart.conf(5)</a>.
+
+       <b>-h</b>, <b>--help</b>
+           Print a short help text and exit.
+
+       <b>-n</b>, <b>--sample </b><i>N</i>
+           Specify the number of samples, <i>N</i>, to record. Samples will be
+           recorded at intervals defined with <b>--freq</b>.
+
+       <b>-f</b>, <b>--freq </b><i>f</i>
+           Specify the sample log frequency, a positive real <i>f</i>, in Hz. Most
+           systems can cope with values up to 25–50 without creating too
+           much overhead.
+
+       <b>-r</b>, <b>--rel</b>
+           Use relative times instead of absolute times. This is useful for
+           using bootchart at post-boot time to profile an already booted
+           system. Without this option the graph would become extremely
+           large. If set, the horizontal axis starts at the first recorded
+           sample instead of time 0.0.
+
+       <b>-F</b>, <b>--no-filter</b>
+           Disable filtering of tasks that did not contribute significantly
+           to the boot. Processes that are too short-lived (only seen in one
+           sample) or that do not consume any significant CPU time (less
+           than 0.001 s) will not be displayed in the output graph.
+
+       <b>-C</b>, <b>--cmdline</b>
+           Display the full command line with arguments of processes,
+           instead of only the process name.
+
+       <b>-g</b>, <b>--control-group</b>
+           Display process control group
+
+       <b>-o</b>, <b>--output </b><i>path</i>
+           Specify the output directory for the graphs. By default,
+           bootchart writes the graphs to /run/log.
+
+       <b>-i</b>, <b>--init </b><i>path</i>
+           Use this init binary. Defaults to <b>/usr/lib/systemd/systemd</b>.
+
+       <b>-p</b>, <b>--pss</b>
+           Enable logging and graphing of processes' PSS (Proportional Set
+           Size) memory consumption. See filesystems/proc.txt in the kernel
+           documentation for an explanation of this field.
+
+       <b>-e</b>, <b>--entropy</b>
+           Enable logging and graphing of the kernel random entropy pool
+           size.
+
+       <b>-x</b>, <b>--scale-x </b><i>N</i>
+           Horizontal scaling factor for all variable graph components.
+
+       <b>-y</b>, <b>--scale-y </b><i>N</i>
+           Vertical scaling factor for all variable graph components.
+</pre>
+<h2><a id="OUTPUT" href="#OUTPUT"></a>OUTPUT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-bootchart </b>generates SVG graphs. In order to render those on a
+       graphical display any SVG capable viewer can be used. It should be
+       noted that the SVG render engines in most browsers (including Chrome
+       and Firefox) are many times faster than dedicated graphical
+       applications like Gimp and Inkscape. Just point your browser at
+       <b>file:///run/log/</b><b></b>!
+</pre>
+<h2><a id="HISTORY" href="#HISTORY"></a>HISTORY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This version of bootchart was implemented from scratch, but is
+       inspired by former bootchart incantations:
+
+       <i>Original bash</i>
+           The original bash/shell code implemented bootchart. This version
+           created a compressed tarball for processing with external
+           applications. This version did not graph anything, only generated
+           data.
+
+       <i>Ubuntu C Implementation</i>
+           This version replaced the shell version with a fast and efficient
+           data logger, but also did not graph the data.
+
+       <i>Java bootchart</i>
+           This was the original graphing application for charting the data,
+           written in java.
+
+       <i>pybootchartgui.py</i>
+           pybootchart created a graph from the data collected by either the
+           bash or C version.
+
+       The version of bootchart you are using now combines both the data
+       collection and the charting into a single application, making it more
+       efficient and simpler. There are no longer any timing issues with the
+       data collector and the grapher, as the graphing cannot be run until
+       the data has been collected. Also, the data kept in memory is reduced
+       to the absolute minimum needed.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man5/bootchart.conf.5.html">bootchart.conf(5)</a>
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-bootchart does not get the model information for the hard
+       drive unless the root device is specified with root=/dev/sdxY. Using
+       UUIDs or PARTUUIDs will boot fine, but the hard drive model will not
+       be added to the chart.
+
+       For bugs, please contact the author and current maintainer:
+           Auke Kok &lt;auke-jan.h.kok@intel.com&gt;
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 228                                             SYSTEMD-BOOTCHART(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/bootchart.conf.5.html">bootchart.conf(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

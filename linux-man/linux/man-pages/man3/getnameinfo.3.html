@@ -1,0 +1,380 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getnameinfo(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#FILES">FILES</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETNAMEINFO(3)            Linux Programmer's Manual           GETNAMEINFO(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getnameinfo  -  address-to-name  translation  in protocol-independent
+       manner
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/socket.h&gt;</b>
+       <b>#include &lt;netdb.h&gt;</b>
+
+       <b>int getnameinfo(const struct sockaddr *</b><i>addr</i><b>, socklen_t </b><i>addrlen</i><b>,</b>
+                       <b>char *</b><i>host</i><b>, socklen_t </b><i>hostlen</i><b>,</b>
+                       <b>char *</b><i>serv</i><b>, socklen_t </b><i>servlen</i><b>, int </b><i>flags</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>getnameinfo</b>():
+           Since glibc 2.22: _POSIX_C_SOURCE &gt;= 201112L
+           Glibc 2.21 and earlier: _POSIX_C_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>getnameinfo</b>() function is the inverse of <a href="getaddrinfo.3.html">getaddrinfo(3)</a>: it
+       converts a socket address to a corresponding host and service, in a
+       protocol-independent manner.  It combines the functionality of
+       <a href="gethostbyaddr.3.html">gethostbyaddr(3)</a> and <a href="getservbyport.3.html">getservbyport(3)</a>, but unlike those functions,
+       <b>getnameinfo</b>() is reentrant and allows programs to eliminate
+       IPv4-versus-IPv6 dependencies.
+
+       The <i>addr</i> argument is a pointer to a generic socket address structure
+       (of type <i>sockaddr_in</i> or <i>sockaddr_in6</i>) of size <i>addrlen</i> that holds the
+       input IP address and port number.  The arguments <i>host</i> and <i>serv</i> are
+       pointers to caller-allocated buffers (of size <i>hostlen</i> and <i>servlen</i>
+       respectively) into which <b>getnameinfo</b>() places null-terminated strings
+       containing the host and service names respectively.
+
+       The caller can specify that no hostname (or no service name) is
+       required by providing a NULL <i>host</i> (or <i>serv</i>) argument or a zero
+       <i>hostlen</i> (or <i>servlen</i>) argument.  However, at least one of hostname or
+       service name must be requested.
+
+       The <i>flags</i> argument modifies the behavior of <b>getnameinfo</b>() as follows:
+
+       <b>NI_NAMEREQD</b>
+              If set, then an error is returned if the hostname cannot be
+              determined.
+
+       <b>NI_DGRAM</b>
+              If set, then the service is datagram (UDP) based rather than
+              stream (TCP) based.  This is required for the few ports
+              (512-514) that have different services for UDP and TCP.
+
+       <b>NI_NOFQDN</b>
+              If set, return only the hostname part of the fully qualified
+              domain name for local hosts.
+
+       <b>NI_NUMERICHOST</b>
+              If set, then the numeric form of the hostname is returned.
+              (When not set, this will still happen in case the node's name
+              cannot be determined.)
+
+       <b>NI_NUMERICSERV</b>
+              If set, then the numeric form of the service address is
+              returned.  (When not set, this will still happen in case the
+              service's name cannot be determined.)
+
+   <b>Extensions to getnameinfo() for Internationalized Domain Names</b>
+       Starting with glibc 2.3.4, <b>getnameinfo</b>() has been extended to
+       selectively allow hostnames to be transparently converted to and from
+       the Internationalized Domain Name (IDN) format (see RFC 3490,
+       <i>Internationalizing Domain Names in Applications (IDNA)</i>).  Three new
+       flags are defined:
+
+       <b>NI_IDN </b>If this flag is used, then the name found in the lookup
+              process is converted from IDN format to the locale's encoding
+              if necessary.  ASCII-only names are not affected by the
+              conversion, which makes this flag usable in existing programs
+              and environments.
+
+       <b>NI_IDN_ALLOW_UNASSIGNED</b>, <b>NI_IDN_USE_STD3_ASCII_RULES</b>
+              Setting these flags will enable the IDNA_ALLOW_UNASSIGNED
+              (allow unassigned Unicode code points) and
+              IDNA_USE_STD3_ASCII_RULES (check output to make sure it is a
+              STD3 conforming hostname) flags respectively to be used in the
+              IDNA handling.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, 0 is returned, and node and service names, if requested,
+       are filled with null-terminated strings, possibly truncated to fit
+       the specified buffer lengths.  On error, one of the following nonzero
+       error codes is returned:
+
+       <b>EAI_AGAIN</b>
+              The name could not be resolved at this time.  Try again later.
+
+       <b>EAI_BADFLAGS</b>
+              The <i>flags</i> argument has an invalid value.
+
+       <b>EAI_FAIL</b>
+              A nonrecoverable error occurred.
+
+       <b>EAI_FAMILY</b>
+              The address family was not recognized, or the address length
+              was invalid for the specified family.
+
+       <b>EAI_MEMORY</b>
+              Out of memory.
+
+       <b>EAI_NONAME</b>
+              The name does not resolve for the supplied arguments.
+              <b>NI_NAMEREQD </b>is set and the host's name cannot be located, or
+              neither hostname nor service name were requested.
+
+       <b>EAI_OVERFLOW</b>
+              The buffer pointed to by <i>host</i> or <i>serv</i> was too small.
+
+       <b>EAI_SYSTEM</b>
+              A system error occurred.  The error code can be found in
+              <i><a href="errno.3.html">errno</a></i>.
+
+       The <a href="gai_strerror.3.html">gai_strerror(3)</a> function translates these error codes to a human
+       readable string, suitable for error reporting.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /etc/hosts
+       /etc/nsswitch.conf
+       /etc/resolv.conf
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>getnameinfo</b>() is provided in glibc since version 2.1.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────┬───────────────┬────────────────────┐
+       │<b>Interface     </b>│ <b>Attribute     </b>│ <b>Value              </b>│
+       ├──────────────┼───────────────┼────────────────────┤
+       │<b>getnameinfo</b>() │ Thread safety │ MT-Safe env locale │
+       └──────────────┴───────────────┴────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, RFC 2553.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In order to assist the programmer in choosing reasonable sizes for
+       the supplied buffers, <i>&lt;netdb.h&gt;</i> defines the constants
+
+           #define NI_MAXHOST      1025
+           #define NI_MAXSERV      32
+
+       Since glibc 2.8, these definitions are exposed only if suitable
+       feature test macros are defined, namely: <b>_GNU_SOURCE</b>, <b>_DEFAULT_SOURCE</b>
+       (since glibc 2.19), or (in glibc versions up to and including 2.19)
+       <b>_BSD_SOURCE </b>or <b>_SVID_SOURCE</b>.
+
+       The former is the constant <b>MAXDNAME </b>in recent versions of BIND's
+       <i>&lt;arpa/nameser.h&gt;</i> header file.  The latter is a guess based on the
+       services listed in the current Assigned Numbers RFC.
+
+       Before glibc version 2.2, the <i>hostlen</i> and <i>servlen</i> arguments were
+       typed as <i>size_t</i>.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following code tries to get the numeric hostname and service
+       name, for a given socket address.  Note that there is no hardcoded
+       reference to a particular address family.
+
+           struct sockaddr *addr;     /* input */
+           socklen_t addrlen;         /* input */
+           char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
+
+           if (getnameinfo(addr, addrlen, hbuf, sizeof(hbuf), sbuf,
+                       sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV) == 0)
+               printf("host=%s, serv=%s\n", hbuf, sbuf);
+
+       The following version checks if the socket address has a reverse
+       address mapping.
+
+           struct sockaddr *addr;     /* input */
+           socklen_t addrlen;         /* input */
+           char hbuf[NI_MAXHOST];
+
+           if (getnameinfo(addr, addrlen, hbuf, sizeof(hbuf),
+                       NULL, 0, NI_NAMEREQD))
+               printf("could not resolve hostname");
+           else
+               printf("host=%s\n", hbuf);
+
+       An example program using <b>getnameinfo</b>() can be found in
+       <a href="getaddrinfo.3.html">getaddrinfo(3)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/accept.2.html">accept(2)</a>, <a href="../man2/getpeername.2.html">getpeername(2)</a>, <a href="../man2/getsockname.2.html">getsockname(2)</a>, <a href="../man2/recvfrom.2.html">recvfrom(2)</a>, <a href="../man2/socket.2.html">socket(2)</a>,
+       <a href="getaddrinfo.3.html">getaddrinfo(3)</a>, <a href="gethostbyaddr.3.html">gethostbyaddr(3)</a>, <a href="getservbyname.3.html">getservbyname(3)</a>, <a href="getservbyport.3.html">getservbyport(3)</a>,
+       <a href="inet_ntop.3.html">inet_ntop(3)</a>, <a href="../man5/hosts.5.html">hosts(5)</a>, <a href="../man5/services.5.html">services(5)</a>, <a href="../man7/hostname.7.html">hostname(7)</a>, <b>named</b>(8)
+
+       R. Gilligan, S. Thomson, J. Bound and W. Stevens, <i>Basic Socket</i>
+       <i>Interface Extensions for IPv6</i>, RFC 2553, March 1999.
+
+       Tatsuya Jinmei and Atsushi Onoe, <i>An Extension of Format for IPv6</i>
+       <i>Scoped Addresses</i>, internet draft, work in progress 
+       ⟨ftp://ftp.ietf.org/internet-drafts/draft-ietf-ipngwg-scopedaddr-format-02.txt⟩.
+
+       Craig Metz, <i>Protocol Independence Using the Sockets API</i>, Proceedings
+       of the freenix track: 2000 USENIX annual technical conference, June
+       2000 
+       ⟨<a href="http://www.usenix.org/publications/library/proceedings/usenix2000/freenix/metzprotocol.html">http://www.usenix.org/publications/library/proceedings/usenix2000/freenix/metzprotocol.html</a>⟩.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2016-03-15                   GETNAMEINFO(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="getaddrinfo.3.html">getaddrinfo(3)</a>,&nbsp; 
+    <a href="gethostbyname.3.html">gethostbyname(3)</a>,&nbsp; 
+    <a href="getifaddrs.3.html">getifaddrs(3)</a>,&nbsp; 
+    <a href="getipnodebyname.3.html">getipnodebyname(3)</a>,&nbsp; 
+    <a href="inet.3.html">inet(3)</a>,&nbsp; 
+    <a href="inet_ntop.3.html">inet_ntop(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getnameinfo.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

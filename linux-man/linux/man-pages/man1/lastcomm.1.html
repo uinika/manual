@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>lastcomm(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#FILES">FILES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LASTCOMM(1)                General Commands Manual               LASTCOMM(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       lastcomm -  print out information about previously executed commands.
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lastcomm</b>
+              [ <i>command-name ...</i>  ]
+              [ <i>user-name ...</i>  ]
+              [ <i>terminal-name ...</i>  ]
+              [ OPTION ... ]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lastcomm </b>prints out information about previously executed commands.
+       If no arguments are specified, <b>lastcomm </b>will print info about all of
+       the commands in <i>acct</i> (the record file).  If called with one or more
+       of <i>command-name, user-name,</i> or <i>terminal-name,</i> only records containing
+       those items will be displayed.  For example, to find out which users
+       used command `a.out' and which users were logged into `tty0', type:
+                                lastcomm a.out tty0
+
+       This will print any entry for which `a.out' or `tty0' matches in any
+       of the record's fields (command, name, or terminal).  If you want to
+       find only items that match *all* of the arguments on the command
+       line, you must use the '-strict-match' option.  For example, to list
+       all of the executions of command <i>a.out</i> by user <i>root</i> on terminal <i>tty0,</i>
+       type:
+          lastcomm --strict-match --command a.out --user root --tty tty0
+
+       The order of the arguments is not important.
+
+       For each entry the following information is printed:
+          + command name of the process
+          + flags, as recorded by the system accounting routines:
+               S -- command executed by super-user
+               F -- command executed after a fork but without a following
+       exec
+               C -- command run in PDP-11 compatibility mode (VAX only)
+               D -- command terminated with the generation of a core file
+               X -- command was terminated with the signal SIGTERM
+          + the name of the user who ran the process
+          + time the process started
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>--strict-match</b>
+              Print only entries that match *all* of the arguments on the
+              command line.
+       <b>--print-controls</b>
+              Print control characters.
+       <b>--user </b><i>name</i>
+              List records for user with <i>name.</i>  This is useful if you're
+              trying to match a username that happens to be the same as a
+              command (e.g., <i>ed</i> ).
+       <b>--command </b><i>name</i>
+              List records for command <i>name.</i>
+       <b>--tty </b><i>name</i>
+              List records for tty <i>name.</i>
+       <b>--forwards</b>
+              Read file forwards instead of backwards. This avoids trying to
+              seek on the file and can be used to read from a pipe. This
+              must be specified prior to any <b>-f </b>arguments.
+       <b>-f </b><i>filename,</i> <b>--file </b><i>filename</i>
+              Read from the file <i>filename</i> instead of <i>acct.</i>  A filename of
+              "-" will result in reading from stdin. This must either be the
+              first <b>-f </b>option, or <b>--forwards </b>must precede all <b>-f </b>options.
+       <b>--ahz </b><i>hz</i>
+              Use this flag to tell the program what <b>AHZ </b>should be (in
+              hertz).  This option is useful if you are trying to view an
+              <i>acct</i> file created on another machine which has the same byte
+              order and file format as your current machine, but has a
+              different value for <b>AHZ.</b>
+       <b>-p, --show-paging</b>
+              Print paging statistics.
+       <b>--pid  </b>Show PID and PPID of the process if acct version 3 format is
+              supported by kernel.
+       <b>--pid  </b>Add pid of the process and pid of the process parent to the
+              output (pid is the last but one and parent pid the last
+              column).  These values are shown only when they are generated
+              by acct function (depends on the version of kernel)
+       <b>--debug</b>
+              Print verbose internal information.
+       <b>-V, --version</b>
+              Print the version number of <b>lastcomm.</b>
+       <b>-h, --help</b>
+              Prints the usage string and default locations of system files
+              to standard output and exits.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>acct</i>
+              The system wide process accounting file. See <a href="../man5/acct.5.html">acct(5)</a> (or
+              <b>pacct</b>(5)) for further details.  <i>/var/log/account</i>
+                     This directory contains pacct files which contain the
+                     binary process accounting data as written by the
+                     kernel.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The GNU accounting utilities were written by Noel Cragg
+       &lt;noel@gnu.ai.mit.edu&gt;. The man page was adapted from the accounting
+       texinfo page by Susan Kleinmann &lt;sgk@sgk.tiac.net&gt;.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="last.1.html">last(1)</a>, <a href="../man5/acct.5.html">acct(5)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>psacct</i> (process accounting utilities)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.gnu.org/software/acct/">http://www.gnu.org/software/acct/</a>⟩.  If you have a bug report for
+       this manual page, see ⟨<a href="http://www.gnu.org/software/acct/">http://www.gnu.org/software/acct/</a>⟩.  This page
+       was obtained from the project's upstream Subversion repository 
+       ⟨svn://svn.savannah.gnu.org/acct/trunk⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                               1995 October 31                   LASTCOMM(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/acct.5.html">acct(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

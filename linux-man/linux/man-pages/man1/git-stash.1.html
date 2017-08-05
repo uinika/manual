@@ -1,0 +1,437 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-stash(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#DISCUSSION">DISCUSSION</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-STASH(1)                     Git Manual                     GIT-STASH(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-stash - Stash the changes in a dirty working directory away
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git stash</i> list [&lt;options&gt;]
+       <i>git stash</i> show [&lt;stash&gt;]
+       <i>git stash</i> drop [-q|--quiet] [&lt;stash&gt;]
+       <i>git stash</i> ( pop | apply ) [--index] [-q|--quiet] [&lt;stash&gt;]
+       <i>git stash</i> branch &lt;branchname&gt; [&lt;stash&gt;]
+       <i>git stash</i> save [-p|--patch] [-k|--[no-]keep-index] [-q|--quiet]
+                    [-u|--include-untracked] [-a|--all] [&lt;message&gt;]
+       <i>git stash</i> [push [-p|--patch] [-k|--[no-]keep-index] [-q|--quiet]
+                    [-u|--include-untracked] [-a|--all] [-m|--message &lt;message&gt;]]
+                    [--] [&lt;pathspec&gt;...]]
+       <i>git stash</i> clear
+       <i>git stash</i> create [&lt;message&gt;]
+       <i>git stash</i> store [-m|--message &lt;message&gt;] [-q|--quiet] &lt;commit&gt;
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Use <b>git stash </b>when you want to record the current state of the
+       working directory and the index, but want to go back to a clean
+       working directory. The command saves your local modifications away
+       and reverts the working directory to match the <b>HEAD </b>commit.
+
+       The modifications stashed away by this command can be listed with <b>git</b>
+       <b>stash list</b>, inspected with <b>git stash show</b>, and restored (potentially
+       on top of a different commit) with <b>git stash apply</b>. Calling <b>git stash</b>
+       without any arguments is equivalent to <b>git stash save</b>. A stash is by
+       default listed as "WIP on <i>branchname</i> ...", but you can give a more
+       descriptive message on the command line when you create one.
+
+       The latest stash you created is stored in <b>refs/stash</b>; older stashes
+       are found in the reflog of this reference and can be named using the
+       usual reflog syntax (e.g. <b>stash@{0} </b>is the most recently created
+       stash, <b>stash@{1} </b>is the one before it, <b>stash@{2.hours.ago} </b>is also
+       possible). Stashes may also be referenced by specifying just the
+       stash index (e.g. the integer <b>n </b>is equivalent to <b>stash@{n}</b>).
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       save [-p|--patch] [-k|--[no-]keep-index] [-u|--include-untracked]
+       [-a|--all] [-q|--quiet] [&lt;message&gt;], push [-p|--patch]
+       [-k|--[no-]keep-index] [-u|--include-untracked] [-a|--all]
+       [-q|--quiet] [-m|--message &lt;message&gt;] [--] [&lt;pathspec&gt;...]
+           Save your local modifications to a new <i>stash entry</i> and roll them
+           back to HEAD (in the working tree and in the index). The
+           &lt;message&gt; part is optional and gives the description along with
+           the stashed state.
+
+           For quickly making a snapshot, you can omit "push". In this mode,
+           non-option arguments are not allowed to prevent a misspelled
+           subcommand from making an unwanted stash entry. The two
+           exceptions to this are <b>stash -p </b>which acts as alias for <b>stash</b>
+           <b>push -p </b>and pathspecs, which are allowed after a double hyphen <b>--</b>
+           for disambiguation.
+
+           When pathspec is given to <i>git stash push</i>, the new stash entry
+           records the modified states only for the files that match the
+           pathspec. The index entries and working tree files are then
+           rolled back to the state in HEAD only for these files, too,
+           leaving files that do not match the pathspec intact.
+
+           If the <b>--keep-index </b>option is used, all changes already added to
+           the index are left intact.
+
+           If the <b>--include-untracked </b>option is used, all untracked files
+           are also stashed and then cleaned up with <b>git clean</b>, leaving the
+           working directory in a very clean state. If the <b>--all </b>option is
+           used instead then the ignored files are stashed and cleaned in
+           addition to the untracked files.
+
+           With <b>--patch</b>, you can interactively select hunks from the diff
+           between HEAD and the working tree to be stashed. The stash entry
+           is constructed such that its index state is the same as the index
+           state of your repository, and its worktree contains only the
+           changes you selected interactively. The selected changes are then
+           rolled back from your worktree. See the “Interactive Mode”
+           section of <a href="git-add.1.html">git-add(1)</a> to learn how to operate the <b>--patch </b>mode.
+
+           The <b>--patch </b>option implies <b>--keep-index</b>. You can use
+           <b>--no-keep-index </b>to override this.
+
+       list [&lt;options&gt;]
+           List the stash entries that you currently have. Each <i>stash entry</i>
+           is listed with its name (e.g.  <b>stash@{0} </b>is the latest entry,
+           <b>stash@{1} </b>is the one before, etc.), the name of the branch that
+           was current when the entry was made, and a short description of
+           the commit the entry was based on.
+
+               stash@{0}: WIP on submit: 6ebd0e2... Update git-stash documentation
+               stash@{1}: On master: 9cc0589... Add git-stash
+
+           The command takes options applicable to the <i>git log</i> command to
+           control what is shown and how. See <a href="git-log.1.html">git-log(1)</a>.
+
+       show [&lt;stash&gt;]
+           Show the changes recorded in the stash entry as a diff between
+           the stashed contents and the commit back when the stash entry was
+           first created. When no <b>&lt;stash&gt; </b>is given, it shows the latest one.
+           By default, the command shows the diffstat, but it will accept
+           any format known to <i>git diff</i> (e.g., <b>git stash show -p stash@{1}</b>
+           to view the second most recent entry in patch form). You can use
+           stash.showStat and/or stash.showPatch config variables to change
+           the default behavior.
+
+       pop [--index] [-q|--quiet] [&lt;stash&gt;]
+           Remove a single stashed state from the stash list and apply it on
+           top of the current working tree state, i.e., do the inverse
+           operation of <b>git stash save</b>. The working directory must match the
+           index.
+
+           Applying the state can fail with conflicts; in this case, it is
+           not removed from the stash list. You need to resolve the
+           conflicts by hand and call <b>git stash drop </b>manually afterwards.
+
+           If the <b>--index </b>option is used, then tries to reinstate not only
+           the working tree’s changes, but also the index’s ones. However,
+           this can fail, when you have conflicts (which are stored in the
+           index, where you therefore can no longer apply the changes as
+           they were originally).
+
+           When no <b>&lt;stash&gt; </b>is given, <b>stash@{0} </b>is assumed, otherwise <b>&lt;stash&gt;</b>
+           must be a reference of the form <b>stash@{&lt;revision&gt;}</b>.
+
+       apply [--index] [-q|--quiet] [&lt;stash&gt;]
+           Like <b>pop</b>, but do not remove the state from the stash list. Unlike
+           <b>pop</b>, <b>&lt;stash&gt; </b>may be any commit that looks like a commit created
+           by <b>stash save </b>or <b>stash create</b>.
+
+       branch &lt;branchname&gt; [&lt;stash&gt;]
+           Creates and checks out a new branch named <b>&lt;branchname&gt; </b>starting
+           from the commit at which the <b>&lt;stash&gt; </b>was originally created,
+           applies the changes recorded in <b>&lt;stash&gt; </b>to the new working tree
+           and index. If that succeeds, and <b>&lt;stash&gt; </b>is a reference of the
+           form <b>stash@{&lt;revision&gt;}</b>, it then drops the <b>&lt;stash&gt;</b>. When no
+           <b>&lt;stash&gt; </b>is given, applies the latest one.
+
+           This is useful if the branch on which you ran <b>git stash save </b>has
+           changed enough that <b>git stash apply </b>fails due to conflicts. Since
+           the stash entry is applied on top of the commit that was HEAD at
+           the time <b>git stash </b>was run, it restores the originally stashed
+           state with no conflicts.
+
+       clear
+           Remove all the stash entries. Note that those entries will then
+           be subject to pruning, and may be impossible to recover (see
+           <i>Examples</i> below for a possible strategy).
+
+       drop [-q|--quiet] [&lt;stash&gt;]
+           Remove a single stash entry from the list of stash entries. When
+           no <b>&lt;stash&gt; </b>is given, it removes the latest one. i.e.  <b>stash@{0}</b>,
+           otherwise <b>&lt;stash&gt; </b>must be a valid stash log reference of the form
+           <b>stash@{&lt;revision&gt;}</b>.
+
+       create
+           Create a stash entry (which is a regular commit object) and
+           return its object name, without storing it anywhere in the ref
+           namespace. This is intended to be useful for scripts. It is
+           probably not the command you want to use; see "save" above.
+
+       store
+           Store a given stash created via <i>git stash create</i> (which is a
+           dangling merge commit) in the stash ref, updating the stash
+           reflog. This is intended to be useful for scripts. It is probably
+           not the command you want to use; see "save" above.
+</pre>
+<h2><a id="DISCUSSION" href="#DISCUSSION"></a>DISCUSSION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A stash entry is represented as a commit whose tree records the state
+       of the working directory, and its first parent is the commit at <b>HEAD</b>
+       when the entry was created. The tree of the second parent records the
+       state of the index when the entry is made, and it is made a child of
+       the <b>HEAD </b>commit. The ancestry graph looks like this:
+
+                  .----W
+                 /    /
+           -----H----I
+
+       where <b>H </b>is the <b>HEAD </b>commit, <b>I </b>is a commit that records the state of
+       the index, and <b>W </b>is a commit that records the state of the working
+       tree.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Pulling into a dirty tree
+           When you are in the middle of something, you learn that there are
+           upstream changes that are possibly relevant to what you are
+           doing. When your local changes do not conflict with the changes
+           in the upstream, a simple <b>git pull </b>will let you move forward.
+
+           However, there are cases in which your local changes do conflict
+           with the upstream changes, and <b>git pull </b>refuses to overwrite your
+           changes. In such a case, you can stash your changes away, perform
+           a pull, and then unstash, like this:
+
+               $ git pull
+                ...
+               file foobar not up to date, cannot merge.
+               $ git stash
+               $ git pull
+               $ git stash pop
+
+       Interrupted workflow
+           When you are in the middle of something, your boss comes in and
+           demands that you fix something immediately. Traditionally, you
+           would make a commit to a temporary branch to store your changes
+           away, and return to your original branch to make the emergency
+           fix, like this:
+
+               # ... hack hack hack ...
+               $ git checkout -b my_wip
+               $ git commit -a -m "WIP"
+               $ git checkout master
+               $ edit emergency fix
+               $ git commit -a -m "Fix in a hurry"
+               $ git checkout my_wip
+               $ git reset --soft HEAD^
+               # ... continue hacking ...
+
+           You can use <i>git stash</i> to simplify the above, like this:
+
+               # ... hack hack hack ...
+               $ git stash
+               $ edit emergency fix
+               $ git commit -a -m "Fix in a hurry"
+               $ git stash pop
+               # ... continue hacking ...
+
+       Testing partial commits
+           You can use <b>git stash save --keep-index </b>when you want to make two
+           or more commits out of the changes in the work tree, and you want
+           to test each change before committing:
+
+               # ... hack hack hack ...
+               $ git add --patch foo            # add just first part to the index
+               $ git stash save --keep-index    # save all other changes to the stash
+               $ edit/build/test first part
+               $ git commit -m 'First part'     # commit fully tested change
+               $ git stash pop                  # prepare to work on all other changes
+               # ... repeat above five steps until one commit remains ...
+               $ edit/build/test remaining parts
+               $ git commit foo -m 'Remaining parts'
+
+       Recovering stash entries that were cleared/dropped erroneously
+           If you mistakenly drop or clear stash entries, they cannot be
+           recovered through the normal safety mechanisms. However, you can
+           try the following incantation to get a list of stash entries that
+           are still in your repository, but not reachable any more:
+
+               git fsck --unreachable |
+               grep commit | cut -d\  -f3 |
+               xargs git log --merges --no-walk --grep=WIP
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="git-checkout.1.html">git-checkout(1)</a>, <a href="git-commit.1.html">git-commit(1)</a>, <a href="git-reflog.1.html">git-reflog(1)</a>, <a href="git-reset.1.html">git-reset(1)</a>
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.13.2.556.g5116f7           07/05/2017                     GIT-STASH(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="git-merge.1.html">git-merge(1)</a>,&nbsp; 
+    <a href="git-pull.1.html">git-pull(1)</a>,&nbsp; 
+    <a href="git-reset.1.html">git-reset(1)</a>,&nbsp; 
+    <a href="git-worktree.1.html">git-worktree(1)</a>,&nbsp; 
+    <a href="../man7/gitworkflows.7.html">gitworkflows(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

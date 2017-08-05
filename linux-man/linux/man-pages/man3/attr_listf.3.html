@@ -1,0 +1,310 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>attr_list(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#DIAGNOSTICS">DIAGNOSTICS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ATTR_LIST(3)                XFS Compatibility API               ATTR_LIST(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       attr_list,  attr_listf  -  list the names of the user attributes of a
+       filesystem object
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/attributes.h&gt;</b>
+
+       <b>int attr_list (const char ∗path, char ∗buffer,</b>
+                      <b>const int buffersize, int flags,</b>
+                      <b>attrlist_cursor_t ∗cursor);</b>
+
+       <b>int attr_listf (int fd, char ∗buffer,</b>
+                       <b>const int buffersize, int flags,</b>
+                       <b>attrlist_cursor_t ∗cursor);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>attr_list </b>and <b>attr_listf </b>functions provide a way to list the
+       existing attributes of a filesystem object.
+
+       <i>Path</i> points to a path name for a filesystem object, and <i>fd</i> refers to
+       the file descriptor associated with a file.  The <i>buffer</i> will be
+       filled with a structure describing at least a portion of the
+       attributes associated with the given filesystem object.  <i>Buffer</i> will
+       be overwritten with an <i><b>attrlist_t</b> </i>structure containing a list of the
+       attributes associated with that filesystem object, up to a maximum of
+       <i>buffersize</i> bytes.  The <i>buffer</i> must be sufficiently large to hold the
+       appropriate data structures plus at least one maximally sized
+       attribute name, but cannot be more than ATTR_MAX_VALUELEN (currently
+       64KB) bytes in length.
+
+       The contents of an <i><b>attrlist_t</b> </i>structure include the following
+       members:
+
+          <b>int32_t al_count; /∗ number of entries in attrlist ∗/</b>
+          <b>int32_t al_more; /∗ T/F: more attrs (do syscall again) ∗/</b>
+          <b>int32_t al_offset[1]; /∗ byte offsets of attrs [var-sized] ∗/</b>
+
+       The <i>al_count</i> field shows the number of attributes represented in this
+       buffer, which is also the number of elements in the <i>al_offset</i> array.
+       The <i>al_more</i> field will be non-zero if another <b>attr_list </b>call would
+       result in more attributes.  The <i>al_offset</i> array contains the byte
+       offset within the <i>buffer</i> of the structure describing each of the
+       attributes, an <i><b>attrlist_ent_t</b> </i>structure.  The <b>ATTR_ENTRY(buffer,</b>
+       <i><b>index)</b> </i>macro will help with decoding the list.  It takes a pointer to
+       the <i>buffer</i> and an <i>index</i> into the <i>al_offset</i> array and returns a
+       pointer to the corresponding <i><b>attrlist_ent_t</b> </i>structure.
+
+       The contents of an <i><b>attrlist_ent_t</b> </i>structure include the following
+       members:
+
+          <b>uint32_t a_valuelen; /∗ number bytes in value of attr ∗/</b>
+          <b>char a_name[]; /∗ attr name (NULL terminated) ∗/</b>
+
+       The <i>a_valuelen</i> field shows the size in bytes of the value associated
+       with the attribute whose name is stored in the <i>a_name</i> field.  The
+       name is a NULL terminated string.
+
+       Note that the value of the attribute cannot be obtained through this
+       interface, the <b>attr_get </b>call should be used to get the value.  The
+       <b>attr_list </b>interface tells the calling process how large of a buffer
+       it must have in order to get the attribute´s value.
+
+       The <i>flags</i> argument can contain the following symbols bitwise OR´ed
+       together:
+
+       ATTR_ROOT
+              List the attributes that are in the <b>root </b>address space, not in
+              the <b>user </b>address space.  (limited to use by super-user only)
+
+       ATTR_DONTFOLLOW
+              Do not follow symbolic links when resolving a <i>path</i> on an
+              <b>attr_list </b>function call.  The default is to follow symbolic
+              links.
+
+       The <i>cursor</i> argument is a pointer to an opaque data structure that the
+       kernel uses to track the calling process´s position in the attribute
+       list.  The only valid operations on a <i>cursor</i> are to pass it into an
+       <b>attr_list </b>function call or to zero it out.  It should be zero´ed out
+       before the first <b>attr_list </b>call.  Note that multi-threaded
+       applications may keep more than one <i>cursor</i> in order to serve multiple
+       contexts, ie: the <b>attr_list </b>call is "thread-safe".
+
+       <b>attr_list </b>will fail if one or more of the following are true:
+
+       [ENOENT]         The named file does not exist.
+
+       [EPERM]          The effective user ID does not match the owner of
+                        the file and the effective user ID is not super-
+                        user.
+
+       [ENOTDIR]        A component of the path prefix is not a directory.
+
+       [EACCES]         Search permission is denied on a component of the
+                        path prefix.
+
+       [EINVAL]         A bit was set in the <i>flag</i> argument that is not
+                        defined for this system call, or the buffer was too
+                        small or too large.
+
+       [EFAULT]         Either <i>Path</i> or <i>buffer</i> points outside the allocated
+                        address space of the process, or <i>buffer</i> or <i>bufsize</i>
+                        are not 32bit aligned.
+
+       [ELOOP]          A path name lookup involved too many symbolic links.
+
+       [ENAMETOOLONG]   The length of <i>path</i> exceeds {<i>MAXPATHLEN</i>}, or a
+                        pathname component is longer than {<i>MAXNAMELEN</i>}.
+
+       [ENOATTR]        <i>attribute</i> does not exist for this file.
+
+       <b>attr_listf </b>will fail if:
+
+       [EINVAL]       A bit was set in the <i>flag</i> argument that is not defined
+                      for this system call, or <i>fd</i> refers to a socket, not a
+                      file, or the buffer was too small or too large.
+
+       [EFAULT]       Either <i>Path</i> or <i>buffer</i> points outside the allocated
+                      address space of the process, or <i>buffer</i> or <i>bufsize</i> are
+                      not 32bit aligned.
+
+       [EBADF]        <i>Fd</i> does not refer to a valid descriptor.
+</pre>
+<h2><a id="DIAGNOSTICS" href="#DIAGNOSTICS"></a>DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Upon successful completion, a value of 0 is returned.  Otherwise, a
+       value of -1 is returned and <i><a href="errno.3.html">errno</a></i> is set to indicate the error.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/attr.1.html">attr(1)</a>, <a href="attr_multi.3.html">attr_multi(3)</a>, <a href="attr_remove.3.html">attr_remove(3)</a>, and <a href="attr_set.3.html">attr_set(3)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>attr</i> (manipulating filesystem extended
+       attributes) project.  Information about the project can be found at
+       ⟨<a href="http://savannah.nongnu.org/projects/attr">http://savannah.nongnu.org/projects/attr</a>⟩.  If you have a bug report
+       for this manual page, see 
+       ⟨<a href="http://savannah.nongnu.org/bugs/?group=attr">http://savannah.nongnu.org/bugs/?group=attr</a>⟩.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.savannah.nongnu.org/attr.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Dec 2005                     Extended Attributes                ATTR_LIST(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="attr_get.3.html">attr_get(3)</a>,&nbsp; 
+    <a href="attr_multi.3.html">attr_multi(3)</a>,&nbsp; 
+    <a href="attr_remove.3.html">attr_remove(3)</a>,&nbsp; 
+    <a href="attr_set.3.html">attr_set(3)</a>,&nbsp; 
+    <a href="handle.3.html">handle(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

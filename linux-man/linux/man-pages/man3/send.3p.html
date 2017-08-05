@@ -1,0 +1,339 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>send.3p - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#PROLOG">PROLOG</a> | <a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#APPLICATION_USAGE">APPLICATION&nbsp;USAGE</a> | <a href="#RATIONALE">RATIONALE</a> | <a href="#FUTURE_DIRECTIONS">FUTURE&nbsp;DIRECTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYRIGHT">COPYRIGHT</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SEND(3P)                  POSIX Programmer's Manual                 SEND(3P)</span>
+</pre>
+<h2><a id="PROLOG" href="#PROLOG"></a>PROLOG  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page is part of the POSIX Programmer's Manual.  The Linux
+       implementation of this interface may differ (consult the
+       corresponding Linux manual page for details of Linux behavior), or
+       the interface may not be implemented on Linux.
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       send — send a message on a socket
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;sys/socket.h&gt;
+
+       ssize_t send(int <i>socket</i>, const void *<i>buffer</i>, size_t <i>length</i>, int <i>flags</i>);
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>send</i>() function shall initiate transmission of a message from the
+       specified socket to its peer. The <i>send</i>() function shall send a
+       message only when the socket is connected. If the socket is a
+       connectionless-mode socket, the message shall be sent to the pre-
+       specified peer address.
+
+       The <i>send</i>() function takes the following arguments:
+
+       <i>socket</i>      Specifies the socket file descriptor.
+
+       <i>buffer</i>      Points to the buffer containing the message to send.
+
+       <i>length</i>      Specifies the length of the message in bytes.
+
+       <i>flags</i>       Specifies the type of message transmission. Values of
+                   this argument are formed by logically OR'ing zero or more
+                   of the following flags:
+
+                   MSG_EOR       Terminates a record (if supported by the
+                                 protocol).
+
+                   MSG_OOB       Sends out-of-band data on sockets that
+                                 support out-of-band communications. The
+                                 significance and semantics of out-of-band
+                                 data are protocol-specific.
+
+                   MSG_NOSIGNAL  Requests not to send the SIGPIPE signal if
+                                 an attempt to send is made on a stream-
+                                 oriented socket that is no longer
+                                 connected. The <b>[EPIPE] </b>error shall still be
+                                 returned.
+
+       The length of the message to be sent is specified by the <i>length</i>
+       argument. If the message is too long to pass through the underlying
+       protocol, <i>send</i>() shall fail and no data shall be transmitted.
+
+       Successful completion of a call to <i>send</i>() does not guarantee delivery
+       of the message. A return value of −1 indicates only locally-detected
+       errors.
+
+       If space is not available at the sending socket to hold the message
+       to be transmitted, and the socket file descriptor does not have
+       O_NONBLOCK set, <i>send</i>() shall block until space is available. If space
+       is not available at the sending socket to hold the message to be
+       transmitted, and the socket file descriptor does have O_NONBLOCK set,
+       <i>send</i>() shall fail. The <i>select</i>() and <i>poll</i>() functions can be used to
+       determine when it is possible to send more data.
+
+       The socket in use may require the process to have appropriate
+       privileges to use the <i>send</i>() function.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Upon successful completion, <i>send</i>() shall return the number of bytes
+       sent. Otherwise, −1 shall be returned and <i><a href="errno.3.html">errno</a></i> set to indicate the
+       error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>send</i>() function shall fail if:
+
+       <b>EAGAIN </b>or <b>EWOULDBLOCK</b>
+              The socket's file descriptor is marked O_NONBLOCK and the
+              requested operation would block.
+
+       <b>EBADF  </b>The <i>socket</i> argument is not a valid file descriptor.
+
+       <b>ECONNRESET</b>
+              A connection was forcibly closed by a peer.
+
+       <b>EDESTADDRREQ</b>
+              The socket is not connection-mode and no peer address is set.
+
+       <b>EINTR  </b>A signal interrupted <i>send</i>() before any data was transmitted.
+
+       <b>EMSGSIZE</b>
+              The message is too large to be sent all at once, as the socket
+              requires.
+
+       <b>ENOTCONN</b>
+              The socket is not connected.
+
+       <b>ENOTSOCK</b>
+              The <i>socket</i> argument does not refer to a socket.
+
+       <b>EOPNOTSUPP</b>
+              The <i>socket</i> argument is associated with a socket that does not
+              support one or more of the values set in <i>flags</i>.
+
+       <b>EPIPE  </b>The socket is shut down for writing, or the socket is
+              connection-mode and is no longer connected. In the latter
+              case, and if the socket is of type SOCK_STREAM or
+              SOCK_SEQPACKET and the MSG_NOSIGNAL flag is not set, the
+              SIGPIPE signal is generated to the calling thread.
+
+       The <i>send</i>() function may fail if:
+
+       <b>EACCES </b>The calling process does not have appropriate privileges.
+
+       <b>EIO    </b>An I/O error occurred while reading from or writing to the
+              file system.
+
+       <b>ENETDOWN</b>
+              The local network interface used to reach the destination is
+              down.
+
+       <b>ENETUNREACH</b>
+              No route to the network is present.
+
+       <b>ENOBUFS</b>
+              Insufficient resources were available in the system to perform
+              the operation.
+
+       <i>The following sections are informative.</i>
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="APPLICATION_USAGE" href="#APPLICATION_USAGE"></a>APPLICATION USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If the <i>socket</i> argument refers to a connection-mode socket, the <i>send</i>()
+       function is equivalent to <i>sendto</i>() (with any value for the <i>dest_addr</i>
+       and <i>dest_len</i> arguments, as they are ignored in this case). If the
+       <i>socket</i> argument refers to a socket and the <i>flags</i> argument is 0, the
+       <i>send</i>() function is equivalent to <i>write</i>().
+</pre>
+<h2><a id="RATIONALE" href="#RATIONALE"></a>RATIONALE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="FUTURE_DIRECTIONS" href="#FUTURE_DIRECTIONS"></a>FUTURE DIRECTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="connect.3p.html">connect(3p)</a>, <a href="getsockopt.3p.html">getsockopt(3p)</a>, <a href="poll.3p.html">poll(3p)</a>, <a href="pselect.3p.html">pselect(3p)</a>, <a href="recv.3p.html">recv(3p)</a>,
+       <a href="recvfrom.3p.html">recvfrom(3p)</a>, <a href="recvmsg.3p.html">recvmsg(3p)</a>, <a href="sendmsg.3p.html">sendmsg(3p)</a>, <a href="sendto.3p.html">sendto(3p)</a>, <a href="setsockopt.3p.html">setsockopt(3p)</a>,
+       <a href="shutdown.3p.html">shutdown(3p)</a>, <a href="socket.3p.html">socket(3p)</a>, <a href="write.3p.html">write(3p)</a>
+
+       The Base Definitions volume of POSIX.1‐2008, <a href="../man0/sys_socket.h.0p.html">sys_socket.h(0p)</a>
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Portions of this text are reprinted and reproduced in electronic form
+       from IEEE Std 1003.1, 2013 Edition, Standard for Information
+       Technology -- Portable Operating System Interface (POSIX), The Open
+       Group Base Specifications Issue 7, Copyright (C) 2013 by the
+       Institute of Electrical and Electronics Engineers, Inc and The Open
+       Group.  (This is POSIX.1-2008 with the 2013 Technical Corrigendum 1
+       applied.) In the event of any discrepancy between this version and
+       the original IEEE and The Open Group Standard, the original IEEE and
+       The Open Group Standard is the referee document. The original
+       Standard can be obtained online at <a href="http://www.unix.org/online.html">http://www.unix.org/online.html</a> .
+
+       Any typographical or formatting errors that appear in this page are
+       most likely to have been introduced during the conversion of the
+       source files to man page format. To report such errors, see
+       <a href="https://www.kernel.org/doc/man-pages/reporting_bugs.html">https://www.kernel.org/doc/man-pages/reporting_bugs.html</a> .
+
+<span class="footline">IEEE/The Open Group                 2013                            SEND(3P)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man0/sys_socket.h.0p.html">sys_socket.h(0p)</a>,&nbsp; 
+    <a href="connect.3p.html">connect(3p)</a>,&nbsp; 
+    <a href="recv.3p.html">recv(3p)</a>,&nbsp; 
+    <a href="recvfrom.3p.html">recvfrom(3p)</a>,&nbsp; 
+    <a href="recvmsg.3p.html">recvmsg(3p)</a>,&nbsp; 
+    <a href="sendmsg.3p.html">sendmsg(3p)</a>,&nbsp; 
+    <a href="sendto.3p.html">sendto(3p)</a>,&nbsp; 
+    <a href="shutdown.3p.html">shutdown(3p)</a>,&nbsp; 
+    <a href="socket.3p.html">socket(3p)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

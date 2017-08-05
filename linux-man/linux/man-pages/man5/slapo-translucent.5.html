@@ -1,0 +1,284 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>slapo-translucent(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFIGURATION">CONFIGURATION</a> | <a href="#ACCESS_CONTROL">ACCESS&nbsp;CONTROL</a> | <a href="#CAVEATS">CAVEATS</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SLAPO-TRANSLUCENT(5)         File Formats Manual        SLAPO-TRANSLUCENT(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       slapo-translucent - Translucent Proxy overlay to slapd
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ETCDIR/slapd.conf
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The Translucent Proxy overlay can be used with a backend database
+       such as <a href="slapd-bdb.5.html">slapd-bdb(5)</a> to create a "translucent proxy".  Entries
+       retrieved from a remote LDAP server may have some or all attributes
+       overridden, or new attributes added, by entries in the local database
+       before being presented to the client.
+
+       A <b>search </b>operation is first populated with entries from the remote
+       LDAP server, the attributes of which are then overridden with any
+       attributes defined in the local database. Local overrides may be
+       populated with the <b>add</b>, <b>modify , </b>and <b>modrdn </b>operations, the use of
+       which is restricted to the root user.
+
+       A <b>compare </b>operation will perform a comparison with attributes defined
+       in the local database record (if any) before any comparison is made
+       with data in the remote database.
+</pre>
+<h2><a id="CONFIGURATION" href="#CONFIGURATION"></a>CONFIGURATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The Translucent Proxy overlay uses a proxied database, typically a
+       (set of) remote LDAP server(s), which is configured with the options
+       shown in <a href="slapd-ldap.5.html">slapd-ldap(5)</a>, <a href="slapd-meta.5.html">slapd-meta(5)</a> or similar.  These <b>slapd.conf</b>
+       options are specific to the Translucent Proxy overlay; they must
+       appear after the <b>overlay </b>directive that instantiates the <b>translucent</b>
+       overlay.
+
+       <b>translucent_strict</b>
+              By default, attempts to delete attributes in either the local
+              or remote databases will be silently ignored. The
+              <b>translucent_strict </b>directive causes these modifications to
+              fail with a Constraint Violation.
+
+       <b>translucent_no_glue</b>
+              This configuration option disables the automatic creation of
+              "glue" records for an <b>add </b>or <b>modrdn </b>operation, such that all
+              parents of an entry added to the local database must be
+              created by hand. Glue records are always created for a <b>modify</b>
+              operation.
+
+       <b>translucent_local &lt;attr[,attr...]&gt;</b>
+              Specify a list of attributes that should be searched for in
+              the local database when used in a search filter. By default,
+              search filters are only handled by the remote database. With
+              this directive, search filters will be split into a local and
+              remote portion, and local attributes will be searched locally.
+
+       <b>translucent_remote &lt;attr[,attr...]&gt;</b>
+              Specify a list of attributes that should be searched for in
+              the remote database when used in a search filter. This
+              directive complements the <b>translucent_local </b>directive.
+              Attributes may be specified as both local and remote if
+              desired.
+
+       If neither <b>translucent_local </b>nor <b>translucent_remote </b>are specified,
+       the default behavior is to search the remote database with the
+       complete search filter. If only <b>translucent_local </b>is specified,
+       searches will only be run on the local database. Likewise, if only
+       <b>translucent_remote </b>is specified, searches will only be run on the
+       remote database. In any case, both the local and remote entries
+       corresponding to a search result will be merged before being returned
+       to the client.
+
+       <b>translucent_bind_local</b>
+              Enable looking for locally stored credentials for simple bind
+              when binding to the remote database fails.  Disabled by
+              default.
+
+       <b>translucent_pwmod_local</b>
+              Enable RFC 3062 Password Modification extended operation on
+              locally stored credentials.  The operation only applies to
+              entries that exist in the remote database.  Disabled by
+              default.
+</pre>
+<h2><a id="ACCESS_CONTROL" href="#ACCESS_CONTROL"></a>ACCESS CONTROL  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Access control is delegated to either the remote DSA(s) or to the
+       local database backend for <b>auth </b>and <b>write </b>operations.  It is
+       delegated to the remote DSA(s) and to the frontend for <b>read</b>
+       operations.  Local access rules involving data returned by the remote
+       DSA(s) should be designed with care.  In fact, entries are returned
+       by the remote DSA(s) only based on the remote fraction of the data,
+       based on the identity the operation is performed as.  As a
+       consequence, local rules might only be allowed to see a portion of
+       the remote data.
+</pre>
+<h2><a id="CAVEATS" href="#CAVEATS"></a>CAVEATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The Translucent Proxy overlay will disable schema checking in the
+       local database, so that an entry consisting of overlay attributes
+       need not adhere to the complete schema.
+
+       Because the translucent overlay does not perform any DN rewrites,
+       the local and remote database instances must have the same suffix.
+       Other configurations will probably fail with No Such Object and other
+       errors.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ETCDIR/slapd.conf
+              default slapd configuration file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="slapd.conf.5.html">slapd.conf(5)</a>, <a href="slapd-config.5.html">slapd-config(5)</a>, <a href="slapd-ldap.5.html">slapd-ldap(5)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>OpenLDAP</i> (an open source implementation of
+       the Lightweight Directory Access Protocol) project.  Information
+       about the project can be found at ⟨<a href="http://www.openldap.org/">http://www.openldap.org/</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="http://www.openldap.org/its/">http://www.openldap.org/its/</a>⟩.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.openldap.org/openldap.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">OpenLDAP LDVERSION               RELEASEDATE            SLAPO-TRANSLUCENT(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="slapd-ldap.5.html">slapd-ldap(5)</a>,&nbsp; 
+    <a href="slapd.overlays.5.html">slapd.overlays(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

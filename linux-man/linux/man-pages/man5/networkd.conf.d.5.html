@@ -1,0 +1,288 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>networkd.conf(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFIGURATION_DIRECTORIES_AND_PRECEDENCE">CONFIGURATION&nbsp;DIRECTORIES&nbsp;AND&nbsp;PRECEDENCE</a> | <a href="#[DHCP]_SECTION_OPTIONS">[DHCP]&nbsp;SECTION&nbsp;OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">NETWORKD.CONF(5)                networkd.conf               NETWORKD.CONF(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       networkd.conf, networkd.conf.d - Global Network configuration files
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /etc/systemd/networkd.conf
+
+       /etc/systemd/networkd.conf.d/*.conf
+
+       /usr/lib/systemd/networkd.conf.d/*.conf
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These configuration files control global network parameters.
+       Currently the DHCP Unique Identifier (DUID).
+</pre>
+<h2><a id="CONFIGURATION_DIRECTORIES_AND_PRECEDENCE" href="#CONFIGURATION_DIRECTORIES_AND_PRECEDENCE"></a>CONFIGURATION DIRECTORIES AND PRECEDENCE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The default configuration is defined during compilation, so a
+       configuration file is only needed when it is necessary to deviate
+       from those defaults. By default, the configuration file in
+       /etc/systemd/ contains commented out entries showing the defaults as
+       a guide to the administrator. This file can be edited to create local
+       overrides.
+
+       When packages need to customize the configuration, they can install
+       configuration snippets in /usr/lib/systemd/*.conf.d/. Files in /etc/
+       are reserved for the local administrator, who may use this logic to
+       override the configuration files installed by vendor packages. The
+       main configuration file is read before any of the configuration
+       directories, and has the lowest precedence; entries in a file in any
+       configuration directory override entries in the single configuration
+       file. Files in the *.conf.d/ configuration subdirectories are sorted
+       by their filename in lexicographic order, regardless of which of the
+       subdirectories they reside in. If multiple files specify the same
+       option, the entry in the file with the lexicographically latest name
+       takes precedence. It is recommended to prefix all filenames in those
+       subdirectories with a two-digit number and a dash, to simplify the
+       ordering of the files.
+
+       To disable a configuration file supplied by the vendor, the
+       recommended way is to place a symlink to /dev/null in the
+       configuration directory in /etc/, with the same filename as the
+       vendor configuration file.
+</pre>
+<h2><a id="[DHCP]_SECTION_OPTIONS" href="#[DHCP]_SECTION_OPTIONS"></a>[DHCP] SECTION OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This section configures the DHCP Unique Identifier (DUID) value used
+       by DHCP protocol. DHCPv6 client protocol sends the DHCP Unique
+       Identifier and the interface Identity Association Identifier (IAID)
+       to a DHCP server when acquiring a dynamic IPv6 address. DHCPv4 client
+       protocol sends IAID and DUID to the DHCP server when acquiring a
+       dynamic IPv4 address if <b>ClientIdentifier=duid</b>. IAID and DUID allows a
+       DHCP server to uniquely identify the machine and the interface
+       requesting a DHCP IP. To configure IAID and ClientIdentifier, see
+       <a href="systemd.network.5.html">systemd.network(5)</a>.
+
+       The following options are understood:
+
+       <i>DUIDType=</i>
+           Specifies how the DUID should be generated. See <b>RFC 3315</b><b></b>[1] for a
+           description of all the options.
+
+           The following values are understood:
+
+           <b>vendor</b>
+               If "DUIDType=vendor", then the DUID value will be generated
+               using "43793" as the vendor identifier (systemd) and hashed
+               contents of <a href="machine-id.5.html">machine-id(5)</a>. This is the default if <i>DUIDType=</i>
+               is not specified.
+
+           <b>link-layer-time</b>, <b>link-layer</b>, <b>uuid</b>
+               Those values are parsed and can be used to set the DUID type
+               field, but DUID contents must be provided using <i>DUIDRawData=</i>.
+
+           In all cases, <i>DUIDRawData=</i> can be used to override the actual
+           DUID value that is used.
+
+       <i>DUIDRawData=</i>
+           Specifies the DHCP DUID value as a single newline-terminated,
+           hexadecimal string, with each byte separated by ":". The DUID
+           that is sent is composed of the DUID type specified by <i>DUIDType=</i>
+           and the value configured here.
+
+           The DUID value specified here overrides the DUID that
+           systemd-networkd generates using the machine-id from the
+           /etc/machine-id file. To configure DUID per-network, see
+           <a href="systemd.network.5.html">systemd.network(5)</a>. The configured DHCP DUID should conform to
+           the specification in <b>RFC 3315</b><b></b>[2], <b>RFC 6355</b><b></b>[3]. To configure IAID,
+           see <a href="systemd.network.5.html">systemd.network(5)</a>.
+
+           <b>Example 1. A DUIDType=vendor with a custom value</b>
+
+               DUIDType=vendor
+               DUIDRawData=00:00:ab:11:f9:2a:c2:77:29:f9:5c:00
+
+           This specifies a 14 byte DUID, with the type DUID-EN ("00:02"),
+           enterprise number 43793 ("00:00:ab:11"), and identifier value
+           "f9:2a:c2:77:29:f9:5c:00".
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="systemd.network.5.html">systemd.network(5)</a>, <b>machine-id</b>(1)
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. RFC 3315
+           <a href="https://tools.ietf.org/html/rfc3315#section-9">https://tools.ietf.org/html/rfc3315#section-9</a>
+
+        2. RFC 3315
+           <a href="http://tools.ietf.org/html/rfc3315#section-9">http://tools.ietf.org/html/rfc3315#section-9</a>
+
+        3. RFC 6355
+           <a href="http://tools.ietf.org/html/rfc6355">http://tools.ietf.org/html/rfc6355</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                 NETWORKD.CONF(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="systemd.network.5.html">systemd.network(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

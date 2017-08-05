@@ -1,0 +1,298 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd-fstab-generator(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#KERNEL_COMMAND_LINE">KERNEL&nbsp;COMMAND&nbsp;LINE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD-FSTAB-GENERATOR(8) systemd-fstab-generatorSYSTEMD-FSTAB-GENERATOR(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-fstab-generator - Unit generator for /etc/fstab
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /usr/lib/systemd/system-generators/systemd-fstab-generator
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-fstab-generator is a generator that translates /etc/fstab
+       (see <a href="../man5/fstab.5.html">fstab(5)</a> for details) into native systemd units early at boot
+       and when configuration of the system manager is reloaded. This will
+       instantiate mount and swap units as necessary.
+
+       The <i>passno</i> field is treated like a simple boolean, and the ordering
+       information is discarded. However, if the root file system is
+       checked, it is checked before all the other file systems.
+
+       See <a href="../man5/systemd.mount.5.html">systemd.mount(5)</a> and <a href="../man5/systemd.swap.5.html">systemd.swap(5)</a> for more information about
+       special /etc/fstab mount options this generator understands.
+
+       systemd-fstab-generator implements <a href="../man7/systemd.generator.7.html">systemd.generator(7)</a>.
+</pre>
+<h2><a id="KERNEL_COMMAND_LINE" href="#KERNEL_COMMAND_LINE"></a>KERNEL COMMAND LINE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-fstab-generator understands the following kernel command line
+       parameters:
+
+       <i>fstab=</i>, <i>rd.fstab=</i>
+           Takes a boolean argument. Defaults to "yes". If "no", causes the
+           generator to ignore any mounts or swap devices configured in
+           /etc/fstab.  <i>rd.fstab=</i> is honored only by the initial RAM disk
+           (initrd) while <i>fstab=</i> is honored by both the main system and the
+           initrd.
+
+       <i>root=</i>
+           Takes the root filesystem to mount in the initrd.  <i>root=</i> is
+           honored by the initrd.
+
+       <i>rootfstype=</i>
+           Takes the root filesystem type that will be passed to the mount
+           command.  <i>rootfstype=</i> is honored by the initrd.
+
+       <i>rootflags=</i>
+           Takes the root filesystem mount options to use.  <i>rootflags=</i> is
+           honored by the initrd.
+
+       <i>mount.usr=</i>
+           Takes the /usr filesystem to be mounted by the initrd. If
+           <i>mount.usrfstype=</i> or <i>mount.usrflags=</i> is set, then <i>mount.usr=</i> will
+           default to the value set in <i>root=</i>.
+
+           Otherwise, this parameter defaults to the /usr entry found in
+           /etc/fstab on the root filesystem.
+
+           <i>mount.usr=</i> is honored by the initrd.
+
+       <i>mount.usrfstype=</i>
+           Takes the /usr filesystem type that will be passed to the mount
+           command. If <i>mount.usr=</i> or <i>mount.usrflags=</i> is set, then
+           <i>mount.usrfstype=</i> will default to the value set in <i>rootfstype=</i>.
+
+           Otherwise, this value will be read from the /usr entry in
+           /etc/fstab on the root filesystem.
+
+           <i>mount.usrfstype=</i> is honored by the initrd.
+
+       <i>mount.usrflags=</i>
+           Takes the /usr filesystem mount options to use. If <i>mount.usr=</i> or
+           <i>mount.usrfstype=</i> is set, then <i>mount.usrflags=</i> will default to the
+           value set in <i>rootflags=</i>.
+
+           Otherwise, this value will be read from the /usr entry in
+           /etc/fstab on the root filesystem.
+
+           <i>mount.usrflags=</i> is honored by the initrd.
+
+       <i>systemd.volatile=</i>
+           Controls whether the system shall boot up in volatile mode. Takes
+           a boolean argument or the special value <b>state</b>.
+
+           If false (the default), this generator makes no changes to the
+           mount tree and the system is booted up in normal mode.
+
+           If true the generator ensures <a href="systemd-volatile-root.service.8.html">systemd-volatile-root.service(8)</a> is
+           run as part of the initial RAM disk ("initrd"). This service
+           changes the mount table before transitioning to the host system,
+           so that a volatile memory file system ("tmpfs") is used as root
+           directory, with only /usr mounted into it from the configured
+           root file system, in read-only mode. This way the system operates
+           in fully stateless mode, with all configuration and state reset
+           at boot and lost at shutdown, as /etc and /var will be served
+           from the (initially unpopulated) volatile memory file system.
+
+           If set to <b>state </b>the generator will leave the root directory mount
+           point unaltered, however will mount a "tmpfs" file system to
+           /var. In this mode the normal system configuration (i.e. the
+           contents of "/etc") is in effect (and may be modified during
+           system runtime), however the system state (i.e. the contents of
+           "/var") is reset at boot and lost at shutdown.
+
+           Note that in none of these modes the root directory, /etc, /var
+           or any other resources stored in the root file system are
+           physically removed. It's thus safe to boot a system that is
+           normally operated in non-volatile mode temporarily into volatile
+           mode, without losing data.
+
+           Note that enabling this setting will only work correctly on
+           operating systems that can boot up with only /usr mounted, and
+           are able to automatically populate /etc, and also /var in case of
+           "systemd.volatile=yes".
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man5/fstab.5.html">fstab(5)</a>, <a href="../man5/systemd.mount.5.html">systemd.mount(5)</a>, <a href="../man5/systemd.swap.5.html">systemd.swap(5)</a>,
+       <b>systemd-cryptsetup-generator</b>(8), <a href="../man7/kernel-command-line.7.html">kernel-command-line(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                       SYSTEMD-FSTAB-GENERATOR(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/systemd.mount.5.html">systemd.mount(5)</a>,&nbsp; 
+    <a href="../man5/systemd.swap.5.html">systemd.swap(5)</a>,&nbsp; 
+    <a href="../man7/kernel-command-line.7.html">kernel-command-line(7)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.generator.7.html">systemd.generator(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man7/systemd.special.7.html">systemd.special(7)</a>,&nbsp; 
+    <a href="systemd-gpt-auto-generator.8.html">systemd-gpt-auto-generator(8)</a>,&nbsp; 
+    <a href="systemd-volatile-root.service.8.html">systemd-volatile-root.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

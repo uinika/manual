@@ -1,0 +1,672 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dpkg-buildflags(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#COMMANDS">COMMANDS</a> | <a href="#SUPPORTED_FLAGS">SUPPORTED&nbsp;FLAGS</a> | <a href="#FEATURE_AREAS">FEATURE&nbsp;AREAS</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#FILES">FILES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">dpkg-buildflags(1)               dpkg suite               dpkg-buildflags(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dpkg-buildflags - returns build flags to use during package build
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dpkg-buildflags </b>[<i>option</i>...] [<i>command</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dpkg-buildflags </b>is a tool to retrieve compilation flags to use during
+       build of Debian packages.  The default flags are defined by the
+       vendor but they can be extended/overridden in several ways:
+
+       1.     system-wide with <b>/usr/local/etc/dpkg/buildflags.conf</b>;
+
+       2.     for the current user with
+              <b>$XDG_CONFIG_HOME/dpkg/buildflags.conf </b>where <b>$XDG_CONFIG_HOME</b>
+              defaults to <b>$HOME/.config</b>;
+
+       3.     temporarily by the user with environment variables (see
+              section <b>ENVIRONMENT</b>);
+
+       4.     dynamically by the package maintainer with environment
+              variables set via <b>debian/rules </b>(see section <b>ENVIRONMENT</b>).
+
+       The configuration files can contain four types of directives:
+
+       <b>SET </b><i>flag value</i>
+              Override the flag named <i>flag</i> to have the value <i>value</i>.
+
+       <b>STRIP </b><i>flag value</i>
+              Strip from the flag named <i>flag</i> all the build flags listed in
+              <i>value</i>.
+
+       <b>APPEND </b><i>flag value</i>
+              Extend the flag named <i>flag</i> by appending the options given in
+              <i>value</i>.  A space is prepended to the appended value if the
+              flag's current value is non-empty.
+
+       <b>PREPEND </b><i>flag value</i>
+              Extend the flag named <i>flag</i> by prepending the options given in
+              <i>value</i>.  A space is appended to the prepended value if the
+              flag's current value is non-empty.
+
+       The configuration files can contain comments on lines starting with a
+       hash (#). Empty lines are also ignored.
+</pre>
+<h2><a id="COMMANDS" href="#COMMANDS"></a>COMMANDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>--dump </b>Print to standard output all compilation flags and their
+              values. It prints one flag per line separated from its value
+              by an equal sign (“<i>flag</i>=<i>value</i>”). This is the default action.
+
+       <b>--list </b>Print the list of flags supported by the current vendor (one
+              per line). See the <b>SUPPORTED FLAGS </b>section for more
+              information about them.
+
+       <b>--status</b>
+              Display any information that can be useful to explain the
+              behaviour of <b>dpkg-buildflags </b>(since dpkg 1.16.5): relevant
+              environment variables, current vendor, state of all feature
+              flags.  Also print the resulting compiler flags with their
+              origin.
+
+              This is intended to be run from <b>debian/rules</b>, so that the
+              build log keeps a clear trace of the build flags used. This
+              can be useful to diagnose problems related to them.
+
+       <b>--export=</b><i>format</i>
+              Print to standard output commands that can be used to export
+              all the compilation flags for some particular tool. If the
+              <i>format</i> value is not given, <b>sh </b>is assumed. Only compilation
+              flags starting with an upper case character are included,
+              others are assumed to not be suitable for the environment.
+              Supported formats:
+
+              <b>sh     </b>Shell commands to set and export all the compilation
+                     flags in the environment. The flag values are quoted so
+                     the output is ready for evaluation by a shell.
+
+              <b>cmdline</b>
+                     Arguments to pass to a build program's command line to
+                     use all the compilation flags (since dpkg 1.17.0). The
+                     flag values are quoted in shell syntax.
+
+              <b>configure</b>
+                     This is a legacy alias for <b>cmdline</b>.
+
+              <b>make   </b>Make directives to set and export all the compilation
+                     flags in the environment. Output can be written to a
+                     makefile fragment and evaluated using an <b>include</b>
+                     directive.
+
+       <b>--get </b><i>flag</i>
+              Print the value of the flag on standard output. Exits with 0
+              if the flag is known otherwise exits with 1.
+
+       <b>--origin </b><i>flag</i>
+              Print the origin of the value that is returned by <b>--get</b>. Exits
+              with 0 if the flag is known otherwise exits with 1. The origin
+              can be one of the following values:
+
+              <b>vendor </b>the original flag set by the vendor is returned;
+
+              <b>system </b>the flag is set/modified by a system-wide
+                     configuration;
+
+              <b>user   </b>the flag is set/modified by a user-specific
+                     configuration;
+
+              <b>env    </b>the flag is set/modified by an environment-specific
+                     configuration.
+
+       <b>--query-features </b><i>area</i>
+              Print the features enabled for a given area (since dpkg
+              1.16.2).  The only currently recognized areas on Debian and
+              derivatives are <b>qa</b>, <b>reproducible</b>, <b>sanitize </b>and <b>hardening</b>, see
+              the <b>FEATURE AREAS </b>section for more details.  Exits with 0 if
+              the area is known otherwise exits with 1.
+
+              The output is in RFC822 format, with one section per feature.
+              For example:
+
+                Feature: pie
+                Enabled: yes
+
+                Feature: stackprotector
+                Enabled: yes
+
+       <b>--help </b>Show the usage message and exit.
+
+       <b>--version</b>
+              Show the version and exit.
+</pre>
+<h2><a id="SUPPORTED_FLAGS" href="#SUPPORTED_FLAGS"></a>SUPPORTED FLAGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>CFLAGS </b>Options for the C compiler. The default value set by the
+              vendor includes <b>-g </b>and the default optimization level (<b>-O2</b>
+              usually, or <b>-O0 </b>if the <b>DEB_BUILD_OPTIONS </b>environment variable
+              defines <i>noopt</i>).
+
+       <b>CPPFLAGS</b>
+              Options for the C preprocessor. Default value: empty.
+
+       <b>CXXFLAGS</b>
+              Options for the C++ compiler. Same as <b>CFLAGS</b>.
+
+       <b>OBJCFLAGS</b>
+              Options for the Objective C compiler. Same as <b>CFLAGS</b>.
+
+       <b>OBJCXXFLAGS</b>
+              Options for the Objective C++ compiler. Same as <b>CXXFLAGS</b>.
+
+       <b>GCJFLAGS</b>
+              Options for the GNU Java compiler (gcj). A subset of <b>CFLAGS</b>.
+
+       <b>FFLAGS </b>Options for the Fortran 77 compiler. A subset of <b>CFLAGS</b>.
+
+       <b>FCFLAGS</b>
+              Options for the Fortran 9x compiler. Same as <b>FFLAGS</b>.
+
+       <b>LDFLAGS</b>
+              Options passed to the compiler when linking executables or
+              shared objects (if the linker is called directly, then <b>-Wl </b>and
+              <b>, </b>have to be stripped from these options). Default value:
+              empty.
+
+       New flags might be added in the future if the need arises (for
+       example to support other languages).
+</pre>
+<h2><a id="FEATURE_AREAS" href="#FEATURE_AREAS"></a>FEATURE AREAS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Each area feature can be enabled and disabled in the
+       <b>DEB_BUILD_OPTIONS </b>and <b>DEB_BUILD_MAINT_OPTIONS </b>environment variable's
+       area value with the ‘<b>+</b>’ and ‘<b>-</b>’ modifier.  For example, to enable the
+       <b>hardening </b>“pie” feature and disable the “fortify” feature you can do
+       this in <b>debian/rules</b>:
+
+         export DEB_BUILD_MAINT_OPTIONS=hardening=+pie,-fortify
+
+       The special feature <b>all </b>(valid in any area) can be used to enable or
+       disable all area features at the same time.  Thus disabling
+       everything in the <b>hardening </b>area and enabling only “format” and
+       “fortify” can be achieved with:
+
+         export DEB_BUILD_MAINT_OPTIONS=hardening=-all,+format,+fortify
+
+   <b>qa</b>
+       Several compile-time options (detailed below) can be used to help
+       detect problems in the source code or build system.
+
+       <b>bug    </b>This setting (disabled by default) adds any warning option
+              that reliably detects problematic source code. The warnings
+              are fatal.  The only currently supported flags are <b>CFLAGS </b>and
+              <b>CXXFLAGS </b>with flags set to <b>-Werror=array-bounds</b>,
+              <b>-Werror=clobbered</b>, <b>-Werror=implicit-function-declaration </b>and
+              <b>-Werror=volatile-register-var</b>.
+
+       <b>canary </b>This setting (disabled by default) adds dummy canary options
+              to the build flags, so that the build logs can be checked for
+              how the build flags propagate and to allow finding any
+              omission of normal build flag settings.  The only currently
+              supported flags are <b>CPPFLAGS</b>, <b>CFLAGS</b>, <b>OBJCFLAGS</b>, <b>CXXFLAGS </b>and
+              <b>OBJCXXFLAGS </b>with flags set to <b>-D__DEB_CANARY_</b><i>flag</i>_<i>random-id</i><b>__</b>,
+              and <b>LDFLAGS </b>set to <b>-Wl,-z,deb-canary-</b><i>random-id</i>.
+
+   <b>sanitize</b>
+       Several compile-time options (detailed below) can be used to help
+       sanitize a resulting binary against memory corruptions, memory leaks,
+       use after free, threading data races and undefined behavior bugs.
+
+       <b>address</b>
+              This setting (disabled by default) adds <b>-fsanitize=address </b>to
+              <b>LDFLAGS </b>and <b>-fsanitize=address -fno-omit-frame-pointer </b>to
+              <b>CFLAGS </b>and <b>CXXFLAGS</b>.
+
+       <b>thread </b>This setting (disabled by default) adds <b>-fsanitize=thread </b>to
+              <b>CFLAGS</b>, <b>CXXFLAGS </b>and <b>LDFLAGS</b>.
+
+       <b>leak   </b>This setting (disabled by default) adds <b>-fsanitize=leak </b>to
+              <b>LDFLAGS</b>. It gets automatically disabled if either the <b>address</b>
+              or the <b>thread </b>features are enabled, as they imply it.
+
+       <b>undefined</b>
+              This setting (disabled by default) adds <b>-fsanitize=undefined</b>
+              to <b>CFLAGS</b>, <b>CXXFLAGS </b>and <b>LDFLAGS</b>.
+
+   <b>hardening</b>
+       Several compile-time options (detailed below) can be used to help
+       harden a resulting binary against memory corruption attacks, or
+       provide additional warning messages during compilation.  Except as
+       noted below, these are enabled by default for architectures that
+       support them.
+
+       <b>format </b>This setting (enabled by default) adds <b>-Wformat</b>
+              <b>-Werror=format-security </b>to <b>CFLAGS</b>, <b>CXXFLAGS</b>, <b>OBJCFLAGS </b>and
+              <b>OBJCXXFLAGS</b>.  This will warn about improper format string
+              uses, and will fail when format functions are used in a way
+              that represent possible security problems. At present, this
+              warns about calls to <b>printf </b>and <b>scanf </b>functions where the
+              format string is not a string literal and there are no format
+              arguments, as in <b>printf(foo); </b>instead of <b>printf("%s", foo);</b>
+              This may be a security hole if the format string came from
+              untrusted input and contains ‘%n’.
+
+       <b>fortify</b>
+              This setting (enabled by default) adds <b>-D_FORTIFY_SOURCE=2 </b>to
+              <b>CPPFLAGS</b>. During code generation the compiler knows a great
+              deal of information about buffer sizes (where possible), and
+              attempts to replace insecure unlimited length buffer function
+              calls with length-limited ones. This is especially useful for
+              old, crufty code.  Additionally, format strings in writable
+              memory that contain ‘%n’ are blocked. If an application
+              depends on such a format string, it will need to be worked
+              around.
+
+              Note that for this option to have any effect, the source must
+              also be compiled with <b>-O1 </b>or higher. If the environment
+              variable <b>DEB_BUILD_OPTIONS </b>contains <i>noopt</i>, then <b>fortify</b>
+              support will be disabled, due to new warnings being issued by
+              glibc 2.16 and later.
+
+       <b>stackprotector</b>
+              This setting (enabled by default if stackprotectorstrong is
+              not in use) adds <b>-fstack-protector --param=ssp-buffer-size=4</b>
+              to <b>CFLAGS</b>, <b>CXXFLAGS</b>, <b>OBJCFLAGS</b>, <b>OBJCXXFLAGS</b>, <b>GCJFLAGS</b>, <b>FFLAGS</b>
+              and <b>FCFLAGS</b>.  This adds safety checks against stack
+              overwrites. This renders many potential code injection attacks
+              into aborting situations. In the best case this turns code
+              injection vulnerabilities into denial of service or into non-
+              issues (depending on the application).
+
+              This feature requires linking against glibc (or another
+              provider of <b>__stack_chk_fail</b>), so needs to be disabled when
+              building with <b>-nostdlib </b>or <b>-ffreestanding </b>or similar.
+
+       <b>stackprotectorstrong</b>
+              This setting (enabled by default) adds
+              <b>-fstack-protector-strong </b>to <b>CFLAGS</b>, <b>CXXFLAGS</b>, <b>OBJCFLAGS</b>,
+              <b>OBJCXXFLAGS</b>, <b>GCJFLAGS</b>, <b>FFLAGS </b>and <b>FCFLAGS</b>.  This is a stronger
+              variant of <b>stackprotector</b>, but without significant performance
+              penalties.
+
+              Disabling <b>stackprotector </b>will also disable this setting.
+
+              This feature has the same requirements as <b>stackprotector</b>, and
+              in addition also requires gcc 4.9 and later.
+
+       <b>relro  </b>This setting (enabled by default) adds <b>-Wl,-z,relro </b>to
+              <b>LDFLAGS</b>.  During program load, several ELF memory sections
+              need to be written to by the linker. This flags the loader to
+              turn these sections read-only before turning over control to
+              the program. Most notably this prevents GOT overwrite attacks.
+              If this option is disabled, <b>bindnow </b>will become disabled as
+              well.
+
+       <b>bindnow</b>
+              This setting (disabled by default) adds <b>-Wl,-z,now </b>to <b>LDFLAGS</b>.
+              During program load, all dynamic symbols are resolved,
+              allowing for the entire PLT to be marked read-only (due to
+              <b>relro </b>above). The option cannot become enabled if <b>relro </b>is not
+              enabled.
+
+       <b>pie    </b>This setting (enabled by default since dpkg 1.18.11, and
+              injected by default by gcc on the amd64, arm64, armel, armhf,
+              i386, mips, mipsel, mips64el, ppc64el and s390x Debian
+              architectures) adds the required options if needed to enable
+              or disable PIE. When enabled and injected by gcc, adds
+              nothing. When enabled and not injected by gcc, adds <b>-fPIE </b>to
+              <b>CFLAGS</b>, <b>CXXFLAGS</b>, <b>OBJCFLAGS</b>, <b>OBJCXXFLAGS</b>, <b>GCJFLAGS</b>, <b>FFLAGS </b>and
+              <b>FCFLAGS</b>, and <b>-fPIE -pie </b>to <b>LDFLAGS</b>. When disabled and injected
+              by gcc, adds <b>-fno-PIE </b>to <b>CFLAGS</b>, <b>CXXFLAGS</b>, <b>OBJCFLAGS</b>,
+              <b>OBJCXXFLAGS</b>, <b>GCJFLAGS</b>, <b>FFLAGS </b>and <b>FCFLAGS</b>, and <b>-fno-PIE</b>
+              <b>-no-pie </b>to <b>LDFLAGS</b>.
+
+              Position Independent Executable are needed to take advantage
+              of Address Space Layout Randomization, supported by some
+              kernel versions. While ASLR can already be enforced for data
+              areas in the stack and heap (brk and mmap), the code areas
+              must be compiled as position-independent. Shared libraries
+              already do this (<b>-fPIC</b>), so they gain ASLR automatically, but
+              binary .text regions need to be build PIE to gain ASLR. When
+              this happens, ROP (Return Oriented Programming) attacks are
+              much harder since there are no static locations to bounce off
+              of during a memory corruption attack.
+
+              PIE is not compatible with <b>-fPIC</b>, so in general care must be
+              taken when building shared objects. But because the PIE flags
+              emitted get injected via gcc specs files, it should always be
+              safe to unconditionally set them regardless of the object type
+              being compiled or linked.
+
+              Static libraries can be used by programs or other shared
+              libraries.  Depending on the flags used to compile all the
+              objects within a static library, these libraries will be
+              usable by different sets of objects:
+
+              none   Cannot be linked into a PIE program, nor a shared
+                     library.
+
+              <b>-fPIE  </b>Can be linked into any program, but not a shared
+                     library (recommended).
+
+              <b>-fPIC  </b>Can be linked into any program and shared library.
+
+              If there is a need to set these flags manually, bypassing the
+              gcc specs injection, there are several things to take into
+              account. Unconditionally and explicitly passing <b>-fPIE</b>, <b>-fpie</b>
+              or <b>-pie </b>to a build-system using libtool is safe as these flags
+              will get stripped when building shared libraries.  Otherwise
+              on projects that build both programs and shared libraries you
+              might need to make sure that when building the shared
+              libraries <b>-fPIC </b>is always passed last (so that it overrides
+              any previous <b>-PIE</b>) to compilation flags such as <b>CFLAGS</b>, and
+              <b>-shared </b>is passed last (so that it overrides any previous
+              <b>-pie</b>) to linking flags such as <b>LDFLAGS</b>. <b>Note: </b>This should not
+              be needed with the default gcc specs machinery.
+
+              Additionally, since PIE is implemented via a general register,
+              some register starved architectures (but not including i386
+              anymore since optimizations implemented in gcc &gt;= 5) can see
+              performance losses of up to 15% in very text-segment-heavy
+              application workloads; most workloads see less than 1%.
+              Architectures with more general registers (e.g. amd64) do not
+              see as high a worst-case penalty.
+
+   <b>reproducible</b>
+       The compile-time options detailed below can be used to help improve
+       build reproducibility or provide additional warning messages during
+       compilation. Except as noted below, these are enabled by default for
+       architectures that support them.
+
+       <b>timeless</b>
+              This setting (enabled by default) adds <b>-Wdate-time </b>to
+              <b>CPPFLAGS</b>.  This will cause warnings when the <b>__TIME__</b>,
+              <b>__DATE__ </b>and <b>__TIMESTAMP__ </b>macros are used.
+
+       <b>fixdebugpath</b>
+              This setting (enabled by default) adds
+              <b>-fdebug-prefix-map=</b><i>BUILDPATH</i><b>=.  </b>to <b>CFLAGS</b>, <b>CXXFLAGS</b>,
+              <b>OBJCFLAGS</b>, <b>OBJCXXFLAGS</b>, <b>GCJFLAGS</b>, <b>FFLAGS </b>and <b>FCFLAGS </b>where
+              <b>BUILDPATH </b>is set to the top-level directory of the package
+              being built.  This has the effect of removing the build path
+              from any generated debug symbols.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       There are 2 sets of environment variables doing the same operations,
+       the first one (DEB_<i>flag</i>_<i>op</i>) should never be used within <b>debian/rules</b>.
+       It's meant for any user that wants to rebuild the source package with
+       different build flags. The second set (DEB_<i>flag</i>_MAINT_<i>op</i>) should only
+       be used in <b>debian/rules </b>by package maintainers to change the
+       resulting build flags.
+
+       <b>DEB_</b><i>flag</i><b>_SET</b>
+       <b>DEB_</b><i>flag</i><b>_MAINT_SET</b>
+              This variable can be used to force the value returned for the
+              given <i>flag</i>.
+
+       <b>DEB_</b><i>flag</i><b>_STRIP</b>
+       <b>DEB_</b><i>flag</i><b>_MAINT_STRIP</b>
+              This variable can be used to provide a space separated list of
+              options that will be stripped from the set of flags returned
+              for the given <i>flag</i>.
+
+       <b>DEB_</b><i>flag</i><b>_APPEND</b>
+       <b>DEB_</b><i>flag</i><b>_MAINT_APPEND</b>
+              This variable can be used to append supplementary options to
+              the value returned for the given <i>flag</i>.
+
+       <b>DEB_</b><i>flag</i><b>_PREPEND</b>
+       <b>DEB_</b><i>flag</i><b>_MAINT_PREPEND</b>
+              This variable can be used to prepend supplementary options to
+              the value returned for the given <i>flag</i>.
+
+       <b>DEB_BUILD_OPTIONS</b>
+       <b>DEB_BUILD_MAINT_OPTIONS</b>
+              These variables can be used by a user or maintainer to
+              disable/enable various area features that affect build flags.
+              The <b>DEB_BUILD_MAINT_OPTIONS </b>variable overrides any setting in
+              the <b>DEB_BUILD_OPTIONS </b>feature areas.  See the <b>FEATURE AREAS</b>
+              section for details.
+
+       <b>DEB_VENDOR</b>
+              This setting defines the current vendor.  If not set, it will
+              discover the current vendor by reading
+              <b>/usr/local/etc/dpkg/origins/default</b>.
+
+       <b>DEB_BUILD_PATH</b>
+              This variable sets the build path (since dpkg 1.18.8) to use
+              in features such as <b>fixdebugpath </b>so that they can be
+              controlled by the caller.  This variable is currently Debian
+              and derivatives-specific.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Configuration files</b>
+       <b>/usr/local/etc/dpkg/buildflags.conf</b>
+              System wide configuration file.
+
+       <b>$XDG_CONFIG_HOME/dpkg/buildflags.conf </b>or
+       <b>$HOME/.config/dpkg/buildflags.conf</b>
+              User configuration file.
+
+   <b>Packaging support</b>
+       <b>/usr/local/share/dpkg/buildflags.mk</b>
+              Makefile snippet that will load (and optionally export) all
+              flags supported by <b>dpkg-buildflags </b>into variables (since dpkg
+              1.16.1).
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       To pass build flags to a build command in a makefile:
+
+           $(MAKE) $(shell dpkg-buildflags --export=cmdline)
+
+           ./configure $(shell dpkg-buildflags --export=cmdline)
+
+       To set build flags in a shell script or shell fragment, <b>eval </b>can be
+       used to interpret the output and to export the flags in the
+       environment:
+
+           eval "$(dpkg-buildflags --export=sh)" &amp;&amp; make
+
+       or to set the positional parameters to pass to a command:
+
+           eval "set -- $(dpkg-buildflags --export=cmdline)"
+           for dir in a b c; do (cd $dir &amp;&amp; ./configure "$@" &amp;&amp; make); done
+
+   <b>Usage in debian/rules</b>
+       You should call <b>dpkg-buildflags </b>or include <b>buildflags.mk </b>from the
+       <b>debian/rules </b>file to obtain the needed build flags to pass to the
+       build system.  Note that older versions of <b>dpkg-buildpackage </b>(before
+       dpkg 1.16.1) exported these flags automatically. However, you should
+       not rely on this, since this breaks manual invocation of
+       <b>debian/rules</b>.
+
+       For packages with autoconf-like build systems, you can pass the
+       relevant options to configure or <a href="make.1.html">make(1)</a> directly, as shown above.
+
+       For other build systems, or when you need more fine-grained control
+       about which flags are passed where, you can use <b>--get</b>. Or you can
+       include <b>buildflags.mk </b>instead, which takes care of calling
+       <b>dpkg-buildflags </b>and storing the build flags in make variables.
+
+       If you want to export all buildflags into the environment (where they
+       can be picked up by your build system):
+
+           DPKG_EXPORT_BUILDFLAGS = 1
+           include /usr/local/share/dpkg/buildflags.mk
+
+       For some extra control over what is exported, you can manually export
+       the variables (as none are exported by default):
+
+           include /usr/local/share/dpkg/buildflags.mk
+           export CPPFLAGS CFLAGS LDFLAGS
+
+       And you can of course pass the flags to commands manually:
+
+           include /usr/local/share/dpkg/buildflags.mk
+           build-arch:
+                $(CC) -o hello hello.c $(CPPFLAGS) $(CFLAGS) $(LDFLAGS)
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01               dpkg-buildflags(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="dpkg-buildpackage.1.html">dpkg-buildpackage(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

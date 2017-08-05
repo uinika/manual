@@ -1,0 +1,525 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getopt(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETOPT(3)                 Linux Programmer's Manual                GETOPT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getopt, getopt_long, getopt_long_only, optarg, optind, opterr, optopt
+       - Parse command-line options
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>int getopt(int </b><i>argc</i><b>, char * const </b><i>argv[]</i><b>,</b>
+                  <b>const char *</b><i>optstring</i><b>);</b>
+
+       <b>extern char *</b><i>optarg</i><b>;</b>
+       <b>extern int </b><i>optind</i><b>, </b><i>opterr</i><b>, </b><i>optopt</i><b>;</b>
+
+       <b>#include &lt;getopt.h&gt;</b>
+
+       <b>int getopt_long(int </b><i>argc</i><b>, char * const </b><i>argv[]</i><b>,</b>
+                  <b>const char *</b><i>optstring</i><b>,</b>
+                  <b>const struct option *</b><i>longopts</i><b>, int *</b><i>longindex</i><b>);</b>
+
+       <b>int getopt_long_only(int </b><i>argc</i><b>, char * const </b><i>argv[]</i><b>,</b>
+                  <b>const char *</b><i>optstring</i><b>,</b>
+                  <b>const struct option *</b><i>longopts</i><b>, int *</b><i>longindex</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>getopt</b>(): _POSIX_C_SOURCE &gt;= 2 || _XOPEN_SOURCE
+       <b>getopt_long</b>(), <b>getopt_long_only</b>(): _GNU_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>getopt</b>() function parses the command-line arguments.  Its
+       arguments <i>argc</i> and <i>argv</i> are the argument count and array as passed to
+       the <i>main</i>() function on program invocation.  An element of <i>argv</i> that
+       starts with '-' (and is not exactly "-" or "--") is an option
+       element.  The characters of this element (aside from the initial '-')
+       are option characters.  If <b>getopt</b>() is called repeatedly, it returns
+       successively each of the option characters from each of the option
+       elements.
+
+       The variable <i>optind</i> is the index of the next element to be processed
+       in <i>argv</i>.  The system initializes this value to 1.  The caller can
+       reset it to 1 to restart scanning of the same <i>argv</i>, or when scanning
+       a new argument vector.
+
+       If <b>getopt</b>() finds another option character, it returns that
+       character, updating the external variable <i>optind</i> and a static
+       variable <i>nextchar</i> so that the next call to <b>getopt</b>() can resume the
+       scan with the following option character or <i>argv</i>-element.
+
+       If there are no more option characters, <b>getopt</b>() returns -1.  Then
+       <i>optind</i> is the index in <i>argv</i> of the first <i>argv</i>-element that is not an
+       option.
+
+       <i>optstring</i> is a string containing the legitimate option characters.
+       If such a character is followed by a colon, the option requires an
+       argument, so <b>getopt</b>() places a pointer to the following text in the
+       same <i>argv</i>-element, or the text of the following <i>argv</i>-element, in
+       <i>optarg</i>.  Two colons mean an option takes an optional arg; if there is
+       text in the current <i>argv</i>-element (i.e., in the same word as the
+       option name itself, for example, "-oarg"), then it is returned in
+       <i>optarg</i>, otherwise <i>optarg</i> is set to zero.  This is a GNU extension.
+       If <i>optstring</i> contains <b>W </b>followed by a semicolon, then <b>-W foo </b>is
+       treated as the long option <b>--foo</b>.  (The <b>-W </b>option is reserved by
+       POSIX.2 for implementation extensions.)  This behavior is a GNU
+       extension, not available with libraries before glibc 2.
+
+       By default, <b>getopt</b>() permutes the contents of <i>argv</i> as it scans, so
+       that eventually all the nonoptions are at the end.  Two other modes
+       are also implemented.  If the first character of <i>optstring</i> is '+' or
+       the environment variable <b>POSIXLY_CORRECT </b>is set, then option
+       processing stops as soon as a nonoption argument is encountered.  If
+       the first character of <i>optstring</i> is '-', then each nonoption <i>argv</i>-
+       element is handled as if it were the argument of an option with
+       character code 1.  (This is used by programs that were written to
+       expect options and other <i>argv</i>-elements in any order and that care
+       about the ordering of the two.)  The special argument "--" forces an
+       end of option-scanning regardless of the scanning mode.
+
+       While processing the option list, <b>getopt</b>() can detect two kinds of
+       errors: (1) an option character that was not specified in <i>optstring</i>
+       and (2) a missing option argument (i.e., an option at the end of the
+       command line without an expected argument).  Such errors are handled
+       and reported as follows:
+
+       *  By default, <b>getopt</b>() prints an error message on standard error,
+          places the erroneous option character in <i>optopt</i>, and returns '?'
+          as the function result.
+
+       *  If the caller has set the global variable <i>opterr</i> to zero, then
+          <b>getopt</b>() does not print an error message.  The caller can
+          determine that there was an error by testing whether the function
+          return value is '?'.  (By default, <i>opterr</i> has a nonzero value.)
+
+       *  If the first character (following any optional '+' or '-'
+          described above) of <i>optstring</i> is a colon (':'), then <b>getopt</b>()
+          likewise does not print an error message.  In addition, it returns
+          ':' instead of '?' to indicate a missing option argument.  This
+          allows the caller to distinguish the two different types of
+          errors.
+
+   <b>getopt_long() and getopt_long_only()</b>
+       The <b>getopt_long</b>() function works like <b>getopt</b>() except that it also
+       accepts long options, started with two dashes.  (If the program
+       accepts only long options, then <i>optstring</i> should be specified as an
+       empty string (""), not NULL.)  Long option names may be abbreviated
+       if the abbreviation is unique or is an exact match for some defined
+       option.  A long option may take a parameter, of the form <b>--arg=param</b>
+       or <b>--arg param</b>.
+
+       <i>longopts</i> is a pointer to the first element of an array of <i>struct</i>
+       <i>option</i> declared in <i>&lt;getopt.h&gt;</i> as
+
+           struct option {
+               const char *name;
+               int         has_arg;
+               int        *flag;
+               int         val;
+           };
+
+       The meanings of the different fields are:
+
+       <i>name</i>   is the name of the long option.
+
+       <i>has_arg</i>
+              is: <b>no_argument </b>(or 0) if the option does not take an
+              argument; <b>required_argument </b>(or 1) if the option requires an
+              argument; or <b>optional_argument </b>(or 2) if the option takes an
+              optional argument.
+
+       <i>flag</i>   specifies how results are returned for a long option.  If <i>flag</i>
+              is NULL, then <b>getopt_long</b>() returns <i>val</i>.  (For example, the
+              calling program may set <i>val</i> to the equivalent short option
+              character.)  Otherwise, <b>getopt_long</b>() returns 0, and <i>flag</i>
+              points to a variable which is set to <i>val</i> if the option is
+              found, but left unchanged if the option is not found.
+
+       <i>val</i>    is the value to return, or to load into the variable pointed
+              to by <i>flag</i>.
+
+       The last element of the array has to be filled with zeros.
+
+       If <i>longindex</i> is not NULL, it points to a variable which is set to the
+       index of the long option relative to <i>longopts</i>.
+
+       <b>getopt_long_only</b>() is like <b>getopt_long</b>(), but '-' as well as "--" can
+       indicate a long option.  If an option that starts with '-' (not "--")
+       doesn't match a long option, but does match a short option, it is
+       parsed as a short option instead.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If an option was successfully found, then <b>getopt</b>() returns the option
+       character.  If all command-line options have been parsed, then
+       <b>getopt</b>() returns -1.  If <b>getopt</b>() encounters an option character that
+       was not in <i>optstring</i>, then '?' is returned.  If <b>getopt</b>() encounters
+       an option with a missing argument, then the return value depends on
+       the first character in <i>optstring</i>: if it is ':', then ':' is returned;
+       otherwise '?' is returned.
+
+       <b>getopt_long</b>() and <b>getopt_long_only</b>() also return the option character
+       when a short option is recognized.  For a long option, they return
+       <i>val</i> if <i>flag</i> is NULL, and 0 otherwise.  Error and -1 returns are the
+       same as for <b>getopt</b>(), plus '?' for an ambiguous match or an
+       extraneous parameter.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>POSIXLY_CORRECT</b>
+              If this is set, then option processing stops as soon as a
+              nonoption argument is encountered.
+
+       <b>_&lt;PID&gt;_GNU_nonoption_argv_flags_</b>
+              This variable was used by <a href="../man1/bash.1.html">bash(1)</a> 2.0 to communicate to glibc
+              which arguments are the results of wildcard expansion and so
+              should not be considered as options.  This behavior was
+              removed in <a href="../man1/bash.1.html">bash(1)</a> version 2.01, but the support remains in
+              glibc.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌─────────────────────────┬───────────────┬───────────────────────────┐
+       │<b>Interface                </b>│ <b>Attribute     </b>│ <b>Value                     </b>│
+       ├─────────────────────────┼───────────────┼───────────────────────────┤
+       │<b>getopt</b>(), <b>getopt_long</b>(), │ Thread safety │ MT-Unsafe race:getopt env │
+       │<b>getopt_long_only</b>()       │               │                           │
+       └─────────────────────────┴───────────────┴───────────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>getopt</b>():
+              POSIX.1-2001, POSIX.1-2008, and POSIX.2, provided the
+              environment variable <b>POSIXLY_CORRECT </b>is set.  Otherwise, the
+              elements of <i>argv</i> aren't really <i>const</i>, because we permute them.
+              We pretend they're <i>const</i> in the prototype to be compatible
+              with other systems.
+
+              The use of '+' and '-' in <i>optstring</i> is a GNU extension.
+
+              On some older implementations, <b>getopt</b>() was declared in
+              <i>&lt;stdio.h&gt;</i>.  SUSv1 permitted the declaration to appear in
+              either <i>&lt;unistd.h&gt;</i> or <i>&lt;stdio.h&gt;</i>.  POSIX.1-1996 marked the use
+              of <i>&lt;stdio.h&gt;</i> for this purpose as LEGACY.  POSIX.1-2001 does
+              not require the declaration to appear in <i>&lt;stdio.h&gt;</i>.
+
+       <b>getopt_long</b>() and <b>getopt_long_only</b>():
+              These functions are GNU extensions.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A program that scans multiple argument vectors, or rescans the same
+       vector more than once, and wants to make use of GNU extensions such
+       as '+' and '-' at the start of <i>optstring</i>, or changes the value of
+       <b>POSIXLY_CORRECT </b>between scans, must reinitialize <b>getopt</b>() by
+       resetting <i>optind</i> to 0, rather than the traditional value of 1.
+       (Resetting to 0 forces the invocation of an internal initialization
+       routine that rechecks <b>POSIXLY_CORRECT </b>and checks for GNU extensions
+       in <i>optstring</i>.)
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>getopt()</b>
+       The following trivial example program uses <b>getopt</b>() to handle two
+       program options: <i>-n</i>, with no associated value; and <i>-t val</i>, which
+       expects an associated value.
+
+       #include &lt;unistd.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;stdio.h&gt;
+
+       int
+       main(int argc, char *argv[])
+       {
+           int flags, opt;
+           int nsecs, tfnd;
+
+           nsecs = 0;
+           tfnd = 0;
+           flags = 0;
+           while ((opt = getopt(argc, argv, "nt:")) != -1) {
+               switch (opt) {
+               case 'n':
+                   flags = 1;
+                   break;
+               case 't':
+                   nsecs = atoi(optarg);
+                   tfnd = 1;
+                   break;
+               default: /* '?' */
+                   fprintf(stderr, "Usage: %s [-t nsecs] [-n] name\n",
+                           argv[0]);
+                   exit(EXIT_FAILURE);
+               }
+           }
+
+           printf("flags=%d; tfnd=%d; nsecs=%d; optind=%d\n",
+                   flags, tfnd, nsecs, optind);
+
+           if (optind &gt;= argc) {
+               fprintf(stderr, "Expected argument after options\n");
+               exit(EXIT_FAILURE);
+           }
+
+           printf("name argument = %s\n", argv[optind]);
+
+           /* Other code omitted */
+
+           exit(EXIT_SUCCESS);
+       }
+
+   <b>getopt_long()</b>
+       The following example program illustrates the use of <b>getopt_long</b>()
+       with most of its features.
+
+       #include &lt;stdio.h&gt;     /* for printf */
+       #include &lt;stdlib.h&gt;    /* for exit */
+       #include &lt;getopt.h&gt;
+
+       int
+       main(int argc, char **argv)
+       {
+           int c;
+           int digit_optind = 0;
+
+           while (1) {
+               int this_option_optind = optind ? optind : 1;
+               int option_index = 0;
+               static struct option long_options[] = {
+                   {"add",     required_argument, 0,  0 },
+                   {"append",  no_argument,       0,  0 },
+                   {"delete",  required_argument, 0,  0 },
+                   {"verbose", no_argument,       0,  0 },
+                   {"create",  required_argument, 0, 'c'},
+                   {"file",    required_argument, 0,  0 },
+                   {0,         0,                 0,  0 }
+               };
+
+               c = getopt_long(argc, argv, "abc:d:012",
+                        long_options, &amp;option_index);
+               if (c == -1)
+                   break;
+
+               switch (c) {
+               case 0:
+                   printf("option %s", long_options[option_index].name);
+                   if (optarg)
+                       printf(" with arg %s", optarg);
+                   printf("\n");
+                   break;
+
+               case '0':
+               case '1':
+               case '2':
+                   if (digit_optind != 0 &amp;&amp; digit_optind != this_option_optind)
+                     printf("digits occur in two different argv-elements.\n");
+                   digit_optind = this_option_optind;
+                   printf("option %c\n", c);
+                   break;
+
+               case 'a':
+                   printf("option a\n");
+                   break;
+
+               case 'b':
+                   printf("option b\n");
+                   break;
+
+               case 'c':
+                   printf("option c with value '%s'\n", optarg);
+                   break;
+
+               case 'd':
+                   printf("option d with value '%s'\n", optarg);
+                   break;
+
+               case '?':
+                   break;
+
+               default:
+                   printf("?? getopt returned character code 0%o ??\n", c);
+               }
+           }
+
+           if (optind &lt; argc) {
+               printf("non-option ARGV-elements: ");
+               while (optind &lt; argc)
+                   printf("%s ", argv[optind++]);
+               printf("\n");
+           }
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/getopt.1.html">getopt(1)</a>, <a href="getsubopt.3.html">getsubopt(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2017-03-13                        GETOPT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/getopt.1.html">getopt(1)</a>,&nbsp; 
+    <a href="../man2/execve.2.html">execve(2)</a>,&nbsp; 
+    <a href="getsubopt.3.html">getsubopt(3)</a>,&nbsp; 
+    <a href="pmdagetoptions.3-2.html">pmdagetoptions(3)</a>,&nbsp; 
+    <a href="pmgetoptions.3-2.html">pmgetoptions(3)</a>,&nbsp; 
+    <a href="../man5/groff_tmac.5.html">groff_tmac(5)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getopt.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

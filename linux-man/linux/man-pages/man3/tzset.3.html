@@ -1,0 +1,329 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>tzset(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#FILES">FILES</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">TZSET(3)                  Linux Programmer's Manual                 TZSET(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       tzset, tzname, timezone, daylight - initialize time conversion infor‐
+       mation
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;time.h&gt;</b>
+
+       <b>void tzset (void);</b>
+
+       <b>extern char *</b><i>tzname</i><b>[2];</b>
+       <b>extern long </b><i>timezone</i><b>;</b>
+       <b>extern int </b><i>daylight</i><b>;</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>tzset</b>(): _POSIX_C_SOURCE
+       <i>tzname</i>: _POSIX_C_SOURCE
+       <i>timezone</i>, <i>daylight</i>: _XOPEN_SOURCE
+           || /* Glibc since 2.19: */ _DEFAULT_SOURCE
+           || /* Glibc versions &lt;= 2.19: */ _SVID_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>tzset</b>() function initializes the <i>tzname</i> variable from the <b>TZ</b>
+       environment variable.  This function is automatically called by the
+       other time conversion functions that depend on the timezone.  In a
+       System-V-like environment, it will also set the variables <i>timezone</i>
+       (seconds West of UTC) and <i>daylight</i> (to 0 if this timezone does not
+       have any daylight saving time rules, or to nonzero if there is a
+       time, past, present or future when daylight saving time applies).
+
+       If the <b>TZ </b>variable does not appear in the environment, the system
+       timezone is used.  The system timezone is configured by copying, or
+       linking, a file in the <a href="../man5/tzfile.5.html">tzfile(5)</a> format to <i>/etc/localtime</i>.  A
+       timezone database of these files may be located in the system
+       timezone directory (see the <b>FILES </b>section below).
+
+       If the <b>TZ </b>variable does appear in the environment, but its value is
+       empty, or its value cannot be interpreted using any of the formats
+       specified below, then Coordinated Universal Time (UTC) is used.
+
+       The value of <b>TZ </b>can be one of two formats.  The first format is a
+       string of characters that directly represent the timezone to be used:
+
+              <i>std offset</i>[<i>dst</i>[<i>offset</i>][,<i>start</i>[<i>/time</i>],<i>end</i>[<i>/time</i>]]]
+
+       There are no spaces in the specification.  The <i>std</i> string specifies
+       an abbreviation for the timezone and must be three or more alphabetic
+       characters.  When enclosed between the less-than (&lt;) and greater-than
+       (&gt;) signs, the characters set is expanded to include the plus (+)
+       sign, the minus (-) sign, and digits.  The <i>offset</i> string immediately
+       follows <i>std</i> and specifies the time value to be added to the local
+       time to get Coordinated Universal Time (UTC).  The <i>offset</i> is positive
+       if the local timezone is west of the Prime Meridian and negative if
+       it is east.  The hour must be between 0 and 24, and the minutes and
+       seconds 00 and 59:
+
+              [<i>+</i>|<i>-</i>]<i>hh</i>[<i>:mm</i>[<i>:ss</i>]]
+
+       The <i>dst</i> string and <i>offset</i> specify the name and offset for the
+       corresponding daylight saving timezone.  If the offset is omitted, it
+       defaults to one hour ahead of standard time.
+
+       The <i>start</i> field specifies when daylight saving time goes into effect
+       and the <i>end</i> field specifies when the change is made back to standard
+       time.  These fields may have the following formats:
+
+       J<i>n</i>     This specifies the Julian day with <i>n</i> between 1 and 365.  Leap
+              days are not counted.  In this format, February 29 can't be
+              represented; February 28 is day 59, and March 1 is always day
+              60.
+
+       <i>n</i>      This specifies the zero-based Julian day with <i>n</i> between 0 and
+              365.  February 29 is counted in leap years.
+
+       M<i>m</i>.<i>w</i>.<i>d</i> This specifies day <i>d</i> (0 &lt;= <i>d</i> &lt;= 6) of week <i>w</i> (1 &lt;= <i>w</i> &lt;= 5) of
+              month <i>m</i> (1 &lt;= <i>m</i> &lt;= 12).  Week 1 is the first week in which day
+              <i>d</i> occurs and week 5 is the last week in which day <i>d</i> occurs.
+              Day 0 is a Sunday.
+
+       The <i>time</i> fields specify when, in the local time currently in effect,
+       the change to the other time occurs.  If omitted, the default is
+       02:00:00.
+
+       Here is an example for New Zealand, where the standard time (NZST) is
+       12 hours ahead of UTC, and daylight saving time (NZDT), 13 hours
+       ahead of UTC, runs from the first Sunday in October to the third
+       Sunday in March, and the changeovers happen at the default time of
+       02:00:00:
+
+           TZ="NZST-12:00:00NZDT-13:00:00,M10.1.0,M3.3.0"
+
+       The second format specifies that the timezone information should be
+       read from a file:
+
+              :[filespec]
+
+       If the file specification <i>filespec</i> is omitted, or its value cannot be
+       interpreted, then Coordinated Universal Time (UTC) is used.  If
+       <i>filespec</i> is given, it specifies another <a href="../man5/tzfile.5.html">tzfile(5)</a>-format file to read
+       the timezone information from.  If <i>filespec</i> does not begin with a
+       '/', the file specification is relative to the system timezone
+       directory.  If the colon is omitted each of the above <b>TZ </b>formats will
+       be tried.
+
+       Here's an example, once more for New Zealand:
+
+           TZ=":Pacific/Auckland"
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>TZ     </b>If this variable is set its value takes precedence over the
+              system configured timezone.
+
+       <b>TZDIR  </b>If this variable is set its value takes precedence over the
+              system configured timezone database directory path.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/etc/localtime</i>
+              The system timezone file.
+
+       <i>/usr/share/zoneinfo/</i>
+              The system timezone database directory.
+
+       <i>/usr/share/zoneinfo/posixrules</i>
+              When a TZ string includes a dst timezone without anything
+              following it, then this file is used for the start/end rules.
+              It is in the <a href="../man5/tzfile.5.html">tzfile(5)</a> format.  By default, the zoneinfo
+              Makefile hard links it to the <i>America/New_York</i> tzfile.
+
+       Above are the current standard file locations, but they are
+       configurable when glibc is compiled.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────┬───────────────┬────────────────────┐
+       │<b>Interface </b>│ <b>Attribute     </b>│ <b>Value              </b>│
+       ├──────────┼───────────────┼────────────────────┤
+       │<b>tzset</b>()   │ Thread safety │ MT-Safe env locale │
+       └──────────┴───────────────┴────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       4.3BSD had a function <b>char *timezone(</b><i>zone</i><b>, </b><i>dst</i><b>) </b>that returned the
+       name of the timezone corresponding to its first argument (minutes
+       West of UTC).  If the second argument was 0, the standard name was
+       used, otherwise the daylight saving time version.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/date.1.html">date(1)</a>, <a href="../man2/gettimeofday.2.html">gettimeofday(2)</a>, <a href="../man2/time.2.html">time(2)</a>, <a href="ctime.3.html">ctime(3)</a>, <a href="getenv.3.html">getenv(3)</a>, <a href="../man5/tzfile.5.html">tzfile(5)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2016-03-15                         TZSET(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/gettimeofday.2.html">gettimeofday(2)</a>,&nbsp; 
+    <a href="ctime.3.html">ctime(3)</a>,&nbsp; 
+    <a href="timegm.3.html">timegm(3)</a>,&nbsp; 
+    <a href="../man5/localtime.5.html">localtime(5)</a>,&nbsp; 
+    <a href="../man5/tzfile.5.html">tzfile(5)</a>,&nbsp; 
+    <a href="../man7/environ.7.html">environ(7)</a>,&nbsp; 
+    <a href="../man8/anacron.8.html">anacron(8)</a>,&nbsp; 
+    <a href="../man8/hwclock.8.html">hwclock(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="tzset.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

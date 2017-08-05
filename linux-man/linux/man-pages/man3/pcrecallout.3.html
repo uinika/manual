@@ -1,0 +1,422 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pcrecallout(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#MISSING_CALLOUTS">MISSING&nbsp;CALLOUTS</a> | <a href="#THE_CALLOUT_INTERFACE">THE&nbsp;CALLOUT&nbsp;INTERFACE</a> | <a href="#RETURN_VALUES">RETURN&nbsp;VALUES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#REVISION">REVISION</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PCRECALLOUT(3)            Library Functions Manual            PCRECALLOUT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       PCRE - Perl-compatible regular expressions
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       <b>#include &lt;pcre.h&gt;</b>
+
+       <b>int (*pcre_callout)(pcre_callout_block *);</b>
+
+       <b>int (*pcre16_callout)(pcre16_callout_block *);</b>
+
+       <b>int (*pcre32_callout)(pcre32_callout_block *);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       PCRE provides a feature called "callout", which is a means of
+       temporarily passing control to the caller of PCRE in the middle of
+       pattern matching. The caller of PCRE provides an external function by
+       putting its entry point in the global variable <i>pcre_callout</i>
+       (<i>pcre16_callout</i> for the 16-bit library, <i>pcre32_callout</i> for the 32-bit
+       library). By default, this variable contains NULL, which disables all
+       calling out.
+
+       Within a regular expression, (?C) indicates the points at which the
+       external function is to be called. Different callout points can be
+       identified by putting a number less than 256 after the letter C. The
+       default value is zero.  For example, this pattern has two callout
+       points:
+
+         (?C1)abc(?C2)def
+
+       If the PCRE_AUTO_CALLOUT option bit is set when a pattern is
+       compiled, PCRE automatically inserts callouts, all with number 255,
+       before each item in the pattern. For example, if PCRE_AUTO_CALLOUT is
+       used with the pattern
+
+         A(\d{2}|--)
+
+       it is processed as if it were
+
+       (?C255)A(?C255)((?C255)\d{2}(?C255)|(?C255)-(?C255)-(?C255))(?C255)
+
+       Notice that there is a callout before and after each parenthesis and
+       alternation bar. If the pattern contains a conditional group whose
+       condition is an assertion, an automatic callout is inserted
+       immediately before the condition. Such a callout may also be inserted
+       explicitly, for example:
+
+         (?(?C9)(?=a)ab|de)
+
+       This applies only to assertion conditions (because they are
+       themselves independent groups).
+
+       Automatic callouts can be used for tracking the progress of pattern
+       matching.  The <b>pcretest </b>program has a pattern qualifier (/C) that
+       sets automatic callouts; when it is used, the output indicates how
+       the pattern is being matched. This is useful information when you are
+       trying to optimize the performance of a particular pattern.
+</pre>
+<h2><a id="MISSING_CALLOUTS" href="#MISSING_CALLOUTS"></a>MISSING CALLOUTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       You should be aware that, because of optimizations in the way PCRE
+       compiles and matches patterns, callouts sometimes do not happen
+       exactly as you might expect.
+
+       At compile time, PCRE "auto-possessifies" repeated items when it
+       knows that what follows cannot be part of the repeat. For example,
+       a+[bc] is compiled as if it were a++[bc]. The <b>pcretest </b>output when
+       this pattern is anchored and then applied with automatic callouts to
+       the string "aaaa" is:
+
+         ---&gt;aaaa
+          +0 ^        ^
+          +1 ^        a+
+          +3 ^   ^    [bc]
+         No match
+
+       This indicates that when matching [bc] fails, there is no
+       backtracking into a+ and therefore the callouts that would be taken
+       for the backtracks do not occur.  You can disable the auto-possessify
+       feature by passing PCRE_NO_AUTO_POSSESS to <b>pcre_compile()</b>, or
+       starting the pattern with (*NO_AUTO_POSSESS). If this is done in
+       <b>pcretest </b>(using the /O qualifier), the output changes to this:
+
+         ---&gt;aaaa
+          +0 ^        ^
+          +1 ^        a+
+          +3 ^   ^    [bc]
+          +3 ^  ^     [bc]
+          +3 ^ ^      [bc]
+          +3 ^^       [bc]
+         No match
+
+       This time, when matching [bc] fails, the matcher backtracks into a+
+       and tries again, repeatedly, until a+ itself fails.
+
+       Other optimizations that provide fast "no match" results also affect
+       callouts.  For example, if the pattern is
+
+         ab(?C4)cd
+
+       PCRE knows that any matching string must contain the letter "d". If
+       the subject string is "abyz", the lack of "d" means that matching
+       doesn't ever start, and the callout is never reached. However, with
+       "abyd", though the result is still no match, the callout is obeyed.
+
+       If the pattern is studied, PCRE knows the minimum length of a
+       matching string, and will immediately give a "no match" return
+       without actually running a match if the subject is not long enough,
+       or, for unanchored patterns, if it has been scanned far enough.
+
+       You can disable these optimizations by passing the
+       PCRE_NO_START_OPTIMIZE option to the matching function, or by
+       starting the pattern with (*NO_START_OPT). This slows down the
+       matching process, but does ensure that callouts such as the example
+       above are obeyed.
+</pre>
+<h2><a id="THE_CALLOUT_INTERFACE" href="#THE_CALLOUT_INTERFACE"></a>THE CALLOUT INTERFACE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       During matching, when PCRE reaches a callout point, the external
+       function defined by <i>pcre_callout</i> or <i>pcre[16|32]_callout</i> is called (if
+       it is set). This applies to both normal and DFA matching. The only
+       argument to the callout function is a pointer to a <b>pcre_callout </b>or
+       <b>pcre[16|32]_callout </b>block. These structures contains the following
+       fields:
+
+         int           <i>version</i>;
+         int           <i>callout_number</i>;
+         int          *<i>offset_vector</i>;
+         const char   *<i>subject</i>;           (8-bit version)
+         PCRE_SPTR16   <i>subject</i>;           (16-bit version)
+         PCRE_SPTR32   <i>subject</i>;           (32-bit version)
+         int           <i>subject_length</i>;
+         int           <i>start_match</i>;
+         int           <i>current_position</i>;
+         int           <i>capture_top</i>;
+         int           <i>capture_last</i>;
+         void         *<i>callout_data</i>;
+         int           <i>pattern_position</i>;
+         int           <i>next_item_length</i>;
+         const unsigned char *<i>mark</i>;       (8-bit version)
+         const PCRE_UCHAR16  *<i>mark</i>;       (16-bit version)
+         const PCRE_UCHAR32  *<i>mark</i>;       (32-bit version)
+
+       The <i>version</i> field is an integer containing the version number of the
+       block format. The initial version was 0; the current version is 2.
+       The version number will change again in future if additional fields
+       are added, but the intention is never to remove any of the existing
+       fields.
+
+       The <i>callout_number</i> field contains the number of the callout, as
+       compiled into the pattern (that is, the number after ?C for manual
+       callouts, and 255 for automatically generated callouts).
+
+       The <i>offset_vector</i> field is a pointer to the vector of offsets that
+       was passed by the caller to the matching function. When <b>pcre_exec()</b>
+       or <b>pcre[16|32]_exec() </b>is used, the contents can be inspected, in
+       order to extract substrings that have been matched so far, in the
+       same way as for extracting substrings after a match has completed.
+       For the DFA matching functions, this field is not useful.
+
+       The <i>subject</i> and <i>subject_length</i> fields contain copies of the values
+       that were passed to the matching function.
+
+       The <i>start_match</i> field normally contains the offset within the subject
+       at which the current match attempt started. However, if the escape
+       sequence \K has been encountered, this value is changed to reflect
+       the modified starting point. If the pattern is not anchored, the
+       callout function may be called several times from the same point in
+       the pattern for different starting points in the subject.
+
+       The <i>current_position</i> field contains the offset within the subject of
+       the current match pointer.
+
+       When the <b>pcre_exec() </b>or <b>pcre[16|32]_exec() </b>is used, the <i>capture_top</i>
+       field contains one more than the number of the highest numbered
+       captured substring so far. If no substrings have been captured, the
+       value of <i>capture_top</i> is one. This is always the case when the DFA
+       functions are used, because they do not support captured substrings.
+
+       The <i>capture_last</i> field contains the number of the most recently
+       captured substring. However, when a recursion exits, the value
+       reverts to what it was outside the recursion, as do the values of all
+       captured substrings. If no substrings have been captured, the value
+       of <i>capture_last</i> is -1. This is always the case for the DFA matching
+       functions.
+
+       The <i>callout_data</i> field contains a value that is passed to a matching
+       function specifically so that it can be passed back in callouts. It
+       is passed in the <i>callout_data</i> field of a <b>pcre_extra </b>or
+       <b>pcre[16|32]_extra </b>data structure. If no such data was passed, the
+       value of <i>callout_data</i> in a callout block is NULL. There is a
+       description of the <b>pcre_extra </b>structure in the <b>pcreapi </b>documentation.
+
+       The <i>pattern_position</i> field is present from version 1 of the callout
+       structure. It contains the offset to the next item to be matched in
+       the pattern string.
+
+       The <i>next_item_length</i> field is present from version 1 of the callout
+       structure. It contains the length of the next item to be matched in
+       the pattern string. When the callout immediately precedes an
+       alternation bar, a closing parenthesis, or the end of the pattern,
+       the length is zero. When the callout precedes an opening parenthesis,
+       the length is that of the entire subpattern.
+
+       The <i>pattern_position</i> and <i>next_item_length</i> fields are intended to help
+       in distinguishing between different automatic callouts, which all
+       have the same callout number. However, they are set for all callouts.
+
+       The <i>mark</i> field is present from version 2 of the callout structure. In
+       callouts from <b>pcre_exec() </b>or <b>pcre[16|32]_exec() </b>it contains a pointer
+       to the zero-terminated name of the most recently passed (*MARK),
+       (*PRUNE), or (*THEN) item in the match, or NULL if no such items have
+       been passed. Instances of (*PRUNE) or (*THEN) without a name do not
+       obliterate a previous (*MARK). In callouts from the DFA matching
+       functions this field always contains NULL.
+</pre>
+<h2><a id="RETURN_VALUES" href="#RETURN_VALUES"></a>RETURN VALUES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       The external callout function returns an integer to PCRE. If the
+       value is zero, matching proceeds as normal. If the value is greater
+       than zero, matching fails at the current point, but the testing of
+       other matching possibilities goes ahead, just as if a lookahead
+       assertion had failed. If the value is less than zero, the match is
+       abandoned, the matching function returns the negative value.
+
+       Negative values should normally be chosen from the set of
+       PCRE_ERROR_xxx values. In particular, PCRE_ERROR_NOMATCH forces a
+       standard "no match" failure.  The error number PCRE_ERROR_CALLOUT is
+       reserved for use by callout functions; it will never be used by PCRE
+       itself.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       Philip Hazel
+       University Computing Service
+       Cambridge CB2 3QH, England.
+</pre>
+<h2><a id="REVISION" href="#REVISION"></a>REVISION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       Last updated: 12 November 2013
+       Copyright (c) 1997-2013 University of Cambridge.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCRE</i> (Perl Compatible Regular Expressions)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.pcre.org/">http://www.pcre.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨<a href="http://bugs.exim.org/enter_bug.cgi?product=PCRE">http://bugs.exim.org/enter_bug.cgi?product=PCRE</a>⟩.  This
+       page was obtained from the tarball pcre-8.40.tar.gz fetched from 
+       ⟨ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">PCRE 8.34                     12 November 2013                PCRECALLOUT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pcretest.1.html">pcretest(1)</a>,&nbsp; 
+    <a href="pcreapi.3.html">pcreapi(3)</a>,&nbsp; 
+    <a href="pcrepattern.3.html">pcrepattern(3)</a>,&nbsp; 
+    <a href="pcresyntax.3.html">pcresyntax(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

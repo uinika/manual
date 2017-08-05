@@ -1,0 +1,489 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-branch(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#GIT">GIT</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-BRANCH(1)                    Git Manual                    GIT-BRANCH(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-branch - List, create, or delete branches
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git branch</i> [--color[=&lt;when&gt;] | --no-color] [-r | -a]
+               [--list] [-v [--abbrev=&lt;length&gt; | --no-abbrev]]
+               [--column[=&lt;options&gt;] | --no-column] [--sort=&lt;key&gt;]
+               [(--merged | --no-merged) [&lt;commit&gt;]]
+               [--contains [&lt;commit]] [--no-contains [&lt;commit&gt;]]
+               [--points-at &lt;object&gt;] [--format=&lt;format&gt;] [&lt;pattern&gt;...]
+       <i>git branch</i> [--set-upstream | --track | --no-track] [-l] [-f] &lt;branchname&gt; [&lt;start-point&gt;]
+       <i>git branch</i> (--set-upstream-to=&lt;upstream&gt; | -u &lt;upstream&gt;) [&lt;branchname&gt;]
+       <i>git branch</i> --unset-upstream [&lt;branchname&gt;]
+       <i>git branch</i> (-m | -M) [&lt;oldbranch&gt;] &lt;newbranch&gt;
+       <i>git branch</i> (-d | -D) [-r] &lt;branchname&gt;...
+       <i>git branch</i> --edit-description [&lt;branchname&gt;]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If <b>--list </b>is given, or if there are no non-option arguments, existing
+       branches are listed; the current branch will be highlighted with an
+       asterisk. Option <b>-r </b>causes the remote-tracking branches to be listed,
+       and option <b>-a </b>shows both local and remote branches. If a <b>&lt;pattern&gt; </b>is
+       given, it is used as a shell wildcard to restrict the output to
+       matching branches. If multiple patterns are given, a branch is shown
+       if it matches any of the patterns. Note that when providing a
+       <b>&lt;pattern&gt;</b>, you must use <b>--list</b>; otherwise the command is interpreted
+       as branch creation.
+
+       With <b>--contains</b>, shows only the branches that contain the named
+       commit (in other words, the branches whose tip commits are
+       descendants of the named commit), <b>--no-contains </b>inverts it. With
+       <b>--merged</b>, only branches merged into the named commit (i.e. the
+       branches whose tip commits are reachable from the named commit) will
+       be listed. With <b>--no-merged </b>only branches not merged into the named
+       commit will be listed. If the &lt;commit&gt; argument is missing it
+       defaults to <b>HEAD </b>(i.e. the tip of the current branch).
+
+       The command’s second form creates a new branch head named
+       &lt;branchname&gt; which points to the current <b>HEAD</b>, or &lt;start-point&gt; if
+       given.
+
+       Note that this will create the new branch, but it will not switch the
+       working tree to it; use "git checkout &lt;newbranch&gt;" to switch to the
+       new branch.
+
+       When a local branch is started off a remote-tracking branch, Git sets
+       up the branch (specifically the <b>branch.&lt;name&gt;.remote </b>and
+       <b>branch.&lt;name&gt;.merge </b>configuration entries) so that <i>git pull</i> will
+       appropriately merge from the remote-tracking branch. This behavior
+       may be changed via the global <b>branch.autoSetupMerge </b>configuration
+       flag. That setting can be overridden by using the <b>--track </b>and
+       <b>--no-track </b>options, and changed later using <b>git branch</b>
+       <b>--set-upstream-to</b>.
+
+       With a <b>-m </b>or <b>-M </b>option, &lt;oldbranch&gt; will be renamed to &lt;newbranch&gt;.
+       If &lt;oldbranch&gt; had a corresponding reflog, it is renamed to match
+       &lt;newbranch&gt;, and a reflog entry is created to remember the branch
+       renaming. If &lt;newbranch&gt; exists, -M must be used to force the rename
+       to happen.
+
+       With a <b>-d </b>or <b>-D </b>option, <b>&lt;branchname&gt; </b>will be deleted. You may specify
+       more than one branch for deletion. If the branch currently has a
+       reflog then the reflog will also be deleted.
+
+       Use <b>-r </b>together with <b>-d </b>to delete remote-tracking branches. Note,
+       that it only makes sense to delete remote-tracking branches if they
+       no longer exist in the remote repository or if <i>git fetch</i> was
+       configured not to fetch them again. See also the <i>prune</i> subcommand of
+       <a href="git-remote.1.html">git-remote(1)</a> for a way to clean up all obsolete remote-tracking
+       branches.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -d, --delete
+           Delete a branch. The branch must be fully merged in its upstream
+           branch, or in <b>HEAD </b>if no upstream was set with <b>--track </b>or
+           <b>--set-upstream</b>.
+
+       -D
+           Shortcut for <b>--delete --force</b>.
+
+       -l, --create-reflog
+           Create the branch’s reflog. This activates recording of all
+           changes made to the branch ref, enabling use of date based sha1
+           expressions such as "&lt;branchname&gt;@{yesterday}". Note that in
+           non-bare repositories, reflogs are usually enabled by default by
+           the <b>core.logallrefupdates </b>config option. The negated form
+           <b>--no-create-reflog </b>only overrides an earlier <b>--create-reflog</b>, but
+           currently does not negate the setting of <b>core.logallrefupdates</b>.
+
+       -f, --force
+           Reset &lt;branchname&gt; to &lt;startpoint&gt; if &lt;branchname&gt; exists
+           already. Without <b>-f</b><i>git branch</i> refuses to change an existing
+           branch. In combination with <b>-d </b>(or <b>--delete</b>), allow deleting the
+           branch irrespective of its merged status. In combination with <b>-m</b>
+           (or <b>--move</b>), allow renaming the branch even if the new branch
+           name already exists.
+
+       -m, --move
+           Move/rename a branch and the corresponding reflog.
+
+       -M
+           Shortcut for <b>--move --force</b>.
+
+       --color[=&lt;when&gt;]
+           Color branches to highlight current, local, and remote-tracking
+           branches. The value must be always (the default), never, or auto.
+
+       --no-color
+           Turn off branch colors, even when the configuration file gives
+           the default to color output. Same as <b>--color=never</b>.
+
+       -i, --ignore-case
+           Sorting and filtering branches are case insensitive.
+
+       --column[=&lt;options&gt;], --no-column
+           Display branch listing in columns. See configuration variable
+           column.branch for option syntax.<b>--column </b>and <b>--no-column </b>without
+           options are equivalent to <i>always</i> and <i>never</i> respectively.
+
+           This option is only applicable in non-verbose mode.
+
+       -r, --remotes
+           List or delete (if used with -d) the remote-tracking branches.
+
+       -a, --all
+           List both remote-tracking branches and local branches.
+
+       --list
+           List branches. With optional <b>&lt;pattern&gt;...</b>, e.g.  <b>git branch</b>
+           <b>--list 'maint-*'</b>, list only the branches that match the
+           pattern(s).
+
+           This should not be confused with <b>git branch -l &lt;branchname&gt;</b>,
+           which creates a branch named <b>&lt;branchname&gt; </b>with a reflog. See
+           <b>--create-reflog </b>above for details.
+
+       -v, -vv, --verbose
+           When in list mode, show sha1 and commit subject line for each
+           head, along with relationship to upstream branch (if any). If
+           given twice, print the name of the upstream branch, as well (see
+           also <b>git remote show &lt;remote&gt;</b>).
+
+       -q, --quiet
+           Be more quiet when creating or deleting a branch, suppressing
+           non-error messages.
+
+       --abbrev=&lt;length&gt;
+           Alter the sha1’s minimum display length in the output listing.
+           The default value is 7 and can be overridden by the <b>core.abbrev</b>
+           config option.
+
+       --no-abbrev
+           Display the full sha1s in the output listing rather than
+           abbreviating them.
+
+       -t, --track
+           When creating a new branch, set up <b>branch.&lt;name&gt;.remote </b>and
+           <b>branch.&lt;name&gt;.merge </b>configuration entries to mark the start-point
+           branch as "upstream" from the new branch. This configuration will
+           tell git to show the relationship between the two branches in <b>git</b>
+           <b>status </b>and <b>git branch -v</b>. Furthermore, it directs <b>git pull</b>
+           without arguments to pull from the upstream when the new branch
+           is checked out.
+
+           This behavior is the default when the start point is a
+           remote-tracking branch. Set the branch.autoSetupMerge
+           configuration variable to <b>false </b>if you want <b>git checkout </b>and <b>git</b>
+           <b>branch </b>to always behave as if <b>--no-track </b>were given. Set it to
+           <b>always </b>if you want this behavior when the start-point is either a
+           local or remote-tracking branch.
+
+       --no-track
+           Do not set up "upstream" configuration, even if the
+           branch.autoSetupMerge configuration variable is true.
+
+       --set-upstream
+           If specified branch does not exist yet or if <b>--force </b>has been
+           given, acts exactly like <b>--track</b>. Otherwise sets up configuration
+           like <b>--track </b>would when creating the branch, except that where
+           branch points to is not changed.
+
+       -u &lt;upstream&gt;, --set-upstream-to=&lt;upstream&gt;
+           Set up &lt;branchname&gt;'s tracking information so &lt;upstream&gt; is
+           considered &lt;branchname&gt;'s upstream branch. If no &lt;branchname&gt; is
+           specified, then it defaults to the current branch.
+
+       --unset-upstream
+           Remove the upstream information for &lt;branchname&gt;. If no branch is
+           specified it defaults to the current branch.
+
+       --edit-description
+           Open an editor and edit the text to explain what the branch is
+           for, to be used by various other commands (e.g.  <b>format-patch</b>,
+           <b>request-pull</b>, and <b>merge </b>(if enabled)). Multi-line explanations
+           may be used.
+
+       --contains [&lt;commit&gt;]
+           Only list branches which contain the specified commit (HEAD if
+           not specified). Implies <b>--list</b>.
+
+       --no-contains [&lt;commit&gt;]
+           Only list branches which don’t contain the specified commit (HEAD
+           if not specified). Implies <b>--list</b>.
+
+       --merged [&lt;commit&gt;]
+           Only list branches whose tips are reachable from the specified
+           commit (HEAD if not specified). Implies <b>--list</b>, incompatible with
+           <b>--no-merged</b>.
+
+       --no-merged [&lt;commit&gt;]
+           Only list branches whose tips are not reachable from the
+           specified commit (HEAD if not specified). Implies <b>--list</b>,
+           incompatible with <b>--merged</b>.
+
+       &lt;branchname&gt;
+           The name of the branch to create or delete. The new branch name
+           must pass all checks defined by <a href="git-check-ref-format.1.html">git-check-ref-format(1)</a>. Some of
+           these checks may restrict the characters allowed in a branch
+           name.
+
+       &lt;start-point&gt;
+           The new branch head will point to this commit. It may be given as
+           a branch name, a commit-id, or a tag. If this option is omitted,
+           the current HEAD will be used instead.
+
+       &lt;oldbranch&gt;
+           The name of an existing branch to rename.
+
+       &lt;newbranch&gt;
+           The new name for an existing branch. The same restrictions as for
+           &lt;branchname&gt; apply.
+
+       --sort=&lt;key&gt;
+           Sort based on the key given. Prefix <b>- </b>to sort in descending order
+           of the value. You may use the --sort=&lt;key&gt; option multiple times,
+           in which case the last key becomes the primary key. The keys
+           supported are the same as those in <b>git for-each-ref</b>. Sort order
+           defaults to sorting based on the full refname (including <b>refs/...</b>
+           prefix). This lists detached HEAD (if present) first, then local
+           branches and finally remote-tracking branches.
+
+       --points-at &lt;object&gt;
+           Only list branches of the given object.
+
+       --format &lt;format&gt;
+           A string that interpolates <b>%(fieldname) </b>from the object pointed
+           at by a ref being shown. The format is the same as that of
+           <a href="git-for-each-ref.1.html">git-for-each-ref(1)</a>.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Start development from a known tag
+
+               $ git clone git://git.kernel.org/pub/scm/.../linux-2.6 my2.6
+               $ cd my2.6
+               $ git branch my2.6.14 v2.6.14   <b>(1)</b>
+               $ git checkout my2.6.14
+
+           <b>1. </b>This step and the next one could be combined into a single
+           step with "checkout -b my2.6.14 v2.6.14".
+
+       Delete an unneeded branch
+
+               $ git clone git://git.kernel.org/.../git.git my.git
+               $ cd my.git
+               $ git branch -d -r origin/todo origin/html origin/man   <b>(1)</b>
+               $ git branch -D test                                    <b>(2)</b>
+
+           <b>1. </b>Delete the remote-tracking branches "todo", "html" and "man".
+           The next <i>fetch</i> or <i>pull</i> will create them again unless you
+           configure them not to. See <a href="git-fetch.1.html">git-fetch(1)</a>.
+           <b>2. </b>Delete the "test" branch even if the "master" branch (or
+           whichever branch is currently checked out) does not have all
+           commits from the test branch.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If you are creating a branch that you want to checkout immediately,
+       it is easier to use the git checkout command with its <b>-b </b>option to
+       create a branch and check it out with a single command.
+
+       The options <b>--contains</b>, <b>--no-contains</b>, <b>--merged </b>and <b>--no-merged </b>serve
+       four related but different purposes:
+
+       ·   <b>--contains &lt;commit&gt; </b>is used to find all branches which will need
+           special attention if &lt;commit&gt; were to be rebased or amended,
+           since those branches contain the specified &lt;commit&gt;.
+
+       ·   <b>--no-contains &lt;commit&gt; </b>is the inverse of that, i.e. branches that
+           don’t contain the specified &lt;commit&gt;.
+
+       ·   <b>--merged </b>is used to find all branches which can be safely
+           deleted, since those branches are fully contained by HEAD.
+
+       ·   <b>--no-merged </b>is used to find branches which are candidates for
+           merging into HEAD, since those branches are not fully contained
+           by HEAD.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="git-check-ref-format.1.html">git-check-ref-format(1)</a>, <a href="git-fetch.1.html">git-fetch(1)</a>, <a href="git-remote.1.html">git-remote(1)</a>, <b>“Understanding</b>
+       <b>history: What is a branch?”</b><b></b>[1] in the Git User’s Manual.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. “Understanding history: What is a branch?”
+           file:///usr/local/share/doc/git/user-manual.html#what-is-a-branch
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.13.0.rc0.45.ge             04/24/2017                    GIT-BRANCH(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-checkout.1.html">git-checkout(1)</a>,&nbsp; 
+    <a href="git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="git-p4.1.html">git-p4(1)</a>,&nbsp; 
+    <a href="git-pull.1.html">git-pull(1)</a>,&nbsp; 
+    <a href="git-remote.1.html">git-remote(1)</a>,&nbsp; 
+    <a href="git-replace.1.html">git-replace(1)</a>,&nbsp; 
+    <a href="../man7/giteveryday.7.html">giteveryday(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

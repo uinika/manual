@@ -1,0 +1,272 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>deb822(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SYNTAX">SYNTAX</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">deb822(5)                        dpkg suite                        deb822(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       deb822 - Debian RFC822 control data format
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The package management system manipulates data represented in a
+       common format, known as <i>control data</i>, stored in <i>control files</i>.
+       Control files are used for source packages, binary packages and the
+       <b>.changes </b>files which control the installation of uploaded files
+       (<b>dpkg</b>'s internal databases are in a similar format).
+</pre>
+<h2><a id="SYNTAX" href="#SYNTAX"></a>SYNTAX  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A control file consists of one or more paragraphs of fields (the
+       paragraphs are also sometimes referred to as stanzas).  The
+       paragraphs are separated by empty lines.  Parsers may accept lines
+       consisting solely of U+0020 <b>SPACE </b>and U+0009 <b>TAB </b>as paragraph
+       separators, but control files should use empty lines.  Some control
+       files allow only one paragraph; others allow several, in which case
+       each paragraph usually refers to a different package.  (For example,
+       in source packages, the first paragraph refers to the source package,
+       and later paragraphs refer to binary packages generated from the
+       source.)  The ordering of the paragraphs in control files is
+       significant.
+
+       Each paragraph consists of a series of data fields.  Each field
+       consists of the field name followed by a colon (U+003A ‘<b>:</b>’), and then
+       the data/value associated with that field.  The field name is
+       composed of US-ASCII characters excluding control characters, space,
+       and colon (i.e., characters in the ranges U+0021 ‘<b>!</b>’ through U+0039
+       ‘<b>9</b>’, and U+003B ‘<b>;</b>’ through U+007E ‘<b>~</b>’, inclusive).  Field names must
+       not begin with the comment character (U+0023 ‘<b>#</b>’), nor with the
+       hyphen character (U+002D ‘<b>-</b>’).
+
+       The field ends at the end of the line or at the end of the last
+       continuation line (see below).  Horizontal whitespace (U+0020 <b>SPACE</b>
+       and U+0009 <b>TAB</b>) may occur immediately before or after the value and
+       is ignored there; it is conventional to put a single space after the
+       colon.  For example, a field might be:
+              Package: dpkg
+       the field name is <b>Package </b>and the field value <b>dpkg</b>.
+
+       Empty field values are only permitted in source package control files
+       (<i>debian/control</i>).  Such fields are ignored.
+
+       A paragraph must not contain more than one instance of a particular
+       field name.
+
+       There are three types of fields:
+
+       <b>simple </b>The field, including its value, must be a single line.
+              Folding of the field is not permitted.  This is the default
+              field type if the definition of the field does not specify a
+              different type.
+
+       <b>folded </b>The value of a folded field is a logical line that may span
+              several lines.  The lines after the first are called
+              continuation lines and must start with a U+0020 <b>SPACE </b>or a
+              U+0009 <b>TAB</b>.  Whitespace, including any newlines, is not
+              significant in the field values of folded fields.
+
+              This folding method is similar to RFC5322, allowing control
+              files that contain only one paragraph and no multiline fields
+              to be read by parsers written for RFC5322.
+
+       <b>multiline</b>
+              The value of a multiline field may comprise multiple
+              continuation lines.  The first line of the value, the part on
+              the same line as the field name, often has special
+              significance or may have to be empty.  Other lines are added
+              following the same syntax as the continuation lines of the
+              folded fields.  Whitespace, including newlines, is significant
+              in the values of multiline fields.
+
+       Whitespace must not appear inside names (of packages, architectures,
+       files or anything else) or version numbers, or between the characters
+       of multi-character version relationships.
+
+       The presence and purpose of a field, and the syntax of its value may
+       differ between types of control files.
+
+       Field names are not case-sensitive, but it is usual to capitalize the
+       field names using mixed case as shown below.  Field values are case-
+       sensitive unless the description of the field says otherwise.
+
+       Paragraph separators (empty lines) and lines consisting only of
+       U+0020 <b>SPACE </b>and U+0009 <b>TAB</b>, are not allowed within field values or
+       between fields.  Empty lines in field values are usually escaped by
+       representing them by a U+0020 <b>SPACE </b>followed by a dot (U+002E ‘<b>.</b>’).
+
+       Lines starting with U+0023 ‘<b>#</b>’, without any preceding whitespace are
+       comments lines that are only permitted in source package control
+       files (<i>debian/control</i>) and in <a href="deb-origin.5.html">deb-origin(5)</a> files.  These comment
+       lines are ignored, even between two continuation lines.  They do not
+       end logical lines.
+
+       All control files must be encoded in UTF-8.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>RFC822</b>, <b>RFC5322</b>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01                        deb822(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

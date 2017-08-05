@@ -1,0 +1,362 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>fuser(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#FILES">FILES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#RESTRICTIONS">RESTRICTIONS</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">FUSER(1)                        User Commands                       FUSER(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       fuser - identify processes using files or sockets
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>fuser </b>[<b>-fuv</b>] [<b>-a</b>|<b>-s</b>] [<b>-4</b>|<b>-6</b>] [<b>-c</b>|<b>-m</b>|<b>-n </b><i>space</i>] [ <b>-k </b>[<b>-i</b>] [<b>-M</b>] [<b>-w</b>]
+       [<b>-</b><i>SIGNAL</i>] ] <i>name</i> ...
+       <b>fuser </b>-l
+       <b>fuser </b>-V
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>fuser </b>displays the PIDs of processes using the specified files or
+       file systems.  In the default display mode, each file name is
+       followed by a letter denoting the type of access:
+
+              <b>c      </b>current directory.
+              <b>e      </b>executable being run.
+              <b>f      </b>open file.  <b>f </b>is omitted in default display mode.
+              <b>F      </b>open file for writing.  <b>F </b>is omitted in default display
+                     mode.
+              <b>r      </b>root directory.
+              <b>m      </b>mmap'ed file or shared library.
+              <b>.      </b>Placeholder, omitted in default display mode.
+
+       <b>fuser </b>returns a non-zero return code if none of the specified files
+       is accessed or in case of a fatal error.  If at least one access has
+       been found, <b>fuser </b>returns zero.
+
+       In order to look up processes using TCP and UDP sockets, the
+       corresponding name space has to be selected with the <b>-n </b>option. By
+       default <b>fuser </b>will look in both IPv6 and IPv4 sockets.  To change the
+       default, behavior, use the <b>-4 </b>and <b>-6 </b>options.  The socket(s) can be
+       specified by the local and remote port, and the remote address.  All
+       fields are optional, but commas in front of missing fields must be
+       present:
+
+       <b>[</b><i>lcl_port</i><b>][</b>,<b>[</b><i>rmt_host</i><b>][</b>,<b>[</b><i>rmt_port</i><b>]]]</b>
+
+       Either symbolic or numeric values can be used for IP addresses and
+       port numbers.
+
+       <b>fuser </b>outputs only the PIDs to stdout, everything else is sent to
+       stderr.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-a</b>, <b>--all</b>
+              Show all files specified on the command line.  By default,
+              only files that are accessed by at least one process are
+              shown.
+
+       <b>-c     </b>Same as -m option, used for POSIX compatibility.
+
+       <b>-f     </b>Silently ignored, used for POSIX compatibility.
+
+       <b>-k</b>, <b>--kill</b>
+              Kill processes accessing the file.  Unless changed with
+              <b>-</b><i>SIGNAL</i>, SIGKILL is sent.  An <b>fuser </b>process never kills
+              itself, but may kill other <b>fuser </b>processes.  The effective
+              user ID of the process executing <b>fuser </b>is set to its real user
+              ID before attempting to kill.
+
+       <b>-i</b>, <b>--interactive</b>
+              Ask the user for confirmation before killing a process. This
+              option is silently ignored if <b>-k </b>is not present too.
+
+       <b>-I</b>, <b>--inode</b>
+              For the name space <b>file </b>let all comparisions be based on the
+              inodes of the specified file(s) and never on the file names
+              even on network based file systems.
+
+       <b>-l</b>, <b>--list-signals</b>
+              List all known signal names.
+
+       <b>-m </b><i>NAME</i>, <b>--mount </b><i>NAME</i>
+              <i>NAME</i> specifies a file on a mounted file system or a block
+              device that is mounted.  All processes accessing files on that
+              file system are listed.  If a directory file is specified, it
+              is automatically changed to <i>NAME</i>/.  to use any file system
+              that might be mounted on that directory.
+
+       <b>-M</b>, <b>--ismountpoint</b>
+              Request will be fulfilled only if <i>NAME</i> specifies a mountpoint.
+              This is an invaluable seatbelt which prevents you from killing
+              the machine if <i>NAME</i> happens to not be a filesystem.
+
+       <b>-w     </b>Kill only processes which have write access.  This option is
+              silently ignored if <b>-k </b>is not present too.
+
+       <b>-n </b><i>SPACE</i>, <b>--namespace </b><i>SPACE</i>
+              Select a different name space.  The name spaces <b>file </b>(file
+              names, the default), <b>udp </b>(local UDP ports), and <b>tcp </b>(local TCP
+              ports) are supported.  For ports, either the port number or
+              the symbolic name can be specified.  If there is no ambiguity,
+              the shortcut notation <i>name</i><b>/</b><i>space</i> (e.g. <i>80</i><b>/</b><i>tcp</i>) can be used.
+
+       <b>-s</b>, <b>--silent</b>
+              Silent operation.  <b>-u </b>and <b>-v </b>are ignored in this mode.  <b>-a</b>
+              must not be used with <b>-s</b>.
+
+       <b>-</b><i>SIGNAL</i>
+              Use the specified signal instead of SIGKILL when killing
+              processes.  Signals can be specified either by name (e.g.
+              <b>-HUP</b>)<b>or</b>by number (e.g.  <b>-1</b>).  This option is silently ignored
+              if the <b>-k </b>option is not used.
+
+       <b>-u</b>, <b>--user</b>
+              Append the user name of the process owner to each PID.
+
+       <b>-v</b>, <b>--verbose</b>
+
+              Verbose mode.  Processes are shown in a <b>ps</b>-like style.  The
+              fields PID, USER and COMMAND are similar to <b>ps</b>.  ACCESS shows
+              how the process accesses the file.  Verbose mode will also
+              show when a particular file is being accessed as a mount
+              point, knfs export or swap file.  In this case <b>kernel </b>is shown
+              instead of the PID.
+
+       <b>-V</b>, <b>--version</b>
+              Display version information.
+
+       <b>-4</b>, <b>--ipv4</b>
+              Search only for IPv4 sockets.  This option must not be used
+              with the <b>-6 </b>option and only has an effect with the tcp and udp
+              namespaces.
+
+       <b>-6</b>, <b>--ipv6</b>
+              Search only for IPv6 sockets.  This option must not be used
+              with the <b>-4 </b>option and only has an effect with the tcp and udp
+              namespaces.
+
+       <b>-      </b>Reset all options and set the signal back to SIGKILL.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /proc  location of the proc file system
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>fuser -km /home</b>
+              kills all processes accessing the file system /home in any
+              way.
+
+       <b>if fuser -s /dev/ttyS1; then :; else </b><i>something</i><b>; fi</b>
+              invokes <i>something</i> if no other process is using /dev/ttyS1.
+
+       <b>fuser telnet/tcp</b>
+              shows all processes at the (local) TELNET port.
+</pre>
+<h2><a id="RESTRICTIONS" href="#RESTRICTIONS"></a>RESTRICTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Processes accessing the same file or file system several times in the
+       same way are only shown once.
+
+       If the same object is specified several times on the command line,
+       some of those entries may be ignored.
+
+       <b>fuser </b>may only be able to gather partial information unless run with
+       privileges.  As a consequence, files opened by processes belonging to
+       other users may not be listed and executables may be classified as
+       mapped only.
+
+       <b>fuser </b>cannot report on any processes that it doesn't have permission
+       to look at the file descriptor table for.  The most common time this
+       problem occurs is when looking for TCP or UDP sockets when running
+       <b>fuser </b>as a non-root user.  In this case <b>fuser </b>will report no access.
+
+       Installing <b>fuser </b>SUID root will avoid problems associated with
+       partial information, but may be undesirable for security and privacy
+       reasons.
+
+       <b>udp </b>and <b>tcp </b>name spaces, and UNIX domain sockets can't be searched
+       with kernels older than 1.3.78.
+
+       Accesses by the kernel are only shown with the <b>-v </b>option.
+
+       The <b>-k </b>option only works on processes.  If the user is the kernel,
+       <b>fuser </b>will print an advice, but take no action beyond that.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       fuser -m /dev/sgX will show (or kill with the -k flag) all processes,
+       even if you don't have that device configured.  There may be other
+       devices it does this for too.
+
+       The mount -m option will match any file within the same device as the
+       specified file, use the -M option as well if you mean to specify only
+       the mount point.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="kill.1.html">kill(1)</a>, <a href="killall.1.html">killall(1)</a>, <a href="../man8/lsof.8.html">lsof(8)</a>, <a href="pkill.1.html">pkill(1)</a>, <a href="ps.1.html">ps(1)</a>, <a href="../man2/kill.2.html">kill(2)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>psmisc</i> (Small utilities that use the /proc
+       filesystem) project.  Information about the project can be found at
+       ⟨<a href="https://gitlab.com/psmisc/psmisc">https://gitlab.com/psmisc/psmisc</a>⟩.  If you have a bug report for
+       this manual page, see ⟨<a href="https://gitlab.com/psmisc/psmisc/issues">https://gitlab.com/psmisc/psmisc/issues</a>⟩.
+       This page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://gitlab.com/psmisc/psmisc.git">https://gitlab.com/psmisc/psmisc.git</a>⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">psmisc                           2016-04-04                         FUSER(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="killall.1.html">killall(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

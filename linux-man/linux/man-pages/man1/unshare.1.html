@@ -1,0 +1,384 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>unshare(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">UNSHARE(1)                      User Commands                     UNSHARE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       unshare - run program with some namespaces unshared from parent
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>unshare </b>[options] [<i>program</i> [<i>arguments</i>]]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Unshares the indicated namespaces from the parent process and then
+       executes the specified <i>program</i>. If <i>program</i> is not given, then
+       ``${SHELL}'' is run (default: /bin/sh).
+
+       The namespaces can optionally be made persistent by bind mounting
+       /proc/<i>pid</i>/ns/<i>type</i> files to a filesystem path and entered with
+       <a href="nsenter.1.html">nsenter(1)</a> even after the <i>program</i> terminates (except PID namespaces
+       where permanently running init process is required).  Once a
+       persistent namespace is no longer needed, it can be unpersisted with
+       <a href="../man8/umount.8.html">umount(8)</a>.  See the <b>EXAMPLES </b>section for more details.
+
+       The namespaces to be unshared are indicated via options.  Unshareable
+       namespaces are:
+
+       <b>mount namespace</b>
+              Mounting and unmounting filesystems will not affect the rest
+              of the system, except for filesystems which are explicitly
+              marked as shared (with <b>mount --make-shared</b>; see
+              <i>/proc/self/mountinfo</i> or <b>findmnt -o+PROPAGATION </b>for the <b>shared</b>
+              flags).  For further details, see <a href="../man7/mount_namespaces.7.html">mount_namespaces(7)</a> and the
+              discussion of the <b>CLONE_NEWNS </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+
+              <b>unshare </b>since util-linux version 2.27 automatically sets
+              propagation to <b>private </b>in a new mount namespace to make sure
+              that the new namespace is really unshared.  It's possible to
+              disable this feature with option <b>--propagation unchanged</b>.
+              Note that <b>private </b>is the kernel default.
+
+       <b>UTS namespace</b>
+              Setting hostname or domainname will not affect the rest of the
+              system.  For further details, see <a href="../man7/namespaces.7.html">namespaces(7)</a> and the
+              discussion of the <b>CLONE_NEWUTS </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>IPC namespace</b>
+              The process will have an independent namespace for POSIX
+              message queues as well as System V message queues, semaphore
+              sets and shared memory segments.  For further details, see
+              <a href="../man7/namespaces.7.html">namespaces(7)</a> and the discussion of the <b>CLONE_NEWIPC </b>flag in
+              <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>network namespace</b>
+              The process will have independent IPv4 and IPv6 stacks, IP
+              routing tables, firewall rules, the <i>/proc/net</i> and
+              <i>/sys/class/net</i> directory trees, sockets, etc.  For further
+              details, see <a href="../man7/namespaces.7.html">namespaces(7)</a> and the discussion of the
+              <b>CLONE_NEWNET </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>PID namespace</b>
+              Children will have a distinct set of PID-to-process mappings
+              from their parent.  For further details, see <a href="../man7/pid_namespaces.7.html">pid_namespaces(7)</a>
+              and the discussion of the <b>CLONE_NEWPID </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>cgroup namespace</b>
+              The process will have a virtualized view of <i>/proc/self/cgroup</i>,
+              and new cgroup mounts will be rooted at the namespace cgroup
+              root.  For further details, see <a href="../man7/cgroup_namespaces.7.html">cgroup_namespaces(7)</a> and the
+              discussion of the <b>CLONE_NEWCGROUP </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>user namespace</b>
+              The process will have a distinct set of UIDs, GIDs and
+              capabilities.  For further details, see <a href="../man7/user_namespaces.7.html">user_namespaces(7)</a> and
+              the discussion of the <b>CLONE_NEWUSER </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-i</b>, <b>--ipc</b>[<b>=</b><i>file</i>]
+              Unshare the IPC namespace.  If <i>file</i> is specified, then a
+              persistent namespace is created by a bind mount.
+
+       <b>-m</b>, <b>--mount</b>[<b>=</b><i>file</i>]
+              Unshare the mount namespace.  If <i>file</i> is specified, then a
+              persistent namespace is created by a bind mount.  Note that
+              <i>file</i> has to be located on a filesystem with the propagation
+              flag set to <b>private</b>.  Use the command <b>findmnt -o+PROPAGATION</b>
+              when not sure about the current setting.  See also the
+              examples below.
+
+       <b>-n</b>, <b>--net</b>[<b>=</b><i>file</i>]
+              Unshare the network namespace.  If <i>file</i> is specified, then a
+              persistent namespace is created by a bind mount.
+
+       <b>-p</b>, <b>--pid</b>[<b>=</b><i>file</i>]
+              Unshare the PID namespace.  If <i>file</i> is specified then
+              persistent namespace is created by a bind mount.  See also the
+              <b>--fork </b>and <b>--mount-proc </b>options.
+
+       <b>-u</b>, <b>--uts</b>[<b>=</b><i>file</i>]
+              Unshare the UTS namespace.  If <i>file</i> is specified, then a
+              persistent namespace is created by a bind mount.
+
+       <b>-U</b>, <b>--user</b>[<b>=</b><i>file</i>]
+              Unshare the user namespace.  If <i>file</i> is specified, then a
+              persistent namespace is created by a bind mount.
+
+       <b>-C</b>, <b>--cgroup</b>[=<i>file</i>]
+              Unshare the cgroup namespace. If <i>file</i> is specified then
+              persistent namespace is created by bind mount.
+
+       <b>-f</b>, <b>--fork</b>
+              Fork the specified <i>program</i> as a child process of <b>unshare</b>
+              rather than running it directly.  This is useful when creating
+              a new PID namespace.
+
+       <b>--mount-proc</b>[<b>=</b><i>mountpoint</i>]
+              Just before running the program, mount the proc filesystem at
+              <i>mountpoint</i> (default is /proc).  This is useful when creating a
+              new PID namespace.  It also implies creating a new mount
+              namespace since the /proc mount would otherwise mess up
+              existing programs on the system.  The new proc filesystem is
+              explicitly mounted as private (with MS_PRIVATE|MS_REC).
+
+       <b>-r</b>, <b>--map-root-user</b>
+              Run the program only after the current effective user and
+              group IDs have been mapped to the superuser UID and GID in the
+              newly created user namespace.  This makes it possible to
+              conveniently gain capabilities needed to manage various
+              aspects of the newly created namespaces (such as configuring
+              interfaces in the network namespace or mounting filesystems in
+              the mount namespace) even when run unprivileged.  As a mere
+              convenience feature, it does not support more sophisticated
+              use cases, such as mapping multiple ranges of UIDs and GIDs.
+              This option implies <b>--setgroups=deny</b>.
+
+       <b>--propagation private</b>|<b>shared</b>|<b>slave</b>|<b>unchanged</b>
+              Recursively set the mount propagation flag in the new mount
+              namespace.  The default is to set the propagation to <i>private</i>.
+              It is possible to disable this feature with the argument
+              <b>unchanged</b>.  The option is silently ignored when the mount
+              namespace (<b>--mount</b>) is not requested.
+
+       <b>--setgroups allow</b>|<b>deny</b>
+              Allow or deny the <a href="../man2/setgroups.2.html">setgroups(2)</a> system call in a user
+              namespace.
+
+              To be able to call <a href="../man2/setgroups.2.html">setgroups(2)</a>, the calling process must at
+              least have CAP_SETGID.  But since Linux 3.19 a further
+              restriction applies: the kernel gives permission to call
+              <a href="../man2/setgroups.2.html">setgroups(2)</a> only after the GID map (<b>/proc/</b><i>pid</i><b>/gid_map</b>) has
+              been set.  The GID map is writable by root when <a href="../man2/setgroups.2.html">setgroups(2)</a>
+              is enabled (i.e. <b>allow</b>, the default), and the GID map becomes
+              writable by unprivileged processes when <a href="../man2/setgroups.2.html">setgroups(2)</a> is
+              permanently disabled (with <b>deny</b>).
+
+       <b>-V</b>, <b>--version</b>
+              Display version information and exit.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The proc and sysfs filesystems mounting as root in a user namespace
+       have to be restricted so that a less privileged user can not get more
+       access to sensitive files that a more privileged user made
+       unavailable. In short the rule for proc and sysfs is as close to a
+       bind mount as possible.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b># unshare --fork --pid --mount-proc readlink /proc/self</b>
+       1
+              Establish a PID namespace, ensure we're PID 1 in it against a
+              newly mounted procfs instance.
+
+       <b>$ unshare --map-root-user --user sh -c whoami</b>
+       root
+              Establish a user namespace as an unprivileged user with a root
+              user within it.
+
+       <b># touch /root/uts-ns</b>
+       <b># unshare --uts=/root/uts-ns hostname FOO</b>
+       <b># nsenter --uts=/root/uts-ns hostname</b>
+       FOO
+       <b># umount /root/uts-ns</b>
+              Establish a persistent UTS namespace, and modify the hostname.
+              The namespace is then entered with <b>nsenter</b>.  The namespace is
+              destroyed by unmounting the bind reference.
+
+       <b># mount --bind /root/namespaces /root/namespaces</b>
+       <b># mount --make-private /root/namespaces</b>
+       <b># touch /root/namespaces/mnt</b>
+       <b># unshare --mount=/root/namespaces/mnt</b>
+              Establish a persistent mount namespace referenced by the bind
+              mount /root/namespaces/mnt.  This example shows a portable
+              solution, because it makes sure that the bind mount is created
+              on a shared filesystem.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/clone.2.html">clone(2)</a>, <a href="../man2/unshare.2.html">unshare(2)</a>, <a href="../man7/namespaces.7.html">namespaces(7)</a>, <a href="../man8/mount.8.html">mount(8)</a>
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Mikhail Gusarov ⟨dottedmag@dottedmag.net⟩
+       Karel Zak ⟨kzak@redhat.com⟩
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The unshare command is part of the util-linux package and is
+       available from <a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                      February 2016                     UNSHARE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/unshare.2.html">unshare(2)</a>,&nbsp; 
+    <a href="../man7/cgroup_namespaces.7.html">cgroup_namespaces(7)</a>,&nbsp; 
+    <a href="../man7/mount_namespaces.7.html">mount_namespaces(7)</a>,&nbsp; 
+    <a href="../man7/namespaces.7.html">namespaces(7)</a>,&nbsp; 
+    <a href="../man8/findmnt.8.html">findmnt(8)</a>,&nbsp; 
+    <a href="../man8/lsns.8.html">lsns(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

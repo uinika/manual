@@ -1,0 +1,370 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>abidw(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#ALTERNATE_DEBUG_INFO_FILES">ALTERNATE&nbsp;DEBUG&nbsp;INFO&nbsp;FILES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COPYRIGHT">COPYRIGHT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ABIDW(1)                         Libabigail                         ABIDW(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       abidw - serialize the ABI of an ELF file ====== abidw ======
+
+       abidw reads a shared library in <i>ELF</i> format and emits an XML represen‐
+       tation of its ABI to standard  output.   The  emitted  representation
+       includes all the globally defined functions and variables, along with
+       a complete representation of their types.  It also includes a  repre‐
+       sentation of the globally defined ELF symbols of the file.  The input
+       shared library must contain associated  debug  information  in  <i>DWARF</i>
+       format.
+
+       When  given  the  <b>--linux-tree </b>option, this program can also handle a
+       Linux kernel tree.  That is, a directory tree that contains both  the
+       vmlinux  binary  and  Linux  kernel modules.  It analyses those Linux
+       kernel binaries and emits an  XML  representation  of  the  interface
+       between the kernel and its module, to standard output.  In this case,
+       we don't call it an ABI, but a KMI (Kernel  Module  Interface).   The
+       emitted  KMI  includes  all  the globally defined functions and vari‐
+       ables, along with a complete  representation  of  their  types.   The
+       input  binaries  must  contain  associated debug information in <i>DWARF</i>
+       format.
+
+          abidw [options] [&lt;path-to-elf-file&gt;]
+
+          · <b>--help | -h</b>
+
+            Display a short help about the command and exit.
+
+          · <i>--version | -v</i>
+
+            Display the version of the program and exit.
+
+          · <b>--debug-info-dir | -d </b>&lt;<i>dir-path</i>&gt;
+
+            In cases where the debug info for <i>path-to-elf-file</i> is in a sepa‐
+            rate  file  that  is located in a non-standard place, this tells
+            <b>abidw </b>where to look for that debug info file.
+
+            Note that <i>dir-path</i> must point to the root directory under  which
+            the  debug information is arranged in a tree-like manner.  Under
+            Red   Hat   based   systems,   that   directory    is    usually
+            <b>&lt;root&gt;/usr/lib/debug</b>.
+
+            Note  that this option is not mandatory for split debug informa‐
+            tion installed by your system's  package  manager  because  then
+            <b>abidw </b>knows where to find it.
+
+          · <b>--out-file </b>&lt;<i>file-path</i>&gt;
+
+            This  option  instructs  <b>abidw </b>to emit the XML representation of
+            <i>path-to-elf-file</i> into the file <i>file-path</i>, rather  than  emitting
+            it to its standard output.
+
+          · <b>--noout</b>
+
+            This  option  instructs <b>abidw </b>to not emit the XML representation
+            of the ABI.  So it only reads the  ELF  and  debug  information,
+            builds  the  internal representation of the ABI and exits.  This
+            option is usually useful for debugging purposes.
+
+          · <b>--no-corpus-path</b>
+
+            Do not emit the path attribute for the ABI corpus.
+
+          · <b>--suppressions | suppr </b>&lt;<i>path-to-suppression-specifications-file</i>&gt;
+
+            Use a suppression specification file located at <i>path-to-suppres‐</i>
+            <i>sion-specifications-file</i>.  Note that this option can appear mul‐
+            tiple times on the command line.  In that case, all of the  pro‐
+            vided  suppression  specification  files are taken into account.
+            ABI artifacts matched by the suppression specifications are sup‐
+            pressed from the output of this tool.
+
+          · <b>--kmi-whitelist | -kaw </b>&lt;<i>path-to-whitelist</i>&gt;
+
+            When  analyzing a Linux kernel binary, this option points to the
+            white list of names of ELF symbols of  functions  and  variables
+            which  ABI  must  be written out.  That white list is called a "
+            Kernel Module Interface white list".  This is  because  for  the
+            Kernel,  we  don't  talk about the ABI; we rather talk about the
+            interface between the Kernel and its module. Hence the term  <b>KMI</b>
+            rather than <b>ABI</b>
+
+            Any  other function or variable which ELF symbol are not present
+            in that white list will not be considered  by  the  KMI  writing
+            process.
+
+            If  this option is not provided -- thus if no white list is pro‐
+            vided -- then the entire KMI, that is, all publicly defined  and
+            exported  functions  and  global  variables  by the Linux Kernel
+            binaries is emitted.
+
+          · <b>--linux-tree | --lt</b>
+
+            Make <b>abidw </b>to consider the input path as a path to  a  directory
+            containing  the  vmlinux  binary as several kernel modules bina‐
+            ries.  In that case, this program emits  the  representation  of
+            the Kernel Module Interface (KMI) on the standard output.
+
+            Below is an example of usage of <b>abidw </b>on a Linux Kernel tree.
+
+            First,  checkout  a Linux kernel source tree and build it.  Then
+            install the kernel modules in a directory somewhere.   Copy  the
+            vmlinux  binary into that directory too.  And then serialize the
+            KMI of that kernel to disk, using <b>abidw</b>:
+
+                $ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+                $ cd linux &amp;&amp; git checkout v4.5
+                $ make allyesconfig all
+                $ mkdir build-output
+                $ make INSTALL_MOD_PATH=./build-output modules_install
+                $ cp vmlinux build-output/modules/4.5.0
+                $ abidw --linux-tree build-output/modules/4.5.0 &gt; build-output/linux-4.5.0.kmi
+
+          · <b>--headers-dir | --hd </b>&lt;headers-directory-path-1&gt;
+
+            Specifies where to find the public headers of the  first  shared
+            library  that the tool has to consider.  The tool will thus fil‐
+            ter out types that are not defined in public headers.
+
+          · <b>--no-linux-kernel-mode</b>
+
+            Without this option, if abipkgiff detects that the  binaries  it
+            is  looking at are Linux Kernel binaries (either vmlinux or mod‐
+            ules) then it only considers functions and variables  which  ELF
+            symbols are listed in the __ksymtab and __ksymtab_gpl sections.
+
+            With  this option, abipkgdiff considers the binary as a non-spe‐
+            cial ELF binary.  It  thus  considers  functions  and  variables
+            which are defined and exported in the ELF sense.
+
+          · <b>--check-alternate-debug-info </b>&lt;<i>elf-path</i>&gt;
+
+            If  the debug info for the file <i>elf-path</i> contains a reference to
+            an <i>alternate debug info</i> file, <b>abidw </b>checks that it can find that
+            alternate  debug info file.  In that case, it emits a meaningful
+            success message mentioning the full path to the alternate  debug
+            info file found.  Otherwise, it emits an error code.
+
+          · <b>--no-show-locs</b>
+              Do  not  show  information  about  where  in the <i>second shared</i>
+              <i>library</i> the respective type was changed.
+
+          · <b>--check-alternate-debug-info-base-name </b>&lt;<i>elf-path</i>&gt;
+
+            Like <b>--check-alternate-debug-info</b>, but in the  success  message,
+            only  mention the base name of the debug info file; not its full
+            path.
+
+          · <b>--load-all-types</b>
+
+            By default, <b>libabigail </b>(and thus <b>abidw</b>) only  loads  types  that
+            are reachable from functions and variables declarations that are
+            publicly defined and exported by  the  binary.   So  only  those
+            types  are  present in the output of <b>abidw</b>.  This option however
+            makes <b>abidw </b>load <i>all</i> the types defined  in  the  binaries,  even
+            those that are not reachable from public declarations.
+
+          · <b>--abidiff</b>
+              Load  the  ABI of the ELF binary given in argument, save it in
+              libabigail's XML format in a temporary file; read the ABI from
+              the  temporary XML file and compare the ABI that has been read
+              back against the ABI of the ELF binary given in argument.  The
+              ABIs should compare equal.  If they don't, the program emits a
+              diagnostic and exits with a non-zero code.
+
+              This is a debugging and sanity check option.
+
+          · <b>--annotate</b>
+              Annotate the ABIXML output with comments above most  elements.
+              The comments are made of the pretty-printed form types, decla‐
+              ration or even ELF symbols.  The purpose is to make the ABIXML
+              output  more  human-readable for debugging or documenting pur‐
+              poses.
+
+          · <b>--stats</b>
+
+            Emit statistics about various internal things.
+
+          · <b>--verbose</b>
+
+            Emit verbose logs about the progress of  miscellaneous  internal
+            things.
+</pre>
+<h2><a id="ALTERNATE_DEBUG_INFO_FILES" href="#ALTERNATE_DEBUG_INFO_FILES"></a>ALTERNATE DEBUG INFO FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       As of the version 4 of the DWARF specification, <i>Alternate debug</i>
+       <i>information</i> is a <i>GNU</i> extension to the DWARF specification.  It has
+       however been proposed for inclusion into the upcoming version 5 of
+       the DWARF standard.  You can read more about the GNU extensions to
+       the DWARF standard <i>here</i>.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Dodji Seketeli
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       2014-2016, Red Hat, Inc.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>libabigail</i> (ABI Generic Analysis and
+       Instrumentation Library) project.  Information about the project can
+       be found at ⟨<a href="https://sourceware.org/libabigail/">https://sourceware.org/libabigail/</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://sourceware.org/bugzilla/enter_bug.cgi?product=libabigail">http://sourceware.org/bugzilla/enter_bug.cgi?product=libabigail</a>⟩.
+       This page was obtained from the project's upstream Git repository 
+       ⟨git://sourceware.org/git/libabigail.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                Jul 05, 2017                        ABIDW(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

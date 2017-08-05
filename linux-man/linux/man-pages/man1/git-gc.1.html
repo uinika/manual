@@ -1,0 +1,345 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-gc(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#CONFIGURATION">CONFIGURATION</a> | <a href="#NOTES">NOTES</a> | <a href="#HOOKS">HOOKS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-GC(1)                        Git Manual                        GIT-GC(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-gc - Cleanup unnecessary files and optimize the local repository
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git gc</i> [--aggressive] [--auto] [--quiet] [--prune=&lt;date&gt; | --no-prune] [--force]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Runs a number of housekeeping tasks within the current repository,
+       such as compressing file revisions (to reduce disk space and increase
+       performance) and removing unreachable objects which may have been
+       created from prior invocations of <i>git add</i>.
+
+       Users are encouraged to run this task on a regular basis within each
+       repository to maintain good disk space utilization and good operating
+       performance.
+
+       Some git commands may automatically run <i>git gc</i>; see the <b>--auto </b>flag
+       below for details. If you know what you’re doing and all you want is
+       to disable this behavior permanently without further considerations,
+       just do:
+
+           $ git config --global gc.auto 0
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       --aggressive
+           Usually <i>git gc</i> runs very quickly while providing good disk space
+           utilization and performance. This option will cause <i>git gc</i> to
+           more aggressively optimize the repository at the expense of
+           taking much more time. The effects of this optimization are
+           persistent, so this option only needs to be used occasionally;
+           every few hundred changesets or so.
+
+       --auto
+           With this option, <i>git gc</i> checks whether any housekeeping is
+           required; if not, it exits without performing any work. Some git
+           commands run <b>git gc --auto </b>after performing operations that could
+           create many loose objects.
+
+           Housekeeping is required if there are too many loose objects or
+           too many packs in the repository. If the number of loose objects
+           exceeds the value of the <b>gc.auto </b>configuration variable, then all
+           loose objects are combined into a single pack using <b>git repack -d</b>
+           <b>-l</b>. Setting the value of <b>gc.auto </b>to 0 disables automatic packing
+           of loose objects.
+
+           If the number of packs exceeds the value of <b>gc.autoPackLimit</b>,
+           then existing packs (except those marked with a <b>.keep </b>file) are
+           consolidated into a single pack by using the <b>-A </b>option of <i>git</i>
+           <i>repack</i>. Setting <b>gc.autoPackLimit </b>to 0 disables automatic
+           consolidation of packs.
+
+       --prune=&lt;date&gt;
+           Prune loose objects older than date (default is 2 weeks ago,
+           overridable by the config variable <b>gc.pruneExpire</b>). --prune=all
+           prunes loose objects regardless of their age and increases the
+           risk of corruption if another process is writing to the
+           repository concurrently; see "NOTES" below. --prune is on by
+           default.
+
+       --no-prune
+           Do not prune any loose objects.
+
+       --quiet
+           Suppress all progress reports.
+
+       --force
+           Force <b>git gc </b>to run even if there may be another <b>git gc </b>instance
+           running on this repository.
+</pre>
+<h2><a id="CONFIGURATION" href="#CONFIGURATION"></a>CONFIGURATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The optional configuration variable <b>gc.reflogExpire </b>can be set to
+       indicate how long historical entries within each branch’s reflog
+       should remain available in this repository. The setting is expressed
+       as a length of time, for example <i>90 days</i> or <i>3 months</i>. It defaults to
+       <i>90 days</i>.
+
+       The optional configuration variable <b>gc.reflogExpireUnreachable </b>can be
+       set to indicate how long historical reflog entries which are not part
+       of the current branch should remain available in this repository.
+       These types of entries are generally created as a result of using <b>git</b>
+       <b>commit --amend </b>or <b>git rebase </b>and are the commits prior to the amend
+       or rebase occurring. Since these changes are not part of the current
+       project most users will want to expire them sooner. This option
+       defaults to <i>30 days</i>.
+
+       The above two configuration variables can be given to a pattern. For
+       example, this sets non-default expiry values only to remote-tracking
+       branches:
+
+           [gc "refs/remotes/*"]
+                   reflogExpire = never
+                   reflogExpireUnreachable = 3 days
+
+       The optional configuration variable <b>gc.rerereResolved </b>indicates how
+       long records of conflicted merge you resolved earlier are kept. This
+       defaults to 60 days.
+
+       The optional configuration variable <b>gc.rerereUnresolved </b>indicates how
+       long records of conflicted merge you have not resolved are kept. This
+       defaults to 15 days.
+
+       The optional configuration variable <b>gc.packRefs </b>determines if <i>git gc</i>
+       runs <i>git pack-refs</i>. This can be set to "notbare" to enable it within
+       all non-bare repos or it can be set to a boolean value. This defaults
+       to true.
+
+       The optional configuration variable ‘gc.aggressiveWindow` controls
+       how much time is spent optimizing the delta compression of the
+       objects in the repository when the --aggressive option is specified.
+       The larger the value, the more time is spent optimizing the delta
+       compression. See the documentation for the --window’ option in
+       <a href="git-repack.1.html">git-repack(1)</a> for more details. This defaults to 250.
+
+       Similarly, the optional configuration variable <b>gc.aggressiveDepth</b>
+       controls --depth option in <a href="git-repack.1.html">git-repack(1)</a>. This defaults to 50.
+
+       The optional configuration variable <b>gc.pruneExpire </b>controls how old
+       the unreferenced loose objects have to be before they are pruned. The
+       default is "2 weeks ago".
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git gc</i> tries very hard not to delete objects that are referenced
+       anywhere in your repository. In particular, it will keep not only
+       objects referenced by your current set of branches and tags, but also
+       objects referenced by the index, remote-tracking branches, refs saved
+       by <i>git filter-branch</i> in refs/original/, or reflogs (which may
+       reference commits in branches that were later amended or rewound). If
+       you are expecting some objects to be deleted and they aren’t, check
+       all of those locations and decide whether it makes sense in your case
+       to remove those references.
+
+       On the other hand, when <i>git gc</i> runs concurrently with another
+       process, there is a risk of it deleting an object that the other
+       process is using but hasn’t created a reference to. This may just
+       cause the other process to fail or may corrupt the repository if the
+       other process later adds a reference to the deleted object. Git has
+       two features that significantly mitigate this problem:
+
+        1. Any object with modification time newer than the <b>--prune </b>date is
+           kept, along with everything reachable from it.
+
+        2. Most operations that add an object to the database update the
+           modification time of the object if it is already present so that
+           #1 applies.
+
+       However, these features fall short of a complete solution, so users
+       who run commands concurrently have to live with some risk of
+       corruption (which seems to be low in practice) unless they turn off
+       automatic garbage collection with <i>git config gc.auto 0</i>.
+</pre>
+<h2><a id="HOOKS" href="#HOOKS"></a>HOOKS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>git gc --auto</i> command will run the <i>pre-auto-gc</i> hook. See
+       <a href="../man5/githooks.5.html">githooks(5)</a> for more information.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="git-prune.1.html">git-prune(1)</a> <a href="git-reflog.1.html">git-reflog(1)</a> <a href="git-repack.1.html">git-repack(1)</a> <a href="git-rerere.1.html">git-rerere(1)</a>
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.12.0.244.g625568           03/12/2017                        GIT-GC(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-clone.1.html">git-clone(1)</a>,&nbsp; 
+    <a href="git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="git-fetch.1.html">git-fetch(1)</a>,&nbsp; 
+    <a href="git-p4.1.html">git-p4(1)</a>,&nbsp; 
+    <a href="git-pack-objects.1.html">git-pack-objects(1)</a>,&nbsp; 
+    <a href="git-prune.1.html">git-prune(1)</a>,&nbsp; 
+    <a href="git-reflog.1.html">git-reflog(1)</a>,&nbsp; 
+    <a href="git-repack.1.html">git-repack(1)</a>,&nbsp; 
+    <a href="../man5/gitrepository-layout.5.html">gitrepository-layout(5)</a>,&nbsp; 
+    <a href="../man7/gitnamespaces.7.html">gitnamespaces(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,315 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd-detect-virt(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD-DETECT-VIRT(1)       systemd-detect-virt      SYSTEMD-DETECT-VIRT(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-detect-virt - Detect execution in a virtualized environment
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-detect-virt </b>[OPTIONS...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-detect-virt </b>detects execution in a virtualized environment.
+       It identifies the virtualization technology and can distinguish full
+       machine virtualization from container virtualization.
+       systemd-detect-virt exits with a return value of 0 (success) if a
+       virtualization technology is detected, and non-zero (error)
+       otherwise. By default, any type of virtualization is detected, and
+       the options <b>--container </b>and <b>--vm </b>can be used to limit what types of
+       virtualization are detected.
+
+       When executed without <b>--quiet </b>will print a short identifier for the
+       detected virtualization technology. The following technologies are
+       currently identified:
+
+       <b>Table 1. Known virtualization technologies (both VM, i.e. full</b>
+       <b>hardware virtualization, and container, i.e. shared kernel</b>
+       <b>virtualization)</b>
+       ┌──────────┬────────────────┬─────────────────────┐
+       │<b>Type      </b>│ <b>ID             </b>│ <b>Product             </b>│
+       ├──────────┼────────────────┼─────────────────────┤
+       │VM        │ <i>qemu</i>           │ QEMU software       │
+       │          │                │ virtualization,     │
+       │          │                │ without KVM         │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>kvm</i>            │ Linux KVM kernel    │
+       │          │                │ virtual machine,    │
+       │          │                │ with whatever       │
+       │          │                │ software, except    │
+       │          │                │             Oracle  │
+       │          │                │ Virtualbox          │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>zvm</i>            │ s390 z/VM           │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>vmware</i>         │ VMware Workstation  │
+       │          │                │ or Server, and      │
+       │          │                │ related products    │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>microsoft</i>      │ Hyper-V, also known │
+       │          │                │ as Viridian or      │
+       │          │                │ Windows Server      │
+       │          │                │ Virtualization      │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>oracle</i>         │ Oracle VM           │
+       │          │                │ VirtualBox          │
+       │          │                │ (historically       │
+       │          │                │ marketed by innotek │
+       │          │                │ and Sun             │
+       │          │                │ Microsystems),      │
+       │          │                │             for     │
+       │          │                │ legacy and KVM      │
+       │          │                │ hypervisor          │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>xen</i>            │ Xen hypervisor      │
+       │          │                │ (only domU, not     │
+       │          │                │ dom0)               │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>bochs</i>          │ Bochs Emulator      │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>uml</i>            │ User-mode Linux     │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>parallels</i>      │ Parallels Desktop,  │
+       │          │                │ Parallels Server    │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>bhyve</i>          │ bhyve, FreeBSD      │
+       │          │                │ hypervisor          │
+       ├──────────┼────────────────┼─────────────────────┤
+       │Container │ <i>openvz</i>         │ OpenVZ/Virtuozzo    │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>lxc</i>            │ Linux container     │
+       │          │                │ implementation by   │
+       │          │                │ LXC                 │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>lxc-libvirt</i>    │ Linux container     │
+       │          │                │ implementation by   │
+       │          │                │ libvirt             │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>systemd-nspawn</i> │ systemd's minimal   │
+       │          │                │ container           │
+       │          │                │ implementation, see │
+       │          │                │ <a href="systemd-nspawn.1.html">systemd-nspawn(1)</a>   │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>docker</i>         │ Docker container    │
+       │          │                │ manager             │
+       │          ├────────────────┼─────────────────────┤
+       │          │ <i>rkt</i>            │ rkt app container   │
+       │          │                │ runtime             │
+       └──────────┴────────────────┴─────────────────────┘
+
+       If multiple virtualization solutions are used, only the "innermost"
+       is detected and identified. That means if both machine and container
+       virtualization are used in conjunction, only the latter will be
+       identified (unless <b>--vm </b>is passed).
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following options are understood:
+
+       <b>-c</b>, <b>--container</b>
+           Only detects container virtualization (i.e. shared kernel
+           virtualization).
+
+       <b>-v</b>, <b>--vm</b>
+           Only detects hardware virtualization).
+
+       <b>-r</b>, <b>--chroot</b>
+           Detect whether invoked in a <a href="../man2/chroot.2.html">chroot(2)</a> environment. In this mode,
+           no output is written, but the return value indicates whether the
+           process was invoked in a <b>chroot() </b>environment or not.
+
+       <b>--private-users</b>
+           Detect whether invoked in a user namespace. In this mode, no
+           output is written, but the return value indicates whether the
+           process was invoked inside of a user namespace or not. See
+           <a href="../man7/user_namespaces.7.html">user_namespaces(7)</a> for more information.
+
+       <b>-q</b>, <b>--quiet</b>
+           Suppress output of the virtualization technology identifier.
+
+       <b>-h</b>, <b>--help</b>
+           Print a short help text and exit.
+
+       <b>--version</b>
+           Print a short version string and exit.
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If a virtualization technology is detected, 0 is returned, a non-zero
+       code otherwise.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="systemd.1.html">systemd(1)</a>, <a href="systemd-nspawn.1.html">systemd-nspawn(1)</a>, <a href="../man2/chroot.2.html">chroot(2)</a>, <a href="../man7/namespaces.7.html">namespaces(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                           SYSTEMD-DETECT-VIRT(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

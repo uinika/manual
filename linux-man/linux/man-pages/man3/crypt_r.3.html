@@ -1,0 +1,312 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>crypt(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">CRYPT(3)                  Linux Programmer's Manual                 CRYPT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       crypt, crypt_r - password and data encryption
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#define _XOPEN_SOURCE       </b>/* See feature_test_macros(7) */
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>char *crypt(const char *</b><i>key</i><b>, const char *</b><i>salt</i><b>);</b>
+
+       <b>#define _GNU_SOURCE         </b>/* See feature_test_macros(7) */
+       <b>#include &lt;crypt.h&gt;</b>
+
+       <b>char *crypt_r(const char *</b><i>key</i><b>, const char *</b><i>salt</i><b>,</b>
+                     <b>struct crypt_data *</b><i>data</i><b>);</b>
+
+       Link with <i>-lcrypt</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>crypt</b>() is the password encryption function.  It is based on the Data
+       Encryption Standard algorithm with variations intended (among other
+       things) to discourage use of hardware implementations of a key
+       search.
+
+       <i>key</i> is a user's typed password.
+
+       <i>salt</i> is a two-character string chosen from the set [<b>a-zA-Z0-9./</b>].
+       This string is used to perturb the algorithm in one of 4096 different
+       ways.
+
+       By taking the lowest 7 bits of each of the first eight characters of
+       the <i>key</i>, a 56-bit key is obtained.  This 56-bit key is used to
+       encrypt repeatedly a constant string (usually a string consisting of
+       all zeros).  The returned value points to the encrypted password, a
+       series of 13 printable ASCII characters (the first two characters
+       represent the salt itself).  The return value points to static data
+       whose content is overwritten by each call.
+
+       Warning: the key space consists of 2**56 equal 7.2e16 possible
+       values.  Exhaustive searches of this key space are possible using
+       massively parallel computers.  Software, such as <b>crack</b>(1), is
+       available which will search the portion of this key space that is
+       generally used by humans for passwords.  Hence, password selection
+       should, at minimum, avoid common words and names.  The use of a
+       <a href="../man1/passwd.1.html">passwd(1)</a> program that checks for crackable passwords during the
+       selection process is recommended.
+
+       The DES algorithm itself has a few quirks which make the use of the
+       <b>crypt</b>() interface a very poor choice for anything other than password
+       authentication.  If you are planning on using the <b>crypt</b>() interface
+       for a cryptography project, don't do it: get a good book on
+       encryption and one of the widely available DES libraries.
+
+       <b>crypt_r</b>() is a reentrant version of <b>crypt</b>().  The structure pointed
+       to by <i>data</i> is used to store result data and bookkeeping information.
+       Other than allocating it, the only thing that the caller should do
+       with this structure is to set <i>data-&gt;initialized</i> to zero before the
+       first call to <b>crypt_r</b>().
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, a pointer to the encrypted password is returned.  On
+       error, NULL is returned.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EINVAL </b><i>salt</i> has the wrong format.
+
+       <b>ENOSYS </b>The <b>crypt</b>() function was not implemented, probably because of
+              U.S.A. export restrictions.
+
+       <b>EPERM  </b><i>/proc/sys/crypto/fips_enabled</i> has a nonzero value, and an
+              attempt was made to use a weak encryption type, such as DES.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────┬───────────────┬──────────────────────┐
+       │<b>Interface </b>│ <b>Attribute     </b>│ <b>Value                </b>│
+       ├──────────┼───────────────┼──────────────────────┤
+       │<b>crypt</b>()   │ Thread safety │ MT-Unsafe race:crypt │
+       ├──────────┼───────────────┼──────────────────────┤
+       │<b>crypt_r</b>() │ Thread safety │ MT-Safe              │
+       └──────────┴───────────────┴──────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>crypt</b>(): POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.  <b>crypt_r</b>() is a
+       GNU extension.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Glibc notes</b>
+       The glibc2 version of this function supports additional encryption
+       algorithms.
+
+       If <i>salt</i> is a character string starting with the characters "$<i>id</i>$"
+       followed by a string terminated by "$":
+
+              $<i>id</i>$<i>salt</i>$<i>encrypted</i>
+
+       then instead of using the DES machine, <i>id</i> identifies the encryption
+       method used and this then determines how the rest of the password
+       string is interpreted.  The following values of <i>id</i> are supported:
+
+              ID  | Method
+              ─────────────────────────────────────────────────────────
+              1   | MD5
+              2a  | Blowfish (not in mainline glibc; added in some
+                  | Linux distributions)
+              5   | SHA-256 (since glibc 2.7)
+              6   | SHA-512 (since glibc 2.7)
+
+       So $5$<i>salt</i>$<i>encrypted</i> is an SHA-256 encoded password and
+       $6$<i>salt</i>$<i>encrypted</i> is an SHA-512 encoded one.
+
+       "<i>salt</i>" stands for the up to 16 characters following "$<i>id</i>$" in the
+       salt.  The encrypted part of the password string is the actual
+       computed password.  The size of this string is fixed:
+
+       MD5     | 22 characters
+       SHA-256 | 43 characters
+       SHA-512 | 86 characters
+
+       The characters in "<i>salt</i>" and "<i>encrypted</i>" are drawn from the set
+       [<b>a-zA-Z0-9./</b>].  In the MD5 and SHA implementations the entire <i>key</i> is
+       significant (instead of only the first 8 bytes in DES).
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/login.1.html">login(1)</a>, <a href="../man1/passwd.1.html">passwd(1)</a>, <a href="encrypt.3.html">encrypt(3)</a>, <a href="getpass.3.html">getpass(3)</a>, <a href="../man5/passwd.5.html">passwd(5)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2015-08-08                         CRYPT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="des_crypt.3.html">des_crypt(3)</a>,&nbsp; 
+    <a href="encrypt.3.html">encrypt(3)</a>,&nbsp; 
+    <a href="getpass.3.html">getpass(3)</a>,&nbsp; 
+    <a href="key_setsecret.3.html">key_setsecret(3)</a>,&nbsp; 
+    <a href="../man5/gshadow.5.html">gshadow(5)</a>,&nbsp; 
+    <a href="../man5/passwd.5.html">passwd(5)</a>,&nbsp; 
+    <a href="../man5/passwd.5%40%40shadow-utils.html">passwd(5@@shadow-utils)</a>,&nbsp; 
+    <a href="../man5/shadow.5.html">shadow(5)</a>,&nbsp; 
+    <a href="../man5/slapd.conf.5.html">slapd.conf(5)</a>,&nbsp; 
+    <a href="../man5/slapd-config.5.html">slapd-config(5)</a>,&nbsp; 
+    <a href="../man8/groupadd.8.html">groupadd(8)</a>,&nbsp; 
+    <a href="../man8/groupmod.8.html">groupmod(8)</a>,&nbsp; 
+    <a href="../man8/pam_unix.8.html">pam_unix(8)</a>,&nbsp; 
+    <a href="../man8/pam_userdb.8.html">pam_userdb(8)</a>,&nbsp; 
+    <a href="../man8/slappasswd.8.html">slappasswd(8)</a>,&nbsp; 
+    <a href="../man8/useradd.8.html">useradd(8)</a>,&nbsp; 
+    <a href="../man8/usermod.8.html">usermod(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="crypt.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

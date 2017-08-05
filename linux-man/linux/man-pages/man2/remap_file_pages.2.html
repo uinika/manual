@@ -1,0 +1,254 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>remap_file_pages(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">REMAP_FILE_PAGES(2)       Linux Programmer's Manual      REMAP_FILE_PAGES(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       remap_file_pages - create a nonlinear file mapping
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#define _GNU_SOURCE         </b>/* See feature_test_macros(7) */
+       <b>#include &lt;sys/mman.h&gt;</b>
+
+       <b>int remap_file_pages(void *</b><i>addr</i><b>, size_t </b><i>size</i><b>, int </b><i>prot</i><b>,</b>
+                            <b>size_t </b><i>pgoff</i><b>, int </b><i>flags</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Note</b>: this system call was marked as deprecated starting with Linux
+       3.16.  In Linux 4.0, the implementation was replaced by a slower in-
+       kernel emulation.  Those few applications that use this system call
+       should consider migrating to alternatives.  This change was made
+       because the kernel code for this system call was complex, and it is
+       believed to be little used or perhaps even completely unused.  While
+       it had some use cases in database applications on 32-bit systems,
+       those use cases don't exist on 64-bit systems.
+
+       The <b>remap_file_pages</b>() system call is used to create a nonlinear
+       mapping, that is, a mapping in which the pages of the file are mapped
+       into a nonsequential order in memory.  The advantage of using
+       <b>remap_file_pages</b>() over using repeated calls to <a href="mmap.2.html">mmap(2)</a> is that the
+       former approach does not require the kernel to create additional VMA
+       (Virtual Memory Area) data structures.
+
+       To create a nonlinear mapping we perform the following steps:
+
+       1. Use <a href="mmap.2.html">mmap(2)</a> to create a mapping (which is initially linear).  This
+          mapping must be created with the <b>MAP_SHARED </b>flag.
+
+       2. Use one or more calls to <b>remap_file_pages</b>() to rearrange the
+          correspondence between the pages of the mapping and the pages of
+          the file.  It is possible to map the same page of a file into
+          multiple locations within the mapped region.
+
+       The <i>pgoff</i> and <i>size</i> arguments specify the region of the file that is
+       to be relocated within the mapping: <i>pgoff</i> is a file offset in units
+       of the system page size; <i>size</i> is the length of the region in bytes.
+
+       The <i>addr</i> argument serves two purposes.  First, it identifies the
+       mapping whose pages we want to rearrange.  Thus, <i>addr</i> must be an
+       address that falls within a region previously mapped by a call to
+       <a href="mmap.2.html">mmap(2)</a>.  Second, <i>addr</i> specifies the address at which the file pages
+       identified by <i>pgoff</i> and <i>size</i> will be placed.
+
+       The values specified in <i>addr</i> and <i>size</i> should be multiples of the
+       system page size.  If they are not, then the kernel rounds <i>both</i>
+       values <i>down</i> to the nearest multiple of the page size.
+
+       The <i>prot</i> argument must be specified as 0.
+
+       The <i>flags</i> argument has the same meaning as for <a href="mmap.2.html">mmap(2)</a>, but all flags
+       other than <b>MAP_NONBLOCK </b>are ignored.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>remap_file_pages</b>() returns 0.  On error, -1 is returned,
+       and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EINVAL </b><i>addr</i> does not refer to a valid mapping created with the
+              <b>MAP_SHARED </b>flag.
+
+       <b>EINVAL </b><i>addr</i>, <i>size</i>, <i>prot</i>, or <i>pgoff</i> is invalid.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>remap_file_pages</b>() system call appeared in Linux 2.5.46; glibc
+       support was added in version 2.3.3.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>remap_file_pages</b>() system call is Linux-specific.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Since Linux 2.6.23, <b>remap_file_pages</b>() creates non-linear mappings
+       only on in-memory filesystems such as <a href="../man5/tmpfs.5.html">tmpfs(5)</a>, hugetlbfs or ramfs.
+       On filesystems with a backing store, <b>remap_file_pages</b>() is not much
+       more efficient than using <a href="mmap.2.html">mmap(2)</a> to adjust which parts of the file
+       are mapped to which addresses.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="getpagesize.2.html">getpagesize(2)</a>, <a href="mmap.2.html">mmap(2)</a>, <a href="mmap2.2.html">mmap2(2)</a>, <a href="mprotect.2.html">mprotect(2)</a>, <a href="mremap.2.html">mremap(2)</a>, <a href="msync.2.html">msync(2)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-12-12              REMAP_FILE_PAGES(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="mincore.2.html">mincore(2)</a>,&nbsp; 
+    <a href="mmap.2.html">mmap(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="remap_file_pages.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

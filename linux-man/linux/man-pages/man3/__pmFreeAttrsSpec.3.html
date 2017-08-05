@@ -1,0 +1,308 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmparsehostattrsspec(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMPARSEHOSTATTRSSPEC(3)   Library Functions Manual   PMPARSEHOSTATTRSSPEC(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>__pmParseHostAttrsSpec</b>,   <b>__pmUnparseHostAttrsSpec</b>,   <b>__pmFreeHostAt‐</b>
+       <b>trsSpec</b>, <b>__pmFreeAttrsSpec </b>- host and attributes specification parser
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pcp/pmapi.h&gt;</b>
+       <b>#include &lt;pcp/impl.h&gt;</b>
+
+       <b>int __pmParseHostAttrsSpec(const char *</b><i>string</i><b>, pmHostSpec **</b><i>hostsp</i><b>,</b>
+               <b>int *</b><i>count</i><b>, __pmHashCtl *</b><i>attrs</i><b>, char **</b><i>errmsg</i><b>);</b>
+       <b>int __pmUnparseHostAttrsSpec(pmHostSpec *</b><i>hostsp</i><b>, int *</b><i>count</i><b>,</b>
+               <b>__pmHashCtl *</b><i>attrs</i><b>, char *</b><i>string</i><b>, size_t </b><i>size</i><b>);</b>
+       <b>void __pmFreeHostAttrsSpec(pmHostSpec *</b><i>hosts</i><b>, int </b><i>count</i><b>,</b>
+               <b>__pmHashCtl *</b><i>attrs</i><b>);</b>
+       <b>void __pmFreeAttrsSpec(__pmHashCtl *</b><i>attrs</i><b>);</b>
+
+       <b>cc ... -lpcp</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>__pmParseHostAttrsSpec </b>accepts a <b>string </b>specifying the location of a
+       PCP performance metric collector daemon, and any attributes that
+       should be associated with the connection to that daemon.
+
+       The syntax allows the optional specification of a protocol (native
+       PCP protocol, encrypted PCP protocol or unix domain socket protocol).
+
+       If the specified protocol is native PCP protocol, or encrypted PCP
+       protocol, an initial <a href="../man1/pmcd.1.html">pmcd(1)</a> hostname with optional port numbers and
+       optional proxy host, and optional attributes which are to be
+       associated with the connection may be specified.  Some examples
+       follow:
+
+            pcp://nas1.servers.com:44321@firewalls.r.us?compress
+            pcps://nas1.servers.com?user=otto&amp;pass=blotto&amp;compress
+
+       If the specified protocol is a unix domain socket protocol, the path
+       to the socket in the local file system may be specified along with
+       optional attributes which are to be associated with the connection.
+       For example:
+
+            unix://$PCP_RUN_DIR/pmcd.socket:?compress
+            local://my/local/pmcd.socket:?user=otto&amp;pass=blotto&amp;compress
+
+       If the optional protocol component is not specified, then the default
+       setting will be used - which is the native PCP binary protocol.
+       However, this can still be overwritten via the environment as
+       described in <a href="../man1/PCPIntro.1.html">PCPIntro(1)</a>.  If the protocol prefix is specified, it
+       must be one of either "pcp://" (clear), "pcps://" (secure,
+       encrypted), "unix://" (authenticated local) or "local://" ("unix://"
+       then "pcp://").
+
+       The path specified for the "unix://" and "local://" protocols will
+       always be interpreted as an absolute path name. For example, the
+       following are all interpreted identically as
+       <i>$PCP_RUN_DIR/pmcd.socket</i>.
+
+            unix://$PCP_RUN_DIR/pmcd.socket
+            unix:/$PCP_RUN_DIR/pmcd.socket
+            unix:$PCP_RUN_DIR/pmcd.socket
+
+       Refer to <a href="__pmParseHostSpec.3.html">__pmParseHostSpec(3)</a> for further details of the host and
+       proxy host components.
+
+       If any optional connection attributes are to be specified, these are
+       separated from the hostname component via the '?' character.  Each
+       attribute is separated by the '&amp;' character, and each can be either a
+       simple attribute flag (such as "compress") or a name=value pair (such
+       as "username=fred").
+
+       <b>__pmParseHostAttrsSpec </b>takes a null-terminated host-and-attributes
+       specification <b>string </b>and returns an array of <b>pmHostSpec </b>structures,
+       where the array has <b>count </b>entries, and an <b>attrs </b>hash table containing
+       any attributes (including the optional protocol, if it was
+       specified).
+
+       Full details of the <b>pmHostSpec </b>structures are provided in
+       <a href="__pmParseHostSpec.3.html">__pmParseHostSpec(3)</a>.
+
+       The <b>__pmHashCtl </b>structure that is filled out on return via
+       <b>attributes</b>, represents each individual attribute in the specification
+       <b>string </b>with any associated value.  It should be considered an opaque
+       structure and should be zeroed beforehand.
+
+       The returned hash table control structure can be iterated using one
+       of the supplied iteration mechanisms - <b>__pmHashWalkCB </b>(a callback-
+       based mechanism) or <b>__pmHashWalk </b>(a simple procedural mechanism).
+       These provide access to the individual hash nodes, as <b>__pmHashNode</b>
+       entries, which provide access to decoded attributes and their
+       (optional) values.
+
+           typedef struct __pmHashNode {
+               __pmHashNode    *next;    /* next node in hash bucket (internal) */
+               unsigned int    key;      /* key identifying particular attribute */
+               void            *data;    /* attributes value (optional, string) */
+           } __pmHashNode;
+
+       There are a set number of valid attributes, however these may be
+       extended in future releases as new connection parameters become
+       needed.  These can be identified via the PCP_ATTR_* macros in the PCP
+       header files.
+
+       <b>__pmUnparseHostSpec </b>performs the inverse operation, creating a <b>string</b>
+       representation from <b>hosts </b>and <b>attributes </b>structures.  The size of the
+       supplied <b>string </b>buffer must be provided by the caller using the <b>size</b>
+       parameter.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If the given <b>string </b>is successfully parsed <b>__pmParseHostAttrsSpec</b>
+       returns zero.  In this case the dynamic storage allocated by
+       <b>__pmParseHostAttrsSpec </b>can be released by calling
+       <b>__pmFreeHostAttrsSpec </b>using the addresses returned from
+       <b>__pmParseHostAttrsSpec</b>
+
+       Alternatively, the <b>hosts </b>and <b>attributes </b>memory can be freed
+       separately, using <a href="__pmFreeHostSpec.3.html">__pmFreeHostSpec(3)</a> and <b>__pmFreeAttrsSpec</b>.
+
+       <b>__pmParseHostAttrsSpec </b>returns <b>PM_ERR_GENERIC </b>and a dynamically
+       allocated error message string in <b>errmsg</b>, if the given <b>string </b>does
+       not parse, and the user-supplied <b>errmsg </b>pointer is non-null.  Be sure
+       to <a href="free.3.html">free(3)</a> the error message string in this situation.
+
+       In the case of an error, both <b>hosts </b>and <b>attributes </b>are undefined.  In
+       the case of success, <b>errmsg </b>is undefined.
+
+       On success <b>__pmUnparseHostAttrsSpec </b>returns a positive value
+       indicating the number of characters written into the supplied buffer.
+       However, if the supplied buffer was too small, a negative status code
+       of <b>-E2BIG </b>will be returned.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/pmcd.1.html">pmcd(1)</a>, <a href="../man1/pmproxy.1.html">pmproxy(1)</a>, <a href="../man1/pmchart.1.html">pmchart(1)</a>, <a href="__pmParseHostSpec.3.html">__pmParseHostSpec(3)</a>, <a href="PMAPI.3.html">PMAPI(3)</a> and
+       <a href="pmNewContext.3.html">pmNewContext(3)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP             PMPARSEHOSTATTRSSPEC(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pmparsehostspec.3.html">pmparsehostspec(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

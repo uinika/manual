@@ -1,0 +1,340 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>backtrace(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">BACKTRACE(3)              Linux Programmer's Manual             BACKTRACE(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       backtrace,  backtrace_symbols,  backtrace_symbols_fd  -  support  for
+       application self-debugging
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;execinfo.h&gt;</b>
+
+       <b>int backtrace(void **</b><i>buffer</i><b>, int </b><i>size</i><b>);</b>
+
+       <b>char **backtrace_symbols(void *const *</b><i>buffer</i><b>, int </b><i>size</i><b>);</b>
+
+       <b>void backtrace_symbols_fd(void *const *</b><i>buffer</i><b>, int </b><i>size</i><b>, int </b><i>fd</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>backtrace</b>() returns a backtrace for the calling program, in the array
+       pointed to by <i>buffer</i>.  A backtrace is the series of currently active
+       function calls for the program.  Each item in the array pointed to by
+       <i>buffer</i> is of type <i>void *</i>, and is the return address from the
+       corresponding stack frame.  The <i>size</i> argument specifies the maximum
+       number of addresses that can be stored in <i>buffer</i>.  If the backtrace
+       is larger than <i>size</i>, then the addresses corresponding to the <i>size</i>
+       most recent function calls are returned; to obtain the complete
+       backtrace, make sure that <i>buffer</i> and <i>size</i> are large enough.
+
+       Given the set of addresses returned by <b>backtrace</b>() in <i>buffer</i>,
+       <b>backtrace_symbols</b>() translates the addresses into an array of strings
+       that describe the addresses symbolically.  The <i>size</i> argument
+       specifies the number of addresses in <i>buffer</i>.  The symbolic
+       representation of each address consists of the function name (if this
+       can be determined), a hexadecimal offset into the function, and the
+       actual return address (in hexadecimal).  The address of the array of
+       string pointers is returned as the function result of
+       <b>backtrace_symbols</b>().  This array is <a href="malloc.3.html">malloc(3)</a>ed by
+       <b>backtrace_symbols</b>(), and must be freed by the caller.  (The strings
+       pointed to by the array of pointers need not and should not be
+       freed.)
+
+       <b>backtrace_symbols_fd</b>() takes the same <i>buffer</i> and <i>size</i> arguments as
+       <b>backtrace_symbols</b>(), but instead of returning an array of strings to
+       the caller, it writes the strings, one per line, to the file
+       descriptor <i>fd</i>.  <b>backtrace_symbols_fd</b>() does not call <a href="malloc.3.html">malloc(3)</a>, and
+       so can be employed in situations where the latter function might
+       fail.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>backtrace</b>() returns the number of addresses returned in <i>buffer</i>, which
+       is not greater than <i>size</i>.  If the return value is less than <i>size</i>,
+       then the full backtrace was stored; if it is equal to <i>size</i>, then it
+       may have been truncated, in which case the addresses of the oldest
+       stack frames are not returned.
+
+       On success, <b>backtrace_symbols</b>() returns a pointer to the array
+       <a href="malloc.3.html">malloc(3)</a>ed by the call; on error, NULL is returned.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>backtrace</b>(), <b>backtrace_symbols</b>(), and <b>backtrace_symbols_fd</b>() are
+       provided in glibc since version 2.1.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌───────────────────────┬───────────────┬─────────┐
+       │<b>Interface              </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├───────────────────────┼───────────────┼─────────┤
+       │<b>backtrace</b>(),           │ Thread safety │ MT-Safe │
+       │<b>backtrace_symbols</b>(),   │               │         │
+       │<b>backtrace_symbols_fd</b>() │               │         │
+       └───────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are GNU extensions.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions make some assumptions about how a function's return
+       address is stored on the stack.  Note the following:
+
+       *  Omission of the frame pointers (as implied by any of <a href="../man1/gcc.1.html">gcc(1)</a>'s
+          nonzero optimization levels) may cause these assumptions to be
+          violated.
+
+       *  Inlined functions do not have stack frames.
+
+       *  Tail-call optimization causes one stack frame to replace another.
+
+       The symbol names may be unavailable without the use of special linker
+       options.  For systems using the GNU linker, it is necessary to use
+       the <i>-rdynamic</i> linker option.  Note that names of "static" functions
+       are not exposed, and won't be available in the backtrace.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below demonstrates the use of <b>backtrace</b>() and
+       <b>backtrace_symbols</b>().  The following shell session shows what we might
+       see when running the program:
+
+           $ <b>cc -rdynamic prog.c -o prog</b>
+           $ <b>./prog 3</b>
+           backtrace() returned 8 addresses
+           ./prog(myfunc3+0x5c) [0x80487f0]
+           ./prog [0x8048871]
+           ./prog(myfunc+0x21) [0x8048894]
+           ./prog(myfunc+0x1a) [0x804888d]
+           ./prog(myfunc+0x1a) [0x804888d]
+           ./prog(main+0x65) [0x80488fb]
+           /lib/libc.so.6(__libc_start_main+0xdc) [0xb7e38f9c]
+           ./prog [0x8048711]
+
+   <b>Program source</b>
+
+       #include &lt;execinfo.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;unistd.h&gt;
+
+       #define BT_BUF_SIZE 100
+
+       void
+       myfunc3(void)
+       {
+           int j, nptrs;
+           void *buffer[BT_BUF_SIZE];
+           char **strings;
+
+           nptrs = backtrace(buffer, BT_BUF_SIZE);
+           printf("backtrace() returned %d addresses\n", nptrs);
+
+           /* The call backtrace_symbols_fd(buffer, nptrs, STDOUT_FILENO)
+              would produce similar output to the following: */
+
+           strings = backtrace_symbols(buffer, nptrs);
+           if (strings == NULL) {
+               perror("backtrace_symbols");
+               exit(EXIT_FAILURE);
+           }
+
+           for (j = 0; j &lt; nptrs; j++)
+               printf("%s\n", strings[j]);
+
+           free(strings);
+       }
+
+       static void   /* "static" means don't export the symbol... */
+       myfunc2(void)
+       {
+           myfunc3();
+       }
+
+       void
+       myfunc(int ncalls)
+       {
+           if (ncalls &gt; 1)
+               myfunc(ncalls - 1);
+           else
+               myfunc2();
+       }
+
+       int
+       main(int argc, char *argv[])
+       {
+           if (argc != 2) {
+               fprintf(stderr, "%s num-calls\n", argv[0]);
+               exit(EXIT_FAILURE);
+           }
+
+           myfunc(atoi(argv[1]));
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/addr2line.1.html">addr2line(1)</a>, <a href="../man1/gdb.1.html">gdb(1)</a>, <a href="../man1/gcc.1.html">gcc(1)</a>, <a href="../man1/ld.1.html">ld(1)</a>, <a href="dlopen.3.html">dlopen(3)</a>, <a href="malloc.3.html">malloc(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2017-03-13                     BACKTRACE(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="mallopt.3.html">mallopt(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="backtrace.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

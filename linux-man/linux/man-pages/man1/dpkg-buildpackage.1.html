@@ -1,0 +1,621 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dpkg-buildpackage(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#FILES">FILES</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">dpkg-buildpackage(1)             dpkg suite             dpkg-buildpackage(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dpkg-buildpackage - build binary or source packages from sources
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dpkg-buildpackage </b>[<i>option</i>...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dpkg-buildpackage </b>is a program that automates the process of building
+       a Debian package. It consists of the following steps:
+
+       <b>1. </b>It prepares the build environment by setting various environment
+          variables (see <b>ENVIRONMENT</b>), runs the <b>init </b>hook, and calls
+          <b>dpkg-source --before-build </b>(unless <b>-T </b>or <b>--target </b>has been used).
+
+       <b>2. </b>It checks that the build-dependencies and build-conflicts are
+          satisfied (unless <b>-d </b>or <b>--no-check-builddeps </b>is specified).
+
+       <b>3. </b>If a specific target has been selected with the <b>-T </b>or <b>--target</b>
+          option, it calls that target and stops here. Otherwise it runs the
+          <b>preclean </b>hook and calls <b>fakeroot debian/rules clean </b>to clean the
+          build-tree (unless <b>-nc </b>or <b>--no-pre-clean </b>is specified).
+
+       <b>4. </b>It runs the <b>source </b>hook and calls <b>dpkg-source -b </b>to generate the
+          source package (if a <b>source </b>build has been requested with <b>--build</b>
+          or equivalent options).
+
+       <b>5. </b>It runs the <b>build </b>hook and calls <b>debian/rules </b><i>build-target</i>, then
+          runs the <b>binary </b>hook followed by <b>fakeroot debian/rules </b><i>binary-</i>
+          <i>target</i> (unless a source-only build has been requested with
+          <b>--build=source </b>or equivalent options).  Note that <i>build-target</i> and
+          <i>binary-target</i> are either <b>build </b>and <b>binary </b>(default case, or if an
+          <b>any </b>and <b>all </b>build has been requested with <b>--build </b>or equivalent
+          options), or <b>build-arch </b>and <b>binary-arch </b>(if an <b>any </b>and not <b>all</b>
+          build has been requested with <b>--build </b>or equivalent options), or
+          <b>build-indep </b>and <b>binary-indep </b>(if an <b>all </b>and not <b>any </b>build has been
+          requested with <b>--build </b>or equivalent options).
+
+       <b>6. </b>Unless a source-only build has been requested, it runs the
+          <b>buildinfo </b>hook and calls <b>dpkg-genbuildinfo </b>to generate a
+          <b>.buildinfo </b>file.  Several <b>dpkg-buildpackage </b>options are forwarded
+          to <b>dpkg-genbuildinfo</b>.
+
+       <b>7. </b>It runs the <b>changes </b>hook and calls <b>dpkg-genchanges </b>to generate a
+          <b>.changes </b>file.  The name of the <b>.changes </b>file will depend on the
+          type of build and will be as specific as necessary but not more;
+          for a build that includes <b>any </b>the name will be <i>source-name</i><b>_</b><i>source-</i>
+          <i>version</i><b>_</b><i>arch</i><b>.changes</b>, or otherwise for a build that includes <b>all</b>
+          the name will be <i>source-name</i><b>_</b><i>source-version</i><b>_all.changes</b>, or
+          otherwise for a build that includes <b>source </b>the name will be
+          <i>source-name</i><b>_</b><i>source-version</i><b>_source.changes</b>.  Many <b>dpkg-buildpackage</b>
+          options are forwarded to <b>dpkg-genchanges</b>.
+
+       <b>8. </b>It runs the <b>postclean </b>hook and if <b>-tc </b>or <b>--post-clean </b>is
+          specified, it will call <b>fakeroot debian/rules clean </b>again.
+
+       <b>9. </b>It calls <b>dpkg-source --after-build</b>.
+
+       <b>10.</b>
+          It runs the <b>check </b>hook and calls a package checker for the
+          <b>.changes </b>file (if a command is specified in <b>DEB_CHECK_COMMAND </b>or
+          with <b>--check-command</b>).
+
+       <b>11.</b>
+          It runs the <b>sign </b>hook and calls <b>gpg2 </b>or <b>gpg </b>to sign the <b>.dsc </b>file
+          (if any, unless <b>-us </b>or <b>--unsigned-source </b>is specified or on
+          UNRELEASED builds), and the <b>.changes </b>file (unless <b>-uc </b>or
+          <b>--unsigned-changes </b>is specified or on UNRELEASED builds).
+
+       <b>12.</b>
+          It runs the <b>done </b>hook.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All long options can be specified both on the command line and in the
+       <b>dpkg-buildpackage </b>system and user configuration files.  Each line in
+       the configuration file is either an option (exactly the same as the
+       command line option but without leading hyphens) or a comment (if it
+       starts with a ‘<b>#</b>’).
+
+       <b>--build=</b><i>type</i>
+              Specifies the build <i>type</i> from a comma-separated list of
+              components (since dpkg 1.18.5).  Passed to <b>dpkg-genchanges</b>.
+
+              The allowed values are:
+
+              <b>source </b>Builds the source package.  Note: when using this value
+                     standalone and if what you want is simply to (re-)build
+                     the source package, using <b>dpkg-source </b>is always better
+                     as it does not require any build dependencies to be
+                     installed to be able to call the <b>clean </b>target.
+
+              <b>any    </b>Builds the architecture specific binary packages.
+
+              <b>all    </b>Builds the architecture independent binary packages.
+
+              <b>binary </b>Builds the architecture specific and independent binary
+                     packages.  This is an alias for <b>any,all</b>.
+
+              <b>full   </b>Builds everything.  This is an alias for
+                     <b>source,any,all</b>, and the same as the default case when
+                     no build option is specified.
+
+       <b>-g     </b>Equivalent to <b>--build=source,all </b>(since dpkg 1.17.11).
+
+       <b>-G     </b>Equivalent to <b>--build=source,any </b>(since dpkg 1.17.11).
+
+       <b>-b     </b>Equivalent to <b>--build=binary </b>or <b>--build=any,all</b>.
+
+       <b>-B     </b>Equivalent to <b>--build=any</b>.
+
+       <b>-A     </b>Equivalent to <b>--build=all</b>.
+
+       <b>-S     </b>Equivalent to <b>--build=source</b>.
+
+       <b>-F     </b>Equivalent to <b>--build=full</b>, <b>--build=source,binary </b>or
+              <b>--build=source,any,all </b>(since dpkg 1.15.8).
+
+       <b>--target=</b><i>target</i>
+       <b>--target </b><i>target</i>
+       <b>-T</b>, <b>--rules-target=</b><i>target</i>
+              Calls <b>debian/rules </b><i>target</i> after having setup the build
+              environment and stops the package build process here (since
+              dpkg 1.15.0, long option since dpkg 1.18.8).  If <b>--as-root </b>is
+              also given, then the command is executed as root (see
+              <b>--root-command</b>).  Note that known targets that are required to
+              be run as root do not need this option (i.e. the <b>clean</b>,
+              <b>binary</b>, <b>binary-arch </b>and <b>binary-indep </b>targets).
+
+       <b>--as-root</b>
+              Only meaningful together with <b>--target </b>(since dpkg 1.15.0).
+              Requires that the target be run with root rights.
+
+       <b>-si</b>
+       <b>-sa</b>
+       <b>-sd</b>
+       <b>-v</b><i>version</i>
+       <b>-C</b><i>changes-description</i>
+       <b>-m</b>, <b>--release-by=</b><i>maintainer-address</i>
+       <b>-e</b>, <b>--build-by=</b><i>maintainer-address</i>
+              Passed unchanged to <b>dpkg-genchanges</b>. See its manual page.
+
+       <b>-a</b>, <b>--host-arch </b><i>architecture</i>
+              Specify the Debian architecture we build for (long option
+              since dpkg 1.17.17).  The architecture of the machine we build
+              on is determined automatically, and is also the default for
+              the host machine.
+
+       <b>-t</b>, <b>--host-type </b><i>gnu-system-type</i>
+              Specify the GNU system type we build for (long option since
+              dpkg 1.17.17).  It can be used in place of <b>--host-arch </b>or as a
+              complement to override the default GNU system type of the host
+              Debian architecture.
+
+       <b>--target-arch </b><i>architecture</i>
+              Specify the Debian architecture the binaries built will build
+              for (since dpkg 1.17.17).  The default value is the host
+              machine.
+
+       <b>--target-type </b><i>gnu-system-type</i>
+              Specify the GNU system type the binaries built will build for
+              (since dpkg 1.17.17).  It can be used in place of
+              <b>--target-arch </b>or as a complement to override the default GNU
+              system type of the target Debian architecture.
+
+       <b>-P</b>, <b>--build-profiles=</b><i>profile</i>[<b>,</b>...]
+              Specify the profile(s) we build, as a comma-separated list
+              (since dpkg 1.17.2, long option since dpkg 1.18.8).  The
+              default behavior is to build for no specific profile. Also
+              sets them (as a space separated list) as the
+              <b>DEB_BUILD_PROFILES </b>environment variable which allows, for
+              example, <b>debian/rules </b>files to use this information for
+              conditional builds.
+
+       <b>-j</b>, <b>--jobs</b>[=<i>jobs</i>|<b>auto</b>]
+              Number of jobs allowed to be run simultaneously, number of
+              jobs matching the number of online processors if <b>auto </b>is
+              specified (since dpkg 1.17.10), or unlimited number if <i>jobs</i> is
+              not specified, equivalent to the <a href="make.1.html">make(1)</a> option of the same
+              name (since dpkg 1.14.7, long option since dpkg 1.18.8).  Will
+              add itself to the <b>MAKEFLAGS </b>environment variable, which should
+              cause all subsequent make invocations to inherit the option,
+              thus forcing the parallel setting on the packaging (and
+              possibly the upstream build system if that uses make)
+              regardless of their support for parallel builds, which might
+              cause build failures.  Also adds <b>parallel=</b><i>jobs</i> or <b>parallel </b>to
+              the <b>DEB_BUILD_OPTIONS </b>environment variable which allows
+              debian/rules files to use this information for their own
+              purposes.  The <b>-j </b>value will override the <b>parallel=</b><i>jobs</i> or
+              <b>parallel </b>option in the <b>DEB_BUILD_OPTIONS </b>environment variable.
+              Note that the <b>auto </b>value will get replaced by the actual
+              number of currently active processors, and as such will not
+              get propagated to any child process. If the number of online
+              processors cannot be inferred then the code will fallback to
+              using serial execution (since dpkg 1.18.15), although this
+              should only happen on exotic and unsupported systems.
+
+       <b>-J</b>, <b>--jobs-try</b>[=<i>jobs</i>|<b>auto</b>]
+              This option (since dpkg 1.18.2, long option since dpkg 1.18.8)
+              is equivalent to the <b>-j </b>option except that it does not set the
+              <b>MAKEFLAGS </b>environment variable, and as such it is safer to use
+              with any package including those that are not parallel-build
+              safe.
+
+              <b>auto </b>is the default behavior (since dpkg 1.18.11). Setting the
+              number of jobs to 1 will restore a serial behavior.
+
+       <b>-D</b>, <b>--check-builddeps</b>
+              Check build dependencies and conflicts; abort if unsatisfied
+              (long option since dpkg 1.18.8).  This is the default
+              behavior.
+
+       <b>-d</b>, <b>--no-check-builddeps</b>
+              Do not check build dependencies and conflicts (long option
+              since dpkg 1.18.8).
+
+       <b>--ignore-builtin-builddeps</b>
+              Do not check built-in build dependencies and conflicts (since
+              dpkg 1.18.2).  These are the distribution specific implicit
+              build dependencies usually required in a build environment,
+              the so called Build-Essential package set.
+
+       <b>-nc</b>, <b>--no-pre-clean</b>
+              Do not clean the source tree (long option since dpkg 1.18.8).
+              Implies <b>-b </b>if nothing else has been selected among <b>-F</b>, <b>-g</b>, <b>-G</b>,
+              <b>-B</b>, <b>-A </b>or <b>-S</b>.  Implies <b>-d </b>with <b>-S </b>(since dpkg 1.18.0).
+
+       <b>--pre-clean</b>
+              Clean the source tree before building (since dpkg 1.18.8).
+
+       <b>-tc</b>, <b>--post-clean</b>
+              Clean the source tree (using <i>gain-root-command</i> <b>debian/rules</b>
+              <b>clean</b>) after the package has been built (long option since
+              dpkg 1.18.8).
+
+       <b>-r</b>, <b>--root-command=</b><i>gain-root-command</i>
+              When <b>dpkg-buildpackage </b>needs to execute part of the build
+              process as root, it prefixes the command it executes with
+              <i>gain-root-command</i> if one has been specified (long option since
+              dpkg 1.18.8).  Otherwise, if none has been specified, <b>fakeroot</b>
+              will be used by default, if the command is present.  <i>gain-</i>
+              <i>root-command</i> should start with the name of a program on the
+              <b>PATH </b>and will get as arguments the name of the real command to
+              run and the arguments it should take.  <i>gain-root-command</i> can
+              include parameters (they must be space-separated) but no shell
+              metacharacters.  <i>gain-root-command</i> might typically be
+              <b>fakeroot</b>, <b>sudo</b>, <b>super </b>or <b>really</b>.  <b>su </b>is not suitable, since it
+              can only invoke the user's shell with <b>-c </b>instead of passing
+              arguments individually to the command to be run.
+
+       <b>-R</b>, <b>--rules-file=</b><i>rules-file</i>
+              Building a Debian package usually involves invoking
+              <b>debian/rules </b>as a command with several standard parameters
+              (since dpkg 1.14.17, long option since dpkg 1.18.8).  With
+              this option it's possible to use another program invocation to
+              build the package (it can include space separated parameters).
+              Alternatively it can be used to execute the standard rules
+              file with another make program (for example by using
+              <b>/usr/local/bin/make -f debian/rules </b>as <i>rules-file</i>).
+
+       <b>--check-command=</b><i>check-command</i>
+              Command used to check the <b>.changes </b>file itself and any
+              artifact built referenced in the file (since dpkg 1.17.6).
+              The command should take the <b>.changes </b>pathname as an argument.
+              This command will usually be <b>lintian</b>.
+
+       <b>--check-option=</b><i>opt</i>
+              Pass option <i>opt</i> to the <i>check-command</i> specified with
+              <b>DEB_CHECK_COMMAND </b>or <b>--check-command </b>(since dpkg 1.17.6).  Can
+              be used multiple times.
+
+       <b>--hook-</b><i>hook-name</i><b>=</b><i>hook-command</i>
+              Set the specified shell code <i>hook-command</i> as the hook <i>hook-</i>
+              <i>name</i>, which will run at the times specified in the run steps
+              (since dpkg 1.17.6).  The hooks will always be executed even
+              if the following action is not performed (except for the
+              <b>binary </b>hook).
+
+              Note: Hooks can affect the build process, and cause build
+              failures if their commands fail, so watch out for unintended
+              consequences.
+
+              The current <i>hook-name</i> supported are:
+
+              <b>init preclean source build binary changes postclean check sign</b>
+              <b>done</b>
+
+              The <i>hook-command</i> supports the following substitution format
+              string, which will get applied to it before execution:
+
+              <b>%%     </b>A single % character.
+
+              <b>%a     </b>A boolean value (0 or 1), representing whether the
+                     following action is being performed.
+
+              <b>%p     </b>The source package name.
+
+              <b>%v     </b>The source package version.
+
+              <b>%s     </b>The source package version (without the epoch).
+
+              <b>%u     </b>The upstream version.
+
+       <b>--buildinfo-option=</b><i>opt</i>
+              Pass option <i>opt</i> to <b>dpkg-genbuildinfo </b>(since dpkg 1.18.11).
+              Can be used multiple times.
+
+       <b>-p</b>, <b>--sign-command=</b><i>sign-command</i>
+              When <b>dpkg-buildpackage </b>needs to execute GPG to sign a source
+              control (<b>.dsc</b>) file or a <b>.changes </b>file it will run <i>sign-</i>
+              <i>command</i> (searching the <b>PATH </b>if necessary) instead of <b>gpg2 </b>or
+              <b>gpg </b>(long option since dpkg 1.18.8).  <i>sign-command</i> will get
+              all the arguments that <b>gpg2 </b>or <b>gpg </b>would have gotten. <i>sign-</i>
+              <i>command</i> should not contain spaces or any other shell
+              metacharacters.
+
+       <b>-k</b>, <b>--sign-key=</b><i>key-id</i>
+              Specify a key-ID to use when signing packages (long option
+              since dpkg 1.18.8).
+
+       <b>-us</b>, <b>--unsigned-source</b>
+              Do not sign the source package (long option since dpkg
+              1.18.8).
+
+       <b>-uc</b>, <b>--unsigned-changes</b>
+              Do not sign the <b>.changes </b>file (long option since dpkg 1.18.8).
+
+       <b>--force-sign</b>
+              Force the signing of the resulting files (since dpkg 1.17.0),
+              regardless of <b>-us</b>, <b>--unsigned-source</b>, <b>-uc</b>, <b>--unsigned-changes</b>
+              or other internal heuristics.
+
+       <b>-sn</b>
+       <b>-ss</b>
+       <b>-sA</b>
+       <b>-sk</b>
+       <b>-su</b>
+       <b>-sr</b>
+       <b>-sK</b>
+       <b>-sU</b>
+       <b>-sR</b>
+       <b>-i</b>, <b>--diff-ignore</b>[=<i>regex</i>]
+       <b>-I</b>, <b>--tar-ignore</b>[=<i>pattern</i>]
+       <b>-z</b>, <b>--compression-level=</b><i>level</i>
+       <b>-Z</b>, <b>--compression=</b><i>compressor</i>
+              Passed unchanged to <b>dpkg-source</b>. See its manual page.
+
+       <b>--source-option=</b><i>opt</i>
+              Pass option <i>opt</i> to <b>dpkg-source </b>(since dpkg 1.15.6).  Can be
+              used multiple times.
+
+       <b>--changes-option=</b><i>opt</i>
+              Pass option <i>opt</i> to <b>dpkg-genchanges </b>(since dpkg 1.15.6).  Can
+              be used multiple times.
+
+       <b>--admindir=</b><i>dir</i>
+       <b>--admindir </b><i>dir</i>
+              Change the location of the <b>dpkg </b>database (since dpkg 1.14.0).
+              The default location is <i>/usr/local/var/lib/dpkg</i>.
+
+       <b>-?</b>, <b>--help</b>
+              Show the usage message and exit.
+
+       <b>--version</b>
+              Show the version and exit.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>External environment</b>
+       <b>DEB_CHECK_COMMAND</b>
+              If set, it will be used as the command to check the <b>.changes</b>
+              file (since dpkg 1.17.6).  Overridden by the <b>--check-command</b>
+              option.
+
+       <b>DEB_SIGN_KEYID</b>
+              If set, it will be used to sign the <b>.changes </b>and <b>.dsc </b>files
+              (since dpkg 1.17.2).  Overridden by the <b>--sign-key </b>option.
+
+       <b>DEB_BUILD_OPTIONS</b>
+              If set, it will contain a space-separated list of options that
+              might affect the build process in <i>debian/rules</i>, and the
+              behavior of some dpkg commands.
+
+              With <b>nocheck </b>the <b>DEB_CHECK_COMMAND </b>variable will be ignored.
+              With <b>parallel=</b><i>N</i> the parallel jobs will be set to <i>N</i>, overridden
+              by the <b>--jobs-try </b>option.
+
+       <b>DEB_BUILD_PROFILES</b>
+              If set, it will be used as the active build profile(s) for the
+              package being built (since dpkg 1.17.2).  It is a space
+              separated list of profile names.  Overridden by the <b>-P </b>option.
+
+       <b>DPKG_COLORS</b>
+              Sets the color mode (since dpkg 1.18.5).  The currently
+              accepted values are: <b>auto </b>(default), <b>always </b>and <b>never</b>.
+
+   <b>Internal environment</b>
+       Even if <b>dpkg-buildpackage </b>exports some variables, <b>debian/rules </b>should
+       not rely on their presence and should instead use the respective
+       interface to retrieve the needed values, because that file is the
+       main entry point to build packages and running it standalone should
+       be supported.
+
+       <b>DEB_BUILD_*</b>
+       <b>DEB_HOST_*</b>
+       <b>DEB_TARGET_*</b>
+              <b>dpkg-architecture </b>is called with the <b>-a </b>and <b>-t </b>parameters
+              forwarded. Any variable that is output by its <b>-s </b>option is
+              integrated in the build environment.
+
+       <b>SOURCE_DATE_EPOCH</b>
+              This variable is set to the Unix timestamp since the epoch of
+              the latest entry in <i>debian/changelog</i>, if it is not already
+              defined.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/usr/local/etc/dpkg/buildpackage.conf</i>
+              System wide configuration file
+
+       <i>$XDG_CONFIG_HOME/dpkg/buildpackage.conf</i> or
+       <i>$HOME/.config/dpkg/buildpackage.conf</i>
+              User configuration file.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Compiler flags are no longer exported</b>
+       Between dpkg 1.14.17 and 1.16.1, <b>dpkg-buildpackage </b>exported compiler
+       flags (<b>CFLAGS</b>, <b>CXXFLAGS</b>, <b>FFLAGS</b>, <b>CPPFLAGS </b>and <b>LDFLAGS</b>) with values as
+       returned by <b>dpkg-buildflags</b>. This is no longer the case.
+
+   <b>Default build targets</b>
+       <b>dpkg-buildpackage </b>is using the <b>build-arch </b>and <b>build-indep </b>targets
+       since dpkg 1.16.2. Those targets are thus mandatory. But to avoid
+       breakages of existing packages, and ease the transition, if the
+       source package does not build both architecture independent and
+       dependent binary packages (since dpkg 1.18.8) it will fallback to use
+       the <b>build </b>target if <b>make -f debian/rules -qn </b><i>build-target</i> returns 2
+       as exit code.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       It should be possible to specify spaces and shell metacharacters and
+       initial arguments for <i>gain-root-command</i> and <i>sign-command</i>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="dpkg-source.1.html">dpkg-source(1)</a>, <a href="dpkg-architecture.1.html">dpkg-architecture(1)</a>, <a href="dpkg-buildflags.1.html">dpkg-buildflags(1)</a>,
+       <a href="dpkg-genbuildinfo.1.html">dpkg-genbuildinfo(1)</a>, <a href="dpkg-genchanges.1.html">dpkg-genchanges(1)</a>, <b>fakeroot</b>(1), <b>lintian</b>(1),
+       <b>gpg2</b>(1), <b>gpg</b>(1).
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01             dpkg-buildpackage(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="dpkg-architecture.1.html">dpkg-architecture(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

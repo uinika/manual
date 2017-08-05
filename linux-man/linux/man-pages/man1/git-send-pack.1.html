@@ -1,0 +1,314 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-send-pack(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SPECIFYING_THE_REFS">SPECIFYING&nbsp;THE&nbsp;REFS</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-SEND-PACK(1)                 Git Manual                 GIT-SEND-PACK(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-send-pack - Push objects over Git protocol to another repository
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git send-pack</i> [--all] [--dry-run] [--force] [--receive-pack=&lt;git-receive-pack&gt;]
+                       [--verbose] [--thin] [--atomic]
+                       [--[no-]signed|--sign=(true|false|if-asked)]
+                       [&lt;host&gt;:]&lt;directory&gt; [&lt;ref&gt;...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Usually you would want to use <i>git push</i>, which is a higher-level
+       wrapper of this command, instead. See <a href="git-push.1.html">git-push(1)</a>.
+
+       Invokes <i>git-receive-pack</i> on a possibly remote repository, and updates
+       it from the current repository, sending named refs.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       --receive-pack=&lt;git-receive-pack&gt;
+           Path to the <i>git-receive-pack</i> program on the remote end. Sometimes
+           useful when pushing to a remote repository over ssh, and you do
+           not have the program in a directory on the default $PATH.
+
+       --exec=&lt;git-receive-pack&gt;
+           Same as --receive-pack=&lt;git-receive-pack&gt;.
+
+       --all
+           Instead of explicitly specifying which refs to update, update all
+           heads that locally exist.
+
+       --stdin
+           Take the list of refs from stdin, one per line. If there are refs
+           specified on the command line in addition to this option, then
+           the refs from stdin are processed after those on the command
+           line.
+
+           If <b>--stateless-rpc </b>is specified together with this option then
+           the list of refs must be in packet format (pkt-line). Each ref
+           must be in a separate packet, and the list must end with a flush
+           packet.
+
+       --dry-run
+           Do everything except actually send the updates.
+
+       --force
+           Usually, the command refuses to update a remote ref that is not
+           an ancestor of the local ref used to overwrite it. This flag
+           disables the check. What this means is that the remote repository
+           can lose commits; use it with care.
+
+       --verbose
+           Run verbosely.
+
+       --thin
+           Send a "thin" pack, which records objects in deltified form based
+           on objects not included in the pack to reduce network traffic.
+
+       --atomic
+           Use an atomic transaction for updating the refs. If any of the
+           refs fails to update then the entire push will fail without
+           changing any refs.
+
+       --[no-]signed, --sign=(true|false|if-asked)
+           GPG-sign the push request to update refs on the receiving side,
+           to allow it to be checked by the hooks and/or be logged. If <b>false</b>
+           or <b>--no-signed</b>, no signing will be attempted. If <b>true </b>or
+           <b>--signed</b>, the push will fail if the server does not support
+           signed pushes. If set to <b>if-asked</b>, sign if and only if the server
+           supports signed pushes. The push will also fail if the actual
+           call to <b>gpg --sign </b>fails. See <a href="git-receive-pack.1.html">git-receive-pack(1)</a> for the details
+           on the receiving end.
+
+       --push-option=&lt;string&gt;
+           Pass the specified string as a push option for consumption by
+           hooks on the server side. If the server doesn’t support push
+           options, error out. See <a href="git-push.1.html">git-push(1)</a> and <a href="../man5/githooks.5.html">githooks(5)</a> for details.
+
+       &lt;host&gt;
+           A remote host to house the repository. When this part is
+           specified, <i>git-receive-pack</i> is invoked via ssh.
+
+       &lt;directory&gt;
+           The repository to update.
+
+       &lt;ref&gt;...
+           The remote refs to update.
+</pre>
+<h2><a id="SPECIFYING_THE_REFS" href="#SPECIFYING_THE_REFS"></a>SPECIFYING THE REFS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       There are three ways to specify which refs to update on the remote
+       end.
+
+       With <b>--all </b>flag, all refs that exist locally are transferred to the
+       remote side. You cannot specify any <i>&lt;ref&gt;</i> if you use this flag.
+
+       Without <b>--all </b>and without any <i>&lt;ref&gt;</i>, the heads that exist both on the
+       local side and on the remote side are updated.
+
+       When one or more <i>&lt;ref&gt;</i> are specified explicitly (whether on the
+       command line or via <b>--stdin</b>), it can be either a single pattern, or a
+       pair of such pattern separated by a colon ":" (this means that a ref
+       name cannot have a colon in it). A single pattern <i>&lt;name&gt;</i> is just a
+       shorthand for <i>&lt;name&gt;:&lt;name&gt;</i>.
+
+       Each pattern pair consists of the source side (before the colon) and
+       the destination side (after the colon). The ref to be pushed is
+       determined by finding a match that matches the source side, and where
+       it is pushed is determined by using the destination side. The rules
+       used to match a ref are the same rules used by <i>git rev-parse</i> to
+       resolve a symbolic ref name. See <a href="git-rev-parse.1.html">git-rev-parse(1)</a>.
+
+       ·   It is an error if &lt;src&gt; does not match exactly one of the local
+           refs.
+
+       ·   It is an error if &lt;dst&gt; matches more than one remote refs.
+
+       ·   If &lt;dst&gt; does not match any remote ref, either
+
+           ·   it has to start with "refs/"; &lt;dst&gt; is used as the
+               destination literally in this case.
+
+           ·   &lt;src&gt; == &lt;dst&gt; and the ref that matched the &lt;src&gt; must not
+               exist in the set of remote refs; the ref matched &lt;src&gt;
+               locally is used as the name of the destination.
+
+       Without ‘--force`, the &lt;src&gt; ref is stored at the remote only if
+       &lt;dst&gt; does not exist, or &lt;dst&gt; is a proper subset (i.e. an ancestor)
+       of &lt;src&gt;. This check, known as "fast-forward check", is performed in
+       order to avoid accidentally overwriting the remote ref and lose other
+       peoples’ commits from there.
+
+       With <b>--force</b>, the fast-forward check is disabled for all refs.
+
+       Optionally, a &lt;ref&gt; parameter can be prefixed with a plus <i>+</i> sign to
+       disable the fast-forward check only on that ref.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.13.0.rc0.45.ge             04/24/2017                 GIT-SEND-PACK(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-push.1.html">git-push(1)</a>,&nbsp; 
+    <a href="git-receive-pack.1.html">git-receive-pack(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

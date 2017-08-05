@@ -1,0 +1,325 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-checkout-index(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#USING_--TEMP_OR_--STAGE=ALL">USING&nbsp;--TEMP&nbsp;OR&nbsp;--STAGE=ALL</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-CHECKOUT-INDEX(1)            Git Manual            GIT-CHECKOUT-INDEX(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-checkout-index - Copy files from the index to the working tree
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git checkout-index</i> [-u] [-q] [-a] [-f] [-n] [--prefix=&lt;string&gt;]
+                          [--stage=&lt;number&gt;|all]
+                          [--temp]
+                          [-z] [--stdin]
+                          [--] [&lt;file&gt;...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Will copy all files listed from the index to the working directory
+       (not overwriting existing files).
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -u, --index
+           update stat information for the checked out entries in the index
+           file.
+
+       -q, --quiet
+           be quiet if files exist or are not in the index
+
+       -f, --force
+           forces overwrite of existing files
+
+       -a, --all
+           checks out all files in the index. Cannot be used together with
+           explicit filenames.
+
+       -n, --no-create
+           Don’t checkout new files, only refresh files already checked out.
+
+       --prefix=&lt;string&gt;
+           When creating files, prepend &lt;string&gt; (usually a directory
+           including a trailing /)
+
+       --stage=&lt;number&gt;|all
+           Instead of checking out unmerged entries, copy out the files from
+           named stage. &lt;number&gt; must be between 1 and 3. Note: --stage=all
+           automatically implies --temp.
+
+       --temp
+           Instead of copying the files to the working directory write the
+           content to temporary files. The temporary name associations will
+           be written to stdout.
+
+       --stdin
+           Instead of taking list of paths from the command line, read list
+           of paths from the standard input. Paths are separated by LF (i.e.
+           one path per line) by default.
+
+       -z
+           Only meaningful with --stdin; paths are separated with NUL
+           character instead of LF.
+
+       --
+           Do not interpret any more arguments as options.
+
+       The order of the flags used to matter, but not anymore.
+
+       Just doing git checkout-index does nothing. You probably meant git
+       checkout-index -a. And if you want to force it, you want git
+       checkout-index -f -a.
+
+       Intuitiveness is not the goal here. Repeatability is. The reason for
+       the "no arguments means no work" behavior is that from scripts you
+       are supposed to be able to do:
+
+           $ find . -name '*.h' -print0 | xargs -0 git checkout-index -f --
+
+       which will force all existing *.h files to be replaced with their
+       cached copies. If an empty command line implied "all", then this
+       would force-refresh everything in the index, which was not the point.
+       But since <i>git checkout-index</i> accepts --stdin it would be faster to
+       use:
+
+           $ find . -name '*.h' -print0 | git checkout-index -f -z --stdin
+
+       The -- is just a good idea when you know the rest will be filenames;
+       it will prevent problems with a filename of, for example, -a. Using
+       -- is probably a good policy in scripts.
+</pre>
+<h2><a id="USING_--TEMP_OR_--STAGE=ALL" href="#USING_--TEMP_OR_--STAGE=ALL"></a>USING --TEMP OR --STAGE=ALL  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When --temp is used (or implied by --stage=all) <i>git checkout-index</i>
+       will create a temporary file for each index entry being checked out.
+       The index will not be updated with stat information. These options
+       can be useful if the caller needs all stages of all unmerged entries
+       so that the unmerged files can be processed by an external merge
+       tool.
+
+       A listing will be written to stdout providing the association of
+       temporary file names to tracked path names. The listing format has
+       two variations:
+
+        1. tempname TAB path RS
+
+           The first format is what gets used when --stage is omitted or is
+           not --stage=all. The field tempname is the temporary file name
+           holding the file content and path is the tracked path name in the
+           index. Only the requested entries are output.
+
+        2. stage1temp SP stage2temp SP stage3tmp TAB path RS
+
+           The second format is what gets used when --stage=all. The three
+           stage temporary fields (stage1temp, stage2temp, stage3temp) list
+           the name of the temporary file if there is a stage entry in the
+           index or .  if there is no stage entry. Paths which only have a
+           stage 0 entry will always be omitted from the output.
+
+       In both formats RS (the record separator) is newline by default but
+       will be the null byte if -z was passed on the command line. The
+       temporary file names are always safe strings; they will never contain
+       directory separators or whitespace characters. The path field is
+       always relative to the current directory and the temporary file names
+       are always relative to the top level directory.
+
+       If the object being copied out to a temporary file is a symbolic link
+       the content of the link will be written to a normal file. It is up to
+       the end-user or the Porcelain to make use of this information.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       To update and refresh only the files already checked out
+
+               $ git checkout-index -n -f -a &amp;&amp; git update-index --ignore-missing --refresh
+
+       Using <i>git checkout-index</i> to "export an entire tree"
+           The prefix ability basically makes it trivial to use <i>git</i>
+           <i>checkout-index</i> as an "export as tree" function. Just read the
+           desired tree into the index, and do:
+
+               $ git checkout-index --prefix=git-export-dir/ -a
+
+           git checkout-index will "export" the index into the specified
+           directory.
+
+           The final "/" is important. The exported name is literally just
+           prefixed with the specified string. Contrast this with the
+           following example.
+
+       Export files with a prefix
+
+               $ git checkout-index --prefix=.merged- Makefile
+
+           This will check out the currently cached copy of Makefile into
+           the file .merged-Makefile.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.7.0.rc1.5.gf3a             12/17/2015            GIT-CHECKOUT-INDEX(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-read-tree.1.html">git-read-tree(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,349 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>readdir(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">READDIR(3)                Linux Programmer's Manual               READDIR(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       readdir - read a directory
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;dirent.h&gt;</b>
+
+       <b>struct dirent *readdir(DIR *</b><i>dirp</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>readdir</b>() function returns a pointer to a <i>dirent</i> structure
+       representing the next directory entry in the directory stream pointed
+       to by <i>dirp</i>.  It returns NULL on reaching the end of the directory
+       stream or if an error occurred.
+
+       In the glibc implementation, the <i>dirent</i> structure is defined as
+       follows:
+
+           struct dirent {
+               ino_t          d_ino;       /* Inode number */
+               off_t          d_off;       /* Not an offset; see below */
+               unsigned short d_reclen;    /* Length of this record */
+               unsigned char  d_type;      /* Type of file; not supported
+                                              by all filesystem types */
+               char           d_name[256]; /* Null-terminated filename */
+           };
+
+       The only fields in the <i>dirent</i> structure that are mandated by POSIX.1
+       are <i>d_name</i> and <i>d_ino</i>.  The other fields are unstandardized, and not
+       present on all systems; see NOTES below for some further details.
+
+       The fields of the <i>dirent</i> structure are as follows:
+
+       <i>d_ino</i>  This is the inode number of the file.
+
+       <i>d_off</i>  The value returned in <i>d_off</i> is the same as would be returned
+              by calling <a href="telldir.3.html">telldir(3)</a> at the current position in the directory
+              stream.  Be aware that despite its type and name, the <i>d_off</i>
+              field is seldom any kind of directory offset on modern
+              filesystems.  Applications should treat this field as an
+              opaque value, making no assumptions about its contents; see
+              also <a href="telldir.3.html">telldir(3)</a>.
+
+       <i>d_reclen</i>
+              This is the size (in bytes) of the returned record.  This may
+              not match the size of the structure definition shown above;
+              see NOTES.
+
+       <i>d_type</i> This field contains a value indicating the file type, making
+              it possible to avoid the expense of calling <a href="../man2/lstat.2.html">lstat(2)</a> if
+              further actions depend on the type of the file.
+
+              When a suitable feature test macro is defined (<b>_DEFAULT_SOURCE</b>
+              on glibc versions since 2.19, or <b>_BSD_SOURCE </b>on glibc versions
+              2.19 and earlier), glibc defines the following macro constants
+              for the value returned in <i>d_type</i>:
+
+              <b>DT_BLK      </b>This is a block device.
+
+              <b>DT_CHR      </b>This is a character device.
+
+              <b>DT_DIR      </b>This is a directory.
+
+              <b>DT_FIFO     </b>This is a named pipe (FIFO).
+
+              <b>DT_LNK      </b>This is a symbolic link.
+
+              <b>DT_REG      </b>This is a regular file.
+
+              <b>DT_SOCK     </b>This is a UNIX domain socket.
+
+              <b>DT_UNKNOWN  </b>The file type could not be determined.
+
+              Currently, only some filesystems (among them: Btrfs, ext2,
+              ext3, and ext4) have full support for returning the file type
+              in <i>d_type</i>.  All applications must properly handle a return of
+              <b>DT_UNKNOWN</b>.
+
+       <i>d_name</i> This field contains the null terminated filename.  <i>See NOTES</i>.
+
+       The data returned by <b>readdir</b>() may be overwritten by subsequent calls
+       to <b>readdir</b>() for the same directory stream.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>readdir</b>() returns a pointer to a <i>dirent</i> structure.  (This
+       structure may be statically allocated; do not attempt to <a href="free.3.html">free(3)</a> it.)
+
+       If the end of the directory stream is reached, NULL is returned and
+       <i><a href="errno.3.html">errno</a></i> is not changed.  If an error occurs, NULL is returned and <i><a href="errno.3.html">errno</a></i>
+       is set appropriately.  To distinguish end of stream and from an
+       error, set <i><a href="errno.3.html">errno</a></i> to zero before calling <b>readdir</b>() and then check the
+       value of <i><a href="errno.3.html">errno</a></i> if NULL is returned.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EBADF  </b>Invalid directory stream descriptor <i>dirp</i>.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────┬───────────────┬──────────────────────────┐
+       │<b>Interface </b>│ <b>Attribute     </b>│ <b>Value                    </b>│
+       ├──────────┼───────────────┼──────────────────────────┤
+       │<b>readdir</b>() │ Thread safety │ MT-Unsafe race:dirstream │
+       └──────────┴───────────────┴──────────────────────────┘
+
+       In the current POSIX.1 specification (POSIX.1-2008), <b>readdir</b>() is not
+       required to be thread-safe.  However, in modern implementations
+       (including the glibc implementation), concurrent calls to <b>readdir</b>()
+       that specify different directory streams are thread-safe.  In cases
+       where multiple threads must read from the same directory stream,
+       using <b>readdir</b>() with external synchronization is still preferable to
+       the use of the deprecated <a href="readdir_r.3.html">readdir_r(3)</a> function.  It is expected that
+       a future version of POSIX.1 will require that <b>readdir</b>() be thread-
+       safe when concurrently employed on different directory streams.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A directory stream is opened using <a href="opendir.3.html">opendir(3)</a>.
+
+       The order in which filenames are read by successive calls to
+       <b>readdir</b>() depends on the filesystem implementation; it is unlikely
+       that the names will be sorted in any fashion.
+
+       Only the fields <i>d_name</i> and (as an XSI extension) <i>d_ino</i> are specified
+       in POSIX.1.  Other than Linux, the <i>d_type</i> field is available mainly
+       only on BSD systems.  The remaining fields are available on many, but
+       not all systems.  Under glibc, programs can check for the
+       availability of the fields not defined in POSIX.1 by testing whether
+       the macros <b>_DIRENT_HAVE_D_NAMLEN</b>, <b>_DIRENT_HAVE_D_RECLEN</b>,
+       <b>_DIRENT_HAVE_D_OFF</b>, or <b>_DIRENT_HAVE_D_TYPE </b>are defined.
+
+   <b>The d_name field</b>
+       The <i>dirent</i> structure definition shown above is taken from the glibc
+       headers, and shows the <i>d_name</i> field with a fixed size.
+
+       <i>Warning</i>: applications should avoid any dependence on the size of the
+       <i>d_name</i> field.  POSIX defines it as <i>char d_name[]</i>, a character array
+       of unspecified size, with at most <b>NAME_MAX </b>characters preceding the
+       terminating null byte ('\0').
+
+       POSIX.1 explicitly notes that this field should not be used as an
+       lvalue.  The standard also notes that the use of <i>sizeof(d_name)</i> is
+       incorrect; use <i>strlen(d_name)</i> instead.  (On some systems, this field
+       is defined as <i>char d_name[1]</i>!)  By implication, the use <i>sizeof(struct</i>
+       <i>dirent)</i> to capture the size of the record including the size of
+       <i>d_name</i> is also incorrect.
+
+       Note that while the call
+
+           fpathconf(fd, _PC_NAME_MAX)
+
+       returns the value 255 for most filesystems, on some filesystems
+       (e.g., CIFS, Windows SMB servers), the null-terminated filename that
+       is (correctly) returned in <i>d_name</i> can actually exceed this size.  In
+       such cases, the <i>d_reclen</i> field will contain a value that exceeds the
+       size of the glibc <i>dirent</i> structure shown above.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/getdents.2.html">getdents(2)</a>, <a href="../man2/read.2.html">read(2)</a>, <a href="closedir.3.html">closedir(3)</a>, <a href="dirfd.3.html">dirfd(3)</a>, <a href="ftw.3.html">ftw(3)</a>, <a href="offsetof.3.html">offsetof(3)</a>,
+       <a href="opendir.3.html">opendir(3)</a>, <a href="readdir_r.3.html">readdir_r(3)</a>, <a href="rewinddir.3.html">rewinddir(3)</a>, <a href="scandir.3.html">scandir(3)</a>, <a href="seekdir.3.html">seekdir(3)</a>,
+       <a href="telldir.3.html">telldir(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2016-03-15                       READDIR(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/fanotify_mark.2.html">fanotify_mark(2)</a>,&nbsp; 
+    <a href="../man2/getdents.2.html">getdents(2)</a>,&nbsp; 
+    <a href="../man2/readdir.2.html">readdir(2)</a>,&nbsp; 
+    <a href="closedir.3.html">closedir(3)</a>,&nbsp; 
+    <a href="dirfd.3.html">dirfd(3)</a>,&nbsp; 
+    <a href="fts.3.html">fts(3)</a>,&nbsp; 
+    <a href="ftw.3.html">ftw(3)</a>,&nbsp; 
+    <a href="getdirentries.3.html">getdirentries(3)</a>,&nbsp; 
+    <a href="glob.3.html">glob(3)</a>,&nbsp; 
+    <a href="opendir.3.html">opendir(3)</a>,&nbsp; 
+    <a href="readdir_r.3.html">readdir_r(3)</a>,&nbsp; 
+    <a href="rewinddir.3.html">rewinddir(3)</a>,&nbsp; 
+    <a href="scandir.3.html">scandir(3)</a>,&nbsp; 
+    <a href="seekdir.3.html">seekdir(3)</a>,&nbsp; 
+    <a href="telldir.3.html">telldir(3)</a>,&nbsp; 
+    <a href="../man8/mkfs.xfs.8.html">mkfs.xfs(8)</a>,&nbsp; 
+    <a href="../man8/xfs_io.8.html">xfs_io(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="readdir.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

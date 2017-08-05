@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="利用简单的 iptables 规则来说明防火墙，另外也会提到 NAT 服务器这个 IP 分享的咚咚！">
+	<title>鸟哥的 Linux 私房菜 -- Linux 防火墙与 NAT 服务器</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0250simple_firewall.php">
+    <span class="text_head0">第九章、防火墙与<span class="text_head_en"> NAT </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/07/22</span>
+    </div>
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+9.2 <a href="#tcp_wrappers">TCP Wrappers</a><br>
+	<span class="text_h2">
+	　　9.2.1 <a href="#tcp_wrappers_program">哪些服务有支持</a>： <a href="#ldd">ldd</a><br>
+	　　9.2.2 <a href="#tcp_wrappers_setup">/etc/hosts.{allow|deny} 的设定方式</a><br>
+	</span>
+</span></div>
+<!-- 本文的正式部分 -->
+<hr><a name="tcp_wrappers"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">9.2 TCP Wrappers</span><br>
+<div class="block1">
+	<p>在进入主题之前，我们先来玩一个简单的防火墙机制，那就是 TCP Wrappers 这玩意儿。如同前面说的， TCP wrappers
+	是透过客户端想要链接的程序文件名，然后分析客户端的 IP ，看看是否需要放行。那么哪些程序支持 TCP wrappers 
+	的功能？这个 TCP wrappers 又该如何设定？我们这里先简单的谈谈吧！(这个小节仅是简单的介绍过 TCP wrappers 
+	，更多相关功能请参考基础学习篇的<a href="http://linux.vbird.org/linux_basic/0560daemons.php#security">第十八章</a>内容喔！)</p><br>
+
+	<hr><a name="tcp_wrappers_program"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">9.2.1 哪些服务有支持</span><br>
+	<div class="block2">
+		<p>说穿了， TCP wrappers 就是透过 /etc/hosts.allow, /etc/hosts.deny 这两个宝贝蛋来管理的一个类似防火墙的机制，
+		但并非所有的软件都可以透过这两个档案来控管，只有底下的软件才能够透过这两个档案来管理防火墙规则，分别是：</p>
+
+		<ul class="text_import2">
+		<li>由 super daemon (xinetd) 所管理的服务；</li>
+		<li>有支援 libwrap.so 模块的服务。</li>
+		</ul>
+
+		<p>经由 xinetd 管理的服务还好理解，就是配置文件在 /etc/xinetd.d/ 里面的服务就是 xinetd 所管理的啊！
+		那么什么是有支持 libwrap.so 模块呢？就让我们来进行底下的例题，你就比较容易明白啰：</p>
+
+<table width="90%" border="1" cellpadding="5" cellspacing="0"><tbody><tr><td>
+例题：<div class="block2">
+请查出你的系统有没有安装 xinetd ，若没有请安装。安装完毕后，请查询 xinetd 管理的服务有哪些？
+</div>
+答：<div class="block2">
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">yum install xinetd</span>
+Setting up Install Process
+Package 2:xinetd-2.3.14-29.el6.x86_64 <span class="term_write">already installed and latest version</span>
+Nothing to do
+<span class="term_say"># 画面中显示，已经是最新的 xinetd ！所以，已经有安装啰！
+# 接下来找出 xinetd 所管理的服务群！</span>
+
+[root@www ~]# <span class="term_command">chkconfig xinetd on</span>   <span class="term_note">&lt;==要先让 xinetd on 后才能看到底下的</span>
+[root@www ~]# <span class="term_command">chkconfig --list</span>
+<span class="term_say">....(前面省略)....</span>
+xinetd based services:
+        chargen-dgram:  off
+        chargen-stream: off
+<span class="term_say">....(中间省略)....</span>
+        <span class="term_write">rsync:          off</span>   <span class="term_note">&lt;==下一小节的范例就用这玩意儿来解释</span>
+        tcpmux-server:  off
+        telnet:         on
+</pre></td></tr></tbody></table>
+上述结果最终输出的部分就是 xinetd 所管理的服务群啰！上述的服务之防火墙简易设定，都可以透过 TCP wrappers 来管理的噜！
+</div>
+</td></tr></tbody></table><br>
+
+<a name="ldd"></a>
+<table width="90%" border="1" cellpadding="5" cellspacing="0"><tbody><tr><td>
+例题：<div class="block2">
+请问， rsyslogd, sshd, xinetd, httpd (若该服务不存在，请自行安装软件)，这四个程序有没有支持 tcp wrappers 的抵挡功能？
+</div>
+答：<div class="block2">
+由于支持 tcp wrappers 的服务必定包含 libwrap 这一个动态函式库，因此可以使用 ldd 来观察该服务即可。
+简单的使用方式为：
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">ldd $(which rsyslogd sshd xinetd httpd)</span>
+<span class="term_say"># 这个方式可以将所有的动态函式库取出来查阅，不过需要眼睛搜寻。
+# 可以透过底下的方式来处理更快！</span>
+
+[root@www ~]# <span class="term_command">for name in rsyslogd sshd xinetd httpd; do echo $name; \</span>
+&gt; <span class="term_command">ldd $(which $name) | grep libwrap; done</span>
+rsyslogd
+sshd
+        libwrap.so.0 =&gt; /lib64/libwrap.so.0 (0x00007fb41d3c9000)
+xinetd
+        libwrap.so.0 =&gt; /lib64/libwrap.so.0 (0x00007f6314821000)
+httpd
+</pre></td></tr></tbody></table>
+上述的结果中，在该档名档下有出现 libwrap 的，代表有找到该函式库，才有支持 tcp wrappers。
+所以， sshd, xinetd 有支持，但是 rsyslogd, httpd 这两支程序则不支持。也就是说， httpd 与 rsyslogd 不能够使用 /etc/hosts.{allow|deny}
+来进行防火墙机制的控管。
+</div>
+</td></tr></tbody></table><br>
+	</div>
+
+	<hr><a name="tcp_wrappers_setup"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">9.2.2 /etc/hosts.{allow|deny} 
+	的设定方式</span><br>
+	<div class="block2">
+		<p>那如何透过这两个档案来抵挡有问题的 IP 来源呢？这两个档案的语法都一样，很简单的：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>&lt;service(program_name)&gt; : &lt;IP, domain, hostname&gt; 
+&lt;服务   (亦即程序名称)&gt; : &lt;IP 或领域 或主机名&gt;
+<span class="term_say"># 上头的 &gt; &lt; 是不存在于配置文件中的喔！</span>
+</pre></td></tr></tbody></table>
+
+		<p>我们知道防火墙的规则都是有顺序的，那这两个档案与规则的顺序优先是怎样呢？基本上是这样的：</p>
+
+		<ul class="text_import2">
+		<li>先以 /etc/hosts.allow 为优先比对，该规则符合就予以放行；</li>
+		<li>再以 /etc/hosts.deny 比对，规则符合就予以抵挡；</li>
+		<li>若不在这两个档案内，亦即规则都不符合，最终则予以放行。</li>
+		</ul>
+
+		<p>我们拿 rsync 这个 xinetd 管理的服务来进行说明好了，请参考底下的例题吧：</p>
+
+<table width="90%" border="1" cellpadding="5" cellspacing="0"><tbody><tr><td>
+例题：<div class="block2">
+先开放本机的 127.0.0.1 可以进行任何本机的服务，然后，让区网 (192.168.1.0/24) 可以使用 rsync ，
+同时 10.0.0.100 也能够使用 rsync ，但其他来源则不允许使用 rsync 喔。
+</div>
+答：<div class="block2">
+<span class="text_import2">我们得要先知道 rsync 的服务启动的档名为何，因为 tcp wrappers 是透过启动服务的档名来管理的。</span>
+当我们观察 rsync 的配置文件时，可以发现：
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">cat /etc/xinetd.d/rsync</span>
+service rsync
+{
+        disable = yes
+        flags           = IPv6
+        socket_type     = stream
+        wait            = no
+        user            = root
+        <span class="term_write">server          = /usr/bin/rsync</span>   <span class="term_note">&lt;==檔名叫做 rsync</span>
+        server_args     = --daemon
+        log_on_failure  += USERID
+}
+</pre></td></tr></tbody></table>
+
+因此程序字段的项目要写的是 rsync 喔！因此，我们应该要这样设定的：
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /etc/hosts.allow</span>
+<span class="term_write">ALL: 127.0.0.1</span>    <span class="term_note">&lt;==这就是本机全部的服务都接受！</span>
+<span class="term_write">rsync: 192.168.1.0/255.255.255.0 10.0.0.100</span>
+
+[root@www ~]# <span class="term_command">vim /etc/hosts.deny</span>
+<span class="term_write">rsync: ALL</span>
+</pre></td></tr></tbody></table>
+</div>
+</td></tr></tbody></table><br>
+
+		<p>上面的例题有几个重点，首先， tcp wrappers 理论上不支持 192.168.1.0/24 这种透过 bit 数值来定义的网域，
+		只支持 netmask 的地址显示方式。另外，如果有多个网域或者是单一来源，可以透过空格来累加。
+		如果想要写成多行呢？也可以啊！多写几行『 kshd: IP 』的方式也可以，不必要将所有数据集中在一行啦！因为
+		tcp wrappers 也是一条一条规则比对嘛！</p>
+
+		<p>基本上，你只要理解这些数据即可！因为绝大部分的时刻，我们都会建议使用底下介绍的 Netfilter 的机制来抵挡封包。
+		那让我们准备开始来玩玩 iptables 封包过滤防火墙吧！</p>
+	</div>
+</div><hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

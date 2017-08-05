@@ -1,0 +1,281 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>atexit(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ATEXIT(3)                 Linux Programmer's Manual                ATEXIT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       atexit  - register a function to be called at normal process termina‐
+       tion
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdlib.h&gt;</b>
+
+       <b>int atexit(void (*</b><i>function</i><b>)(void));</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>atexit</b>() function registers the given <i>function</i> to be called at
+       normal process termination, either via <a href="exit.3.html">exit(3)</a> or via return from the
+       program's <i>main</i>().  Functions so registered are called in the reverse
+       order of their registration; no arguments are passed.
+
+       The same function may be registered multiple times: it is called once
+       for each registration.
+
+       POSIX.1 requires that an implementation allow at least <b>ATEXIT_MAX</b>
+       (32) such functions to be registered.  The actual limit supported by
+       an implementation can be obtained using <a href="sysconf.3.html">sysconf(3)</a>.
+
+       When a child process is created via <a href="../man2/fork.2.html">fork(2)</a>, it inherits copies of
+       its parent's registrations.  Upon a successful call to one of the
+       <a href="exec.3.html">exec(3)</a> functions, all registrations are removed.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>atexit</b>() function returns the value 0 if successful; otherwise it
+       returns a nonzero value.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────┬───────────────┬─────────┐
+       │<b>Interface </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├──────────┼───────────────┼─────────┤
+       │<b>atexit</b>()  │ Thread safety │ MT-Safe │
+       └──────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, C89, C99, SVr4, 4.3BSD.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Functions registered using <b>atexit</b>() (and <a href="on_exit.3.html">on_exit(3)</a>) are not called
+       if a process terminates abnormally because of the delivery of a
+       signal.
+
+       If one of the functions registered functions calls <a href="../man2/_exit.2-2.html">_exit(2)</a>, then any
+       remaining functions are not invoked, and the other process
+       termination steps performed by <a href="exit.3.html">exit(3)</a> are not performed.
+
+       POSIX.1 says that the result of calling <a href="exit.3.html">exit(3)</a> more than once (i.e.,
+       calling <a href="exit.3.html">exit(3)</a> within a function registered using <b>atexit</b>()) is
+       undefined.  On some systems (but not Linux), this can result in an
+       infinite recursion; portable programs should not invoke <a href="exit.3.html">exit(3)</a>
+       inside a function registered using <b>atexit</b>().
+
+       The <b>atexit</b>() and <a href="on_exit.3.html">on_exit(3)</a> functions register functions on the same
+       list: at normal process termination, the registered functions are
+       invoked in reverse order of their registration by these two
+       functions.
+
+       According to POSIX.1, the result is undefined if <a href="longjmp.3.html">longjmp(3)</a> is used
+       to terminate execution of one of the functions registered <b>atexit</b>().
+
+   <b>Linux notes</b>
+       Since glibc 2.2.3, <b>atexit</b>() (and <a href="on_exit.3.html">on_exit(3)</a>) can be used within a
+       shared library to establish functions that are called when the shared
+       library is unloaded.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;unistd.h&gt;
+
+       void
+       bye(void)
+       {
+           printf("That was all, folks\n");
+       }
+
+       int
+       main(void)
+       {
+           long a;
+           int i;
+
+           a = sysconf(_SC_ATEXIT_MAX);
+           printf("ATEXIT_MAX = %ld\n", a);
+
+           i = atexit(bye);
+           if (i != 0) {
+               fprintf(stderr, "cannot set exit function\n");
+               exit(EXIT_FAILURE);
+           }
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/_exit.2-2.html">_exit(2)</a>, <a href="dlopen.3.html">dlopen(3)</a>, <a href="exit.3.html">exit(3)</a>, <a href="on_exit.3.html">on_exit(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-08-08                        ATEXIT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/execve.2.html">execve(2)</a>,&nbsp; 
+    <a href="../man2/_exit.2-2.html">_exit(2)</a>,&nbsp; 
+    <a href="dlopen.3.html">dlopen(3)</a>,&nbsp; 
+    <a href="exit.3.html">exit(3)</a>,&nbsp; 
+    <a href="on_exit.3.html">on_exit(3)</a>,&nbsp; 
+    <a href="pmdaopenlog.3-2.html">pmdaopenlog(3)</a>,&nbsp; 
+    <a href="pmfault.3.html">pmfault(3)</a>,&nbsp; 
+    <a href="pmopenlog.3.html">pmopenlog(3)</a>,&nbsp; 
+    <a href="pthread_atfork.3.html">pthread_atfork(3)</a>,&nbsp; 
+    <a href="pthread_exit.3.html">pthread_exit(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="atexit.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,420 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.journal-fields(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#USER_JOURNAL_FIELDS">USER&nbsp;JOURNAL&nbsp;FIELDS</a> | <a href="#TRUSTED_JOURNAL_FIELDS">TRUSTED&nbsp;JOURNAL&nbsp;FIELDS</a> | <a href="#KERNEL_JOURNAL_FIELDS">KERNEL&nbsp;JOURNAL&nbsp;FIELDS</a> | <a href="#FIELDS_TO_LOG_ON_BEHALF_OF_A_DIFFERENT_PROGRAM">FIELDS&nbsp;TO&nbsp;LOG&nbsp;ON&nbsp;BEHALF&nbsp;OF&nbsp;A&nbsp;DIFFERENT&nbsp;PROGRAM</a> | <a href="#ADDRESS_FIELDS">ADDRESS&nbsp;FIELDS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.JOURNAL-FIELDS(7)  systemd.journal-fields  SYSTEMD.JOURNAL-FIELDS(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.journal-fields - Special journal fields
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Entries in the journal resemble an environment block in their syntax
+       but with fields that can include binary data. Primarily, fields are
+       formatted UTF-8 text strings, and binary formatting is used only
+       where formatting as UTF-8 text strings makes little sense. New fields
+       may freely be defined by applications, but a few fields have special
+       meaning. All fields with special meanings are optional. In some
+       cases, fields may appear more than once per entry.
+</pre>
+<h2><a id="USER_JOURNAL_FIELDS" href="#USER_JOURNAL_FIELDS"></a>USER JOURNAL FIELDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       User fields are fields that are directly passed from clients and
+       stored in the journal.
+
+       <i>MESSAGE=</i>
+           The human-readable message string for this entry. This is
+           supposed to be the primary text shown to the user. It is usually
+           not translated (but might be in some cases), and is not supposed
+           to be parsed for metadata.
+
+       <i>MESSAGE_ID=</i>
+           A 128-bit message identifier ID for recognizing certain message
+           types, if this is desirable. This should contain a 128-bit ID
+           formatted as a lower-case hexadecimal string, without any
+           separating dashes or suchlike. This is recommended to be a
+           UUID-compatible ID, but this is not enforced, and formatted
+           differently. Developers can generate a new ID for this purpose
+           with <b>journalctl --new-id128</b>.
+
+       <i>PRIORITY=</i>
+           A priority value between 0 ("emerg") and 7 ("debug") formatted as
+           a decimal string. This field is compatible with syslog's priority
+           concept.
+
+       <i>CODE_FILE=</i>, <i>CODE_LINE=</i>, <i>CODE_FUNC=</i>
+           The code location generating this message, if known. Contains the
+           source filename, the line number and the function name.
+
+       <i>ERRNO=</i>
+           The low-level Unix error number causing this entry, if any.
+           Contains the numeric value of <a href="../man3/errno.3.html">errno(3)</a> formatted as a decimal
+           string.
+
+       <i>SYSLOG_FACILITY=</i>, <i>SYSLOG_IDENTIFIER=</i>, <i>SYSLOG_PID=</i>
+           Syslog compatibility fields containing the facility (formatted as
+           decimal string), the identifier string (i.e. "tag"), and the
+           client PID. (Note that the tag is usually derived from glibc's
+           <i>program_invocation_short_name</i> variable, see
+           <a href="../man3/program_invocation_short_name.3.html">program_invocation_short_name(3)</a>.)
+</pre>
+<h2><a id="TRUSTED_JOURNAL_FIELDS" href="#TRUSTED_JOURNAL_FIELDS"></a>TRUSTED JOURNAL FIELDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Fields prefixed with an underscore are trusted fields, i.e. fields
+       that are implicitly added by the journal and cannot be altered by
+       client code.
+
+       <i>_PID=</i>, <i>_UID=</i>, <i>_GID=</i>
+           The process, user, and group ID of the process the journal entry
+           originates from formatted as a decimal string. Note that entries
+           obtained via "stdout" or "stderr" of forked processes will
+           contain credentials valid for a parent process (that initiated
+           the connection to <b>systemd-journald</b>).
+
+       <i>_COMM=</i>, <i>_EXE=</i>, <i>_CMDLINE=</i>
+           The name, the executable path, and the command line of the
+           process the journal entry originates from.
+
+       <i>_CAP_EFFECTIVE=</i>
+           The effective <a href="capabilities.7.html">capabilities(7)</a> of the process the journal entry
+           originates from.
+
+       <i>_AUDIT_SESSION=</i>, <i>_AUDIT_LOGINUID=</i>
+           The session and login UID of the process the journal entry
+           originates from, as maintained by the kernel audit subsystem.
+
+       <i>_SYSTEMD_CGROUP=</i>, <i>_SYSTEMD_SESSION=</i>, <i>_SYSTEMD_UNIT=</i>,
+       <i>_SYSTEMD_USER_UNIT=</i>, <i>_SYSTEMD_OWNER_UID=</i>, <i>_SYSTEMD_SLICE=</i>
+           The control group path in the systemd hierarchy, the systemd
+           session ID (if any), the systemd unit name (if any), the systemd
+           user session unit name (if any), the owner UID of the systemd
+           session (if any) and the systemd slice unit of the process the
+           journal entry originates from.
+
+       <i>_SELINUX_CONTEXT=</i>
+           The SELinux security context (label) of the process the journal
+           entry originates from.
+
+       <i>_SOURCE_REALTIME_TIMESTAMP=</i>
+           The earliest trusted timestamp of the message, if any is known
+           that is different from the reception time of the journal. This is
+           the time in microseconds since the epoch UTC, formatted as a
+           decimal string.
+
+       <i>_BOOT_ID=</i>
+           The kernel boot ID for the boot the message was generated in,
+           formatted as a 128-bit hexadecimal string.
+
+       <i>_MACHINE_ID=</i>
+           The machine ID of the originating host, as available in
+           <a href="../man5/machine-id.5.html">machine-id(5)</a>.
+
+       <i>_SYSTEMD_INVOCATION_ID=</i>
+           The invocation ID for the runtime cycle of the unit the message
+           was generated in, as available to processes of the unit in
+           <i>$INVOCATION_ID</i> (see <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>).
+
+       <i>_HOSTNAME=</i>
+           The name of the originating host.
+
+       <i>_TRANSPORT=</i>
+           How the entry was received by the journal service. Valid
+           transports are:
+
+           <b>audit</b>
+               for those read from the kernel audit subsystem
+
+           <b>driver</b>
+               for internally generated messages
+
+           <b>syslog</b>
+               for those received via the local syslog socket with the
+               syslog protocol
+
+           <b>journal</b>
+               for those received via the native journal protocol
+
+           <b>stdout</b>
+               for those read from a service's standard output or error
+               output
+
+           <b>kernel</b>
+               for those read from the kernel
+</pre>
+<h2><a id="KERNEL_JOURNAL_FIELDS" href="#KERNEL_JOURNAL_FIELDS"></a>KERNEL JOURNAL FIELDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Kernel fields are fields that are used by messages originating in the
+       kernel and stored in the journal.
+
+       <i>_KERNEL_DEVICE=</i>
+           The kernel device name. If the entry is associated to a block
+           device, the major and minor of the device node, separated by ":"
+           and prefixed by "b". Similar for character devices but prefixed
+           by "c". For network devices, this is the interface index prefixed
+           by "n". For all other devices, this is the subsystem name
+           prefixed by "+", followed by ":", followed by the kernel device
+           name.
+
+       <i>_KERNEL_SUBSYSTEM=</i>
+           The kernel subsystem name.
+
+       <i>_UDEV_SYSNAME=</i>
+           The kernel device name as it shows up in the device tree below
+           /sys.
+
+       <i>_UDEV_DEVNODE=</i>
+           The device node path of this device in /dev.
+
+       <i>_UDEV_DEVLINK=</i>
+           Additional symlink names pointing to the device node in /dev.
+           This field is frequently set more than once per entry.
+</pre>
+<h2><a id="FIELDS_TO_LOG_ON_BEHALF_OF_A_DIFFERENT_PROGRAM" href="#FIELDS_TO_LOG_ON_BEHALF_OF_A_DIFFERENT_PROGRAM"></a>FIELDS TO LOG ON BEHALF OF A DIFFERENT PROGRAM  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Fields in this section are used by programs to specify that they are
+       logging on behalf of another program or unit.
+
+       Fields used by the <b>systemd-coredump </b>coredump kernel helper:
+
+       <i>COREDUMP_UNIT=</i>, <i>COREDUMP_USER_UNIT=</i>
+           Used to annotate messages containing coredumps from system and
+           session units. See <a href="../man1/coredumpctl.1.html">coredumpctl(1)</a>.
+
+       Privileged programs (currently UID 0) may attach <i>OBJECT_PID=</i> to a
+       message. This will instruct <b>systemd-journald </b>to attach additional
+       fields on behalf of the caller:
+
+       <i>OBJECT_PID=PID</i>
+           PID of the program that this message pertains to.
+
+       <i>OBJECT_UID=</i>, <i>OBJECT_GID=</i>, <i>OBJECT_COMM=</i>, <i>OBJECT_EXE=</i>, <i>OBJECT_CMDLINE=</i>,
+       <i>OBJECT_AUDIT_SESSION=</i>, <i>OBJECT_AUDIT_LOGINUID=</i>,
+       <i>OBJECT_SYSTEMD_CGROUP=</i>, <i>OBJECT_SYSTEMD_SESSION=</i>,
+       <i>OBJECT_SYSTEMD_OWNER_UID=</i>, <i>OBJECT_SYSTEMD_UNIT=</i>,
+       <i>OBJECT_SYSTEMD_USER_UNIT=</i>
+           These are additional fields added automatically by
+           <b>systemd-journald</b>. Their meaning is the same as <i>_UID=</i>, <i>_GID=</i>,
+           <i>_COMM=</i>, <i>_EXE=</i>, <i>_CMDLINE=</i>, <i>_AUDIT_SESSION=</i>, <i>_AUDIT_LOGINUID=</i>,
+           <i>_SYSTEMD_CGROUP=</i>, <i>_SYSTEMD_SESSION=</i>, <i>_SYSTEMD_UNIT=</i>,
+           <i>_SYSTEMD_USER_UNIT=</i>, and <i>_SYSTEMD_OWNER_UID=</i> as described above,
+           except that the process identified by <i>PID</i> is described, instead
+           of the process which logged the message.
+</pre>
+<h2><a id="ADDRESS_FIELDS" href="#ADDRESS_FIELDS"></a>ADDRESS FIELDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       During serialization into external formats, such as the <b>Journal</b>
+       <b>Export Format</b><b></b>[1] or the <b>Journal JSON Format</b><b></b>[2], the addresses of
+       journal entries are serialized into fields prefixed with double
+       underscores. Note that these are not proper fields when stored in the
+       journal but for addressing metadata of entries. They cannot be
+       written as part of structured log entries via calls such as
+       <a href="../man3/sd_journal_send.3.html">sd_journal_send(3)</a>. They may also not be used as matches for
+       <a href="../man3/sd_journal_add_match.3.html">sd_journal_add_match(3)</a>
+
+       <i>__CURSOR=</i>
+           The cursor for the entry. A cursor is an opaque text string that
+           uniquely describes the position of an entry in the journal and is
+           portable across machines, platforms and journal files.
+
+       <i>__REALTIME_TIMESTAMP=</i>
+           The wallclock time (<b>CLOCK_REALTIME</b>) at the point in time the
+           entry was received by the journal, in microseconds since the
+           epoch UTC, formatted as a decimal string. This has different
+           properties from "_SOURCE_REALTIME_TIMESTAMP=", as it is usually a
+           bit later but more likely to be monotonic.
+
+       <i>__MONOTONIC_TIMESTAMP=</i>
+           The monotonic time (<b>CLOCK_MONOTONIC</b>) at the point in time the
+           entry was received by the journal in microseconds, formatted as a
+           decimal string. To be useful as an address for the entry, this
+           should be combined with the boot ID in "_BOOT_ID=".
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man1/journalctl.1.html">journalctl(1)</a>, <a href="../man5/journald.conf.5.html">journald.conf(5)</a>, <a href="../man3/sd-journal.3.html">sd-journal(3)</a>,
+       <a href="../man1/coredumpctl.1.html">coredumpctl(1)</a>, <a href="systemd.directives.7.html">systemd.directives(7)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. Journal Export Format
+           <a href="https://www.freedesktop.org/wiki/Software/systemd/export">https://www.freedesktop.org/wiki/Software/systemd/export</a>
+
+        2. Journal JSON Format
+           <a href="https://www.freedesktop.org/wiki/Software/systemd/json">https://www.freedesktop.org/wiki/Software/systemd/json</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                        SYSTEMD.JOURNAL-FIELDS(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/journalctl.1.html">journalctl(1)</a>,&nbsp; 
+    <a href="../man1/logger.1.html">logger(1)</a>,&nbsp; 
+    <a href="../man3/sd_bus_creds_get_pid.3.html">sd_bus_creds_get_pid(3)</a>,&nbsp; 
+    <a href="../man3/sd_journal_add_match.3.html">sd_journal_add_match(3)</a>,&nbsp; 
+    <a href="../man3/sd_journal_enumerate_fields.3.html">sd_journal_enumerate_fields(3)</a>,&nbsp; 
+    <a href="../man3/sd_journal_get_catalog.3.html">sd_journal_get_catalog(3)</a>,&nbsp; 
+    <a href="../man3/sd_journal_get_data.3.html">sd_journal_get_data(3)</a>,&nbsp; 
+    <a href="../man3/sd_journal_print.3.html">sd_journal_print(3)</a>,&nbsp; 
+    <a href="../man3/sd_journal_query_unique.3.html">sd_journal_query_unique(3)</a>,&nbsp; 
+    <a href="../man3/sd_journal_stream_fd.3.html">sd_journal_stream_fd(3)</a>,&nbsp; 
+    <a href="../man5/journald.conf.5.html">journald.conf(5)</a>,&nbsp; 
+    <a href="systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man8/systemd-journald.service.8.html">systemd-journald.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

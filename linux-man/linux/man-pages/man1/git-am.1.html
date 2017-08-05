@@ -1,0 +1,380 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-am(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#DISCUSSION">DISCUSSION</a> | <a href="#HOOKS">HOOKS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-AM(1)                        Git Manual                        GIT-AM(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-am - Apply a series of patches from a mailbox
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git am</i> [--signoff] [--keep] [--[no-]keep-cr] [--[no-]utf8]
+                [--[no-]3way] [--interactive] [--committer-date-is-author-date]
+                [--ignore-date] [--ignore-space-change | --ignore-whitespace]
+                [--whitespace=&lt;option&gt;] [-C&lt;n&gt;] [-p&lt;n&gt;] [--directory=&lt;dir&gt;]
+                [--exclude=&lt;path&gt;] [--include=&lt;path&gt;] [--reject] [-q | --quiet]
+                [--[no-]scissors] [-S[&lt;keyid&gt;]] [--patch-format=&lt;format&gt;]
+                [(&lt;mbox&gt; | &lt;Maildir&gt;)...]
+       <i>git am</i> (--continue | --skip | --abort)
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Splits mail messages in a mailbox into commit log message, authorship
+       information and patches, and applies them to the current branch.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       (&lt;mbox&gt;|&lt;Maildir&gt;)...
+           The list of mailbox files to read patches from. If you do not
+           supply this argument, the command reads from the standard input.
+           If you supply directories, they will be treated as Maildirs.
+
+       -s, --signoff
+           Add a <b>Signed-off-by: </b>line to the commit message, using the
+           committer identity of yourself. See the signoff option in
+           <a href="git-commit.1.html">git-commit(1)</a> for more information.
+
+       -k, --keep
+           Pass <b>-k </b>flag to <i>git mailinfo</i> (see <a href="git-mailinfo.1.html">git-mailinfo(1)</a>).
+
+       --keep-non-patch
+           Pass <b>-b </b>flag to <i>git mailinfo</i> (see <a href="git-mailinfo.1.html">git-mailinfo(1)</a>).
+
+       --[no-]keep-cr
+           With <b>--keep-cr</b>, call <i>git mailsplit</i> (see <a href="git-mailsplit.1.html">git-mailsplit(1)</a>) with
+           the same option, to prevent it from stripping CR at the end of
+           lines.  <b>am.keepcr </b>configuration variable can be used to specify
+           the default behaviour.  <b>--no-keep-cr </b>is useful to override
+           <b>am.keepcr</b>.
+
+       -c, --scissors
+           Remove everything in body before a scissors line (see
+           <a href="git-mailinfo.1.html">git-mailinfo(1)</a>). Can be activated by default using the
+           <b>mailinfo.scissors </b>configuration variable.
+
+       --no-scissors
+           Ignore scissors lines (see <a href="git-mailinfo.1.html">git-mailinfo(1)</a>).
+
+       -m, --message-id
+           Pass the <b>-m </b>flag to <i>git mailinfo</i> (see <a href="git-mailinfo.1.html">git-mailinfo(1)</a>), so that
+           the Message-ID header is added to the commit message. The
+           <b>am.messageid </b>configuration variable can be used to specify the
+           default behaviour.
+
+       --no-message-id
+           Do not add the Message-ID header to the commit message.
+           <b>no-message-id </b>is useful to override <b>am.messageid</b>.
+
+       -q, --quiet
+           Be quiet. Only print error messages.
+
+       -u, --utf8
+           Pass <b>-u </b>flag to <i>git mailinfo</i> (see <a href="git-mailinfo.1.html">git-mailinfo(1)</a>). The proposed
+           commit log message taken from the e-mail is re-coded into UTF-8
+           encoding (configuration variable <b>i18n.commitencoding </b>can be used
+           to specify project’s preferred encoding if it is not UTF-8).
+
+           This was optional in prior versions of git, but now it is the
+           default. You can use <b>--no-utf8 </b>to override this.
+
+       --no-utf8
+           Pass <b>-n </b>flag to <i>git mailinfo</i> (see <a href="git-mailinfo.1.html">git-mailinfo(1)</a>).
+
+       -3, --3way, --no-3way
+           When the patch does not apply cleanly, fall back on 3-way merge
+           if the patch records the identity of blobs it is supposed to
+           apply to and we have those blobs available locally.  <b>--no-3way</b>
+           can be used to override am.threeWay configuration variable. For
+           more information, see am.threeWay in <a href="git-config.1.html">git-config(1)</a>.
+
+       --ignore-space-change, --ignore-whitespace, --whitespace=&lt;option&gt;,
+       -C&lt;n&gt;, -p&lt;n&gt;, --directory=&lt;dir&gt;, --exclude=&lt;path&gt;, --include=&lt;path&gt;,
+       --reject
+           These flags are passed to the <i>git apply</i> (see <a href="git-apply.1.html">git-apply(1)</a>)
+           program that applies the patch.
+
+       --patch-format
+           By default the command will try to detect the patch format
+           automatically. This option allows the user to bypass the
+           automatic detection and specify the patch format that the
+           patch(es) should be interpreted as. Valid formats are mbox,
+           mboxrd, stgit, stgit-series and hg.
+
+       -i, --interactive
+           Run interactively.
+
+       --committer-date-is-author-date
+           By default the command records the date from the e-mail message
+           as the commit author date, and uses the time of commit creation
+           as the committer date. This allows the user to lie about the
+           committer date by using the same value as the author date.
+
+       --ignore-date
+           By default the command records the date from the e-mail message
+           as the commit author date, and uses the time of commit creation
+           as the committer date. This allows the user to lie about the
+           author date by using the same value as the committer date.
+
+       --skip
+           Skip the current patch. This is only meaningful when restarting
+           an aborted patch.
+
+       -S[&lt;keyid&gt;], --gpg-sign[=&lt;keyid&gt;]
+           GPG-sign commits. The <b>keyid </b>argument is optional and defaults to
+           the committer identity; if specified, it must be stuck to the
+           option without a space.
+
+       --continue, -r, --resolved
+           After a patch failure (e.g. attempting to apply conflicting
+           patch), the user has applied it by hand and the index file stores
+           the result of the application. Make a commit using the authorship
+           and commit log extracted from the e-mail message and the current
+           index file, and continue.
+
+       --resolvemsg=&lt;msg&gt;
+           When a patch failure occurs, &lt;msg&gt; will be printed to the screen
+           before exiting. This overrides the standard message informing you
+           to use <b>--continue </b>or <b>--skip </b>to handle the failure. This is solely
+           for internal use between <i>git rebase</i> and <i>git am</i>.
+
+       --abort
+           Restore the original branch and abort the patching operation.
+</pre>
+<h2><a id="DISCUSSION" href="#DISCUSSION"></a>DISCUSSION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The commit author name is taken from the "From: " line of the
+       message, and commit author date is taken from the "Date: " line of
+       the message. The "Subject: " line is used as the title of the commit,
+       after stripping common prefix "[PATCH &lt;anything&gt;]". The "Subject: "
+       line is supposed to concisely describe what the commit is about in
+       one line of text.
+
+       "From: " and "Subject: " lines starting the body override the
+       respective commit author name and title values taken from the
+       headers.
+
+       The commit message is formed by the title taken from the "Subject: ",
+       a blank line and the body of the message up to where the patch
+       begins. Excess whitespace at the end of each line is automatically
+       stripped.
+
+       The patch is expected to be inline, directly following the message.
+       Any line that is of the form:
+
+       ·   three-dashes and end-of-line, or
+
+       ·   a line that begins with "diff -", or
+
+       ·   a line that begins with "Index: "
+
+       is taken as the beginning of a patch, and the commit log message is
+       terminated before the first occurrence of such a line.
+
+       When initially invoking <b>git am</b>, you give it the names of the
+       mailboxes to process. Upon seeing the first patch that does not
+       apply, it aborts in the middle. You can recover from this in one of
+       two ways:
+
+        1. skip the current patch by re-running the command with the <b>--skip</b>
+           option.
+
+        2. hand resolve the conflict in the working directory, and update
+           the index file to bring it into a state that the patch should
+           have produced. Then run the command with the <b>--continue </b>option.
+
+       The command refuses to process new mailboxes until the current
+       operation is finished, so if you decide to start over from scratch,
+       run <b>git am --abort </b>before running the command with mailbox names.
+
+       Before any patches are applied, ORIG_HEAD is set to the tip of the
+       current branch. This is useful if you have problems with multiple
+       commits, like running <i>git am</i> on the wrong branch or an error in the
+       commits that is more easily fixed by changing the mailbox (e.g.
+       errors in the "From:" lines).
+</pre>
+<h2><a id="HOOKS" href="#HOOKS"></a>HOOKS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This command can run <b>applypatch-msg</b>, <b>pre-applypatch</b>, and
+       <b>post-applypatch </b>hooks. See <a href="../man5/githooks.5.html">githooks(5)</a> for more information.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="git-apply.1.html">git-apply(1)</a>.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.9.2.277.g2949358           07/16/2016                        GIT-AM(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-apply.1.html">git-apply(1)</a>,&nbsp; 
+    <a href="git-cherry.1.html">git-cherry(1)</a>,&nbsp; 
+    <a href="git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="git-format-patch.1.html">git-format-patch(1)</a>,&nbsp; 
+    <a href="git-mailinfo.1.html">git-mailinfo(1)</a>,&nbsp; 
+    <a href="git-rebase.1.html">git-rebase(1)</a>,&nbsp; 
+    <a href="gitweb.1.html">gitweb(1)</a>,&nbsp; 
+    <a href="../man7/giteveryday.7.html">giteveryday(7)</a>,&nbsp; 
+    <a href="../man7/gittutorial.7.html">gittutorial(7)</a>,&nbsp; 
+    <a href="../man7/gitworkflows.7.html">gitworkflows(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,902 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>mkfs.xfs(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#BUGS">BUGS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">mkfs.xfs(8)                System Manager's Manual               mkfs.xfs(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       mkfs.xfs - construct an XFS filesystem
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mkfs.xfs </b>[ <b>-b </b><i>block_size</i> ] [ <b>-m </b><i>global_metadata_options</i> ] [ <b>-d</b>
+       <i>data_section_options</i> ] [ <b>-f </b>] [ <b>-i </b><i>inode_options</i> ] [ <b>-l</b>
+       <i>log_section_options</i> ] [ <b>-n </b><i>naming_options</i> ] [ <b>-p </b><i>protofile</i> ] [ <b>-q </b>] [
+       <b>-r </b><i>realtime_section_options</i> ] [ <b>-s </b><i>sector_size</i> ] [ <b>-L </b><i>label</i> ] [ <b>-N </b>]
+       [ <b>-K </b>] <i>device</i>
+       <b>mkfs.xfs -V</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mkfs.xfs </b>constructs an XFS filesystem by writing on a special file
+       using the values found in the arguments of the command line.  It is
+       invoked automatically by <a href="mkfs.8.html">mkfs(8)</a> when it is given the <b>-t xfs </b>option.
+
+       In its simplest (and most commonly used form), the size of the
+       filesystem is determined from the disk driver.  As an example, to
+       make a filesystem with an internal log on the first partition on the
+       first SCSI disk, use:
+
+              <b>mkfs.xfs /dev/sda1</b>
+
+       The metadata log can be placed on another device to reduce the number
+       of disk seeks.  To create a filesystem on the first partition on the
+       first SCSI disk with a 10MiB log located on the first partition on
+       the second SCSI disk, use:
+
+              <b>mkfs.xfs -l logdev=/dev/sdb1,size=10m /dev/sda1</b>
+
+       Each of the <i>option</i> elements in the argument list above can be given
+       as multiple comma-separated suboptions if multiple suboptions apply
+       to the same option.  Equivalently, each main option can be given
+       multiple times with different suboptions.  For example, <b>-l</b>
+       <b>internal,size=10m </b>and <b>-l internal -l size=10m </b>are equivalent.
+
+       In the descriptions below, sizes are given in sectors, bytes, blocks,
+       kilobytes, megabytes, gigabytes, etc.  Sizes are treated as
+       hexadecimal if prefixed by 0x or 0X, octal if prefixed by 0, or
+       decimal otherwise.  The following lists possible multiplication
+       suffixes:
+              <b>s </b>- multiply by sector size (default = 512, see <b>-s </b>option
+                     below).
+              <b>b </b>- multiply by filesystem block size (default = 4K, see <b>-b</b>
+                     option below).
+              <b>k </b>- multiply by one kilobyte (1,024 bytes).
+              <b>m </b>- multiply by one megabyte (1,048,576 bytes).
+              <b>g </b>- multiply by one gigabyte (1,073,741,824 bytes).
+              <b>t </b>- multiply by one terabyte (1,099,511,627,776 bytes).
+              <b>p </b>- multiply by one petabyte (1,024 terabytes).
+              <b>e </b>- multiply by one exabyte (1,048,576 terabytes).
+
+       When specifying parameters in units of sectors or filesystem blocks,
+       the <b>-s </b>option or the <b>-b </b>option first needs to be added to the command
+       line.  Failure to specify the size of the units will result in
+       illegal value errors when parameters are quantified in those units.
+
+       Many feature options allow an optional argument of 0 or 1, to
+       explicitly disable or enable the functionality.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-b </b><i>block_size_options</i>
+              This option specifies the fundamental block size of the
+              filesystem.  The valid <i>block_size_options</i> are: <b>log=</b><i>value</i> or
+              <b>size=</b><i>value</i> and only one can be supplied.  The block size is
+              specified either as a base two logarithm value with <b>log=</b>, or
+              in bytes with <b>size=</b>.  The default value is 4096 bytes (4 KiB),
+              the minimum is 512, and the maximum is 65536 (64 KiB).
+
+              To specify any options on the command line in units of
+              filesystem blocks, this option must be specified first so that
+              the filesystem block size is applied consistently to all
+              options.
+
+              Although <b>mkfs.xfs </b>will accept any of these values and create a
+              valid filesystem, XFS on Linux can only mount filesystems with
+              pagesize or smaller blocks.
+
+       <b>-m </b><i>global_metadata_options</i>
+              These options specify metadata format options that either
+              apply to the entire filesystem or aren't easily characterised
+              by a specific functionality group. The valid
+              <i>global_metadata_options</i> are:
+
+                   <b>crc=</b><i>value</i>
+                          This is used to create a filesystem which
+                          maintains and checks CRC information in all
+                          metadata objects on disk. The value is either 0 to
+                          disable the feature, or 1 to enable the use of
+                          CRCs.
+
+                          CRCs enable enhanced error detection due to
+                          hardware issues, whilst the format changes also
+                          improves crash recovery algorithms and the ability
+                          of various tools to validate and repair metadata
+                          corruptions when they are found.  The CRC
+                          algorithm used is CRC32c, so the overhead is
+                          dependent on CPU architecture as some CPUs have
+                          hardware acceleration of this algorithm.
+                          Typically the overhead of calculating and checking
+                          the CRCs is not noticeable in normal operation.
+
+                          By default, <b>mkfs.xfs </b>will enable metadata CRCs.
+
+                   <b>finobt=</b><i>value</i>
+                          This option enables the use of a separate free
+                          inode btree index in each allocation group. The
+                          value is either 0 to disable the feature, or 1 to
+                          create a free inode btree in each allocation
+                          group.
+
+                          The free inode btree mirrors the existing
+                          allocated inode btree index which indexes both
+                          used and free inodes. The free inode btree does
+                          not index used inodes, allowing faster, more
+                          consistent inode allocation performance as
+                          filesystems age.
+
+                          By default, <b>mkfs.xfs </b>will create free inode btrees
+                          for filesystems created with the (default) <b>-m</b>
+                          <b>crc=1 </b>option set. When the option <b>-m crc=0 </b>is
+                          used, the free inode btree feature is not
+                          supported and is disabled.
+
+                   <b>uuid=</b><i>value</i>
+                          Use the given value as the filesystem UUID for the
+                          newly created filesystem.  The default is to
+                          generate a random UUID.
+
+                   <b>rmapbt=</b><i>value</i>
+                          This option enables the creation of a reverse-
+                          mapping btree index in each allocation group.  The
+                          value is either 0 to disable the feature, or 1 to
+                          create the btree.
+
+                          The reverse mapping btree maps filesystem blocks
+                          to the owner of the filesystem block.  Most of the
+                          mappings will be to an inode number and an offset,
+                          though there will also be mappings to filesystem
+                          metadata.  This secondary metadata can be used to
+                          validate the primary metadata or to pinpoint
+                          exactly which data has been lost when a disk error
+                          occurs.
+
+                          By default, <b>mkfs.xfs </b>will not create reverse
+                          mapping btrees.  This feature is only available
+                          for filesystems created with the (default) <b>-m</b>
+                          <b>crc=1 </b>option set. When the option <b>-m crc=0 </b>is
+                          used, the reverse mapping btree feature is not
+                          supported and is disabled.
+
+                   <b>reflink=</b><i>value</i>
+                          This option enables the use of a separate
+                          reference count btree index in each allocation
+                          group. The value is either 0 to disable the
+                          feature, or 1 to create a reference count btree in
+                          each allocation group.
+
+                          The reference count btree enables the sharing of
+                          physical extents between the data forks of
+                          different files, which is commonly known as
+                          "reflink".  Unlike traditional Unix filesystems
+                          which assume that every inode and logical block
+                          pair map to a unique physical block, a reflink-
+                          capable XFS filesystem removes the uniqueness
+                          requirement, allowing up to four billion arbitrary
+                          inode/logical block pairs to map to a physical
+                          block.  If a program tries to write to a multiply-
+                          referenced block in a file, the write will be
+                          redirected to a new block, and that file's
+                          logical-to-physical mapping will be changed to the
+                          new block ("copy on write").  This feature enables
+                          the creation of per-file snapshots and
+                          deduplication.  It is only available for the data
+                          forks of regular files.
+
+                          By default, <b>mkfs.xfs </b>will not create reference
+                          count btrees and therefore will not enable the
+                          reflink feature.  This feature is only available
+                          for filesystems created with the (default) <b>-m</b>
+                          <b>crc=1 </b>option set. When the option <b>-m crc=0 </b>is
+                          used, the reference count btree feature is not
+                          supported and reflink is disabled.
+
+       <b>-d </b><i>data_section_options</i>
+              These options specify the location, size, and other parameters
+              of the data section of the filesystem. The valid
+              <i>data_section_options</i> are:
+
+                   <b>agcount=</b><i>value</i>
+                          This is used to specify the number of allocation
+                          groups. The data section of the filesystem is
+                          divided into allocation groups to improve the
+                          performance of XFS. More allocation groups imply
+                          that more parallelism can be achieved when
+                          allocating blocks and inodes. The minimum
+                          allocation group size is 16 MiB; the maximum size
+                          is just under 1 TiB.  The data section of the
+                          filesystem is divided into <i>value</i> allocation groups
+                          (default value is scaled automatically based on
+                          the underlying device size).
+
+                   <b>agsize=</b><i>value</i>
+                          This is an alternative to using the <b>agcount</b>
+                          suboption. The <i>value</i> is the desired size of the
+                          allocation group expressed in bytes (usually using
+                          the <b>m </b>or <b>g </b>suffixes).  This value must be a
+                          multiple of the filesystem block size, and must be
+                          at least 16MiB, and no more than 1TiB, and may be
+                          automatically adjusted to properly align with the
+                          stripe geometry.  The <b>agcount </b>and <b>agsize</b>
+                          suboptions are mutually exclusive.
+
+                   <b>name=</b><i>value</i>
+                          This can be used to specify the name of the
+                          special file containing the filesystem. In this
+                          case, the log section must be specified as
+                          <b>internal </b>(with a size, see the <b>-l </b>option below)
+                          and there can be no real-time section.
+
+                   <b>file[=</b><i>value</i><b>]</b>
+                          This is used to specify that the file given by the
+                          <b>name </b>suboption is a regular file. The <i>value</i> is
+                          either 0 or 1, with 1 signifying that the file is
+                          regular. This suboption is used only to make a
+                          filesystem image. If the <i>value</i> is omitted then 1
+                          is assumed.
+
+                   <b>size=</b><i>value</i>
+                          This is used to specify the size of the data
+                          section. This suboption is required if <b>-d file[=1]</b>
+                          is given. Otherwise, it is only needed if the
+                          filesystem should occupy less space than the size
+                          of the special file.
+
+                   <b>sunit=</b><i>value</i>
+                          This is used to specify the stripe unit for a RAID
+                          device or a logical volume. The <i>value</i> has to be
+                          specified in 512-byte block units. Use the <b>su</b>
+                          suboption to specify the stripe unit size in
+                          bytes. This suboption ensures that data
+                          allocations will be stripe unit aligned when the
+                          current end of file is being extended and the file
+                          size is larger than 512KiB. Also inode allocations
+                          and the internal log will be stripe unit aligned.
+
+                   <b>su=</b><i>value</i>
+                          This is an alternative to using <b>sunit.  </b>The <b>su</b>
+                          suboption is used to specify the stripe unit for a
+                          RAID device or a striped logical volume. The <i>value</i>
+                          has to be specified in bytes, (usually using the <b>m</b>
+                          or <b>g </b>suffixes). This <i>value</i> must be a multiple of
+                          the filesystem block size.
+
+                   <b>swidth=</b><i>value</i>
+                          This is used to specify the stripe width for a
+                          RAID device or a striped logical volume. The <i>value</i>
+                          has to be specified in 512-byte block units. Use
+                          the <b>sw </b>suboption to specify the stripe width size
+                          in bytes.  This suboption is required if <b>-d sunit</b>
+                          has been specified and it has to be a multiple of
+                          the <b>-d sunit </b>suboption.
+
+                   <b>sw=</b><i>value</i>
+                          suboption is an alternative to using <b>swidth.  </b>The
+                          <b>sw </b>suboption is used to specify the stripe width
+                          for a RAID device or striped logical volume. The
+                          <i>value</i> is expressed as a multiplier of the stripe
+                          unit, usually the same as the number of stripe
+                          members in the logical volume configuration, or
+                          data disks in a RAID device.
+
+                          When a filesystem is created on a logical volume
+                          device, <b>mkfs.xfs </b>will automatically query the
+                          logical volume for appropriate <b>sunit </b>and <b>swidth</b>
+                          values.
+
+                   <b>noalign</b>
+                          This option disables automatic geometry detection
+                          and creates the filesystem without stripe geometry
+                          alignment even if the underlying storage device
+                          provides this information.
+
+       <b>-f     </b>Force overwrite when an existing filesystem is detected on the
+              device.  By default, <b>mkfs.xfs </b>will not write to the device if
+              it suspects that there is a filesystem or partition table on
+              the device already.
+
+       <b>-i </b><i>inode_options</i>
+              This option specifies the inode size of the filesystem, and
+              other inode allocation parameters.  The XFS inode contains a
+              fixed-size part and a variable-size part.  The variable-size
+              part, whose size is affected by this option, can contain:
+              directory data, for small directories; attribute data, for
+              small attribute sets; symbolic link data, for small symbolic
+              links; the extent list for the file, for files with a small
+              number of extents; and the root of a tree describing the
+              location of extents for the file, for files with a large
+              number of extents.
+
+              The valid <i>inode_options</i> are:
+
+                   <b>size=</b><i>value</i> <b>| log=</b><i>value</i> <b>| perblock=</b><i>value</i>
+                          The inode size is specified either as a <i>value</i> in
+                          bytes with <b>size=</b>, a base two logarithm <i>value</i> with
+                          <b>log=</b>, or as the number fitting in a filesystem
+                          block with <b>perblock=</b>.  The minimum (and default)
+                          <i>value</i> is 256 bytes without crc, 512 bytes with crc
+                          enabled.  The maximum <i>value</i> is 2048 (2 KiB)
+                          subject to the restriction that the inode size
+                          cannot exceed one half of the filesystem block
+                          size.
+
+                          XFS uses 64-bit inode numbers internally; however,
+                          the number of significant bits in an inode number
+                          is affected by filesystem geometry.  In practice,
+                          filesystem size and inode size are the predominant
+                          factors.  The Linux kernel (on 32 bit hardware
+                          platforms) and most applications cannot currently
+                          handle inode numbers greater than 32 significant
+                          bits, so if no inode size is given on the command
+                          line, <b>mkfs.xfs </b>will attempt to choose a size such
+                          that inode numbers will be &lt; 32 bits.  If an inode
+                          size is specified, or if a filesystem is
+                          sufficiently large, <b>mkfs.xfs </b>will warn if this
+                          will create inode numbers &gt; 32 significant bits.
+
+                   <b>maxpct=</b><i>value</i>
+                          This specifies the maximum percentage of space in
+                          the filesystem that can be allocated to inodes.
+                          The default <i>value</i> is 25% for filesystems under
+                          1TB, 5% for filesystems under 50TB and 1% for
+                          filesystems over 50TB.
+
+                          In the default inode allocation mode, inode blocks
+                          are chosen such that inode numbers will not exceed
+                          32 bits, which restricts the inode blocks to the
+                          lower portion of the filesystem. The data block
+                          allocator will avoid these low blocks to
+                          accommodate the specified maxpct, so a high value
+                          may result in a filesystem with nothing but inodes
+                          in a significant portion of the lower blocks of
+                          the filesystem.  (This restriction is not present
+                          when the filesystem is mounted with the <i>inode64</i>
+                          option on 64-bit platforms).
+
+                          Setting the value to 0 means that essentially all
+                          of the filesystem can become inode blocks, subject
+                          to inode32 restrictions.
+
+                          This value can be modified with <a href="xfs_growfs.8.html">xfs_growfs(8)</a>.
+
+                   <b>align[=</b><i>value</i><b>]</b>
+                          This is used to specify that inode allocation is
+                          or is not aligned. The <i>value</i> is either 0 or 1,
+                          with 1 signifying that inodes are allocated
+                          aligned.  If the <i>value</i> is omitted, 1 is assumed.
+                          The default is that inodes are aligned.  Aligned
+                          inode access is normally more efficient than
+                          unaligned access; alignment must be established at
+                          the time the filesystem is created, since inodes
+                          are allocated at that time.  This option can be
+                          used to turn off inode alignment when the
+                          filesystem needs to be mountable by a version of
+                          IRIX that does not have the inode alignment
+                          feature (any release of IRIX before 6.2, and IRIX
+                          6.2 without XFS patches).
+
+                   <b>attr=</b><i>value</i>
+                          This is used to specify the version of extended
+                          attribute inline allocation policy to be used.  By
+                          default, this is 2, which uses an efficient
+                          algorithm for managing the available inline inode
+                          space between attribute and extent data.
+
+                          The previous version 1, which has fixed regions
+                          for attribute and extent data, is kept for
+                          backwards compatibility with kernels older than
+                          version 2.6.16.
+
+                   <b>projid32bit[=</b><i>value</i><b>]</b>
+                          This is used to enable 32bit quota project
+                          identifiers. The <i>value</i> is either 0 or 1, with 1
+                          signifying that 32bit projid are to be enabled.
+                          If the value is omitted, 1 is assumed.  (This
+                          default changed in release version 3.2.0.)
+
+                   <b>sparse[=</b><i>value</i><b>]</b>
+                          Enable sparse inode chunk allocation. The <i>value</i> is
+                          either 0 or 1, with 1 signifying that sparse
+                          allocation is enabled.  If the value is omitted, 1
+                          is assumed. Sparse inode allocation is disabled by
+                          default. This feature is only available for
+                          filesystems formatted with <b>-m crc=1.</b>
+
+                          When enabled, sparse inode allocation allows the
+                          filesystem to allocate smaller than the standard
+                          64-inode chunk when free space is severely
+                          limited. This feature is useful for filesystems
+                          that might fragment free space over time such that
+                          no free extents are large enough to accommodate a
+                          chunk of 64 inodes. Without this feature enabled,
+                          inode allocations can fail with out of space
+                          errors under severe fragmented free space
+                          conditions.
+
+       <b>-l </b><i>log_section_options</i>
+              These options specify the location, size, and other parameters
+              of the log section of the filesystem. The valid
+              <i>log_section_options</i> are:
+
+                   <b>internal[=</b><i>value</i><b>]</b>
+                          This is used to specify that the log section is a
+                          piece of the data section instead of being another
+                          device or logical volume. The <i>value</i> is either 0 or
+                          1, with 1 signifying that the log is internal. If
+                          the <i>value</i> is omitted, 1 is assumed.
+
+                   <b>logdev=</b><i>device</i>
+                          This is used to specify that the log section
+                          should reside on the <i>device</i> separate from the data
+                          section. The <b>internal=1 </b>and <b>logdev </b>options are
+                          mutually exclusive.
+
+                   <b>size=</b><i>value</i>
+                          This is used to specify the size of the log
+                          section.
+
+                          If the log is contained within the data section
+                          and <b>size </b>isn't specified, <b>mkfs.xfs </b>will try to
+                          select a suitable log size depending on the size
+                          of the filesystem.  The actual logsize depends on
+                          the filesystem block size and the directory block
+                          size.
+
+                          Otherwise, the <b>size </b>suboption is only needed if
+                          the log section of the filesystem should occupy
+                          less space than the size of the special file. The
+                          <i>value</i> is specified in bytes or blocks, with a <b>b</b>
+                          suffix meaning multiplication by the filesystem
+                          block size, as described above. The overriding
+                          minimum value for size is 512 blocks.  With some
+                          combinations of filesystem block size, inode size,
+                          and directory block size, the minimum log size is
+                          larger than 512 blocks.
+
+                   <b>version=</b><i>value</i>
+                          This specifies the version of the log. The current
+                          default is 2, which allows for larger log buffer
+                          sizes, as well as supporting stripe-aligned log
+                          writes (see the sunit and su options, below).
+
+                          The previous version 1, which is limited to 32k
+                          log buffers and does not support stripe-aligned
+                          writes, is kept for backwards compatibility with
+                          very old 2.4 kernels.
+
+                   <b>sunit=</b><i>value</i>
+                          This specifies the alignment to be used for log
+                          writes. The <i>value</i> has to be specified in 512-byte
+                          block units. Use the <b>su </b>suboption to specify the
+                          log stripe unit size in bytes.  Log writes will be
+                          aligned on this boundary, and rounded up to this
+                          boundary.  This gives major improvements in
+                          performance on some configurations such as
+                          software RAID5 when the <b>sunit </b>is specified as the
+                          filesystem block size.  The equivalent byte value
+                          must be a multiple of the filesystem block size.
+                          Version 2 logs are automatically selected if the
+                          log <b>sunit </b>suboption is specified.
+
+                          The <b>su </b>suboption is an alternative to using <b>sunit.</b>
+
+                   <b>su=</b><i>value</i>
+                          This is used to specify the log stripe. The <i>value</i>
+                          has to be specified in bytes, (usually using the <b>s</b>
+                          or <b>b </b>suffixes). This value must be a multiple of
+                          the filesystem block size.  Version 2 logs are
+                          automatically selected if the log <b>su </b>suboption is
+                          specified.
+
+                   <b>lazy-count=</b><i>value</i>
+                          This changes the method of logging various
+                          persistent counters in the superblock.  Under
+                          metadata intensive workloads, these counters are
+                          updated and logged frequently enough that the
+                          superblock updates become a serialization point in
+                          the filesystem. The <i>value</i> can be either 0 or 1.
+
+                          With <b>lazy-count=1</b>, the superblock is not modified
+                          or logged on every change of the persistent
+                          counters. Instead, enough information is kept in
+                          other parts of the filesystem to be able to
+                          maintain the persistent counter values without
+                          needed to keep them in the superblock.  This gives
+                          significant improvements in performance on some
+                          configurations.  The default <i>value</i> is 1 (on) so
+                          you must specify <b>lazy-count=0 </b>if you want to
+                          disable this feature for older kernels which don't
+                          support it.
+
+       <b>-n </b><i>naming_options</i>
+              These options specify the version and size parameters for the
+              naming (directory) area of the filesystem. The valid
+              <i>naming_options</i> are:
+
+                   <b>size=</b><i>value</i> <b>| log=</b><i>value</i>
+                          The block size is specified either as a <i>value</i> in
+                          bytes with <b>size=</b>, or as a base two logarithm <i>value</i>
+                          with <b>log=</b>.  The block size must be a power of 2
+                          and cannot be less than the filesystem block size.
+                          The default size <i>value</i> for version 2 directories
+                          is 4096 bytes (4 KiB), unless the filesystem block
+                          size is larger than 4096, in which case the
+                          default <i>value</i> is the filesystem block size.  For
+                          version 1 directories the block size is the same
+                          as the filesystem block size.
+
+                   <b>version=</b><i>value</i>
+                          The naming (directory) version <i>value</i> can be either
+                          2 or 'ci', defaulting to 2 if unspecified.  With
+                          version 2 directories, the directory block size
+                          can be any power of 2 size from the filesystem
+                          block size up to 65536.
+
+                          The <b>version=ci </b>option enables ASCII only case-
+                          insensitive filename lookup and version 2
+                          directories. Filenames are case-preserving, that
+                          is, the names are stored in directories using the
+                          case they were created with.
+
+                          Note: Version 1 directories are not supported.
+
+                   <b>ftype=</b><i>value</i>
+                          This feature allows the inode type to be stored in
+                          the directory structure so that the <a href="../man3/readdir.3.html">readdir(3)</a> and
+                          <a href="../man2/getdents.2.html">getdents(2)</a> do not need to look up the inode to
+                          determine the inode type.
+
+                          The <i>value</i> is either 0 or 1, with 1 signifying that
+                          filetype information will be stored in the
+                          directory structure.  The default value is 1.
+
+                          When CRCs are enabled (the default), the ftype
+                          functionality is always enabled, and cannot be
+                          turned off.
+
+       <b>-p </b><i>protofile</i>
+              If the optional <b>-p </b><i>protofile</i> argument is given, <b>mkfs.xfs </b>uses
+              <i>protofile</i> as a prototype file and takes its directions from
+              that file.  The blocks and inodes specifiers in the <i>protofile</i>
+              are provided for backwards compatibility, but are otherwise
+              unused.  The syntax of the protofile is defined by a number of
+              tokens separated by spaces or newlines. Note that the line
+              numbers are not part of the syntax but are meant to help you
+              in the following discussion of the file contents.
+
+                   1       /stand/<i>diskboot</i>
+                   2       4872 110
+                   3       d--777 3 1
+                   4       usr     d--777 3 1
+                   5       sh      ---755 3 1 /bin/sh
+                   6       ken     d--755 6 1
+                   7               $
+                   8       b0      b--644 3 1 0 0
+                   9       c0      c--644 3 1 0 0
+                   10      fifo    p--644 3 1
+                   11      slink   l--644 3 1 /a/symbolic/link
+                   12      :  This is a comment line
+                   13      $
+                   14      $
+
+              Line 1 is a dummy string.  (It was formerly the bootfilename.)
+              It is present for backward compatibility; boot blocks are not
+              used on SGI systems.
+
+              Note that some string of characters must be present as the
+              first line of the proto file to cause it to be parsed
+              correctly; the value of this string is immaterial since it is
+              ignored.
+
+              Line 2 contains two numeric values (formerly the numbers of
+              blocks and inodes).  These are also merely for backward
+              compatibility: two numeric values must appear at this point
+              for the proto file to be correctly parsed, but their values
+              are immaterial since they are ignored.
+
+              The lines 3 through 11 specify the files and directories you
+              want to include in this filesystem. Line 3 defines the root
+              directory. Other directories and files that you want in the
+              filesystem are indicated by lines 4 through 6 and lines 8
+              through 10. Line 11 contains symbolic link syntax.
+
+              Notice the dollar sign (<b>$</b>) syntax on line 7. This syntax
+              directs the <b>mkfs.xfs </b>command to terminate the branch of the
+              filesystem it is currently on and then continue from the
+              directory specified by the next line, in this case line 8.  It
+              must be the last character on a line.  The colon on line 12
+              introduces a comment; all characters up until the following
+              newline are ignored.  Note that this means you cannot have a
+              file in a prototype file whose name contains a colon.  The <b>$</b>
+              on lines 13 and 14 end the process, since no additional
+              specifications follow.
+
+              File specifications provide the following:
+
+                * file mode
+                * user ID
+                * group ID
+                * the file's beginning contents
+
+              A 6-character string defines the mode for a file. The first
+              character of this string defines the file type. The character
+              range for this first character is <b>-bcdpl.  </b>A file may be a
+              regular file, a block special file, a character special file,
+              directory files, named pipes (first-in, first out files), and
+              symbolic links.  The second character of the mode string is
+              used to specify setuserID mode, in which case it is <b>u</b>.  If
+              setuserID mode is not specified, the second character is <b>-</b>.
+              The third character of the mode string is used to specify the
+              setgroupID mode, in which case it is <b>g</b>.  If setgroupID mode is
+              not specified, the third character is <b>-</b>.  The remaining
+              characters of the mode string are a three digit octal number.
+              This octal number defines the owner, group, and other read,
+              write, and execute permissions for the file, respectively.
+              For more information on file permissions, see the <a href="../man1/chmod.1.html">chmod(1)</a>
+              command.
+
+              Following the mode character string are two decimal number
+              tokens that specify the user and group IDs of the file's
+              owner.
+
+              In a regular file, the next token specifies the pathname from
+              which the contents and size of the file are copied.  In a
+              block or character special file, the next token are two
+              decimal numbers that specify the major and minor device
+              numbers.  When a file is a symbolic link, the next token
+              specifies the contents of the link.
+
+              When the file is a directory, the <b>mkfs.xfs </b>command creates the
+              entries <b>dot </b>(.) and <b>dot-dot </b>(..) and then reads the list of
+              names and file specifications in a recursive manner for all of
+              the entries in the directory. A scan of the protofile is
+              always terminated with the dollar ( <b>$ </b>) token.
+
+       <b>-q     </b>Quiet option. Normally <b>mkfs.xfs </b>prints the parameters of the
+              filesystem to be constructed; the <b>-q </b>flag suppresses this.
+
+       <b>-r </b><i>realtime_section_options</i>
+              These options specify the location, size, and other parameters
+              of the real-time section of the filesystem. The valid
+              <i>realtime_section_options</i> are:
+
+                   <b>rtdev=</b><i>device</i>
+                          This is used to specify the <i>device</i> which should
+                          contain the real-time section of the filesystem.
+                          The suboption value is the name of a block device.
+
+                   <b>extsize=</b><i>value</i>
+                          This is used to specify the size of the blocks in
+                          the real-time section of the filesystem. This
+                          <i>value</i> must be a multiple of the filesystem block
+                          size. The minimum allowed size is the filesystem
+                          block size or 4 KiB (whichever is larger); the
+                          default size is the stripe width for striped
+                          volumes or 64 KiB for non-striped volumes; the
+                          maximum allowed size is 1 GiB. The real-time
+                          extent size should be carefully chosen to match
+                          the parameters of the physical media used.
+
+                   <b>size=</b><i>value</i>
+                          This is used to specify the size of the real-time
+                          section.  This suboption is only needed if the
+                          real-time section of the filesystem should occupy
+                          less space than the size of the partition or
+                          logical volume containing the section.
+
+                   <b>noalign</b>
+                          This option disables stripe size detection,
+                          enforcing a realtime device with no stripe
+                          geometry.
+
+       <b>-s </b><i>sector_size</i>
+              This option specifies the fundamental sector size of the
+              filesystem.  The <i>sector_size</i> is specified either as a value in
+              bytes with <b>size=</b><i>value</i> or as a base two logarithm value with
+              <b>log=</b><i>value.</i>  The default <i>sector_size</i> is 512 bytes. The minimum
+              value for sector size is 512; the maximum is 32768 (32 KiB).
+              The <i>sector_size</i> must be a power of 2 size and cannot be made
+              larger than the filesystem block size.
+
+              To specify any options on the command line in units of
+              sectors, this option must be specified first so that the
+              sector size is applied consistently to all options.
+
+       <b>-L </b><i>label</i>
+              Set the filesystem <i>label</i>.  XFS filesystem labels can be at
+              most 12 characters long; if <i>label</i> is longer than 12
+              characters, <b>mkfs.xfs </b>will not proceed with creating the
+              filesystem.  Refer to the <a href="mount.8.html">mount(8)</a> and <a href="xfs_admin.8.html">xfs_admin(8)</a> manual
+              entries for additional information.
+
+       <b>-N     </b>Causes the file system parameters to be printed out without
+              really creating the file system.
+
+       <b>-K     </b>Do not attempt to discard blocks at mkfs time.
+
+       <b>-V     </b>Prints the version number and exits.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man5/xfs.5.html">xfs(5)</a>, <a href="mkfs.8.html">mkfs(8)</a>, <a href="mount.8.html">mount(8)</a>, <a href="xfs_info.8.html">xfs_info(8)</a>, <a href="xfs_admin.8.html">xfs_admin(8)</a>.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       With a prototype file, it is not possible to specify hard links.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>xfsprogs</i> (utilities for XFS filesystems)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://xfs.org/">http://xfs.org/</a>⟩.  If you have a bug report for this manual page, see
+       ⟨<a href="http://oss.sgi.com/bugzilla/buglist.cgi?product=XFS">http://oss.sgi.com/bugzilla/buglist.cgi?product=XFS</a>⟩.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨git://oss.sgi.com/xfs/cmds/xfsprogs⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                                                 mkfs.xfs(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/xfs.5.html">xfs(5)</a>,&nbsp; 
+    <a href="mkfs.8.html">mkfs(8)</a>,&nbsp; 
+    <a href="xfs_admin.8.html">xfs_admin(8)</a>,&nbsp; 
+    <a href="xfs_copy.8.html">xfs_copy(8)</a>,&nbsp; 
+    <a href="xfs_db.8.html">xfs_db(8)</a>,&nbsp; 
+    <a href="xfs_growfs.8.html">xfs_growfs(8)</a>,&nbsp; 
+    <a href="xfs_io.8.html">xfs_io(8)</a>,&nbsp; 
+    <a href="xfs_logprint.8.html">xfs_logprint(8)</a>,&nbsp; 
+    <a href="xfs_metadump.8.html">xfs_metadump(8)</a>,&nbsp; 
+    <a href="xfs_ncheck.8.html">xfs_ncheck(8)</a>,&nbsp; 
+    <a href="xfs_repair.8.html">xfs_repair(8)</a>,&nbsp; 
+    <a href="xfs_rtcp.8.html">xfs_rtcp(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

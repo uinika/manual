@@ -1,0 +1,312 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-init(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#TEMPLATE_DIRECTORY">TEMPLATE&nbsp;DIRECTORY</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-INIT(1)                      Git Manual                      GIT-INIT(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-init - Create an empty Git repository or reinitialize an existing
+       one
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git init</i> [-q | --quiet] [--bare] [--template=&lt;template_directory&gt;]
+                 [--separate-git-dir &lt;git dir&gt;]
+                 [--shared[=&lt;permissions&gt;]] [directory]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This command creates an empty Git repository - basically a <b>.git</b>
+       directory with subdirectories for <b>objects</b>, <b>refs/heads</b>, <b>refs/tags</b>, and
+       template files. An initial <b>HEAD </b>file that references the HEAD of the
+       master branch is also created.
+
+       If the <b>$GIT_DIR </b>environment variable is set then it specifies a path
+       to use instead of <b>./.git </b>for the base of the repository.
+
+       If the object storage directory is specified via the
+       <b>$GIT_OBJECT_DIRECTORY </b>environment variable then the sha1 directories
+       are created underneath - otherwise the default <b>$GIT_DIR/objects</b>
+       directory is used.
+
+       Running <i>git init</i> in an existing repository is safe. It will not
+       overwrite things that are already there. The primary reason for
+       rerunning <i>git init</i> is to pick up newly added templates (or to move
+       the repository to another place if --separate-git-dir is given).
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -q, --quiet
+           Only print error and warning messages; all other output will be
+           suppressed.
+
+       --bare
+           Create a bare repository. If <b>GIT_DIR </b>environment is not set, it
+           is set to the current working directory.
+
+       --template=&lt;template_directory&gt;
+           Specify the directory from which templates will be used. (See the
+           "TEMPLATE DIRECTORY" section below.)
+
+       --separate-git-dir=&lt;git dir&gt;
+           Instead of initializing the repository as a directory to either
+           <b>$GIT_DIR </b>or <b>./.git/</b>, create a text file there containing the path
+           to the actual repository. This file acts as filesystem-agnostic
+           Git symbolic link to the repository.
+
+           If this is reinitialization, the repository will be moved to the
+           specified path.
+
+       --shared[=(false|true|umask|group|all|world|everybody|0xxx)]
+           Specify that the Git repository is to be shared amongst several
+           users. This allows users belonging to the same group to push into
+           that repository. When specified, the config variable
+           "core.sharedRepository" is set so that files and directories
+           under <b>$GIT_DIR </b>are created with the requested permissions. When
+           not specified, Git will use permissions reported by umask(2).
+
+           The option can have the following values, defaulting to <i>group</i> if
+           no value is given:
+
+           <i>umask</i> (or <i>false</i>)
+               Use permissions reported by umask(2). The default, when
+               <b>--shared </b>is not specified.
+
+           <i>group</i> (or <i>true</i>)
+               Make the repository group-writable, (and g+sx, since the git
+               group may be not the primary group of all users). This is
+               used to loosen the permissions of an otherwise safe umask(2)
+               value. Note that the umask still applies to the other
+               permission bits (e.g. if umask is <i>0022</i>, using <i>group</i> will not
+               remove read privileges from other (non-group) users). See
+               <i>0xxx</i> for how to exactly specify the repository permissions.
+
+           <i>all</i> (or <i>world</i> or <i>everybody</i>)
+               Same as <i>group</i>, but make the repository readable by all users.
+
+           <i>0xxx</i>
+               <i>0xxx</i> is an octal number and each file will have mode <i>0xxx</i>.
+               <i>0xxx</i> will override users' umask(2) value (and not only loosen
+               permissions as <i>group</i> and <i>all</i> does).  <i>0640</i> will create a
+               repository which is group-readable, but not group-writable or
+               accessible to others.  <i>0660</i> will create a repo that is
+               readable and writable to the current user and group, but
+               inaccessible to others.
+
+       By default, the configuration flag <b>receive.denyNonFastForwards </b>is
+       enabled in shared repositories, so that you cannot force a non
+       fast-forwarding push into it.
+
+       If you provide a <i>directory</i>, the command is run inside it. If this
+       directory does not exist, it will be created.
+</pre>
+<h2><a id="TEMPLATE_DIRECTORY" href="#TEMPLATE_DIRECTORY"></a>TEMPLATE DIRECTORY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Files and directories in the template directory whose name do not
+       start with a dot will be copied to the <b>$GIT_DIR </b>after it is created.
+
+       The template directory will be one of the following (in order):
+
+       ·   the argument given with the <b>--template </b>option;
+
+       ·   the contents of the <b>$GIT_TEMPLATE_DIR </b>environment variable;
+
+       ·   the <b>init.templateDir </b>configuration variable; or
+
+       ·   the default template directory: <b>/usr/share/git-core/templates</b>.
+
+       The default template directory includes some directory structure,
+       suggested "exclude patterns" (see <a href="../man5/gitignore.5.html">gitignore(5)</a>), and sample hook
+       files.
+
+       The sample hooks are all disabled by default, To enable one of the
+       sample hooks rename it by removing its <b>.sample </b>suffix.
+
+       See <a href="../man5/githooks.5.html">githooks(5)</a> for more general info on hook execution.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Start a new Git repository for an existing code base
+
+               $ cd /path/to/my/codebase
+               $ git init      <b>(1)</b>
+               $ git add .     <b>(2)</b>
+               $ git commit    <b>(3)</b>
+
+           <b>1. </b>Create a /path/to/my/codebase/.git directory.
+           <b>2. </b>Add all existing files to the index.
+           <b>3. </b>Record the pristine state as the first commit in the history.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.12.0.244.g625568           03/12/2017                      GIT-INIT(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-clone.1.html">git-clone(1)</a>,&nbsp; 
+    <a href="git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="git-init-db.1.html">git-init-db(1)</a>,&nbsp; 
+    <a href="../man5/githooks.5.html">githooks(5)</a>,&nbsp; 
+    <a href="../man5/gitrepository-layout.5.html">gitrepository-layout(5)</a>,&nbsp; 
+    <a href="../man7/giteveryday.7.html">giteveryday(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

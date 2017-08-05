@@ -1,0 +1,407 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ldif(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#ENTRY_RECORDS">ENTRY&nbsp;RECORDS</a> | <a href="#ENTRY_RECORD_EXAMPLE">ENTRY&nbsp;RECORD&nbsp;EXAMPLE</a> | <a href="#CHANGE_RECORDS">CHANGE&nbsp;RECORDS</a> | <a href="#CHANGE_RECORD_EXAMPLE">CHANGE&nbsp;RECORD&nbsp;EXAMPLE</a> | <a href="#INCLUDE_STATEMENT">INCLUDE&nbsp;STATEMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LDIF(5)                      File Formats Manual                     LDIF(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ldif - LDAP Data Interchange Format
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The LDAP Data Interchange Format (LDIF) is used to represent LDAP
+       entries and change records in text form. LDAP tools, such as
+       <a href="../man1/ldapadd.1.html">ldapadd(1)</a> and <a href="../man1/ldapsearch.1.html">ldapsearch(1)</a>, read and write LDIF entry records.
+       <a href="../man1/ldapmodify.1.html">ldapmodify(1)</a> reads LDIF change records.
+
+       This manual page provides a basic description of LDIF.  A formal
+       specification of LDIF is published in RFC 2849.
+</pre>
+<h2><a id="ENTRY_RECORDS" href="#ENTRY_RECORDS"></a>ENTRY RECORDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       LDIF entry records are used to represent directory entries.  The
+       basic form of an entry record is:
+
+            dn: &lt;distinguished name&gt;
+            &lt;attrdesc&gt;: &lt;attrvalue&gt;
+            &lt;attrdesc&gt;: &lt;attrvalue&gt;
+            &lt;attrdesc&gt;:: &lt;base64-encoded-value&gt;
+            &lt;attrdesc&gt;:&lt; &lt;URL&gt;
+            ...
+
+       The value may be specified as UTF-8 text or as base64 encoded data,
+       or a URI may be provided to the location of the attribute value.
+
+       A line may be continued by starting the next line with a single space
+       or tab, e.g.,
+
+            dn: cn=Barbara J Jensen,dc=exam
+             ple,dc=com
+
+       Lines beginning with a sharp sign ('#') are ignored.
+
+       Multiple attribute values are specified on separate lines, e.g.,
+
+            cn: Barbara J Jensen
+            cn: Babs Jensen
+
+       If an value contains a non-printing character, or begins with a space
+       or a colon ':', the &lt;attrtype&gt; is followed by a double colon and the
+       value is encoded in base 64 notation. e.g., the value " begins with a
+       space" would be encoded like this:
+
+            cn:: IGJlZ2lucyB3aXRoIGEgc3BhY2U=
+
+       If the attribute value is located in a file, the &lt;attrtype&gt; is
+       followed by a ':&lt;' and a file: URI.  e.g., the value contained in the
+       file /tmp/value would be listed like this:
+
+            cn:&lt; file:///tmp/value
+       Other URI schemes (ftp,http) may be supported as well.
+
+       Multiple entries within the same LDIF file are separated by blank
+       lines.
+</pre>
+<h2><a id="ENTRY_RECORD_EXAMPLE" href="#ENTRY_RECORD_EXAMPLE"></a>ENTRY RECORD EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Here is an example of an LDIF file containing three entries.
+
+            dn: cn=Barbara J Jensen,dc=example,dc=com
+            cn: Barbara J Jensen
+            cn: Babs Jensen
+            objectclass: person
+            description:&lt; file:///tmp/babs
+            sn: Jensen
+
+            dn: cn=Bjorn J Jensen,dc=example,dc=com
+            cn: Bjorn J Jensen
+            cn: Bjorn Jensen
+            objectclass: person
+            sn: Jensen
+
+            dn: cn=Jennifer J Jensen,dc=example,dc=com
+            cn: Jennifer J Jensen
+            cn: Jennifer Jensen
+            objectclass: person
+            sn: Jensen
+            jpegPhoto:: /9j/4AAQSkZJRgABAAAAAQABAAD/2wBDABALD
+             A4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQ
+             ERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVG
+            ...
+
+       Note that the description in Barbara Jensen's entry is read from
+       file:///tmp/babs and the jpegPhoto in Jennifer Jensen's entry is
+       encoded using base 64.
+</pre>
+<h2><a id="CHANGE_RECORDS" href="#CHANGE_RECORDS"></a>CHANGE RECORDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       LDIF change records are used to represent directory change requests.
+       Each change record starts with line indicating the distinguished name
+       of the entry being changed:
+
+            dn: &lt;distinguishedname&gt;
+
+            changetype: &lt;[modify|add|delete|modrdn]&gt;
+
+       Finally, the change information itself is given, the format of which
+       depends on what kind of change was specified above.  For a <i>changetype</i>
+       of <i>modify</i>, the format is one or more of the following:
+
+            add: &lt;attributetype&gt;
+            &lt;attrdesc&gt;: &lt;value1&gt;
+            &lt;attrdesc&gt;: &lt;value2&gt;
+            ...
+            -
+
+       Or, for a replace modification:
+
+            replace: &lt;attributetype&gt;
+            &lt;attrdesc&gt;: &lt;value1&gt;
+            &lt;attrdesc&gt;: &lt;value2&gt;
+            ...
+            -
+
+       If no <i>attributetype</i> lines are given to replace, the entire attribute
+       is to be deleted (if present).
+
+       Or, for a delete modification:
+
+            delete: &lt;attributetype&gt;
+            &lt;attrdesc&gt;: &lt;value1&gt;
+            &lt;attrdesc&gt;: &lt;value2&gt;
+            ...
+            -
+
+       If no <i>attributetype</i> lines are given to delete, the entire attribute
+       is to be deleted.
+
+       For a <i>changetype</i> of <i>add</i>, the format is:
+
+            &lt;attrdesc1&gt;: &lt;value1&gt;
+            &lt;attrdesc1&gt;: &lt;value2&gt;
+            ...
+            &lt;attrdescN&gt;: &lt;value1&gt;
+            &lt;attrdescN&gt;: &lt;value2&gt;
+
+       For a <i>changetype</i> of <i>modrdn</i> or <i>moddn</i>, the format is:
+
+            newrdn: &lt;newrdn&gt;
+            deleteoldrdn: 0 | 1
+            newsuperior: &lt;DN&gt;
+
+       where a value of 1 for deleteoldrdn means to delete the values
+       forming the old rdn from the entry, and a value of 0 means to leave
+       the values as non-distinguished attributes in the entry.  The
+       newsuperior line is optional and, if present, specifies the new
+       superior to move the entry to.
+
+       For a <i>changetype</i> of <i>delete</i>, no additional information is needed in
+       the record.
+
+       Note that attribute values may be presented using base64 or in files
+       as described for entry records.  Lines in change records may be
+       continued in the manner described for entry records as well.
+</pre>
+<h2><a id="CHANGE_RECORD_EXAMPLE" href="#CHANGE_RECORD_EXAMPLE"></a>CHANGE RECORD EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following sample LDIF file contains a change record of each type
+       of change.
+
+            dn: cn=Babs Jensen,dc=example,dc=com
+            changetype: add
+            objectclass: person
+            objectclass: extensibleObject
+            cn: babs
+            cn: babs jensen
+            sn: jensen
+
+            dn: cn=Babs Jensen,dc=example,dc=com
+            changetype: modify
+            add: givenName
+            givenName: Barbara
+            givenName: babs
+            -
+            replace: description
+            description: the fabulous babs
+            -
+            delete: sn
+            sn: jensen
+            -
+
+            dn: cn=Babs Jensen,dc=example,dc=com
+            changetype: modrdn
+            newrdn: cn=Barbara J Jensen
+            deleteoldrdn: 0
+            newsuperior: ou=People,dc=example,dc=com
+
+            dn: cn=Barbara J Jensen,ou=People,dc=example,dc=com
+            changetype: delete
+</pre>
+<h2><a id="INCLUDE_STATEMENT" href="#INCLUDE_STATEMENT"></a>INCLUDE STATEMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The LDIF parser has been extended to support an <b>include </b>statement for
+       referencing other LDIF files.  The <b>include </b>statement must be
+       separated from other records by a blank line.  The referenced file is
+       specified using a file: URI and all of its contents are incorporated
+       as if they were part of the original LDIF file. As above, other URI
+       schemes may be supported. For example:
+
+            dn: dc=example,dc=com
+            objectclass: domain
+            dc: example
+
+            include: file:///tmp/example.com.ldif
+
+            dn: dc=example,dc=org
+            objectclass: domain
+            dc: example
+       This feature is not part of the LDIF specification in RFC 2849 but is
+       expected to appear in a future revision of this spec. It is supported
+       by the <a href="../man1/ldapadd.1.html">ldapadd(1)</a>, <a href="../man1/ldapmodify.1.html">ldapmodify(1)</a>, and <a href="../man8/slapadd.8.html">slapadd(8)</a> commands.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man3/ldap.3.html">ldap(3)</a>, <a href="../man1/ldapsearch.1.html">ldapsearch(1)</a>, <a href="../man1/ldapadd.1.html">ldapadd(1)</a>, <a href="../man1/ldapmodify.1.html">ldapmodify(1)</a>, <a href="../man8/slapadd.8.html">slapadd(8)</a>,
+       <a href="../man8/slapcat.8.html">slapcat(8)</a>, <a href="slapd-ldif.5.html">slapd-ldif(5)</a>.
+
+       "LDAP Data Interchange Format," Good, G., RFC 2849.
+</pre>
+<h2><a id="ACKNOWLEDGEMENTS" href="#ACKNOWLEDGEMENTS"></a>ACKNOWLEDGEMENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>OpenLDAP Software </b>is developed and maintained by The OpenLDAP Project
+       &lt;<a href="http://www.openldap.org/">http://www.openldap.org/</a>&gt;.  <b>OpenLDAP Software </b>is derived from the
+       University of Michigan LDAP 3.3 Release.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>OpenLDAP</i> (an open source implementation of
+       the Lightweight Directory Access Protocol) project.  Information
+       about the project can be found at ⟨<a href="http://www.openldap.org/">http://www.openldap.org/</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="http://www.openldap.org/its/">http://www.openldap.org/its/</a>⟩.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.openldap.org/openldap.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">OpenLDAP LDVERSION               RELEASEDATE                         LDIF(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/ldapcompare.1.html">ldapcompare(1)</a>,&nbsp; 
+    <a href="../man1/ldapmodify.1.html">ldapmodify(1)</a>,&nbsp; 
+    <a href="../man1/ldapsearch.1.html">ldapsearch(1)</a>,&nbsp; 
+    <a href="slapd-config.5.html">slapd-config(5)</a>,&nbsp; 
+    <a href="slapd-ldif.5.html">slapd-ldif(5)</a>,&nbsp; 
+    <a href="slapd-sql.5.html">slapd-sql(5)</a>,&nbsp; 
+    <a href="../man8/slapadd.8.html">slapadd(8)</a>,&nbsp; 
+    <a href="../man8/slapcat.8.html">slapcat(8)</a>,&nbsp; 
+    <a href="../man8/slapindex.8.html">slapindex(8)</a>,&nbsp; 
+    <a href="../man8/slapmodify.8.html">slapmodify(8)</a>,&nbsp; 
+    <a href="../man8/slapschema.8.html">slapschema(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

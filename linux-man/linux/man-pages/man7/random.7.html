@@ -1,0 +1,286 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>random(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">RANDOM(7)                 Linux Programmer's Manual                RANDOM(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       random - overview of interfaces for obtaining randomness
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The kernel random-number generator relies on entropy gathered from
+       device drivers and other sources of environmental noise to seed a
+       cryptographically secure pseudorandom number generator (CSPRNG).  It
+       is designed for security, rather than speed.
+
+       The following interfaces provide access to output from the kernel
+       CSPRNG:
+
+       *  The <i>/dev/urandom</i> and <i>/dev/random</i> devices, both described in
+          <a href="../man4/random.4.html">random(4)</a>.  These devices have been present on Linux since early
+          times, and are also available on many other systems.
+
+       *  The Linux-specific <a href="../man2/getrandom.2.html">getrandom(2)</a> system call, available since Linux
+          3.17.  This system call provides access either to the same source
+          as <i>/dev/urandom</i> (called the <i>urandom</i> source in this page) or to the
+          same source as <i>/dev/random</i> (called the <i>random</i> source in this
+          page).  The default is the <i>urandom</i> source; the <i>random</i> source is
+          selected by specifying the <b>GRND_RANDOM </b>flag to the system call.
+          (The <a href="../man3/getentropy.3.html">getentropy(3)</a> function provides a slightly more portable
+          interface on top of <a href="../man2/getrandom.2.html">getrandom(2)</a>.)
+
+   <b>Initialization of the entropy pool</b>
+       The kernel collects bits of entropy from the environment.  When a
+       sufficient number of random bits has been collected, the entropy pool
+       is considered to be initialized.
+
+   <b>Choice of random source</b>
+       Unless you are doing long-term key generation (and most likely not
+       even then), you probably shouldn't be reading from the <i>/dev/random</i>
+       device or employing <a href="../man2/getrandom.2.html">getrandom(2)</a> with the <b>GRND_RANDOM </b>flag.  Instead,
+       either read from the <i>/dev/urandom</i> device or employ <a href="../man2/getrandom.2.html">getrandom(2)</a>
+       without the <b>GRND_RANDOM </b>flag.  The cryptographic algorithms used for
+       the <i>urandom</i> source are quite conservative, and so should be
+       sufficient for all purposes.
+
+       The disadvantage of <b>GRND_RANDOM </b>and reads from <i>/dev/random</i> is that
+       the operation can block for an indefinite period of time.
+       Furthermore, dealing with the partially fulfilled requests that can
+       occur when using <b>GRND_RANDOM </b>or when reading from <i>/dev/random</i>
+       increases code complexity.
+
+   <b>Monte Carlo and other probabilistic sampling applications</b>
+       Using these interfaces to provide large quantities of data for Monte
+       Carlo simulations or other programs/algorithms which are doing
+       probabilistic sampling will be slow.  Furthermore, it is unnecessary,
+       because such applications do not need cryptographically secure random
+       numbers.  Instead, use the interfaces described in this page to
+       obtain a small amount of data to seed a user-space pseudorandom
+       number generator for use by such applications.
+
+   <b>Comparison between getrandom, /dev/urandom, and /dev/random</b>
+       The following table summarizes the behavior of the various interfaces
+       that can be used to obtain randomness.  <b>GRND_NONBLOCK </b>is a flag that
+       can be used to control the blocking behavior of <a href="../man2/getrandom.2.html">getrandom(2)</a>.  The
+       final column of the table considers the case that can occur in early
+       boot time when the entropy pool is not yet initialized.
+
+       ┌──────────────┬──────────────┬────────────────┬────────────────────┐
+       │<b>Interface     </b>│ <b>Pool         </b>│ <b>Blocking       </b>│ <b>Behavior when pool </b>│
+       │              │              │ <b>behavior       </b>│ <b>is not yet ready   </b>│
+       ├──────────────┼──────────────┼────────────────┼────────────────────┤
+       │<i>/dev/random</i>   │ Blocking     │ If entropy too │ Blocks until       │
+       │              │ pool         │ low, blocks    │ enough entropy     │
+       │              │              │ until there is │ gathered           │
+       │              │              │ enough entropy │                    │
+       │              │              │ again          │                    │
+       ├──────────────┼──────────────┼────────────────┼────────────────────┤
+       │<i>/dev/urandom</i>  │ CSPRNG       │ Never blocks   │ Returns output     │
+       │              │ output       │                │ from uninitialized │
+       │              │              │                │ CSPRNG (may be low │
+       │              │              │                │ entropy and        │
+       │              │              │                │ unsuitable for     │
+       │              │              │                │ cryptography)      │
+       ├──────────────┼──────────────┼────────────────┼────────────────────┤
+       │<b>getrandom</b>()   │ Same as      │ Does not block │ Blocks until pool  │
+       │              │ <i>/dev/urandom</i> │ once is pool   │ ready              │
+       │              │              │ ready          │                    │
+       ├──────────────┼──────────────┼────────────────┼────────────────────┤
+       │<b>getrandom</b>()   │ Same as      │ If entropy too │ Blocks until pool  │
+       │<b>GRND_RANDOM   </b>│ <i>/dev/random</i>  │ low, blocks    │ ready              │
+       │              │              │ until there is │                    │
+       │              │              │ enough entropy │                    │
+       │              │              │ again          │                    │
+       ├──────────────┼──────────────┼────────────────┼────────────────────┤
+       │<b>getrandom</b>()   │ Same as      │ Does not block │ <b>EAGAIN             </b>│
+       │<b>GRND_NONBLOCK </b>│ <i>/dev/urandom</i> │ once is pool   │                    │
+       │              │              │ ready          │                    │
+       ├──────────────┼──────────────┼────────────────┼────────────────────┤
+       │<b>getrandom</b>()   │ Same as      │ <b>EAGAIN </b>if not  │ <b>EAGAIN             </b>│
+       │<b>GRND_RANDOM </b>+ │ <i>/dev/random</i>  │ enough entropy │                    │
+       │<b>GRND_NONBLOCK </b>│              │ available      │                    │
+       └──────────────┴──────────────┴────────────────┴────────────────────┘
+   <b>Generating cryptographic keys</b>
+       The  amount of seed material required to generate a cryptographic key
+       equals the effective key size of the key.  For  example,  a  3072-bit
+       RSA  or  Diffie-Hellman  private key has an effective key size of 128
+       bits (it requires about 2^128 operations to break) so a key generator
+       needs only 128 bits (16 bytes) of seed material from <i>/dev/random</i>.
+
+       While some safety margin above that minimum is reasonable, as a guard
+       against flaws in the CSPRNG  algorithm,  no  cryptographic  primitive
+       available  today  can hope to promise more than 256 bits of security,
+       so if any program reads more than 256 bits (32 bytes) from the kernel
+       random  pool  per  invocation, or per reasonable reseed interval (not
+       less than one minute), that should  be  taken  as  a  sign  that  its
+       cryptography is <i>not</i> skillfully implemented.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/getrandom.2.html">getrandom(2)</a>, <a href="../man3/getauxval.3.html">getauxval(3)</a>, <a href="../man3/getentropy.3.html">getentropy(3)</a>, <a href="../man4/random.4.html">random(4)</a>, <a href="../man4/urandom.4.html">urandom(4)</a>,
+       <a href="signal.7.html">signal(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-03-13                        RANDOM(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/getrandom.2.html">getrandom(2)</a>,&nbsp; 
+    <a href="../man3/getentropy.3.html">getentropy(3)</a>,&nbsp; 
+    <a href="../man4/random.4.html">random(4)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="random.7.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

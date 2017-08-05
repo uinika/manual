@@ -1,0 +1,417 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>audit.rules(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#NOTES">NOTES</a> | <a href="#TROUBLESHOOTING">TROUBLESHOOTING</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">AUDIT.RULES:(7)        System Administration Utilities       AUDIT.RULES:(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       audit.rules - a set of rules loaded in the kernel audit system
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>audit.rules </b>is a file containing audit rules that will be loaded by
+       the audit daemon's init script whenever the daemon is started. The
+       auditctl program is used by the initscripts to perform this
+       operation. The syntax for the rules is essentially the same as when
+       typing in an auditctl command at a shell prompt except you do not
+       need to type the auditctl command name since that is implied. The
+       audit rules come in 3 varieties: <i>control</i>, <i>file</i>, and <i>syscall</i>.
+
+   <b>Control</b>
+       Control commands generally involve configuring the audit system
+       rather than telling it what to watch for. These commands typically
+       include deleting all rules, setting the size of the kernel's backlog
+       queue, setting the failure mode, setting the event rate limit, or to
+       tell auditctl to ignore syntax errors in the rules and continue
+       loading. Generally, these rules are at the top of the rules file.
+
+   <b>File System</b>
+       File System rules are sometimes called watches. These rules are used
+       to audit access to particular files or directories that you may be
+       interested in. If the path given in the rule is a directory, then the
+       rule used is recursive to the bottom of the directory tree excluding
+       any directories that may be mount points. The syntax of these rules
+       generally follow this format:
+
+       <b>-w path-to-file -p permissions -k keyname</b>
+
+       where the permission are any one of the following:
+
+              <b>r </b>- read of the file
+
+              <b>w </b>- write to the file
+
+              <b>x </b>- execute the file
+
+              <b>a </b>- change in the file's attribute
+
+   <b>System Call</b>
+       The system call rules are loaded into a matching engine that
+       intercepts each syscall that all programs on the system makes.
+       Therefore it is very important to only use syscall rules when you
+       have to since these affect performance. The more rules, the bigger
+       the performance hit. You can help the performance, though, by
+       combining syscalls into one rule whenever possible.
+
+       The Linux kernel has 4 rule matching lists or filters as they are
+       sometimes called. They are: task, exit, user, and exclude. The task
+       list is checked only during the fork or clone syscalls. It is rarely
+       used in practice.
+
+       The exit filter is the place where all syscall and file system audit
+       requests are evaluated.
+
+       The user filter is used to filter (remove) some events that originate
+       in user space.  By default, any event originating in user space is
+       allowed. So, if there are some events that you do not want to see,
+       then this is a place where some can be removed. See auditctl(8) for
+       fields that are valid.
+
+       The exclude filter is used to exclude certain events from being
+       emitted. The msgtype field is used to tell the kernel which message
+       types you do not want to record. This filter can remove the event as
+       a whole and is not selective about any other attribute. The user and
+       exit filters are better suited to selectively auditing events.
+
+       Syscall rules take the general form of:
+
+       <b>-a action,list -S syscall -F field=value -k keyname</b>
+
+       The <b>-a </b>option tells the kernel's rule matching engine that we want to
+       append a rule at the end of the rule list. But we need to specify
+       which rule list it goes on and what action to take when it triggers.
+       Valid actions are:
+
+              <b>always </b>- always create an event
+
+              <b>never  </b>- never create an event
+
+       The action and list are separated by a comma but no space in between.
+       Valid lists are: <i>task</i>, <i>exit</i>, <i>user</i>, and <i>exclude</i>. Their meaning was
+       explained earlier.
+
+       Next in the rule would normally be the <b>-S </b>option. This field can
+       either be the syscall name or number. For readability, the name is
+       almost always used. You may give more than one syscall in a rule by
+       specifying another <b>-S </b>option. When sent into the kernel, all syscall
+       fields are put into a mask so that one compare can determine if the
+       syscall is of interest. So, adding multiple syscalls in one rule is
+       very efficient. When you specify a syscall name, auditctl will look
+       up the name and get its syscall number. This leads to some problems
+       on bi-arch machines. The 32 and 64 bit syscall numbers sometimes, but
+       not always, line up. So, to solve this problem, you would generally
+       need to break the rule into 2 with one specifying -F arch=b32 and the
+       other specifying -F arch=b64. This needs to go in front of the <b>-S</b>
+       option so that auditctl looks at the right lookup table when
+       returning the number.
+
+       After the syscall is specified, you would normally have one or more
+       <b>-F </b>options that fine tune what to match against. Rather than list all
+       the valid field types here, the reader should look at the auditctl
+       man page which has a full listing of each field and what it means.
+       But it's worth mentioning a couple things.
+
+       The audit system considers uids to be unsigned numbers. The audit
+       system uses the number -1 to indicate that a loginuid is not set.
+       This means that when it's printed out, it looks like 4294967295. If
+       you write a rule that you wanted try to get the valid users of the
+       system, you need to look in /etc/login.defs to see where user
+       accounts start. For example, if UID_MIN is  500, then you would also
+       need to take into account that the unsigned representation of -1 is
+       higher than 500. So you would address this with the following piece
+       of a rule:
+
+       -F auid&gt;=500 -F auid!=4294967295
+
+       These individual checks are "anded" and both have to be true.
+
+       The last thing to know about syscall rules is that you can add a key
+       field which is a free form text string that you want inserted into
+       the event to help identify its meaning. This is discussed in more
+       detail in the NOTES section.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The purpose of auditing is to be able to do an investigation
+       periodically or whenever an incident occurs. A few simple steps in
+       planning up front will make this job easier. The best advice is to
+       use keys in both the watches and system call rules to give the rule a
+       meaning. If rules are related or together meet a specific
+       requirement, then give them a common key name. You can use this
+       during your investigation to select only results with a specific
+       meaning.
+
+       When doing an investigation, you would normally start off with the
+       main aureport output to just get an idea about what is happening on
+       the system. This report mostly tells you about events that are hard
+       coded by the audit system such as login/out, uses of authentication,
+       system anomalies, how many users have been on the machine, and if SE
+       Linux has detected any AVCs.
+
+       aureport --start this-week
+
+       After looking at the report, you probably want to get a second view
+       about what rules you loaded that have been triggering. This is where
+       keys become important. You would generally run the key summary report
+       like this:
+
+       aureport --start this-week --key --summary
+
+       This will give an ordered listing of the keys associated with rules
+       that have been triggering. If, for example, you had a syscall audit
+       rule that triggered on the failure to open files with EPERM that had
+       a key field of access like this:
+
+       -a always,exit -F arch=b64 -S open -S openat -F exit=-EPERM -k access
+
+       Then you can isolate these failures with ausearch and pipe the
+       results to aureport for display. Suppose your investigation noticed a
+       lot of the access denied events. If you wanted to see the files that
+       unauthorized access has been attempted, you could run the following
+       command:
+
+       ausearch --start this-week -k access --raw | aureport --file --summary
+
+       This will give an ordered list showing which files are being accessed
+       with the EPERM failure. Suppose you wanted to see which users might
+       be having failed access, you would run the following command:
+
+       ausearch --start this-week -k access --raw | aureport --user --summary
+
+       If your investigation showed a lot of failed accesses to a particular
+       file, you could run the following report to see who is doing it:
+
+       ausearch --start this-week -k access -f /path-to/file --raw |
+       aureport --user -i
+
+       This report will give you the individual access attempts by person.
+       If you needed to see the actual audit event that is being reported,
+       you would look at the date, time, and event columns. Assuming the
+       event was 822 and it occurred at 2:30 on 09/01/2009 and you use the
+       en_US.utf8 locale, the command would look something like this:
+
+       ausearch --start 09/01/2009 02:30 -a 822 -i --just-one
+
+       This will select the first event from that day and time with the
+       matching event id and interpret the numeric values into human
+       readable values.
+
+       The most important step in being able to do this kind of analysis is
+       setting up key fields when the rules were originally written. It
+       should also be pointed out that you can have more than one key field
+       associated with any given rule.
+</pre>
+<h2><a id="TROUBLESHOOTING" href="#TROUBLESHOOTING"></a>TROUBLESHOOTING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If you are not getting events on syscall rules that you think you
+       should, try running a test program under strace so that you can see
+       the syscalls. There is a chance that you might have identified the
+       wrong syscall.
+
+       If you get a warning from auditctl saying, "32/64 bit syscall
+       mismatch in line XX, you should specify an arch". This means that you
+       specified a syscall rule on a bi-arch system where the syscall has a
+       different syscall number for the 32 and 64 bit interfaces. This means
+       that on one of those interfaces you are likely auditing the wrong
+       syscall. To solve the problem, re-write the rule as two rules
+       specifying the intended arch for each rule. For example,
+
+       -always,exit -S openat -k access
+
+       would be rewritten as
+
+       -always,exit -F arch=b32 -S openat -k access
+       -always,exit -F arch=b64 -S openat -k access
+
+       If you get a warning that says, "entry rules deprecated, changing to
+       exit rule". This means that you have a rule intended for the entry
+       filter, but that filter is no longer available. Auditctl moved your
+       rule to the exit filter so that it's not lost. But to solve this so
+       that you do not get the warning any more, you need to change the
+       offending rule from entry to exit.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following rule shows how to audit failed access to files due to
+       permission problems. Note that it takes two rules for each arch ABI
+       to audit this since file access can fail with two different failure
+       codes indicating permission problems.
+
+       <b>-a always,exit -F arch=b32 -S open -S openat -F exit=-EACCES -k access</b>
+       <b>-a always,exit -F arch=b32 -S open -S openat -F exit=-EPERM -k access</b>
+       <b>-a always,exit -F arch=b64 -S open -S openat -F exit=-EACCES -k access</b>
+       <b>-a always,exit -F arch=b64 -S open -S openat -F exit=-EPERM -k access</b>
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/auditctl.8.html">auditctl(8)</a>, <a href="../man8/auditd.8.html">auditd(8)</a>.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Steve Grubb
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>audit</i> (Linux Audit) project.  Information
+       about the project can be found at 
+       ⟨<a href="http://people.redhat.com/sgrubb/audit/">http://people.redhat.com/sgrubb/audit/</a>⟩.  If you have a bug report
+       for this manual page, send it to linux-audit@redhat.com.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/linux-audit/audit-userspace.git">https://github.com/linux-audit/audit-userspace.git</a>⟩ on 2017-07-05.
+       If you discover any rendering problems in this HTML version of the
+       page, or you believe there is a better or more up-to-date source for
+       the page, or you have corrections or improvements to the information
+       in this COLOPHON (which is <i>not</i> part of the original manual page),
+       send a mail to man-pages@man7.org
+
+<span class="footline">Red Hat                           Aug 2014                   AUDIT.RULES:(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man8/auditctl.8.html">auditctl(8)</a>,&nbsp; 
+    <a href="../man8/auditd.8.html">auditd(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

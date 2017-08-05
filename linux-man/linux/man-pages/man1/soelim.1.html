@@ -1,0 +1,280 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>soelim(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#USAGE">USAGE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYING">COPYING</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SOELIM(1)                  General Commands Manual                 SOELIM(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       soelim - interpret .so requests in groff input
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>soelim </b>[<b>-Crtv</b>] [<b>-I </b><i>dir</i>] [<i>files ...</i>]
+
+       It is possible to have whitespace between the <b>-I </b>command line option
+       and its parameter.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>soelim </b>reads <i>files</i> and replaces lines of the form
+
+              <b>.so </b><i>file</i>
+
+       by the contents of <i>file</i>.  It is useful if files included with <b>.so</b>
+       need to be preprocessed.  Normally, <b>soelim </b>should be invoked with the
+       <b>-s </b>option of <b>groff</b>.
+
+       To embed ‘\’ in the file name, write ‘\\’ or ‘\e’.  To embed a space,
+       write ‘\ ’.  Any other escape sequence in <i>file</i> makes <b>soelim </b>ignore
+       the whole line.
+
+       Note that there must be no whitespace between the leading dot and the
+       two characters ‘s’ and ‘o’.  Otherwise, only <b>groff </b>interprets the <b>.so</b>
+       request (and <b>soelim </b>ignores it).
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-C     </b>Recognize <b>.so </b>even when followed by a character other than
+              space or newline.
+
+       <b>-I</b><i>dir</i>  This option may be used to add a directory to the search path
+              for files (both those on the command line and those named in
+              <b>.so </b>requests).  The search path is initialized with the
+              current directory.  This option may be specified more than
+              once; the directories are then searched in the order specified
+              (but before the current directory).  If you want to make the
+              current directory be read before other directories, add <b>-I. </b>at
+              the appropriate place.
+
+              No directory search is performed for files with an absolute
+              file name.
+
+       <b>-r     </b>Do not add <b>.lf </b>requests (for general use, with non-groff
+              files).
+
+       <b>-t     </b>Don't emit <b>.lf </b>requests but TeX comment lines (starting with
+              ‘%’) giving the current file and line number.
+
+       <b>-v     </b>Print the version number.
+</pre>
+<h2><a id="USAGE" href="#USAGE"></a>USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The normal processing sequence of groff is this:
+
+                 input        sourced
+                 file          file
+                   |             |
+                   v             v
+               preprocessor -&gt; troff -&gt; postprocessor
+                                             |
+                                             v
+                                          output
+                                           file
+
+       That is, files sourced with <b>.so </b>are normally read <i>only</i> by <b>troff </b>(the
+       actual formatter).  <b>soelim </b>is <i>not</i> required for <b>troff </b>to source files.
+
+       If a file to be sourced should also be preprocessed, it must already
+       be read <i>before</i> the input file passes through the preprocessor.  This
+       is handled by <b>soelim</b>:
+
+                 input
+                 file
+                   |
+                   v
+                 soelim -&gt; preprocessor -&gt; troff -&gt; postprocessor
+                   ^                                     |
+                   |                                     v
+                sourced                               output
+                 file                                  file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="groff.1.html">groff(1)</a>
+</pre>
+<h2><a id="COPYING" href="#COPYING"></a>COPYING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Copyright © 1989-2014 Free Software Foundation, Inc.
+
+       Permission is granted to make and distribute verbatim copies of this
+       manual provided the copyright notice and this permission notice are
+       preserved on all copies.
+
+       Permission is granted to copy and distribute modified versions of
+       this manual under the conditions for verbatim copying, provided that
+       the entire resulting derived work is distributed under the terms of a
+       permission notice identical to this one.
+
+       Permission is granted to copy and distribute translations of this
+       manual into another language, under the above conditions for modified
+       versions, except that this permission notice may be included in
+       translations approved by the Free Software Foundation instead of in
+       the original English.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>groff</i> (GNU troff) project.  Information
+       about the project can be found at 
+       ⟨<a href="http://www.gnu.org/software/groff/">http://www.gnu.org/software/groff/</a>⟩.  If you have a bug report for
+       this manual page, see ⟨<a href="http://www.gnu.org/software/groff/">http://www.gnu.org/software/groff/</a>⟩.  This
+       page was obtained from the tarball groff-1.22.3.tar.gz fetched from
+       ⟨ftp://ftp.gnu.org/gnu/groff/⟩ on 2017-07-05.  If you discover any
+       rendering problems in this HTML version of the page, or you believe
+       there is a better or more up-to-date source for the page, or you have
+       corrections or improvements to the information in this COLOPHON
+       (which is <i>not</i> part of the original manual page), send a mail to
+       man-pages@man7.org
+
+<span class="footline">Groff Version 1.22.3           4 November 2014                     SOELIM(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="groff.1.html">groff(1)</a>,&nbsp; 
+    <a href="grog.1.html">grog(1)</a>,&nbsp; 
+    <a href="refer.1.html">refer(1)</a>,&nbsp; 
+    <a href="../man5/groff_tmac.5.html">groff_tmac(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

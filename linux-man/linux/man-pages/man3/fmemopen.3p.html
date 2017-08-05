@@ -1,0 +1,353 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>fmemopen.3p - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#PROLOG">PROLOG</a> | <a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#APPLICATION_USAGE">APPLICATION&nbsp;USAGE</a> | <a href="#RATIONALE">RATIONALE</a> | <a href="#FUTURE_DIRECTIONS">FUTURE&nbsp;DIRECTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYRIGHT">COPYRIGHT</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">FMEMOPEN(3P)              POSIX Programmer's Manual             FMEMOPEN(3P)</span>
+</pre>
+<h2><a id="PROLOG" href="#PROLOG"></a>PROLOG  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page is part of the POSIX Programmer's Manual.  The Linux
+       implementation of this interface may differ (consult the
+       corresponding Linux manual page for details of Linux behavior), or
+       the interface may not be implemented on Linux.
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       fmemopen — open a memory buffer stream
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;stdio.h&gt;
+
+       FILE *fmemopen(void *restrict <i>buf</i>, size_t <i>size</i>,
+           const char *restrict <i>mode</i>);
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>fmemopen</i>() function shall associate the buffer given by the <i>buf</i>
+       and <i>size</i> arguments with a stream. The <i>buf</i> argument shall be either a
+       null pointer or point to a buffer that is at least <i>size</i> bytes long.
+
+       The <i>mode</i> argument points to a string. If the string is one of the
+       following, the stream shall be opened in the indicated mode.
+       Otherwise, the behavior is undefined.
+
+       <i>r</i>       Open the stream for reading.
+
+       <i>w</i>       Open the stream for writing.
+
+       <i>a</i>       Append; open the stream for writing at the first null byte.
+
+       <i>r</i>+      Open the stream for update (reading and writing).
+
+       <i>w</i>+      Open the stream for update (reading and writing). Truncate
+               the buffer contents.
+
+       <i>a</i>+      Append; open the stream for update (reading and writing); the
+               initial position is at the first null byte.
+
+       Implementations shall accept all mode strings allowed by <i>fopen</i>(), but
+       the use of the character <b>'b' </b>shall produce implementation-defined
+       results, where the resulting <b>FILE * </b>need not behave the same as if
+       <b>'b' </b>were omitted.
+
+       If a null pointer is specified as the <i>buf</i> argument, <i>fmemopen</i>() shall
+       allocate <i>size</i> bytes of memory as if by a call to <i>malloc</i>().  This
+       buffer shall be automatically freed when the stream is closed.
+       Because this feature is only useful when the stream is opened for
+       updating (because there is no way to get a pointer to the buffer) the
+       <i>fmemopen</i>() call may fail if the <i>mode</i> argument does not include a <b>'+'</b>.
+
+       The stream shall maintain a current position in the buffer. This
+       position shall be initially set to either the beginning of the buffer
+       (for <i>r</i> and <i>w</i> modes) or to the first null byte in the buffer (for <i>a</i>
+       modes). If no null byte is found in append mode, the initial position
+       shall be set to one byte after the end of the buffer.
+
+       If <i>buf</i> is a null pointer, the initial position shall always be set to
+       the beginning of the buffer.
+
+       The stream shall also maintain the size of the current buffer
+       contents; use of <i>fseek</i>() or <i>fseeko</i>() on the stream with SEEK_END
+       shall seek relative to this size. For modes <i>r</i> and <i>r+</i> the size shall
+       be set to the value given by the <i>size</i> argument. For modes <i>w</i> and <i>w+</i>
+       the initial size shall be zero and for modes <i>a</i> and <i>a+</i> the initial
+       size shall be either the position of the first null byte in the
+       buffer or the value of the <i>size</i> argument if no null byte is found.
+
+       A read operation on the stream shall not advance the current buffer
+       position beyond the current buffer size. Reaching the buffer size in
+       a read operation shall count as ``end-of-file''. Null bytes in the
+       buffer shall have no special meaning for reads. The read operation
+       shall start at the current buffer position of the stream.
+
+       A write operation shall start either at the current position of the
+       stream (if <i>mode</i> has not specified <b>'a' </b>as the first character) or at
+       the current size of the stream (if <i>mode</i> had <b>'a' </b>as the first
+       character). If the current position at the end of the write is larger
+       than the current buffer size, the current buffer size shall be set to
+       the current position. A write operation on the stream shall not
+       advance the current buffer size beyond the size given in the <i>size</i>
+       argument.
+
+       When a stream open for writing is flushed or closed, a null byte
+       shall be written at the current position or at the end of the buffer,
+       depending on the size of the contents. If a stream open for update is
+       flushed or closed and the last write has advanced the current buffer
+       size, a null byte shall be written at the end of the buffer if it
+       fits.
+
+       An attempt to seek a memory buffer stream to a negative position or
+       to a position larger than the buffer size given in the <i>size</i> argument
+       shall fail.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Upon successful completion, <i>fmemopen</i>() shall return a pointer to the
+       object controlling the stream. Otherwise, a null pointer shall be
+       returned, and <i><a href="errno.3.html">errno</a></i> shall be set to indicate the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>fmemopen</i>() function shall fail if:
+
+       <b>EINVAL </b>The <i>size</i> argument specifies a buffer size of zero.
+
+       The <i>fmemopen</i>() function may fail if:
+
+       <b>EINVAL </b>The value of the <i>mode</i> argument is not valid.
+
+       <b>EINVAL </b>The <i>buf</i> argument is a null pointer and the <i>mode</i> argument does
+              not include a <b>'+' </b>character.
+
+       <b>ENOMEM </b>The <i>buf</i> argument is a null pointer and the allocation of a
+              buffer of length <i>size</i> has failed.
+
+       <b>EMFILE </b>{FOPEN_MAX} streams are currently open in the calling process.
+
+       <i>The following sections are informative.</i>
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           <b>#include &lt;stdio.h&gt;</b>
+           <b>#include &lt;string.h&gt;</b>
+
+           static char buffer[] = "foobar";
+
+           int
+           main (void)
+           {
+               int ch;
+               FILE *stream;
+
+               stream = fmemopen(buffer, strlen (buffer), "r");
+               if (stream == NULL)
+                   /* handle error */;
+
+               while ((ch = fgetc(stream)) != EOF)
+                   printf("Got %c\n", ch);
+
+               fclose(stream);
+               return (0);
+           }
+
+       This program produces the following output:
+
+           <b>Got f</b>
+           <b>Got o</b>
+           <b>Got o</b>
+           <b>Got b</b>
+           <b>Got a</b>
+           <b>Got r</b>
+</pre>
+<h2><a id="APPLICATION_USAGE" href="#APPLICATION_USAGE"></a>APPLICATION USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="RATIONALE" href="#RATIONALE"></a>RATIONALE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This interface has been introduced to eliminate many of the errors
+       encountered in the construction of strings, notably overflowing of
+       strings. This interface prevents overflow.
+</pre>
+<h2><a id="FUTURE_DIRECTIONS" href="#FUTURE_DIRECTIONS"></a>FUTURE DIRECTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A future revision of this standard may mandate specific behavior when
+       the <i>mode</i> argument includes <b>'b'</b>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="fdopen.3p.html">fdopen(3p)</a>, <a href="fopen.3p.html">fopen(3p)</a>, <a href="freopen.3p.html">freopen(3p)</a>, <a href="fseek.3p.html">fseek(3p)</a>, <a href="malloc.3p.html">malloc(3p)</a>,
+       <a href="open_memstream.3p.html">open_memstream(3p)</a>
+
+       The Base Definitions volume of POSIX.1‐2008, <a href="../man0/stdio.h.0p.html">stdio.h(0p)</a>
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Portions of this text are reprinted and reproduced in electronic form
+       from IEEE Std 1003.1, 2013 Edition, Standard for Information
+       Technology -- Portable Operating System Interface (POSIX), The Open
+       Group Base Specifications Issue 7, Copyright (C) 2013 by the
+       Institute of Electrical and Electronics Engineers, Inc and The Open
+       Group.  (This is POSIX.1-2008 with the 2013 Technical Corrigendum 1
+       applied.) In the event of any discrepancy between this version and
+       the original IEEE and The Open Group Standard, the original IEEE and
+       The Open Group Standard is the referee document. The original
+       Standard can be obtained online at <a href="http://www.unix.org/online.html">http://www.unix.org/online.html</a> .
+
+       Any typographical or formatting errors that appear in this page are
+       most likely to have been introduced during the conversion of the
+       source files to man page format. To report such errors, see
+       <a href="https://www.kernel.org/doc/man-pages/reporting_bugs.html">https://www.kernel.org/doc/man-pages/reporting_bugs.html</a> .
+
+<span class="footline">IEEE/The Open Group                 2013                        FMEMOPEN(3P)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man0/stdio.h.0p.html">stdio.h(0p)</a>,&nbsp; 
+    <a href="fclose.3p.html">fclose(3p)</a>,&nbsp; 
+    <a href="fdopen.3p.html">fdopen(3p)</a>,&nbsp; 
+    <a href="fflush.3p.html">fflush(3p)</a>,&nbsp; 
+    <a href="fopen.3p.html">fopen(3p)</a>,&nbsp; 
+    <a href="freopen.3p.html">freopen(3p)</a>,&nbsp; 
+    <a href="open_memstream.3p.html">open_memstream(3p)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

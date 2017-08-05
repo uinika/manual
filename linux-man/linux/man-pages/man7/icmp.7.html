@@ -1,0 +1,318 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>icmp(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ICMP(7)                   Linux Programmer's Manual                  ICMP(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       icmp - Linux IPv4 ICMP kernel module.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This kernel protocol module implements the Internet Control Message
+       Protocol defined in RFC 792.  It is used to signal error conditions
+       and for diagnosis.  The user doesn't interact directly with this
+       module; instead it communicates with the other protocols in the
+       kernel and these pass the ICMP errors to the application layers.  The
+       kernel ICMP module also answers ICMP requests.
+
+       A user protocol may receive ICMP packets for all local sockets by
+       opening a raw socket with the protocol <b>IPPROTO_ICMP</b>.  See <a href="raw.7.html">raw(7)</a> for
+       more information.  The types of ICMP packets passed to the socket can
+       be filtered using the <b>ICMP_FILTER </b>socket option.  ICMP packets are
+       always processed by the kernel too, even when passed to a user
+       socket.
+
+       Linux limits the rate of ICMP error packets to each destination.
+       <b>ICMP_REDIRECT </b>and <b>ICMP_DEST_UNREACH </b>are also limited by the
+       destination route of the incoming packets.
+
+   <b>/proc interfaces</b>
+       ICMP supports a set of <i>/proc</i> interfaces to configure some global IP
+       parameters.  The parameters can be accessed by reading or writing
+       files in the directory <i>/proc/sys/net/ipv4/</i>.  Most of these parameters
+       are rate limitations for specific ICMP types.  Linux 2.2 uses a token
+       bucket filter to limit ICMPs.  The value is the timeout in jiffies
+       until the token bucket filter is cleared after a burst.  A jiffy is a
+       system dependent unit, usually 10ms on i386 and about 1ms on alpha
+       and ia64.
+
+       <i>icmp_destunreach_rate</i> (Linux 2.2 to 2.4.9)
+              Maximum rate to send ICMP Destination Unreachable packets.
+              This limits the rate at which packets are sent to any
+              individual route or destination.  The limit does not affect
+              sending of <b>ICMP_FRAG_NEEDED </b>packets needed for path MTU
+              discovery.
+
+       <i>icmp_echo_ignore_all</i> (since Linux 2.2)
+              If this value is nonzero, Linux will ignore all <b>ICMP_ECHO</b>
+              requests.
+
+       <i>icmp_echo_ignore_broadcasts</i> (since Linux 2.2)
+              If this value is nonzero, Linux will ignore all <b>ICMP_ECHO</b>
+              packets sent to broadcast addresses.
+
+       <i>icmp_echoreply_rate</i> (Linux 2.2 to 2.4.9)
+              Maximum rate for sending <b>ICMP_ECHOREPLY </b>packets in response to
+              <b>ICMP_ECHOREQUEST </b>packets.
+
+       <i>icmp_errors_use_inbound_ifaddr</i> (Boolean; default: disabled; since
+       Linux 2.6.12)
+              If disabled, ICMP error messages are sent with the primary
+              address of the exiting interface.
+
+              If enabled, the message will be sent with the primary address
+              of the interface that received the packet that caused the ICMP
+              error.  This is the behavior that many network administrators
+              will expect from a router.  And it can make debugging
+              complicated network layouts much easier.
+
+              Note that if no primary address exists for the interface
+              selected, then the primary address of the first non-loopback
+              interface that has one will be used regardless of this
+              setting.
+
+       <i>icmp_ignore_bogus_error_responses</i> (Boolean; default: disabled; since
+       Linux 2.2)
+              Some routers violate RFC1122 by sending bogus responses to
+              broadcast frames.  Such violations are normally logged via a
+              kernel warning.  If this parameter is enabled, the kernel will
+              not give such warnings, which will avoid log file clutter.
+
+       <i>icmp_paramprob_rate</i> (Linux 2.2 to 2.4.9)
+              Maximum rate for sending <b>ICMP_PARAMETERPROB </b>packets.  These
+              packets are sent when a packet arrives with an invalid IP
+              header.
+
+       <i>icmp_ratelimit</i> (integer; default: 1000; since Linux 2.4.10)
+              Limit the maximum rates for sending ICMP packets whose type
+              matches <i>icmp_ratemask</i> (see below) to specific targets.  0 to
+              disable any limiting, otherwise the minimum space between
+              responses in milliseconds.
+
+       <i>icmp_ratemask</i> (integer; default: see below; since Linux 2.4.10)
+              Mask made of ICMP types for which rates are being limited.
+
+              Significant bits: IHGFEDCBA9876543210
+              Default mask:     0000001100000011000 (0x1818)
+
+              Bit definitions (see the Linux kernel source file
+              <i>include/linux/icmp.h</i>):
+
+                   0 Echo Reply
+                   3 Destination Unreachable *
+                   4 Source Quench *
+                   5 Redirect
+                   8 Echo Request
+                   B Time Exceeded *
+                   C Parameter Problem *
+                   D Timestamp Request
+                   E Timestamp Reply
+                   F Info Request
+                   G Info Reply
+                   H Address Mask Request
+                   I Address Mask Reply
+
+       The bits marked with an asterisk are rate limited by default (see the
+       default mask above).
+
+       <i>icmp_timeexceed_rate</i> (Linux 2.2 to 2.4.9)
+              Maximum rate for sending <b>ICMP_TIME_EXCEEDED </b>packets.  These
+              packets are sent to prevent loops when a packet has crossed
+              too many hops.
+
+       <i>ping_group_range</i> (two integers; default: see below; since Linux
+       2.6.39)
+              Range of the group IDs (minimum and maximum group IDs,
+              inclusive) that are allowed to create ICMP Echo sockets.  The
+              default is "1 0", which means no group is allowed to create
+              ICMP Echo sockets.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Support for the <b>ICMP_ADDRESS </b>request was removed in 2.2.
+
+       Support for <b>ICMP_SOURCE_QUENCH </b>was removed in Linux 2.2.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       As many other implementations don't support <b>IPPROTO_ICMP </b>raw sockets,
+       this feature should not be relied on in portable programs.
+
+       <b>ICMP_REDIRECT </b>packets are not sent when Linux is not acting as a
+       router.  They are also accepted only from the old gateway defined in
+       the routing table and the redirect routes are expired after some
+       time.
+
+       The 64-bit timestamp returned by <b>ICMP_TIMESTAMP </b>is in milliseconds
+       since the Epoch, 1970-01-01 00:00:00 +0000 (UTC).
+
+       Linux ICMP internally uses a raw socket to send ICMPs.  This raw
+       socket may appear in <a href="../man8/netstat.8.html">netstat(8)</a> output with a zero inode.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="ip.7.html">ip(7)</a>
+
+       RFC 792 for a description of the ICMP protocol.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-04-19                          ICMP(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="ip.7.html">ip(7)</a>,&nbsp; 
+    <a href="../man8/rdisc.8.html">rdisc(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="icmp.7.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

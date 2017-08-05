@@ -1,0 +1,321 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>stdio(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">STDIO(3)                  Linux Programmer's Manual                 STDIO(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       stdio - standard input/output library functions
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdio.h&gt;</b>
+
+       <b>FILE *</b><i>stdin</i><b>;</b>
+       <b>FILE *</b><i>stdout</i><b>;</b>
+       <b>FILE *</b><i>stderr</i><b>;</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The standard I/O library provides a simple and efficient buffered
+       stream I/O interface.  Input and output is mapped into logical data
+       streams and the physical I/O characteristics are concealed.  The
+       functions and macros are listed below; more information is available
+       from the individual man pages.
+
+       A stream is associated with an external file (which may be a physical
+       device) by <i>opening</i> a file, which may involve creating a new file.
+       Creating an existing file causes its former contents to be discarded.
+       If a file can support positioning requests (such as a disk file, as
+       opposed to a terminal), then a <i>file position indicator</i> associated
+       with the stream is positioned at the start of the file (byte zero),
+       unless the file is opened with append mode.  If append mode is used,
+       it is unspecified whether the position indicator will be placed at
+       the start or the end of the file.  The position indicator is
+       maintained by subsequent reads, writes and positioning requests.  All
+       input occurs as if the characters were read by successive calls to
+       the <a href="fgetc.3.html">fgetc(3)</a> function; all output takes place as if all characters
+       were written by successive calls to the <a href="fputc.3.html">fputc(3)</a> function.
+
+       A file is disassociated from a stream by <i>closing</i> the file.  Output
+       streams are flushed (any unwritten buffer contents are transferred to
+       the host environment) before the stream is disassociated from the
+       file.  The value of a pointer to a <i>FILE</i> object is indeterminate after
+       a file is closed (garbage).
+
+       A file may be subsequently reopened, by the same or another program
+       execution, and its contents reclaimed or modified (if it can be
+       repositioned at the start).  If the main function returns to its
+       original caller, or the <a href="exit.3.html">exit(3)</a> function is called, all open files
+       are closed (hence all output streams are flushed) before program
+       termination.  Other methods of program termination, such as <a href="abort.3.html">abort(3)</a>
+       do not bother about closing files properly.
+
+       At program startup, three text streams are predefined and need not be
+       opened explicitly: <i>standard input</i> (for reading conventional input),
+       <i>standard output</i> (for writing conventional output), and <i>standard error</i>
+       (for writing diagnostic output).  These streams are abbreviated
+       <i>stdin</i>,<i>stdout</i> and <i>stderr</i>.  When opened, the standard error stream is
+       not fully buffered; the standard input and output streams are fully
+       buffered if and only if the streams do not refer to an interactive
+       device.
+
+       Output streams that refer to terminal devices are always line
+       buffered by default; pending output to such streams is written
+       automatically whenever an input stream that refers to a terminal
+       device is read.  In cases where a large amount of computation is done
+       after printing part of a line on an output terminal, it is necessary
+       to <a href="fflush.3.html">fflush(3)</a> the standard output before going off and computing so
+       that the output will appear.
+
+       The <i>stdio</i> library is a part of the library <b>libc </b>and routines are
+       automatically loaded as needed by the compilers <b>cc</b>(1) and <b>pc</b>(1).  The
+       SYNOPSIS sections of the following manual pages indicate which
+       include files are to be used, what the compiler declaration for the
+       function looks like and which external variables are of interest.
+
+       The following are defined as macros; these names may not be reused
+       without first removing their current definitions with <b>#undef</b>: <b>BUFSIZ</b>,
+       <b>EOF</b>, <b>FILENAME_MAX</b>, <b>FOPEN_MAX</b>, <b>L_cuserid</b>, <b>L_ctermid</b>, <b>L_tmpnam</b>, <b>NULL</b>,
+       <b>SEEK_END</b>, <b>SEEK_SET</b>, <b>SEEK_CUR</b>, <b>TMP_MAX</b>, <b>clearerr</b>, <b>feof</b>, <b>ferror</b>,
+       <b>fileno</b>, <b>getc</b>, <b>getchar</b>, <b>putc</b>, <b>putchar</b>, <b>stderr</b>, <b>stdin</b>, <b>stdout</b>.
+       Function versions of the macro functions <b>feof</b>, <b>ferror</b>, <b>clearerr</b>,
+       <b>fileno</b>, <b>getc</b>, <b>getchar</b>, <b>putc</b>, and <b>putchar </b>exist and will be used if
+       the macros definitions are explicitly removed.
+
+   <b>List of functions</b>
+       <b>Function      Description</b>
+       ───────────────────────────────────────────────────────────────────
+       <b>clearerr      </b>check and reset stream status
+       <b>fclose        </b>close a stream
+       <b>fdopen        </b>stream open functions
+       <b>feof          </b>check and reset stream status
+       <b>ferror        </b>check and reset stream status
+       <b>fflush        </b>flush a stream
+       <b>fgetc         </b>get next character or word from input stream
+       <b>fgetpos       </b>reposition a stream
+       <b>fgets         </b>get a line from a stream
+       <b>fileno        </b>return the integer descriptor of the argument stream
+       <b>fopen         </b>stream open functions
+       <b>fprintf       </b>formatted output conversion
+       <b>fpurge        </b>flush a stream
+       <b>fputc         </b>output a character or word to a stream
+       <b>fputs         </b>output a line to a stream
+       <b>fread         </b>binary stream input/output
+       <b>freopen       </b>stream open functions
+       <b>fscanf        </b>input format conversion
+       <b>fseek         </b>reposition a stream
+       <b>fsetpos       </b>reposition a stream
+       <b>ftell         </b>reposition a stream
+       <b>fwrite        </b>binary stream input/output
+       <b>getc          </b>get next character or word from input stream
+       <b>getchar       </b>get next character or word from input stream
+       <b>gets          </b>get a line from a stream
+       <b>getw          </b>get next character or word from input stream
+       <b>mktemp        </b>make temporary filename (unique)
+       <b>perror        </b>system error messages
+       <b>printf        </b>formatted output conversion
+       <b>putc          </b>output a character or word to a stream
+       <b>putchar       </b>output a character or word to a stream
+       <b>puts          </b>output a line to a stream
+       <b>putw          </b>output a character or word to a stream
+       <b>remove        </b>remove directory entry
+       <b>rewind        </b>reposition a stream
+       <b>scanf         </b>input format conversion
+       <b>setbuf        </b>stream buffering operations
+       <b>setbuffer     </b>stream buffering operations
+       <b>setlinebuf    </b>stream buffering operations
+       <b>setvbuf       </b>stream buffering operations
+       <b>sprintf       </b>formatted output conversion
+       <b>sscanf        </b>input format conversion
+       <b>strerror      </b>system error messages
+       <b>sys_errlist   </b>system error messages
+       <b>sys_nerr      </b>system error messages
+       <b>tempnam       </b>temporary file routines
+       <b>tmpfile       </b>temporary file routines
+
+       <b>tmpnam        </b>temporary file routines
+       <b>ungetc        </b>un-get character from input stream
+       <b>vfprintf      </b>formatted output conversion
+       <b>vfscanf       </b>input format conversion
+       <b>vprintf       </b>formatted output conversion
+       <b>vscanf        </b>input format conversion
+       <b>vsprintf      </b>formatted output conversion
+       <b>vsscanf       </b>input format conversion
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>stdio</i> library conforms to C89.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/close.2.html">close(2)</a>, <a href="../man2/open.2.html">open(2)</a>, <a href="../man2/read.2.html">read(2)</a>, <a href="../man2/write.2.html">write(2)</a>, <a href="stdout.3.html">stdout(3)</a>, <a href="unlocked_stdio.3.html">unlocked_stdio(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2001-12-26                         STDIO(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pmsnap.1.html">pmsnap(1)</a>,&nbsp; 
+    <a href="../man2/_exit.2-2.html">_exit(2)</a>,&nbsp; 
+    <a href="../man2/fcntl.2.html">fcntl(2)</a>,&nbsp; 
+    <a href="../man2/vfork.2.html">vfork(2)</a>,&nbsp; 
+    <a href="curs_addch.3x.html">curs_addch(3x)</a>,&nbsp; 
+    <a href="exit.3.html">exit(3)</a>,&nbsp; 
+    <a href="ferror.3.html">ferror(3)</a>,&nbsp; 
+    <a href="popen.3.html">popen(3)</a>,&nbsp; 
+    <a href="stdin.3.html">stdin(3)</a>,&nbsp; 
+    <a href="unlocked_stdio.3.html">unlocked_stdio(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="stdio.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

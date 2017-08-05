@@ -1,0 +1,304 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>tc-ematch(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#MATCHES">MATCHES</a> | <a href="#CAVEATS">CAVEATS</a> | <a href="#EXAMPLE_&amp;_USAGE">EXAMPLE&nbsp;&amp;&nbsp;USAGE</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ematch(8)                           Linux                          ematch(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ematch - extended matches for use with "basic" or "flow" filters
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>tc filter add .. basic match </b>EXPR <b>.. flowid ..</b>
+
+       <i>EXPR</i> := <i>TERM</i> [ { <b>and | or </b>} <i>EXPR</i> ]
+
+       <i>TERM</i> := [ <b>not </b>] { <i>MATCH</i> | '(' <i>EXPR</i> ')' }
+
+       <i>MATCH</i> := <i>module</i> '(' <i>ARGS</i> ')'
+
+       <i>ARGS</i> := <i>ARG1 ARG2</i> ..
+</pre>
+<h2><a id="MATCHES" href="#MATCHES"></a>MATCHES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>cmp</b>
+       Simple comparison ematch: arithmetic compare of packet data to a
+       given value.
+
+       <i>cmp</i>( <i>ALIGN</i> at <i>OFFSET</i> [ <i>ATTRS</i> ] { <i>eq</i> | <i>lt</i> | <i>gt</i> } <i>VALUE</i> )
+
+       <i>ALIGN</i> := { <i>u8</i> | <i>u16</i> | <i>u32</i> }
+
+       <i>ATTRS</i> := [ layer <i>LAYER</i> ] [ mask <i>MASK</i> ] [ trans ]
+
+       <i>LAYER</i> := { <i>link</i> | <i>network</i> | <i>transport</i> | <i>0..2</i> }
+
+   <b>meta</b>
+       Metadata ematch
+
+       <i>meta</i>( <i>OBJECT</i> { <i>eq</i> | <i>lt</i> |<i>gt</i> } <i>OBJECT</i> )
+
+       <i>OBJECT</i> := { <i>META_ID</i> |  <i>VALUE</i> }
+
+       <i>META_ID</i> := <i>id</i> [ shift <i>SHIFT</i> ] [ mask <i>MASK</i> ]
+
+       meta attributes:
+
+              <b>random </b>32 bit random value
+
+              <b>loadavg_1 </b>Load average in last 5 minutes
+
+              <b>nf_mark </b>Netfilter mark
+
+              <b>vlan </b>Vlan tag
+
+              <b>sk_rcvbuf </b>Receive buffer size
+
+              <b>sk_snd_queue </b>Send queue length
+
+       A full list of meta attributes can be obtained via
+
+       # tc filter add dev eth1 basic match 'meta(list)'
+
+   <b>nbyte</b>
+       match packet data byte sequence
+
+       <i>nbyte</i>( <i>NEEDLE</i> at <i>OFFSET</i> [ layer <i>LAYER</i> ] )
+
+       <i>NEEDLE</i> := { <i>string</i> | <i>c-escape-sequence</i>  }
+
+       <i>OFFSET</i> := <i>int</i>
+
+       <i>LAYER</i> := { <i>link</i> | <i>network</i> | <i>transport</i> | <i>0..2</i> }
+
+   <b>u32</b>
+       u32 ematch
+
+       <i>u32</i>( <i>ALIGN VALUE MASK</i> at [ nexthdr+ ] <i>OFFSET</i> )
+
+       <i>ALIGN</i> := { <i>u8</i> | <i>u16</i> | <i>u32</i> }
+
+   <b>ipset</b>
+       test packet against ipset membership
+
+       <i>ipset</i>( <i>SETNAME FLAGS</i> )
+
+       <i>SETNAME</i> := <i>string</i>
+
+       <i>FLAGS</i> := { <i>FLAG</i> [, <i>FLAGS</i>] }
+
+       The flag options are the same as those used by the iptables "set"
+       match.
+
+       When using the ipset ematch with the "ip_set_hash:net,iface" set
+       type, the interface can be queried using "src,dst (source ip address,
+       outgoing interface) or "src,src" (source ip address, incoming
+       interface) syntax.
+</pre>
+<h2><a id="CAVEATS" href="#CAVEATS"></a>CAVEATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The ematch syntax uses '(' and ')' to group expressions. All braces
+       need to be escaped properly to prevent shell commandline from
+       interpreting these directly.
+
+       When using the ipset ematch with the "ifb" device, the outgoing
+       device will be the ifb device itself, e.g. "ifb0".  The original
+       interface (i.e. the device the packet arrived on) is treated as the
+       incoming interface.
+</pre>
+<h2><a id="EXAMPLE_&amp;_USAGE" href="#EXAMPLE_&amp;_USAGE"></a>EXAMPLE &amp; USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       # tc filter add .. basic match ...
+
+       # 'cmp(u16 at 3 layer 2 mask 0xff00 gt 20)'
+
+       # 'meta(nfmark gt 24)' and 'meta(tcindex mask 0xf0 eq 0xf0)'
+
+       # 'nbyte("ababa" at 12 layer 1)'
+
+       # 'u32(u16 0x1122 0xffff at nexthdr+4)'
+
+       Check if packet source ip address is member of set named <b>bulk</b>:
+
+       # 'ipset(bulk src)'
+
+       Check if packet source ip and the interface the packet arrived on is
+       member of "hash:net,iface" set named <b>interactive</b>:
+
+       # 'ipset(interactive src,src)'
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The extended match infrastructure was added by Thomas Graf.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>iproute2</i> (utilities for controlling TCP/IP
+       networking and traffic) project.  Information about the project can
+       be found at 
+       ⟨<a href="http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2">http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2</a>⟩.
+       If you have a bug report for this manual page, send it to
+       netdev@vger.kernel.org, shemminger@osdl.org.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git⟩
+       on 2017-07-05.  If you discover any rendering problems in this HTML
+       version of the page, or you believe there is a better or more up-to-
+       date source for the page, or you have corrections or improvements to
+       the information in this COLOPHON (which is <i>not</i> part of the original
+       manual page), send a mail to man-pages@man7.org
+
+<span class="footline">iproute2                        6 August 2012                      ematch(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="tc.8.html">tc(8)</a>,&nbsp; 
+    <a href="tc-basic.8.html">tc-basic(8)</a>,&nbsp; 
+    <a href="tc-bpf.8.html">tc-bpf(8)</a>,&nbsp; 
+    <a href="tc-cgroup.8.html">tc-cgroup(8)</a>,&nbsp; 
+    <a href="tc-flow.8.html">tc-flow(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

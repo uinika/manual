@@ -1,0 +1,349 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pthread_cancel(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PTHREAD_CANCEL(3)         Linux Programmer's Manual        PTHREAD_CANCEL(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pthread_cancel - send a cancellation request to a thread
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pthread.h&gt;</b>
+
+       <b>int pthread_cancel(pthread_t </b><i>thread</i><b>);</b>
+
+       Compile and link with <i>-pthread</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>pthread_cancel</b>() function sends a cancellation request to the
+       thread <i>thread</i>.  Whether and when the target thread reacts to the
+       cancellation request depends on two attributes that are under the
+       control of that thread: its cancelability <i>state</i> and <i>type</i>.
+
+       A thread's cancelability state, determined by
+       <a href="pthread_setcancelstate.3.html">pthread_setcancelstate(3)</a>, can be <i>enabled</i> (the default for new
+       threads) or <i>disabled</i>.  If a thread has disabled cancellation, then a
+       cancellation request remains queued until the thread enables
+       cancellation.  If a thread has enabled cancellation, then its
+       cancelability type determines when cancellation occurs.
+
+       A thread's cancellation type, determined by <a href="pthread_setcanceltype.3.html">pthread_setcanceltype(3)</a>,
+       may be either <i>asynchronous</i> or <i>deferred</i> (the default for new threads).
+       Asynchronous cancelability means that the thread can be canceled at
+       any time (usually immediately, but the system does not guarantee
+       this).  Deferred cancelability means that cancellation will be
+       delayed until the thread next calls a function that is a <i>cancellation</i>
+       <i>point</i>.  A list of functions that are or may be cancellation points is
+       provided in <a href="../man7/pthreads.7.html">pthreads(7)</a>.
+
+       When a cancellation requested is acted on, the following steps occur
+       for <i>thread</i> (in this order):
+
+       1. Cancellation clean-up handlers are popped (in the reverse of the
+          order in which they were pushed) and called.  (See
+          <a href="pthread_cleanup_push.3.html">pthread_cleanup_push(3)</a>.)
+
+       2. Thread-specific data destructors are called, in an unspecified
+          order.  (See <b>pthread_key_create</b>(3).)
+
+       3. The thread is terminated.  (See <a href="pthread_exit.3.html">pthread_exit(3)</a>.)
+
+       The above steps happen asynchronously with respect to the
+       <b>pthread_cancel</b>() call; the return status of <b>pthread_cancel</b>() merely
+       informs the caller whether the cancellation request was successfully
+       queued.
+
+       After a canceled thread has terminated, a join with that thread using
+       <a href="pthread_join.3.html">pthread_join(3)</a> obtains <b>PTHREAD_CANCELED </b>as the thread's exit status.
+       (Joining with a thread is the only way to know that cancellation has
+       completed.)
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>pthread_cancel</b>() returns 0; on error, it returns a
+       nonzero error number.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ESRCH  </b>No thread with the ID <i>thread</i> could be found.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌─────────────────┬───────────────┬─────────┐
+       │<b>Interface        </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├─────────────────┼───────────────┼─────────┤
+       │<b>pthread_cancel</b>() │ Thread safety │ MT-Safe │
+       └─────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On Linux, cancellation is implemented using signals.  Under the NPTL
+       threading implementation, the first real-time signal (i.e., signal
+       32) is used for this purpose.  On LinuxThreads, the second real-time
+       signal is used, if real-time signals are available, otherwise <b>SIGUSR2</b>
+       is used.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below creates a thread and then cancels it.  The main
+       thread joins with the canceled thread to check that its exit status
+       was <b>PTHREAD_CANCELED</b>.  The following shell session shows what happens
+       when we run the program:
+
+           $ ./a.out
+           thread_func(): started; cancellation disabled
+           main(): sending cancellation request
+           thread_func(): about to enable cancellation
+           main(): thread was canceled
+
+   <b>Program source</b>
+
+       #include &lt;pthread.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;errno.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;unistd.h&gt;
+
+       #define handle_error_en(en, msg) \
+               do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
+
+       static void *
+       thread_func(void *ignored_argument)
+       {
+           int s;
+
+           /* Disable cancellation for a while, so that we don't
+              immediately react to a cancellation request */
+
+           s = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+           if (s != 0)
+               handle_error_en(s, "pthread_setcancelstate");
+
+           printf("thread_func(): started; cancellation disabled\n");
+           sleep(5);
+           printf("thread_func(): about to enable cancellation\n");
+
+           s = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+           if (s != 0)
+               handle_error_en(s, "pthread_setcancelstate");
+
+           /* sleep() is a cancellation point */
+
+           sleep(1000);        /* Should get canceled while we sleep */
+
+           /* Should never get here */
+
+           printf("thread_func(): not canceled!\n");
+           return NULL;
+       }
+
+       int
+       main(void)
+       {
+           pthread_t thr;
+           void *res;
+           int s;
+
+           /* Start a thread and then send it a cancellation request */
+
+           s = pthread_create(&amp;thr, NULL, &amp;thread_func, NULL);
+           if (s != 0)
+               handle_error_en(s, "pthread_create");
+
+           sleep(2);           /* Give thread a chance to get started */
+
+           printf("main(): sending cancellation request\n");
+           s = pthread_cancel(thr);
+           if (s != 0)
+               handle_error_en(s, "pthread_cancel");
+
+           /* Join with thread to see what its exit status was */
+
+           s = pthread_join(thr, &amp;res);
+           if (s != 0)
+               handle_error_en(s, "pthread_join");
+
+           if (res == PTHREAD_CANCELED)
+               printf("main(): thread was canceled\n");
+           else
+               printf("main(): thread wasn't canceled (shouldn't happen!)\n");
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="pthread_cleanup_push.3.html">pthread_cleanup_push(3)</a>, <a href="pthread_create.3.html">pthread_create(3)</a>, <a href="pthread_exit.3.html">pthread_exit(3)</a>,
+       <a href="pthread_join.3.html">pthread_join(3)</a>, <b>pthread_key_create</b>(3), <a href="pthread_setcancelstate.3.html">pthread_setcancelstate(3)</a>,
+       <a href="pthread_setcanceltype.3.html">pthread_setcanceltype(3)</a>, <a href="pthread_testcancel.3.html">pthread_testcancel(3)</a>, <a href="../man7/pthreads.7.html">pthreads(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-07-23                PTHREAD_CANCEL(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pthread_cleanup_push.3.html">pthread_cleanup_push(3)</a>,&nbsp; 
+    <a href="pthread_cleanup_push_defer_np.3.html">pthread_cleanup_push_defer_np(3)</a>,&nbsp; 
+    <a href="pthread_create.3.html">pthread_create(3)</a>,&nbsp; 
+    <a href="pthread_detach.3.html">pthread_detach(3)</a>,&nbsp; 
+    <a href="pthread_join.3.html">pthread_join(3)</a>,&nbsp; 
+    <a href="pthread_kill_other_threads_np.3.html">pthread_kill_other_threads_np(3)</a>,&nbsp; 
+    <a href="pthread_setcancelstate.3.html">pthread_setcancelstate(3)</a>,&nbsp; 
+    <a href="pthread_testcancel.3.html">pthread_testcancel(3)</a>,&nbsp; 
+    <a href="../man7/pthreads.7.html">pthreads(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="pthread_cancel.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

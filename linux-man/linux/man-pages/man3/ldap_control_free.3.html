@@ -1,0 +1,246 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ldap_controls(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#LIBRARY">LIBRARY</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LDAP_CONTROLS(3)          Library Functions Manual          LDAP_CONTROLS(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ldap_control_create,  ldap_control_find,  ldap_control_dup, ldap_con‐
+       trols_dup,  ldap_control_free,  ldap_controls_free  -  LDAP   control
+       manipulation routines
+</pre>
+<h2><a id="LIBRARY" href="#LIBRARY"></a>LIBRARY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       OpenLDAP LDAP (libldap, -lldap)
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;ldap.h&gt;</b>
+
+       <b>int ldap_control_create(const char *</b><i>oid</i><b>, int </b><i>iscritical</i><b>, struct</b>
+       <b>berval *</b><i>value</i><b>, int </b><i>dupval</i><b>, LDAPControl **</b><i>ctrlp</i><b>);</b>
+
+       <b>LDAPControl *ldap_control_find( const char *</b><i>oid</i><b>, LDAPControl **</b><i>ctrls</i><b>,</b>
+       <b>LDAPControl ***</b><i>nextctrlp</i><b>);</b>
+
+       <b>LDAPControl *ldap_control_dup(LDAPControl *</b><i>ctrl</i><b>);</b>
+
+       <b>LDAPControl **ldap_controls_dup(LDAPControl **</b><i>ctrls</i><b>);</b>
+
+       <b>void ldap_control_free(LDAPControl *</b><i>ctrl</i><b>);</b>
+
+       <b>void ldap_controls_free(LDAPControl **</b><i>ctrls</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These routines are used to manipulate structures used for LDAP
+       controls.
+
+       <b>ldap_control_create</b>() creates a control with the specified <i>OID</i> using
+       the contents of the <i>value</i> parameter for the control value, if any.
+       The content of <i>value</i> is duplicated if <i>dupval</i> is non-zero.  The
+       <i>iscritical</i> parameter must be non-zero for a critical control. The
+       created control is returned in the <i>ctrlp</i> parameter.  The routine
+       returns <b>LDAP_SUCCESS </b>on success or some other error code on failure.
+       The content of <i>value</i>, for supported control types, can be prepared
+       using helpers provided by this implementation of libldap, usually in
+       the form <b>ldap_create_&lt;control name&gt;_control_value</b>().  Otherwise, it
+       can be BER-encoded using the functionalities of liblber.
+
+       <b>ldap_control_find</b>() searches the NULL-terminated <i>ctrls</i> array for a
+       control whose OID matches the <i>oid</i> parameter.  The routine returns a
+       pointer to the control if found, NULL otherwise.  If the parameter
+       <i>nextctrlp</i> is not NULL, on return it will point to the next control in
+       the array, and can be passed to the <b>ldap_control_find</b>() routine for
+       subsequent calls, to find further occurrences of the same control
+       type.  The use of this function is discouraged; the recommended way
+       of handling controls in responses consists in going through the array
+       of controls, dealing with each of them in the returned order, since
+       it could matter.
+
+       <b>ldap_control_dup</b>() duplicates an individual control structure, and
+       <b>ldap_controls_dup</b>() duplicates a NULL-terminated array of controls.
+
+       <b>ldap_control_free</b>() frees an individual control structure, and
+       <b>ldap_controls_free</b>() frees a NULL-terminated array of controls.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="ldap.3.html">ldap(3)</a>, <a href="ldap_error.3.html">ldap_error(3)</a>
+</pre>
+<h2><a id="ACKNOWLEDGEMENTS" href="#ACKNOWLEDGEMENTS"></a>ACKNOWLEDGEMENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>OpenLDAP Software </b>is developed and maintained by The OpenLDAP Project
+       &lt;<a href="http://www.openldap.org/">http://www.openldap.org/</a>&gt;.  <b>OpenLDAP Software </b>is derived from the
+       University of Michigan LDAP 3.3 Release.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>OpenLDAP</i> (an open source implementation of
+       the Lightweight Directory Access Protocol) project.  Information
+       about the project can be found at ⟨<a href="http://www.openldap.org/">http://www.openldap.org/</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="http://www.openldap.org/its/">http://www.openldap.org/its/</a>⟩.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.openldap.org/openldap.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">OpenLDAP LDVERSION               RELEASEDATE                LDAP_CONTROLS(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="ldap.3.html">ldap(3)</a>,&nbsp; 
+    <a href="ldap_get_option.3.html">ldap_get_option(3)</a>,&nbsp; 
+    <a href="ldap_parse_reference.3.html">ldap_parse_reference(3)</a>,&nbsp; 
+    <a href="ldap_parse_result.3.html">ldap_parse_result(3)</a>,&nbsp; 
+    <a href="ldap_parse_sort_control.3.html">ldap_parse_sort_control(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

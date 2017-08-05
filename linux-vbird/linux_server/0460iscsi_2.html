@@ -1,0 +1,416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="透过 iscsi 的使用，来提供网络驱动器～">
+	<title>鸟哥的 Linux 私房菜 -- 网络驱动器装置：iSCSI服务器</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0460iscsi.php">
+    <span class="text_head0">第十八章、网络驱动器装置：<span class="text_head_en"> iSCSI </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/08/02</span>
+    </div>
+
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+18.2 <a href="#server">iSCSI target 的设定</a><br>
+	<span class="text_h2">
+	　　18.2.1 <a href="#server_pkg">所需软件与软件结构</a><br>
+	　　18.2.2 <a href="#server_config">target 的实际设定</a><br>
+	</span>
+</span></div>
+<!-- 本文的正式部分 -->
+<hr><a name="server"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">18.2 iSCSI target 的设定</span><br>
+<div class="block1">
+	<p>能够完成 iSCSI target/initiator 设定的项目非常多 (<a href="#ps4">注4</a>)，鸟哥找的到的就有底下这几个：</p>
+	<ul>
+	<li>Linux SCSI target framework (tgt)：<a href="http://stgt.sourceforge.net/" target="_blank">http://stgt.sourceforge.net/</a></li>
+	<li>Linux-iSCSI Project：<a href="http://linux-iscsi.sourceforge.net/" target="_blank">http://linux-iscsi.sourceforge.net/</a></li>
+	<li>Open-iSCSI：<a href="http://www.open-iscsi.org/" target="_blank">http://www.open-iscsi.org/</a></li>
+	</ul>
+	<p>由于被我们 CentOS 6.x 官方直接使用的是 tgt 这个软件，因此底下我们会使用 tgt 来介绍整个 iSCSI target 的设定喔！<br><br></p>
+
+	<hr><a name="server_pkg"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">18.2.1 所需软件与软件结构</span><br>
+	<div class="block2">
+		<p>CentOS 将 tgt 的软件名称定义为 scsi-target-utils ，因此你得要使用 yum 去安装他才行。至于用来作为 initiator 
+		的软件则是使用 linux-iscsi 的项目，该项目所提供的软件名称则为 iscsi-initiator-utils 。所以，总的来说，你需要的软件有：</p>
+
+		<ul>
+		<li><span class="text_import2">scsi-target-utils</span>：用来将 Linux 系统仿真成为 iSCSI target 的功能；</li>
+		<li><span class="text_import2">iscsi-initiator-utils</span>：挂载来自 target 的磁盘到 Linux 本机上。</li>
+		</ul>
+
+		<p>那么 scsi-target-utils 主要提供哪些档案呢？基本上有底下几个比较重要需要注意的：</p>
+
+		<ul>
+		<li><span class="text_import1">/etc/tgt/targets.conf</span>：主要配置文件，设定要分享的磁盘格式与哪几颗；</li>
+		<li><span class="text_import1">/usr/sbin/tgt-admin</span>：在线查询、删除 target 等功能的设定工具；</li>
+		<li><span class="text_import1">/usr/sbin/tgt-setup-lun</span>：建立 target 
+		以及设定分享的磁盘与可使用的客户端等工具软件。</li>
+		<li><span class="text_import1">/usr/sbin/tgtadm</span>：手动直接管理的管理员工具 (可使用配置文件取代)；</li>
+		<li><span class="text_import2">/usr/sbin/tgtd</span>：主要提供 iSCSI target 服务的主程序；</li>
+		<li><span class="text_import2">/usr/sbin/tgtimg</span>：建置预计分享的映像文件装置的工具 (以映像文件仿真磁盘)；</li>
+		</ul>
+
+		<p>其实 CentOS 已经将很多功能都设定好了，因此我们只要修订配置文件，然后启动 tgtd 这个服务就可以啰！
+		接下来，就让我们实际来玩一玩 iSCSI target 的设定吧！</p>
+	</div>
+
+	<hr><a name="server_config"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">18.2.2 target 的实际设定</span><br>
+	<div class="block2">
+		<p>从上面的分析来看，iSCSI 就是透过一个网络接口，将既有的磁盘给分享出去就是了。那么有哪些类型的磁盘可以分享呢？
+		这包括：</p>
+
+		<ul class="text_import2">
+		<li>使用 dd 指令所建立的大型档案可供仿真为磁盘 (无须预先格式化)；</li>
+		<li>使用单一分割槽 (partition) 分享为磁盘；</li>
+		<li>使用单一完整的磁盘 (无须预先分割)；</li>
+		<li>使用磁盘阵列分享 (其实与单一磁盘相同方式)；</li>
+		<li>使用软件磁盘阵列 (software raid) 分享成单一磁盘；</li>
+		<li>使用 LVM 的 LV 装置分享为磁盘。</li>
+		</ul>
+
+		<p>其实没有那么复杂，我们大概知道可以透过 (1)大型档案； (2)单一分割槽； (3)单一装置 (包括磁盘、数组、软件磁盘阵列、LVM
+		的 LV 装置文件名等等) 来进行分享。在本小节当中，我们将透过新的分割产生新的没有用到的分割槽、LVM 
+		逻辑滚动条、大型档案等三个咚咚来进行分享。既然如此，那就得要先来搞定这些咚咚啰！
+		要注意喔，等一下我们要分享出去的数据，最好不要被使用，也最好不要开机就被挂载 (/etc/fstab 当中没有存在记录的意思)。
+		那么就来玩玩看啰！<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>建立所需要的磁盘装置</li></ul>
+
+		<p>既然 iSCSI 要分享的是磁盘，那么我们得要准备好啊！目前预计准备的磁盘为：</p>
+		<ul>
+		<li>建立一个名为 /srv/iscsi/disk1.img 的 500MB 档案；</li>
+		<li>使用 /dev/sda10 提供 2GB 作为分享 (从第一章到目前为止的分割数)；</li>
+		<li>使用 /dev/server/iscsi01 的 2GB LV 作为分享 (再加入 5GB /dev/sda11 到 server VG 中)。</li>
+		</ul>
+
+		<p>实际处理的方式如下：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre><span class="term_hd"># 1. 建立大型档案：</span>
+[root@www ~]# <span class="term_command">mkdir /srv/iscsi</span>
+[root@www ~]# <span class="term_command">dd if=/dev/zero of=/srv/iscsi/disk1.img bs=1M count=500</span>
+[root@www ~]# <span class="term_command">chcon -Rv -t tgtd_var_lib_t /srv/iscsi/</span>
+[root@www ~]# <span class="term_command">ls -lh /srv/iscsi/disk1.img</span>
+-rw-r--r--. 1 root root <span class="term_write">500M</span> Aug  2 16:22 /srv/iscsi/disk1.img <span class="term_note">&lt;==容量对的！</span>
+
+<span class="term_hd"># 2. 建立实际的 partition 分割：</span>
+[root@www ~]# <span class="term_command">fdisk /dev/sda</span>  <span class="term_note">&lt;==实际的分割方式自己处理吧！</span>
+[root@www ~]# <span class="term_command">partprobe     </span>  <span class="term_note">&lt;==某些情况下得 reboot 喔！</span>
+[root@www ~]# <span class="term_command">fdisk -l</span>
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda10           2202        2463     <span class="term_write">2104483+</span>  83  Linux
+/dev/sda11           2464        3117     <span class="term_write">5253223+</span>  8e  Linux LVM
+<span class="term_say"># 只有输出 /dev/sda{10,11} 信息，其他的都省略了。注意看容量，上述容量单位 KB</span>
+
+[root@www ~]# <span class="term_command">swapon -s; mount | grep 'sda1'</span>
+<span class="term_say"># 自己测试一下 /dev/sda{10,11} 不能够被使用喔！若有被使用，请 umount 或 swapoff</span>
+
+<span class="term_hd"># 3. 建立 LV 装置 ：</span>
+[root@www ~]# <span class="term_command">pvcreate /dev/sda11</span>
+[root@www ~]# <span class="term_command">vgextend server /dev/sda11</span>
+[root@www ~]# <span class="term_command">lvcreate -L 2G -n iscsi01 server</span>
+[root@www ~]# <span class="term_command">lvscan</span>
+  ACTIVE            '/dev/server/myhome' [6.88 GiB] inherit
+  ACTIVE            '/dev/server/iscsi01' [<span class="term_write">2.00 GB</span>] inherit
+</pre></td></tr></tbody></table>
+
+		<ul class="list1"><li class="text_import1"><hr>规划分享的 iSCSI target 檔名</li></ul>
+
+		<p>iSCSI 有一套自己分享 target 档名的定义，基本上，藉由 iSCSI 分享出来的 target 檔名都是以 iqn 为开头，意思是：『iSCSI
+		Qualified Name (iSCSI 合格名称)』的意思(<a href="#ps5">注5</a>)。那么在 iqn 后面要接啥档名呢？通常是这样的：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre><span class="term_write">iqn.yyyy-mm.&lt;reversed domain name&gt;:identifier</span>
+iqn.年年-月.单位网域名的反转写法  :这个分享的target名称
+</pre></td></tr></tbody></table>
+
+		<p>鸟哥做这个测试的时间是 2011 年 8 月份，然后鸟哥的机器是 www.centos.vbird ，反转网域写法为 vbird.centos，
+		然后，鸟哥想要的 iSCSI target 名称是 vbirddisk ，那么就可以这样写：</p>
+
+		<ul class="text_import2" style="font-family: '细明体'">
+		<li>iqn.2011-08.vbird.centos:vbirddisk</li>
+		</ul>
+
+		<p>另外，就如同一般外接式储存装置 (target 名称) 可以具有多个磁盘一样，我们的 target 也能够拥有数个磁盘装置的。
+		每个在同一个 target 上头的磁盘我们可以将它定义为<span class="text_import2">逻辑单位编号 
+		(Logical Unit Number, LUN)</span>。我们的 iSCSI initiator 就是跟 target 协调后才取得 LUN 的存取权就是了
+		(<a href="#ps5">注5</a>)。在鸟哥的这个简单案例中，最终的结果，我们会有一个 target ，在这个 target 
+		当中可以使用三个 LUN 的磁盘。<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>设定 tgt 的配置文件 /etc/tgt/targets.conf</li></ul>
+
+		<p>接下来我们要开始来修改配置文件了。基本上，配置文件就是修改 /etc/tgt/targets.conf 啦。这个档案的内容可以改得很简单，
+		最重要的就是设定前一点规定的 iqn 名称，以及该名称所对应的装置，然后再给予一些可能会用到的参数而已。
+		多说无益，让我们实际来实作看看：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /etc/tgt/targets.conf</span>
+<span class="term_say"># 此档案的语法如下：
+&lt;target iqn.相关装置的target名称&gt;
+    backing-store /你的/虚拟设备/完整檔名-1
+    backing-store /你的/虚拟设备/完整檔名-2
+&lt;/target&gt;</span>
+<span class="term_write">
+&lt;target iqn.2011-08.vbird.centos:vbirddisk&gt;
+    backing-store /srv/iscsi/disk1.img  <span class="term_note">&lt;==LUN 1 (LUN 的编号通常照顺序)</span>
+    backing-store /dev/sda10            <span class="term_note">&lt;==LUN 2</span>
+    backing-store /dev/server/iscsi01   <span class="term_note">&lt;==LUN 3</span>
+&lt;/target&gt;</span>
+</pre></td></tr></tbody></table>
+
+		<p>事实上，除了 backing-store 之外，在这个配置文件当中还有一些比较特别的参数可以讨论看看 (man tgt-admin)：</p>
+
+		<ul>
+		<li><span class="text_import2">backing-store (虚拟的装置), direct-store (实际的装置)</span>：
+		设定装置时，如果你的整颗磁盘是全部被拿来当 iSCSI 分享之用，那么才能够使用 direct-store 。不过，根据网络上的其他文件，
+		似乎说明这个设定值有点危险的样子。所以，基本上还是建议单纯使用模拟的 backing-store 
+		较佳。例如鸟哥的简单案例中，就通通使用 backing-store 而已。<br><br></li>
+
+		<li><span class="text_import2">initiator-address (用户端地址)</span>：
+		如果你想要限制能够使用这个 target 的客户端来源，才需要填写这个设定值。基本上，不用设定它 (代表所有人都能使用的意思)，
+		因为我们后来会使用 iptables  来规范可以联机的客户端嘛！<br><br></li>
+
+		<li><span class="text_import2">incominguser (用户账号密码设定)</span>：
+		如果除了来源 IP 的限制之外，你还想要让使用者输入账密才能使用你的 iSCSI target 的话，那么就加用这个设定项目。
+		此设定后面接两个参数，分别是账号与密码啰。<br><br></li>
+
+		<li><span class="text_import2">write-cache [off|on] (是否使用快取)</span>：
+		在预设的情况下，tgtd 会使用快取来增快速度。不过，这样可能会有遗失数据的风险。所以，如果你的数据比较重要的话，
+		或许不要使用快取，直接存取装置会比较妥当一些。</li>
+		</ul>
+
+		<p>上面的设定值要怎么用呢？现在，假设你的环境中，仅允许 192.168.100.0/24 这个网段可以存取 iSCSI 
+		target，而且存取时需要帐密分别为
+		vbirduser, vbirdpasswd ，此外，不要使用快取，那么原本的配置文件之外，还得要加上这样的参数才行 
+		(基本上，使用上述的设定即可，底下的设定是多加测试用的，不需要填入你的设定中)。</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /etc/tgt/targets.conf</span>
+&lt;target iqn.2011-04.vbird.centos:vbirddisk&gt;
+    backing-store /home/iscsi/disk1.img
+    backing-store /dev/sda7
+    backing-store /dev/server/iscsi01
+<span class="term_write">    initiator-address 192.168.100.0/24
+    incominguser vbirduser vbirdpasswd
+    write-cache off</span>
+&lt;/target&gt;
+</pre></td></tr></tbody></table>
+
+		<ul class="list1"><li class="text_import1"><hr>启动 iSCSI target 以及观察相关端口与磁盘信息</li></ul>
+
+		<p>再来则是启动、开机启动，以及观察 iSCSI target 所启动的埠口啰：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">/etc/init.d/tgtd start</span>
+[root@www ~]# <span class="term_command">chkconfig tgtd on</span>
+[root@www ~]# <span class="term_command">netstat -tlunp | grep tgt</span>
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address   Foreign Address   State   PID/Program name
+tcp        0      0 0.0.0.0:<span class="term_write">3260</span>    0.0.0.0:*         LISTEN  26944/tgtd
+tcp        0      0 :::3260         :::*              LISTEN  26944/tgtd
+<span class="term_say"># 重点就是那个 3260 TCP 封包啦！等一下的防火墙务必要开放这个埠口。</span>
+
+<span class="term_hd"># 观察一下我们 target 相关信息，以及提供的 LUN 数据内容：</span>
+[root@www ~]# <span class="term_command">tgt-admin --show</span>
+Target 1: <span class="term_write">iqn.2011-08.vbird.centos:vbirddisk</span> <span class="term_note">&lt;==就是我们的 target</span>
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+    LUN information:
+        <span class="term_write">LUN: 0
+            Type: controller     <span class="term_note">&lt;==这是个控制器，并非可以用的 LUN 喔！</span>
+<span class="term_say">....(中间省略)....</span>
+        LUN: 1
+            Type: disk</span>       <span class="term_note">&lt;==第一个 LUN，是磁盘 (disk) 喔！</span>
+            SCSI ID: IET     00010001
+            SCSI SN: beaf11
+            <span class="term_write">Size: 2155 MB</span>      <span class="term_note">&lt;==容量有这么大！</span>
+            Online: Yes
+            Removable media: No
+            Backing store type: rdwr
+            <span class="term_write">Backing store path: /dev/sda10</span> <span class="term_note">&lt;==磁盘所在的实际文件名</span>
+        <span class="term_write">LUN: 2</span>
+            Type: disk
+            SCSI ID: IET     00010002
+            SCSI SN: beaf12
+            <span class="term_write">Size: 2147 MB</span>
+            Online: Yes
+            Removable media: No
+            Backing store type: rdwr
+            <span class="term_write">Backing store path: /dev/server/iscsi01</span>
+        <span class="term_write">LUN: 3</span>
+            Type: disk
+            SCSI ID: IET     00010003
+            SCSI SN: beaf13
+            <span class="term_write">Size: 524 MB</span>
+            Online: Yes
+            Removable media: No
+            Backing store type: rdwr
+            <span class="term_write">Backing store path: /srv/iscsi/disk1.img</span>
+    Account information:
+<span class="term_write">        vbirduser</span>        <span class="term_note">&lt;==额外的帐户信息</span>
+    ACL information:
+<span class="term_write">        192.168.100.0/24</span> <span class="term_note">&lt;==额外的来源 IP 限制</span>
+</pre></td></tr></tbody></table>
+
+		<p>请将上面的信息对照一下我们的配置文件呦！看看有没有错误就是了！尤其注意每个 LUN 的容量、实际磁盘路径！
+		那个项目不能错误就是了。(照理说 LUN 的数字应该与 backing-store  设定的顺序有关，不过，在鸟哥的测试中，
+		出现的顺序并不相同！因此，还是需要使用 tgt-admin --show 去查阅查阅才好！)<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>设定防火墙</li></ul>
+
+		<p>不论你有没有使用 initiator-address 在 targets.conf 配置文件中，iSCSI target 就是使用 TCP/IP 传输数据的，
+		所以你还是得要在防火墙内设定可以联机的客户端才行！既然 iSCSI 仅开启 3260 埠口，那么我们就这么进行即可：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /usr/local/virus/iptables/iptables.allow</span>
+<span class="term_write">iptables -A INPUT  -p tcp -s 192.168.100.0/24 --dport 3260 -j ACCEPT</span>
+
+[root@www ~]# <span class="term_command">/usr/local/virus/iptables/iptables.rule</span>
+[root@www ~]# <span class="term_command">iptables-save | grep 3260</span>
+-A INPUT -s 192.168.100.0/24 -p tcp -m tcp --dport 3260 -j ACCEPT
+<span class="term_say"># 最终要看到上述的输出字样才是 OK 的呦！若有其他用户需要联机，
+# 自行复制 iptables.allow 内的语法，修改来源端即可。</span>
+</pre></td></tr></tbody></table>
+	</div>
+</div>
+<hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

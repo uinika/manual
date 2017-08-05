@@ -1,0 +1,305 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pthread_setcancelstate(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PTHREAD_SETCANCELSTATE(3) Linux Programmer's ManualPTHREAD_SETCANCELSTATE(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pthread_setcancelstate,  pthread_setcanceltype  -  set  cancelability
+       state and type
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pthread.h&gt;</b>
+
+       <b>int pthread_setcancelstate(int </b><i>state</i><b>, int *</b><i>oldstate</i><b>);</b>
+       <b>int pthread_setcanceltype(int </b><i>type</i><b>, int *</b><i>oldtype</i><b>);</b>
+
+       Compile and link with <i>-pthread</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>pthread_setcancelstate</b>() sets the cancelability state of the
+       calling thread to the value given in <i>state</i>.  The previous
+       cancelability state of the thread is returned in the buffer pointed
+       to by <i>oldstate</i>.  The <i>state</i> argument must have one of the following
+       values:
+
+       <b>PTHREAD_CANCEL_ENABLE</b>
+              The thread is cancelable.  This is the default cancelability
+              state in all new threads, including the initial thread.  The
+              thread's cancelability type determines when a cancelable
+              thread will respond to a cancellation request.
+
+       <b>PTHREAD_CANCEL_DISABLE</b>
+              The thread is not cancelable.  If a cancellation request is
+              received, it is blocked until cancelability is enabled.
+
+       The <b>pthread_setcanceltype</b>() sets the cancelability type of the
+       calling thread to the value given in <i>type</i>.  The previous
+       cancelability type of the thread is returned in the buffer pointed to
+       by <i>oldtype</i>.  The <i>type</i> argument must have one of the following values:
+
+       <b>PTHREAD_CANCEL_DEFERRED</b>
+              A cancellation request is deferred until the thread next calls
+              a function that is a cancellation point (see <a href="../man7/pthreads.7.html">pthreads(7)</a>).
+              This is the default cancelability type in all new threads,
+              including the initial thread.
+
+       <b>PTHREAD_CANCEL_ASYNCHRONOUS</b>
+              The thread can be canceled at any time.  (Typically, it will
+              be canceled immediately upon receiving a cancellation request,
+              but the system doesn't guarantee this.)
+
+       The set-and-get operation performed by each of these functions is
+       atomic with respect to other threads in the process calling the same
+       function.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, these functions return 0; on error, they return a nonzero
+       error number.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>pthread_setcancelstate</b>() can fail with the following error:
+
+       <b>EINVAL </b>Invalid value for <i>state</i>.
+
+       The <b>pthread_setcanceltype</b>() can fail with the following error:
+
+       <b>EINVAL </b>Invalid value for <i>type</i>.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────────────────┬─────────────────────┬─────────┐
+       │<b>Interface                 </b>│ <b>Attribute           </b>│ <b>Value   </b>│
+       ├──────────────────────────┼─────────────────────┼─────────┤
+       │<b>pthread_setcancelstate</b>(), │ Thread safety       │ MT-Safe │
+       │<b>pthread_setcanceltype</b>()   │                     │         │
+       ├──────────────────────────┼─────────────────────┼─────────┤
+       │<b>pthread_setcancelstate</b>(), │ Async-cancel-safety │ AC-Safe │
+       │<b>pthread_setcanceltype</b>()   │                     │         │
+       └──────────────────────────┴─────────────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For details of what happens when a thread is canceled, see
+       <a href="pthread_cancel.3.html">pthread_cancel(3)</a>.
+
+       Briefly disabling cancelability is useful if a thread performs some
+       critical action that must not be interrupted by a cancellation
+       request.  Beware of disabling cancelability for long periods, or
+       around operations that may block for long periods, since that will
+       render the thread unresponsive to cancellation requests.
+
+   <b>Asynchronous cancelability</b>
+       Setting the cancelability type to <b>PTHREAD_CANCEL_ASYNCHRONOUS </b>is
+       rarely useful.  Since the thread could be canceled at <i>any</i> time, it
+       cannot safely reserve resources (e.g., allocating memory with
+       <a href="malloc.3.html">malloc(3)</a>), acquire mutexes, semaphores, or locks, and so on.
+       Reserving resources is unsafe because the application has no way of
+       knowing what the state of these resources is when the thread is
+       canceled; that is, did cancellation occur before the resources were
+       reserved, while they were reserved, or after they were released?
+       Furthermore, some internal data structures (e.g., the linked list of
+       free blocks managed by the <a href="malloc.3.html">malloc(3)</a> family of functions) may be left
+       in an inconsistent state if cancellation occurs in the middle of the
+       function call.  Consequently, clean-up handlers cease to be useful.
+
+       Functions that can be safely asynchronously canceled are called
+       <i>async-cancel-safe functions</i>.  POSIX.1-2001 and POSIX.1-2008 require
+       only that <a href="pthread_cancel.3.html">pthread_cancel(3)</a>, <b>pthread_setcancelstate</b>(), and
+       <b>pthread_setcanceltype</b>() be async-cancel-safe.  In general, other
+       library functions can't be safely called from an asynchronously
+       cancelable thread.
+
+       One of the few circumstances in which asynchronous cancelability is
+       useful is for cancellation of a thread that is in a pure compute-
+       bound loop.
+
+   <b>Portability notes</b>
+       The Linux threading implementations permit the <i>oldstate</i> argument of
+       <b>pthread_setcancelstate</b>() to be NULL, in which case the information
+       about the previous cancelability state is not returned to the caller.
+       Many other implementations also permit a NULL <i>oldstat</i> argument, but
+       POSIX.1 does not specify this point, so portable applications should
+       always specify a non-NULL value in <i>oldstate</i>.  A precisely analogous
+       set of statements applies for the <i>oldtype</i> argument of
+       <b>pthread_setcanceltype</b>().
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       See <a href="pthread_cancel.3.html">pthread_cancel(3)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="pthread_cancel.3.html">pthread_cancel(3)</a>, <a href="pthread_cleanup_push.3.html">pthread_cleanup_push(3)</a>, <a href="pthread_testcancel.3.html">pthread_testcancel(3)</a>,
+       <a href="../man7/pthreads.7.html">pthreads(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-08-08        PTHREAD_SETCANCELSTATE(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pthread_cancel.3.html">pthread_cancel(3)</a>,&nbsp; 
+    <a href="pthread_cleanup_push.3.html">pthread_cleanup_push(3)</a>,&nbsp; 
+    <a href="pthread_cleanup_push_defer_np.3.html">pthread_cleanup_push_defer_np(3)</a>,&nbsp; 
+    <a href="pthread_kill_other_threads_np.3.html">pthread_kill_other_threads_np(3)</a>,&nbsp; 
+    <a href="pthread_testcancel.3.html">pthread_testcancel(3)</a>,&nbsp; 
+    <a href="../man7/pthreads.7.html">pthreads(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="pthread_setcancelstate.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

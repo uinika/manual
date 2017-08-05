@@ -1,0 +1,330 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pam_tally(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#MODULE_TYPES_PROVIDED">MODULE&nbsp;TYPES&nbsp;PROVIDED</a> | <a href="#RETURN_VALUES">RETURN&nbsp;VALUES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PAM_TALLY(8)                  Linux-PAM Manual                  PAM_TALLY(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_tally - The login counter (tallying) module
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pam_tally.so </b>[file=<i>/path/to/counter</i>] [onerr=[<i>fail</i>|<i>succeed</i>]]
+                    [magic_root] [even_deny_root_account] [deny=<i>n</i>]
+                    [lock_time=<i>n</i>] [unlock_time=<i>n</i>] [per_user] [no_lock_time]
+                    [no_reset] [audit] [silent] [no_log_info]
+
+       <b>pam_tally </b>[--file <i>/path/to/counter</i>] [--user <i>username</i>] [--reset[=<i>n</i>]]
+                 [--quiet]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This module maintains a count of attempted accesses, can reset count
+       on success, can deny access if too many attempts fail.
+
+       pam_tally has several limitations, which are solved with pam_tally2.
+       For this reason pam_tally is deprecated and will be removed in a
+       future release.
+
+       pam_tally comes in two parts: <b>pam_tally.so </b>and <b>pam_tally</b>. The former
+       is the PAM module and the latter, a stand-alone program.  <b>pam_tally</b>
+       is an (optional) application which can be used to interrogate and
+       manipulate the counter file. It can display user counts, set
+       individual counts, or clear all counts. Setting artificially high
+       counts may be useful for blocking users without changing their
+       passwords. For example, one might find it useful to clear all counts
+       every midnight from a cron job. The <a href="faillog.8.html">faillog(8)</a> command can be used
+       instead of pam_tally to to maintain the counter file.
+
+       Normally, failed attempts to access <i>root</i> will <b>not </b>cause the root
+       account to become blocked, to prevent denial-of-service: if your
+       users aren't given shell accounts and root may only login via <b>su </b>or
+       at the machine console (not telnet/rsh, etc), this is safe.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       GLOBAL OPTIONS
+           This can be used for <i>auth</i> and <i>account</i> module types.
+
+           <b>onerr=[</b><i>fail</i><b>|</b><i>succeed</i><b>]</b>
+               If something weird happens (like unable to open the file),
+               return with <b>PAM_SUCCESS </b>if <b>onerr=</b><i>succeed</i> is given, else with
+               the corresponding PAM error code.
+
+           <b>file=</b><i>/path/to/counter</i>
+               File where to keep counts. Default is /var/log/faillog.
+
+           <b>audit</b>
+               Will log the user name into the system log if the user is not
+               found.
+
+           <b>silent</b>
+               Don't print informative messages.
+
+           <b>no_log_info</b>
+               Don't log informative messages via <a href="../man3/syslog.3.html">syslog(3)</a>.
+
+       AUTH OPTIONS
+           Authentication phase first checks if user should be denied access
+           and if not it increments attempted login counter. Then on call to
+           <a href="../man3/pam_setcred.3.html">pam_setcred(3)</a> it resets the attempts counter.
+
+           <b>deny=</b><i>n</i>
+               Deny access if tally for this user exceeds <i>n</i>.
+
+           <b>lock_time=</b><i>n</i>
+               Always deny for <i>n</i> seconds after failed attempt.
+
+           <b>unlock_time=</b><i>n</i>
+               Allow access after <i>n</i> seconds after failed attempt. If this
+               option is used the user will be locked out for the specified
+               amount of time after he exceeded his maximum allowed
+               attempts. Otherwise the account is locked until the lock is
+               removed by a manual intervention of the system administrator.
+
+           <b>magic_root</b>
+               If the module is invoked by a user with uid=0 the counter is
+               not incremented. The sysadmin should use this for user
+               launched services, like <b>su</b>, otherwise this argument should be
+               omitted.
+
+           <b>no_lock_time</b>
+               Do not use the .fail_locktime field in /var/log/faillog for
+               this user.
+
+           <b>no_reset</b>
+               Don't reset count on successful entry, only decrement.
+
+           <b>even_deny_root_account</b>
+               Root account can become unavailable.
+
+           <b>per_user</b>
+               If /var/log/faillog contains a non-zero
+               .fail_max/.fail_locktime field for this user then use it
+               instead of <b>deny=</b><i>n</i>/ <b>lock_time=</b><i>n</i> parameter.
+
+           <b>no_lock_time</b>
+               Don't use .fail_locktime filed in /var/log/faillog for this
+               user.
+
+       ACCOUNT OPTIONS
+           Account phase resets attempts counter if the user is <b>not </b>magic
+           root. This phase can be used optionally for services which don't
+           call <a href="../man3/pam_setcred.3.html">pam_setcred(3)</a> correctly or if the reset should be done
+           regardless of the failure of the account phase of other modules.
+
+           <b>magic_root</b>
+               If the module is invoked by a user with uid=0 the counter is
+               not incremented. The sysadmin should use this for user
+               launched services, like <b>su</b>, otherwise this argument should be
+               omitted.
+
+           <b>no_reset</b>
+               Don't reset count on successful entry, only decrement.
+</pre>
+<h2><a id="MODULE_TYPES_PROVIDED" href="#MODULE_TYPES_PROVIDED"></a>MODULE TYPES PROVIDED  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>auth </b>and <b>account </b>module types are provided.
+</pre>
+<h2><a id="RETURN_VALUES" href="#RETURN_VALUES"></a>RETURN VALUES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       PAM_AUTH_ERR
+           A invalid option was given, the module was not able to retrieve
+           the user name, no valid counter file was found, or too many
+           failed logins.
+
+       PAM_SUCCESS
+           Everything was successful.
+
+       PAM_USER_UNKNOWN
+           User not known.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Add the following line to /etc/pam.d/login to lock the account after
+       too many failed logins. The number of allowed fails is specified by
+       /var/log/faillog and needs to be set with pam_tally or <a href="faillog.8.html">faillog(8)</a>
+       before.
+
+           auth     required       pam_securetty.so
+           auth     required       pam_tally.so per_user
+           auth     required       pam_env.so
+           auth     required       pam_unix.so
+           auth     required       pam_nologin.so
+           account  required       pam_unix.so
+           password required       pam_unix.so
+           session  required       pam_limits.so
+           session  required       pam_unix.so
+           session  required       pam_lastlog.so nowtmp
+           session  optional       pam_mail.so standard
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /var/log/faillog
+           failure logging file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="faillog.8.html">faillog(8)</a>, <a href="../man5/pam.conf.5.html">pam.conf(5)</a>, <a href="../man5/pam.d.5.html">pam.d(5)</a>, <a href="pam.8-2.html">pam(8)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_tally was written by Tim Baverstock and Tomas Mraz.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>linux-pam</i> (Pluggable Authentication Modules
+       for Linux) project.  Information about the project can be found at 
+       ⟨<a href="http://www.linux-pam.org/">http://www.linux-pam.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨//www.linux-pam.org/⟩.  This page was obtained from the
+       tarball Linux-PAM-1.3.0.tar.gz fetched from 
+       ⟨<a href="http://www.linux-pam.org/library/">http://www.linux-pam.org/library/</a>⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Linux-PAM Manual                 04/01/2016                     PAM_TALLY(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

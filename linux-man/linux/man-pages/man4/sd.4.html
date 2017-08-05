@@ -1,0 +1,242 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sd(4) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#CONFIGURATION">CONFIGURATION</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SD(4)                     Linux Programmer's Manual                    SD(4)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sd - driver for SCSI disk drives
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;linux/hdreg.h&gt;        </b>/* for HDIO_GETGEO */
+       <b>#include &lt;linux/fs.h&gt;           </b>/* for BLKGETSIZE and BLKRRPART */
+</pre>
+<h2><a id="CONFIGURATION" href="#CONFIGURATION"></a>CONFIGURATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The block device name has the following form: <b>sd</b><i>lp,</i> where <i>l</i> is a
+       letter denoting the physical drive, and <i>p</i> is a number denoting the
+       partition on that physical drive.  Often, the partition number, <i>p</i>,
+       will be left off when the device corresponds to the whole drive.
+
+       SCSI disks have a major device number of 8, and a minor device number
+       of the form (16 * <i>drive_number</i>) + <i>partition_number</i>, where
+       <i>drive_number</i> is the number of the physical drive in order of
+       detection, and <i>partition_number</i> is as follows:
+
+       partition 0 is the whole drive
+       partitions 1-4 are the DOS "primary" partitions
+       partitions 5-8 are the DOS "extended" (or "logical") partitions
+
+       For example, <i>/dev/sda</i> will have major 8, minor 0, and will refer to
+       all of the first SCSI drive in the system; and <i>/dev/sdb3</i> will have
+       major 8, minor 19, and will refer to the third DOS "primary"
+       partition on the second SCSI drive in the system.
+
+       At this time, only block devices are provided.  Raw devices have not
+       yet been implemented.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following <i>ioctl</i>s are provided:
+
+       <b>HDIO_GETGEO</b>
+              Returns the BIOS disk parameters in the following structure:
+
+                  struct hd_geometry {
+                      unsigned char  heads;
+                      unsigned char  sectors;
+                      unsigned short cylinders;
+                      unsigned long  start;
+                  };
+
+              A pointer to this structure is passed as the <a href="../man2/ioctl.2.html">ioctl(2)</a>
+              parameter.
+
+              The information returned in the parameter is the disk geometry
+              of the drive <i>as understood by DOS!</i>  This geometry is <i>not</i> the
+              physical geometry of the drive.  It is used when constructing
+              the drive's partition table, however, and is needed for
+              convenient operation of <b>fdisk</b>(1), <b>efdisk</b>(1), and <b>lilo</b>(1).  If
+              the geometry information is not available, zero will be
+              returned for all of the parameters.
+
+       <b>BLKGETSIZE</b>
+              Returns the device size in sectors.  The <a href="../man2/ioctl.2.html">ioctl(2)</a> parameter
+              should be a pointer to a <i>long</i>.
+
+       <b>BLKRRPART</b>
+              Forces a reread of the SCSI disk partition tables.  No
+              parameter is needed.
+
+              The SCSI <a href="../man2/ioctl.2.html">ioctl(2)</a> operations are also supported.  If the
+              <a href="../man2/ioctl.2.html">ioctl(2)</a> parameter is required, and it is NULL, then <a href="../man2/ioctl.2.html">ioctl(2)</a>
+              will fail with the error <b>EINVAL</b>.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /dev/sd[a-h]: the whole device
+       /dev/sd[a-h][0-8]: individual block partitions
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2012-05-03                            SD(4)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/ioctl.2.html">ioctl(2)</a>,&nbsp; 
+    <a href="../man2/ioctl_console.2.html">ioctl_console(2)</a>,&nbsp; 
+    <a href="hd.4.html">hd(4)</a>,&nbsp; 
+    <a href="hpsa.4.html">hpsa(4)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="sd.4.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

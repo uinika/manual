@@ -1,0 +1,383 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="利用简单的 iptables 规则来说明防火墙，另外也会提到 NAT 服务器这个 IP 分享的咚咚！">
+	<title>鸟哥的 Linux 私房菜 -- Linux 防火墙与 NAT 服务器</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0250simple_firewall.php">
+    <span class="text_head0">第九章、防火墙与<span class="text_head_en"> NAT </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/07/22</span>
+    </div>
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+9.4 <a href="#local">单机防火墙的一个实例</a><br>
+	<span class="text_h2">
+	　　9.4.1 <a href="#local_rule">规则草拟</a><br>
+	　　9.4.2 <a href="#local_script">实际设定</a><br>
+	</span>
+</span></div>
+<!-- 本文的正式部分 -->
+
+<hr><a name="local"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">9.4 单机防火墙的一个实例</span><br>
+<div class="block1">
+	<p>介绍了这么多的防火墙语法与相关的注意事项后，终于要来架设防火墙了。鸟哥还是比较偏好使用脚本来撰写防火墙，
+	然后透过最终的 /etc/init.d/iptables save 来将结果储存到 /etc/sysconfig/iptables 去！
+	而且此一特色还可以用在呼叫其他的 scripts ，可以让防火墙规则具有较为灵活的使用方式。
+	好了，那就来谈谈如何设定咱们的防火墙规则吧！</p><br>
+
+	<hr><a name="local_rule"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">9.4.1 规则草拟</span><br>
+	<div class="block2">
+		<p>鸟哥底下介绍的这个防火墙，其实可以用来作为路由器上的防火墙，也可以用来作为本机的防火墙。
+		假设硬件联机如同下图所示， Linux 主机本身也是内部 LAN 的路由器！亦即是一个简单的 IP 
+		分享器的功能啦！依据第三章的<a href="http://linux.vbird.org/linux_server/0120intranet.php#fig3.2-1">图 3.2-1</a>
+		假设鸟哥网络接口有底下这些：</p>
+
+		<ul>
+		<li>外部网络使用 eth0 (如果是拨接，有可能是 ppp0，请针对你的环境来设定)；</li>
+		<li>内部网络使用 eth1 ，且内部使用 192.168.100.0/24 这个 Class ；</li>
+		<li>主机默认开放的服务有 WWW, SSH, https 等等；</li>
+		</ul>
+
+		<center><img src="0250simple_firewall_files/centos_6_real_case.gif" alt="一个局域网络的路由器架构示意图" title="一个局域网络的路由器架构示意图" border="0"><br>
+		图 9.4-1、一个局域网络的路由器架构示意图<br></center>
+
+
+		<p><span class="text_import2">由于希望将信任网域 (LAN) 与不信任网域 (Internet) 整个分开的完整一点，
+		所以希望你可以在 Linux 上面安装两块以上的实体网卡，将两块网卡接在不同的网域，这样可以避免很多问题。</span>
+		至于最重要的防火墙政策是：『<span class="text_import1">关闭所有的联机，仅开放特定的服务</span>』模式。
+		而且假设内部使用者已经受过良好的训练，因此在 filter table 的三条链个预设政策是：</p>
+
+		<ul>
+		<li>INPUT 为 DROP</li>
+		<li>OUTPUT 及 FORWARD 为 ACCEPT</li></ul>
+
+		<p>鸟哥底下预计提供的防火墙流程是这样的：</p>
+
+		<center><img src="0250simple_firewall_files/simple_firewall.png" alt="本机的防火墙规则流程示意图" title="本机的防火墙规则流程示意图" border="0"><br>
+		图 9.4-2、本机的防火墙规则流程示意图<br></center>
+
+		<p>原则上，内部 LAN 主机与主机本身的开放度很高，因为 Output 与 Forward 
+		是完全开放不理的！对于小家庭的主机是可以接受的，因为我们内部的计算机数量不多，而且人员都是熟悉的，
+		所以不需要特别加以控管！但是：『<span class="text_import2">在大企业的内部，这样的规划是很不合格的，
+		因为你不能保证内部所有的人都可以按照你的规定来使用 Network</span> ！』也就是说『家贼难防』呀！
+		因此，那样的环境连 Output 与 Forward 都需要特别加以管理才行！</p>
+	</div>
+
+	<hr><a name="local_script"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">9.4.2 实际设定</span><br>
+	<div class="block2">
+		<p>事实上，我们在设定防火墙的时候，不太可能会一个一个指令的输入，通常是利用 shell scripts 
+		来帮我们达成这样的功能吶！底下是利用上面的流程图所规划出来的防火墙脚本，你可以参考看看，
+		但是你需要将环境修改成适合你自己的环境才行喔！此外，为了未来修改维护的方便，鸟哥将整个 script 拆成三部分，分别是：</p>
+
+		<ul>
+		<li>iptables.rule：设定最基本的规则，包括清除防火墙规则、加载模块、设定服务可接受等；</li>
+		<li>iptables.deny：设定抵挡某些恶意主机的进入；</li>
+		<li>iptables.allow：设定允许某些自定义的后门来源主机！</li></ul>
+
+		<p>鸟哥个人习惯是将这个脚本放置到 /usr/local/virus/iptables 目录下，你也可以自行放置到自己习惯的位置去。
+		那底下就来瞧瞧这支脚本是怎么写的吧！</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">mkdir -p /usr/local/virus/iptables</span>
+[root@www ~]# <span class="term_command">cd /usr/local/virus/iptables</span>
+<a name="iptables.rule"></a>[root@www iptables]# <span class="term_command">vim iptables.rule</span>
+#!/bin/bash
+
+<span class="term_say"># 请先输入您的相关参数，不要输入错误了！</span>
+  EXTIF="<span class="term_write">eth0</span>"             # 这个是可以连上 Public IP 的网络接口
+  INIF="<span class="term_write">eth1</span>"              # 内部 LAN 的连接接口；若无则写成 INIF=""
+  INNET="<span class="term_write">192.168.100.0/24</span>" # 若无内部网域接口，请填写成 INNET=""
+  export EXTIF INIF INNET
+
+<span class="term_say"># 第一部份，针对本机的防火墙设定！##########################################
+# 1. 先设定好核心的网络功能：</span>
+  echo "1" &gt; /proc/sys/net/ipv4/tcp_syncookies
+  echo "1" &gt; /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts
+  for i in /proc/sys/net/ipv4/conf/*/{rp_filter,log_martians}; do
+        echo "1" &gt; $i
+  done
+  for i in /proc/sys/net/ipv4/conf/*/{accept_source_route,accept_redirects,\
+send_redirects}; do
+        echo "0" &gt; $i
+  done
+
+<span class="term_say"># 2. 清除规则、设定默认政策及开放 lo 与相关的设定值</span>
+  PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/sbin:/usr/local/bin; export PATH
+  iptables -F
+  iptables -X
+  iptables -Z
+  iptables -P INPUT   DROP
+  iptables -P OUTPUT  ACCEPT
+  iptables -P FORWARD ACCEPT
+  iptables -A INPUT -i lo -j ACCEPT
+  iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+<span class="term_say"># 3. 启动额外的防火墙 script 模块</span>
+  if [ -f /usr/local/virus/iptables/iptables.deny ]; then
+        sh /usr/local/virus/iptables/iptables.deny
+  fi
+  if [ -f /usr/local/virus/iptables/iptables.allow ]; then
+        sh /usr/local/virus/iptables/iptables.allow
+  fi
+  if [ -f /usr/local/virus/httpd-err/iptables.http ]; then
+        sh /usr/local/virus/httpd-err/iptables.http
+  fi
+
+<span class="term_say"># 4. 允许某些类型的 ICMP 封包进入</span>
+  AICMP="0 3 3/4 4 11 12 14 16 18"
+  for tyicmp in $AICMP
+  do
+    iptables -A INPUT -i $EXTIF -p icmp --icmp-type $tyicmp -j ACCEPT
+  done
+<a name="script_daemon"></a>
+<span class="term_say"># 5. 允许某些服务的进入，请依照你自己的环境开启</span>
+# iptables -A INPUT -p TCP -i $EXTIF --dport  21 --sport 1024:65534 -j ACCEPT # FTP
+# iptables -A INPUT -p TCP -i $EXTIF --dport  22 --sport 1024:65534 -j ACCEPT # SSH
+# iptables -A INPUT -p TCP -i $EXTIF --dport  25 --sport 1024:65534 -j ACCEPT # SMTP
+# iptables -A INPUT -p UDP -i $EXTIF --dport  53 --sport 1024:65534 -j ACCEPT # DNS
+# iptables -A INPUT -p TCP -i $EXTIF --dport  53 --sport 1024:65534 -j ACCEPT # DNS
+# iptables -A INPUT -p TCP -i $EXTIF --dport  80 --sport 1024:65534 -j ACCEPT # WWW
+# iptables -A INPUT -p TCP -i $EXTIF --dport 110 --sport 1024:65534 -j ACCEPT # POP3
+# iptables -A INPUT -p TCP -i $EXTIF --dport 443 --sport 1024:65534 -j ACCEPT # HTTPS
+
+<a name="script_part2"></a>
+<span class="term_say"># 第二部份，针对后端主机的防火墙设定！###############################
+# 1. 先加载一些有用的模块</span>
+  modules="ip_tables iptable_nat ip_nat_ftp ip_nat_irc ip_conntrack 
+ip_conntrack_ftp ip_conntrack_irc"
+  for mod in $modules
+  do
+      testmod=`lsmod | grep "^${mod} " | awk '{print $1}'`
+      if [ "$testmod" == "" ]; then
+            modprobe $mod
+      fi
+  done
+
+<span class="term_say"># 2. 清除 NAT table 的规则吧！</span>
+  iptables -F -t nat
+  iptables -X -t nat
+  iptables -Z -t nat
+  iptables -t nat -P PREROUTING  ACCEPT
+  iptables -t nat -P POSTROUTING ACCEPT
+  iptables -t nat -P OUTPUT      ACCEPT
+
+<span class="term_say"># 3. 若有内部接口的存在 (双网卡) 开放成为路由器，且为 IP 分享器！</span>
+  if [ "$INIF" != "" ]; then
+    iptables -A INPUT -i $INIF -j ACCEPT
+    echo "1" &gt; /proc/sys/net/ipv4/ip_forward
+    if [ "$INNET" != "" ]; then
+        for innet in $INNET
+        do
+            iptables -t nat -A POSTROUTING -s $innet -o $EXTIF -j MASQUERADE
+        done
+    fi
+  fi
+<span class="term_say">  # 如果你的 MSN 一直无法联机，或者是某些网站 OK 某些网站不 OK，
+  # 可能是 MTU 的问题，那你可以将底下这一行给他取消批注来启动 MTU 限制范围</span>
+  # iptables -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss \
+  #          --mss 1400:1536 -j TCPMSS --clamp-mss-to-pmtu
+
+<span class="term_say"># 4. NAT 服务器后端的 LAN 内对外之服务器设定</span>
+# iptables -t nat -A PREROUTING -p tcp -i $EXTIF --dport 80 \
+#          -j DNAT --to-destination 192.168.1.210:80 # WWW
+
+<span class="term_say"># 5. 特殊的功能，包括 Windows 远程桌面所产生的规则，假设桌面主机为 1.2.3.4</span>
+# iptables -t nat -A PREROUTING -p tcp -s 1.2.3.4  --dport 6000 \
+#          -j DNAT --to-destination 192.168.100.10
+# iptables -t nat -A PREROUTING -p tcp -s 1.2.3.4  --sport 3389 \
+#          -j DNAT --to-destination 192.168.100.20
+
+<span class="term_say"># 6. 最终将这些功能储存下来吧！</span>
+  /etc/init.d/iptables save
+</pre></td></tr></tbody></table>
+
+		<p>特别留意上面程序代码的特殊字体部分，基本上，你只要修改一下最上方的接口部分，
+		应该就能够运作这个防火墙了。不过因为每个人的环境都不相同，
+		因此你在设定完成后，依旧需要测试一下才行喔！不然，出了问题不要怪我啊！....
+		再来看一下关于 iptables.allow 的内容是如何？假如我要让一个 140.116.44.0/24 
+		这个网域的所有主机来源可以进入我的主机的话，那么这个档案的内容可以写成这样：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www iptables]# <span class="term_command">vim iptables.allow</span>
+#!/bin/bash
+# 底下则填写你允许进入本机的其他网域或主机啊！
+  iptables -A INPUT -i $EXTIF -s 140.116.44.0/24 -j ACCEPT
+
+<span class="term_say"># 底下则是关于抵挡的档案设定法！</span>
+[root@www iptables]# <span class="term_command">vim iptables.deny</span>
+#!/bin/bash
+# 底下填写的是『你要抵挡的那个咚咚！』
+  iptables -A INPUT -i $EXTIF -s 140.116.44.254 -j DROP
+
+[root@www iptables]# <span class="term_command">chmod 700 iptables.*</span>
+</pre></td></tr></tbody></table>
+
+		<p>将这三个档案的权限设定为 700 且只属于 root 的权限后，就能够直接执行 iptables.rule 啰！
+		不过要注意的是，在上面的案例当中，鸟哥预设将所有的服务的通道都是关闭的！
+		所以你必须要到<a href="#script_daemon">本机防火墙的第 5 步骤</a>处将一些批注符号 (#) 解开才行。
+		同样的，如果有其他更多的 port 想要开启时，一样需要增加额外的规则才行喔！</p>
+
+		<p>不过，还是如同前面我们所说的，这个 firewall 仅能提供基本的安全防护，其他的相关问题还需要再测试测试呢！
+		此外，如果你希望一开机就自动执行这个 script 的话，请将这个档案的完整档名写入 /etc/rc.d/rc.local 
+		当中，有点像底下这样：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /etc/rc.d/rc.local</span>
+<span class="term_say">....(其他省略)....</span>
+# 1. Firewall
+<span class="term_write">/usr/local/virus/iptables/iptables.rule</span>
+</pre></td></tr></tbody></table>
+
+		<p>事实上，这个脚本的最底下已经加入写入防火墙默认规则文件的功能，所以你只要执行一次，就拥有最正确的规则了！
+		上述的 rc.local 仅是预防万一而已。 ^_^！上述三个档案请你不要在 Windows 系统上面编辑后才传送到 Linux 
+		上运作，因为 Windows 系统的断行字符问题，将可能导致该档案无法执行。建议你直接到底下去下载，传送到 Linux 后可以利用 
+		<a href="http://linux.vbird.org/linux_basic/0310vi.php#dos2unix">dos2unix</a> 指令去转换断行字符！就不会有问题！</p>
+
+		<ul><li><a href="http://linux.vbird.org/download/index.php?action=detail&amp;fileid=43" target="_blank">http://linux.vbird.org/download/index.php?action=detail&amp;fileid=43</a></li></ul>
+
+		<p>这就是一个最简单、阳春的防火墙。同时，这个防火墙还可以具有最阳春的 IP 分享器的功能呢！
+		也就是在 <a href="#iptables.rule">iptables.rule</a> 这个档案当中的第二部分了。
+		这部分我们在下一节会再继续介绍的。</p>
+	</div>
+</div><hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

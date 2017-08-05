@@ -1,0 +1,236 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>e4defrag(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#NOTES">NOTES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">E4DEFRAG(8)                System Manager's Manual               E4DEFRAG(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       e4defrag - online defragmenter for ext4 filesystem
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>e4defrag </b>[ <b>-c </b>] [ <b>-v </b>] <i>target</i> ...
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>e4defrag </b>reduces fragmentation of extent based file. The file
+       targeted by <b>e4defrag </b>is created on ext4 filesystem made with "-O
+       extent" option (see <a href="mke2fs.8.html">mke2fs(8)</a>).  The targeted file gets more
+       contiguous blocks and improves the file access speed.
+
+       <i>target</i> is a regular file, a directory, or a device that is mounted as
+       ext4 filesystem.  If <i>target</i> is a directory, <b>e4defrag </b>reduces
+       fragmentation of all files in it. If <i>target</i> is a device, <b>e4defrag</b>
+       gets the mount point of it and reduces fragmentation of all files in
+       this mount point.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-c     </b>Get a current fragmentation count and an ideal fragmentation
+              count, and calculate fragmentation score based on them. By
+              seeing this score, we can determine whether we should execute
+              <b>e4defrag </b>to <i>target</i>.  When used with <b>-v </b>option, the current
+              fragmentation count and the ideal fragmentation count are
+              printed for each file.
+
+              Also this option outputs the average data size in one extent.
+              If you see it, you'll find the file has ideal extents or not.
+              Note that the maximum extent size is 131072KB in ext4
+              filesystem (if block size is 4KB).
+
+              If this option is specified, <i>target</i> is never defragmented.
+
+       <b>-v     </b>Print error messages and the fragmentation count before and
+              after defrag for each file.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>e4defrag </b>does not support swap file, files in lost+found directory,
+       and files allocated in indirect blocks. When <i>target</i> is a device or a
+       mount point, <b>e4defrag </b>doesn't defragment files in mount point of
+       other device.
+
+       It safe to run e4defrag on a file while it is actively in use by
+       another application.  Since the contents of file blocks are copied
+       using the page cache, this can result in a performance slowdown to
+       both e4defrag and the application due to contention over the system's
+       memory and disk bandwidth.
+
+       If the file system's free space is fragmented, or if there is
+       insufficient free space available, e4defrag may not be able to
+       improve the file's fragmentation.
+
+       Non-privileged users can execute <b>e4defrag </b>to their own file, but the
+       score is not printed if <b>-c </b>option is specified. Therefore, it is
+       desirable to be executed by root user.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Written by Akira Fujita &lt;a-fujita@rs.jp.nec.com&gt; and Takashi Sato &lt;t-
+       sato@yk.jp.nec.com&gt;.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="mke2fs.8.html">mke2fs(8)</a>, <a href="mount.8.html">mount(8)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>e2fsprogs</i> (utilities for ext2/3/4
+       filesystems) project.  Information about the project can be found at
+       ⟨<a href="http://e2fsprogs.sourceforge.net/">http://e2fsprogs.sourceforge.net/</a>⟩.  It is not known how to report
+       bugs for this man page; if you know, please send a mail to
+       man-pages@man7.org.  This page was obtained from the project's
+       upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git⟩ on 2017-07-05.
+       If you discover any rendering problems in this HTML version of the
+       page, or you believe there is a better or more up-to-date source for
+       the page, or you have corrections or improvements to the information
+       in this COLOPHON (which is <i>not</i> part of the original manual page),
+       send a mail to man-pages@man7.org
+
+<span class="footline">e4defrag version 2.0              May 2009                       E4DEFRAG(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

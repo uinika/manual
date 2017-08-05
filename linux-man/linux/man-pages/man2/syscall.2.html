@@ -1,0 +1,416 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>syscall(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSCALL(2)                Linux Programmer's Manual               SYSCALL(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       syscall - indirect system call
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#define _GNU_SOURCE         </b>/* See feature_test_macros(7) */
+       <b>#include &lt;unistd.h&gt;</b>
+       <b>#include &lt;sys/syscall.h&gt;   </b>/* For SYS_xxx definitions */
+
+       <b>long syscall(long </b><i>number</i><b>, ...);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>syscall</b>() is a small library function that invokes the system call
+       whose assembly language interface has the specified <i>number</i> with the
+       specified arguments.  Employing <b>syscall</b>() is useful, for example,
+       when invoking a system call that has no wrapper function in the C
+       library.
+
+       <b>syscall</b>() saves CPU registers before making the system call, restores
+       the registers upon return from the system call, and stores any error
+       code returned by the system call in <a href="../man3/errno.3.html">errno(3)</a> if an error occurs.
+
+       Symbolic constants for system call numbers can be found in the header
+       file <i>&lt;sys/syscall.h&gt;</i>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The return value is defined by the system call being invoked.  In
+       general, a 0 return value indicates success.  A -1 return value
+       indicates an error, and an error code is stored in <i><a href="../man3/errno.3.html">errno</a></i>.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>syscall</b>() first appeared in 4BSD.
+
+   <b>Architecture-specific requirements</b>
+       Each architecture ABI has its own requirements on how system call
+       arguments are passed to the kernel.  For system calls that have a
+       glibc wrapper (e.g., most system calls), glibc handles the details of
+       copying arguments to the right registers in a manner suitable for the
+       architecture.  However, when using <b>syscall</b>() to make a system call,
+       the caller might need to handle architecture-dependent details; this
+       requirement is most commonly encountered on certain 32-bit
+       architectures.
+
+       For example, on the ARM architecture Embedded ABI (EABI), a 64-bit
+       value (e.g., <i>long long</i>) must be aligned to an even register pair.
+       Thus, using <b>syscall</b>() instead of the wrapper provided by glibc, the
+       <b>readahead</b>() system call would be invoked as follows on the ARM
+       architecture with the EABI in little endian mode:
+
+           syscall(SYS_readahead, fd, 0,
+                   (unsigned int) (offset &amp; 0xFFFFFFFF),
+                   (unsigned int) (offset &gt;&gt; 32),
+                   count);
+
+       Since the offset argument is 64 bits, and the first argument (<i>fd</i>) is
+       passed in <i>r0</i>, the caller must manually split and align the 64-bit
+       value so that it is passed in the <i>r2</i>/<i>r3</i> register pair.  That means
+       inserting a dummy value into <i>r1</i> (the second argument of 0).  Care
+       also must be taken so that the split follows endian conventions
+       (according to the C ABI for the platform).
+
+       Similar issues can occur on MIPS with the O32 ABI, on PowerPC with
+       the 32-bit ABI, and on Xtensa.
+
+       Note that while the parisc C ABI also uses aligned register pairs, it
+       uses a shim layer to hide the issue from userspace.
+
+       The affected system calls are <a href="fadvise64_64.2.html">fadvise64_64(2)</a>, <a href="ftruncate64.2.html">ftruncate64(2)</a>,
+       <a href="posix_fadvise.2.html">posix_fadvise(2)</a>, <a href="pread64.2.html">pread64(2)</a>, <a href="pwrite64.2.html">pwrite64(2)</a>, <a href="readahead.2.html">readahead(2)</a>,
+       <a href="sync_file_range.2.html">sync_file_range(2)</a>, and <a href="truncate64.2.html">truncate64(2)</a>.
+
+       This does not affect syscalls that manually split and assemble 64-bit
+       values such as <a href="_llseek.2.html">_llseek(2)</a>, <a href="preadv.2.html">preadv(2)</a>, <a href="preadv2.2.html">preadv2(2)</a>, <a href="pwritev.2.html">pwritev(2)</a>.  and
+       <a href="pwritev2.2.html">pwritev2(2)</a>.  Welcome to the wonderful world of historical baggage.
+
+   <b>Architecture calling conventions</b>
+       Every architecture has its own way of invoking and passing arguments
+       to the kernel.  The details for various architectures are listed in
+       the two tables below.
+
+       The first table lists the instruction used to transition to kernel
+       mode (which might not be the fastest or best way to transition to the
+       kernel, so you might have to refer to <a href="../man7/vdso.7.html">vdso(7)</a>), the register used to
+       indicate the system call number, the register used to return the
+       system call result, and the register used to signal an error.
+
+       arch/ABI    instruction           syscall #  retval  error    Notes
+       ────────────────────────────────────────────────────────────────────
+       alpha       callsys               v0         a0      a3       [1]
+       arc         trap0                 r8         r0      -
+       arm/OABI    swi NR                -          a1      -        [2]
+       arm/EABI    swi 0x0               r7         r0      -
+       arm64       svc #0                x8         x0      -
+       blackfin    excpt 0x0             P0         R0      -
+       i386        int $0x80             eax        eax     -
+       ia64        break 0x100000        r15        r8      r10      [1]
+       m68k        trap #0               d0         d0      -
+       microblaze  brki r14,8            r12        r3      -
+       mips        syscall               v0         v0      a3       [1]
+       nios2       trap                  r2         r2      r7
+       parisc      ble 0x100(%sr2, %r0)  r20        r28     -
+       powerpc     sc                    r0         r3      r0       [1]
+       s390        svc 0                 r1         r2      -        [3]
+       s390x       svc 0                 r1         r2      -        [3]
+       superh      trap #0x17            r3         r0      -        [4]
+       sparc/32    t 0x10                g1         o0      psr/csr  [1]
+       sparc/64    t 0x6d                g1         o0      psr/csr  [1]
+       tile        swint1                R10        R00     R01      [1]
+       x86_64      syscall               rax        rax     -        [5]
+       x32         syscall               rax        rax     -        [5]
+       xtensa      syscall               a2         a2      -
+
+       Notes:
+
+           [1] On a few architectures, a register is used as a boolean (0
+               indicating no error, and -1 indicating an error) to signal
+               that the system call failed.  The actual error value is still
+               contained in the return register.  On sparc, the carry bit
+               (<i>csr</i>) in the processor status register (<i>psr</i>) is used instead
+               of a full register.
+
+           [2] <i>NR</i> is the system call number.
+
+           [3] For s390 and s390x, <i>NR</i> (the system call number) may be passed
+               directly with <i>svc NR</i> if it is less than 256.
+
+           [4] On SuperH, the trap number controls the maximum number of
+               arguments passed.  A <i>trap #0x10</i> can be used with only
+               0-argument system calls, a <i>trap #0x11</i> can be used with 0- or
+               1-argument system calls, and so on up to <i>trap #0x17</i> for
+               7-argument system calls.
+
+           [5] The x32 ABI uses the same instruction as the x86_64 ABI and
+               is used on the same processors.  To differentiate between
+               them, the bit mask <i>__X32_SYSCALL_BIT</i> is bitwise-ORed into the
+               system call number for system calls under the x32 ABI.  Both
+               system call tables are available though, so setting the bit
+               is not a hard requirement.
+
+       The second table shows the registers used to pass the system call
+       arguments.
+
+       arch/ABI      arg1  arg2  arg3  arg4  arg5  arg6  arg7  Notes
+       ──────────────────────────────────────────────────────────────
+       alpha         a0    a1    a2    a3    a4    a5    -
+       arc           r0    r1    r2    r3    r4    r5    -
+       arm/OABI      a1    a2    a3    a4    v1    v2    v3
+       arm/EABI      r0    r1    r2    r3    r4    r5    r6
+       arm64         x0    x1    x2    x3    x4    x5    -
+       blackfin      R0    R1    R2    R3    R4    R5    -
+       i386          ebx   ecx   edx   esi   edi   ebp   -
+       ia64          out0  out1  out2  out3  out4  out5  -
+       m68k          d1    d2    d3    d4    d5    a0    -
+       microblaze    r5    r6    r7    r8    r9    r10   -
+       mips/o32      a0    a1    a2    a3    -     -     -     [1]
+       mips/n32,64   a0    a1    a2    a3    a4    a5    -
+       nios2         r4    r5    r6    r7    r8    r9    -
+       parisc        r26   r25   r24   r23   r22   r21   -
+       powerpc       r3    r4    r5    r6    r7    r8    r9
+       s390          r2    r3    r4    r5    r6    r7    -
+       s390x         r2    r3    r4    r5    r6    r7    -
+       superh        r4    r5    r6    r7    r0    r1    r2
+       sparc/32      o0    o1    o2    o3    o4    o5    -
+       sparc/64      o0    o1    o2    o3    o4    o5    -
+       tile          R00   R01   R02   R03   R04   R05   -
+       x86_64        rdi   rsi   rdx   r10   r8    r9    -
+       x32           rdi   rsi   rdx   r10   r8    r9    -
+       xtensa        a6    a3    a4    a5    a8    a9    -
+
+       Notes:
+
+           [1] The mips/o32 system call convention passes arguments 5
+               through 8 on the user stack.
+
+       Note that these tables don't cover the entire calling convention—some
+       architectures may indiscriminately clobber other registers not listed
+       here.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #define _GNU_SOURCE
+       #include &lt;unistd.h&gt;
+       #include &lt;sys/syscall.h&gt;
+       #include &lt;sys/types.h&gt;
+       #include &lt;signal.h&gt;
+
+       int
+       main(int argc, char *argv[])
+       {
+           pid_t tid;
+
+           tid = syscall(SYS_gettid);
+           syscall(SYS_tgkill, getpid(), tid, SIGHUP);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="_syscall.2.html">_syscall(2)</a>, <a href="intro.2.html">intro(2)</a>, <a href="syscalls.2.html">syscalls(2)</a>, <a href="../man3/errno.3.html">errno(3)</a>, <a href="../man7/vdso.7.html">vdso(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-03-13                       SYSCALL(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="create_module.2.html">create_module(2)</a>,&nbsp; 
+    <a href="delete_module.2.html">delete_module(2)</a>,&nbsp; 
+    <a href="futex.2.html">futex(2)</a>,&nbsp; 
+    <a href="getcpu.2.html">getcpu(2)</a>,&nbsp; 
+    <a href="getdents.2.html">getdents(2)</a>,&nbsp; 
+    <a href="get_kernel_syms.2.html">get_kernel_syms(2)</a>,&nbsp; 
+    <a href="getpid.2.html">getpid(2)</a>,&nbsp; 
+    <a href="get_robust_list.2.html">get_robust_list(2)</a>,&nbsp; 
+    <a href="gettid.2.html">gettid(2)</a>,&nbsp; 
+    <a href="getunwind.2.html">getunwind(2)</a>,&nbsp; 
+    <a href="init_module.2.html">init_module(2)</a>,&nbsp; 
+    <a href="intro.2.html">intro(2)</a>,&nbsp; 
+    <a href="io_cancel.2.html">io_cancel(2)</a>,&nbsp; 
+    <a href="io_destroy.2.html">io_destroy(2)</a>,&nbsp; 
+    <a href="io_getevents.2.html">io_getevents(2)</a>,&nbsp; 
+    <a href="ioprio_set.2.html">ioprio_set(2)</a>,&nbsp; 
+    <a href="io_setup.2.html">io_setup(2)</a>,&nbsp; 
+    <a href="io_submit.2.html">io_submit(2)</a>,&nbsp; 
+    <a href="kcmp.2.html">kcmp(2)</a>,&nbsp; 
+    <a href="kexec_load.2.html">kexec_load(2)</a>,&nbsp; 
+    <a href="llseek.2.html">llseek(2)</a>,&nbsp; 
+    <a href="memfd_create.2.html">memfd_create(2)</a>,&nbsp; 
+    <a href="mlock.2.html">mlock(2)</a>,&nbsp; 
+    <a href="modify_ldt.2.html">modify_ldt(2)</a>,&nbsp; 
+    <a href="mq_getsetattr.2.html">mq_getsetattr(2)</a>,&nbsp; 
+    <a href="perf_event_open.2.html">perf_event_open(2)</a>,&nbsp; 
+    <a href="perfmonctl.2.html">perfmonctl(2)</a>,&nbsp; 
+    <a href="pivot_root.2.html">pivot_root(2)</a>,&nbsp; 
+    <a href="posix_fadvise.2.html">posix_fadvise(2)</a>,&nbsp; 
+    <a href="pread.2.html">pread(2)</a>,&nbsp; 
+    <a href="query_module.2.html">query_module(2)</a>,&nbsp; 
+    <a href="readahead.2.html">readahead(2)</a>,&nbsp; 
+    <a href="readdir.2.html">readdir(2)</a>,&nbsp; 
+    <a href="rename.2.html">rename(2)</a>,&nbsp; 
+    <a href="rt_sigqueueinfo.2.html">rt_sigqueueinfo(2)</a>,&nbsp; 
+    <a href="s390_pci_mmio_write.2.html">s390_pci_mmio_write(2)</a>,&nbsp; 
+    <a href="s390_runtime_instr.2.html">s390_runtime_instr(2)</a>,&nbsp; 
+    <a href="set_thread_area.2.html">set_thread_area(2)</a>,&nbsp; 
+    <a href="sgetmask.2.html">sgetmask(2)</a>,&nbsp; 
+    <a href="spu_create.2.html">spu_create(2)</a>,&nbsp; 
+    <a href="spu_run.2.html">spu_run(2)</a>,&nbsp; 
+    <a href="statx.2.html">statx(2)</a>,&nbsp; 
+    <a href="subpage_prot.2.html">subpage_prot(2)</a>,&nbsp; 
+    <a href="sync_file_range.2.html">sync_file_range(2)</a>,&nbsp; 
+    <a href="_syscall.2.html">_syscall(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="sysctl.2.html">sysctl(2)</a>,&nbsp; 
+    <a href="tkill.2.html">tkill(2)</a>,&nbsp; 
+    <a href="truncate.2.html">truncate(2)</a>,&nbsp; 
+    <a href="uselib.2.html">uselib(2)</a>,&nbsp; 
+    <a href="userfaultfd.2.html">userfaultfd(2)</a>,&nbsp; 
+    <a href="../man7/vdso.7.html">vdso(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="syscall.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

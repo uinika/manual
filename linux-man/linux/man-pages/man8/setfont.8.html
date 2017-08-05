@@ -1,0 +1,353 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>setfont(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FONT_FORMATS">FONT&nbsp;FORMATS</a> | <a href="#FONT_HEIGHT">FONT&nbsp;HEIGHT</a> | <a href="#CONSOLE_MAPS">CONSOLE&nbsp;MAPS</a> | <a href="#UNICODE_FONT_MAPS">UNICODE&nbsp;FONT&nbsp;MAPS</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#NOTE">NOTE</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SETFONT(8)                  International Support                 SETFONT(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       setfont - load EGA/VGA console screen font
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>setfont </b>[-O <i>font+umap.orig</i>] [-o <i>font.orig</i>] [-om <i>cmap.orig</i>] [-ou
+       <i>umap.orig</i>] [-<i>N</i>] [<i>font.new ...</i>]  [-m <i>cmap</i>] [-u <i>umap</i>] [-C <i>console</i>]
+       [-h<i>H</i>] [-v] [-V]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>setfont </b>command reads a font from the file <i>font.new</i> and loads it
+       into the EGA/VGA character generator, and optionally outputs the
+       previous font.  It can also load various mapping tables and output
+       the previous versions.
+
+       If no args are given (or only the option -<i>N</i> for some number <i>N</i>), then
+       a default (8x<i>N</i>) font is loaded (see below).  One may give several
+       small fonts, all containing a Unicode table, and <b>setfont </b>will combine
+       them and load the union.  Typical use:
+
+       <b>setfont</b>
+              Load a default font.
+
+       <b>setfont drdos8x16</b>
+              Load a given font (here the 448-glyph drdos font).
+
+       <b>setfont cybercafe -u cybercafe</b>
+              Load a given font that does not have a Unicode map and provide
+              one explicitly.
+
+       <b>setfont LatArCyrHeb-19 -m 8859-2</b>
+              Load a given font (here a 512-glyph font combining several
+              character sets) and indicate that one's local character set is
+              ISO 8859-2.
+
+       Note: if a font has more than 256 glyphs, only 8 out of 16 colors can
+       be used simultaneously. It can make console perception worse (loss of
+       intensity and even some colors).
+</pre>
+<h2><a id="FONT_FORMATS" href="#FONT_FORMATS"></a>FONT FORMATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The standard Linux font format is the PSF font.  It has a header
+       describing font properties like character size, followed by the glyph
+       bitmaps, optionally followed by a Unicode mapping table giving the
+       Unicode value for each glyph.  Several other (obsolete) font formats
+       are recognized.  If the input file has code page format (probably
+       with suffix .cp), containing three fonts with sizes e.g. 8x8, 8x14
+       and 8x16, then one of the options -8 or -14 or -16 must be used to
+       select one.  Raw font files are binary files of size 256*<i>N</i> bytes,
+       containing bit images for each of 256 characters, one byte per scan
+       line, and <i>N</i> bytes per character (0 &lt; <i>N</i> &lt;= 32).  Most fonts have a
+       width of 8 bits, but with the framebuffer device (fb) other widths
+       can be used.
+</pre>
+<h2><a id="FONT_HEIGHT" href="#FONT_HEIGHT"></a>FONT HEIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program <b>setfont </b>has no built-in knowledge of VGA video modes, but
+       just asks the kernel to load the character ROM of the video card with
+       certain bitmaps. However, since Linux 1.3.1 the kernel knows enough
+       about EGA/VGA video modes to select a different line distance. The
+       default character height will be the number <i>N</i> inferred from the font
+       or specified by option. However, the user can specify a different
+       character height <i>H</i> using the <i>-h</i> option.
+</pre>
+<h2><a id="CONSOLE_MAPS" href="#CONSOLE_MAPS"></a>CONSOLE MAPS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Several mappings are involved in the path from user program output to
+       console display. If the console is in utf8 mode (see
+       <a href="../man1/unicode_start.1.html">unicode_start(1)</a>) then the kernel expects that user program output is
+       coded as UTF-8 (see <a href="../man7/utf-8.7-2.html">utf-8(7)</a>), and converts that to Unicode (ucs2).
+       Otherwise, a translation table is used from the 8-bit program output
+       to 16-bit Unicode values. Such a translation table is called a
+       <i>Unicode console map</i>.  There are four of them: three built into the
+       kernel, the fourth settable using the <i>-m</i> option of <b>setfont</b>.  An
+       escape sequence chooses between these four tables; after loading a
+       <i>cmap</i>, <b>setfont </b>will output the escape sequence Esc ( K that makes it
+       the active translation.
+
+       Suitable arguments for the <i>-m</i> option are for example <i>8859-1</i>, <i>8859-2</i>,
+       ..., <i>8859-15</i>, <i>cp437</i>, ..., <i>cp1250</i>.
+
+       Given the Unicode value of the symbol to be displayed, the kernel
+       finds the right glyph in the font using the Unicode mapping info of
+       the font and displays it.
+
+       Old fonts do not have Unicode mapping info, and in order to handle
+       them there are direct-to-font maps (also loaded using <i>-m</i>) that give a
+       correspondence between user bytes and font positions.  The most
+       common correspondence is the one given in the file <i>trivial</i> (where
+       user byte values are used directly as font positions).  Other
+       correspondences are sometimes preferable since the PC video hardware
+       expects line drawing characters in certain font positions.
+
+       Giving a <i>-m none</i> argument inhibits the loading and activation of a
+       mapping table.  The previous console map can be saved to a file using
+       the <i>-om file</i> option.  These options of setfont render <a href="mapscrn.8.html">mapscrn(8)</a>
+       obsolete. (However, it may be useful to read that man page.)
+</pre>
+<h2><a id="UNICODE_FONT_MAPS" href="#UNICODE_FONT_MAPS"></a>UNICODE FONT MAPS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The correspondence between the glyphs in the font and Unicode values
+       is described by a Unicode mapping table.  Many fonts have a Unicode
+       mapping table included in the font file, and an explicit table can be
+       indicated using the <i>-u</i> option. The program <b>setfont </b>will load such a
+       Unicode mapping table, unless a <i>-u none</i> argument is given. The
+       previous Unicode mapping table will be saved as part of the saved
+       font file when the -O option is used. It can be saved to a separate
+       file using the <i>-ou file</i> option.  These options of setfont render
+       <a href="loadunimap.8.html">loadunimap(8)</a> obsolete.
+
+       The Unicode mapping table should assign some glyph to the `missing
+       character' value U+fffd, otherwise missing characters are not
+       translated, giving a usually very confusing result.
+
+       Usually no mapping table is needed, and a Unicode mapping table is
+       already contained in the font (sometimes this is indicated by the
+       .psfu extension), so that most users need not worry about the precise
+       meaning and functioning of these mapping tables.
+
+       One may add a Unicode mapping table to a psf font using
+       <a href="../man1/psfaddtable.1.html">psfaddtable(1)</a>.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-h </b><i>H</i>   Override font height.
+
+       <b>-m </b><i>file</i>
+              Load console map or Unicode console map from <i>file</i>.
+
+       <b>-o </b><i>file</i>
+              Save previous font in <i>file</i>.
+
+       <b>-O </b><i>file</i>
+              Save previous font and Unicode map in <i>file</i>.
+
+       <b>-om </b><i>file</i>
+              Store console map in <i>file</i>.
+
+       <b>-ou </b><i>file</i>
+              Save previous Unicode map in <i>file</i>.
+
+       <b>-u </b><i>file</i>
+              Load Unicode table describing the font from <i>file</i>.
+
+       <b>-C </b><i>console</i>
+              Set the font for the indicated console. (May require root
+              permissions.)
+
+       <b>-v     </b>Be verbose.
+
+       <b>-V     </b>Print version and exit.
+</pre>
+<h2><a id="NOTE" href="#NOTE"></a>NOTE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       PC video hardware allows one to use the "intensity" bit either to
+       indicate brightness, or to address 512 (instead of 256) glyphs in the
+       font. So, if the font has more than 256 glyphs, the console will be
+       reduced to 8 (instead of 16) colors.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>@DATADIR@/consolefonts</i> is the default font directory.
+       <i>@DATADIR@/unimaps</i> is the default directory for Unicode maps.
+       <i>@DATADIR@/consoletrans</i> is the default directory for screen mappings.
+       The default font is a file <i>default</i> (or <i>default8x</i>N if the -N option
+       was given for some number N) perhaps with suitable extension (like
+       .psf).
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/psfaddtable.1.html">psfaddtable(1)</a>, <a href="../man1/unicode_start.1.html">unicode_start(1)</a>, <a href="loadunimap.8.html">loadunimap(8)</a>, <a href="../man7/utf-8.7-2.html">utf-8(7)</a>, <a href="mapscrn.8.html">mapscrn(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>kbd</i> (Linux keyboard tools) project.
+       Information about the project can be found at 
+       ⟨<a href="http://www.kbd-project.org/">http://www.kbd-project.org/</a>⟩.  If you have a bug report for this man‐
+       ual page, send it to kbd@lists.altlinux.org.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/kernel/git/legion/kbd.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">                                 11 Feb 2001                      SETFONT(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/psfaddtable.1.html">psfaddtable(1)</a>,&nbsp; 
+    <a href="../man1/psfgettable.1.html">psfgettable(1)</a>,&nbsp; 
+    <a href="../man1/psfstriptable.1.html">psfstriptable(1)</a>,&nbsp; 
+    <a href="../man1/psfxtable.1.html">psfxtable(1)</a>,&nbsp; 
+    <a href="../man1/unicode_start.1.html">unicode_start(1)</a>,&nbsp; 
+    <a href="../man1/unicode_stop.1.html">unicode_stop(1)</a>,&nbsp; 
+    <a href="../man2/ioctl_console.2.html">ioctl_console(2)</a>,&nbsp; 
+    <a href="../man4/console_codes.4.html">console_codes(4)</a>,&nbsp; 
+    <a href="../man5/vconsole.conf.5.html">vconsole.conf(5)</a>,&nbsp; 
+    <a href="../man7/charsets.7.html">charsets(7)</a>,&nbsp; 
+    <a href="loadunimap.8.html">loadunimap(8)</a>,&nbsp; 
+    <a href="mapscrn.8.html">mapscrn(8)</a>,&nbsp; 
+    <a href="resizecons.8.html">resizecons(8)</a>,&nbsp; 
+    <a href="showconsolefont.8.html">showconsolefont(8)</a>,&nbsp; 
+    <a href="systemd-vconsole-setup.service.8.html">systemd-vconsole-setup.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

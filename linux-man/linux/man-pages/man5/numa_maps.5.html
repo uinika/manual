@@ -1,0 +1,293 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>numa(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">NUMA(7)                   Linux Programmer's Manual                  NUMA(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       numa - overview of Non-Uniform Memory Architecture
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Non-Uniform Memory Access (NUMA) refers to multiprocessor systems
+       whose memory is divided into multiple memory nodes.  The access time
+       of a memory node depends on the relative locations of the accessing
+       CPU and the accessed node.  (This contrasts with a symmetric
+       multiprocessor system, where the access time for all of the memory is
+       the same for all CPUs.)  Normally, each CPU on a NUMA system has a
+       local memory node whose contents can be accessed faster than the
+       memory in the node local to another CPU or the memory on a bus shared
+       by all CPUs.
+
+   <b>NUMA system calls</b>
+       The Linux kernel implements the following NUMA-related system calls:
+       <a href="../man2/get_mempolicy.2.html">get_mempolicy(2)</a>, <a href="../man2/mbind.2.html">mbind(2)</a>, <a href="../man2/migrate_pages.2.html">migrate_pages(2)</a>, <a href="../man2/move_pages.2.html">move_pages(2)</a>, and
+       <a href="../man2/set_mempolicy.2.html">set_mempolicy(2)</a>.  However, applications should normally use the
+       interface provided by <i>libnuma</i>; see "Library Support" below.
+
+   <b>/proc/[number]/numa_maps (since Linux 2.6.14)</b>
+       This file displays information about a process's NUMA memory policy
+       and allocation.
+
+       Each line contains information about a memory range used by the
+       process, displaying—among other information—the effective memory
+       policy for that memory range and on which nodes the pages have been
+       allocated.
+
+       <i>numa_maps</i> is a read-only file.  When <i>/proc/&lt;pid&gt;/numa_maps</i> is read,
+       the kernel will scan the virtual address space of the process and
+       report how memory is used.  One line is displayed for each unique
+       memory range of the process.
+
+       The first field of each line shows the starting address of the memory
+       range.  This field allows a correlation with the contents of the
+       <i>/proc/&lt;pid&gt;/maps</i> file, which contains the end address of the range
+       and other information, such as the access permissions and sharing.
+
+       The second field shows the memory policy currently in effect for the
+       memory range.  Note that the effective policy is not necessarily the
+       policy installed by the process for that memory range.  Specifically,
+       if the process installed a "default" policy for that range, the
+       effective policy for that range will be the process policy, which may
+       or may not be "default".
+
+       The rest of the line contains information about the pages allocated
+       in the memory range, as follows:
+
+       <i>N&lt;node&gt;=&lt;nr_pages&gt;</i>
+              The number of pages allocated on <i>&lt;node&gt;</i>.  <i>&lt;nr_pages&gt;</i> includes
+              only pages currently mapped by the process.  Page migration
+              and memory reclaim may have temporarily unmapped pages
+              associated with this memory range.  These pages may show up
+              again only after the process has attempted to reference them.
+              If the memory range represents a shared memory area or file
+              mapping, other processes may currently have additional pages
+              mapped in a corresponding memory range.
+
+       <i>file=&lt;filename&gt;</i>
+              The file backing the memory range.  If the file is mapped as
+              private, write accesses may have generated COW (Copy-On-Write)
+              pages in this memory range.  These pages are displayed as
+              anonymous pages.
+
+       <i>heap</i>   Memory range is used for the heap.
+
+       <i>stack</i>  Memory range is used for the stack.
+
+       <i>huge</i>   Huge memory range.  The page counts shown are huge pages and
+              not regular sized pages.
+
+       <i>anon=&lt;pages&gt;</i>
+              The number of anonymous page in the range.
+
+       <i>dirty=&lt;pages&gt;</i>
+              Number of dirty pages.
+
+       <i>mapped=&lt;pages&gt;</i>
+              Total number of mapped pages, if different from <i>dirty</i> and <i>anon</i>
+              pages.
+
+       <i>mapmax=&lt;count&gt;</i>
+              Maximum mapcount (number of processes mapping a single page)
+              encountered during the scan.  This may be used as an indicator
+              of the degree of sharing occurring in a given memory range.
+
+       <i>swapcache=&lt;count&gt;</i>
+              Number of pages that have an associated entry on a swap
+              device.
+
+       <i>active=&lt;pages&gt;</i>
+              The number of pages on the active list.  This field is shown
+              only if different from the number of pages in this range.
+              This means that some inactive pages exist in the memory range
+              that may be removed from memory by the swapper soon.
+
+       <i>writeback=&lt;pages&gt;</i>
+              Number of pages that are currently being written out to disk.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       No standards govern NUMA interfaces.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The Linux NUMA system calls and <i>/proc</i> interface are available only if
+       the kernel was configured and built with the <b>CONFIG_NUMA </b>option.
+
+   <b>Library support</b>
+       Link with <i>-lnuma</i> to get the system call definitions.  <i>libnuma</i> and the
+       required <i>&lt;numaif.h&gt;</i> header are available in the <i>numactl</i> package.
+
+       However, applications should not use these system calls directly.
+       Instead, the higher level interface provided by the <a href="../man3/numa.3.html">numa(3)</a> functions
+       in the <i>numactl</i> package is recommended.  The <i>numactl</i> package is
+       available at ⟨ftp://oss.sgi.com/www/projects/libnuma/download/⟩.  The
+       package is also included in some Linux distributions.  Some distribu‐
+       tions include the development library and header in the separate
+       <i>numactl-devel</i> package.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/get_mempolicy.2.html">get_mempolicy(2)</a>, <a href="../man2/mbind.2.html">mbind(2)</a>, <a href="../man2/move_pages.2.html">move_pages(2)</a>, <a href="../man2/set_mempolicy.2.html">set_mempolicy(2)</a>, <a href="../man3/numa.3.html">numa(3)</a>,
+       <a href="../man7/cpuset.7.html">cpuset(7)</a>, <a href="../man8/numactl.8.html">numactl(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2012-08-05                          NUMA(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/migrate_pages.2.html">migrate_pages(2)</a>,&nbsp; 
+    <a href="../man2/move_pages.2.html">move_pages(2)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="../man7/numa.7.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

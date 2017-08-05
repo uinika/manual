@@ -1,0 +1,313 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sigprocmask(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SIGPROCMASK(2)            Linux Programmer's Manual           SIGPROCMASK(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sigprocmask, rt_sigprocmask - examine and change blocked signals
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;signal.h&gt;</b>
+
+       /* Prototype for the glibc wrapper function */
+       <b>int sigprocmask(int </b><i>how</i><b>, const sigset_t *</b><i>set</i><b>, sigset_t *</b><i>oldset</i><b>);</b>
+
+       /* Prototype for the underlying system call */
+       <b>int rt_sigprocmask(int </b><i>how</i><b>, const kernel_sigset_t *</b><i>set</i><b>,</b>
+                          <b>kernel_sigset_t *</b><i>oldset</i><b>, size_t </b><i>sigsetsize</i><b>);</b>
+
+       /* Prototype for the legacy system call (deprecated) */
+       <b>int sigprocmask(int </b><i>how</i><b>, const old_kernel_sigset_t *</b><i>set</i><b>,</b>
+                       <b>old_kernel_sigset_t *</b><i>oldset</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>sigprocmask</b>(): _POSIX_C_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sigprocmask</b>() is used to fetch and/or change the signal mask of the
+       calling thread.  The signal mask is the set of signals whose delivery
+       is currently blocked for the caller (see also <a href="../man7/signal.7.html">signal(7)</a> for more
+       details).
+
+       The behavior of the call is dependent on the value of <i>how</i>, as
+       follows.
+
+       <b>SIG_BLOCK</b>
+              The set of blocked signals is the union of the current set and
+              the <i>set</i> argument.
+
+       <b>SIG_UNBLOCK</b>
+              The signals in <i>set</i> are removed from the current set of blocked
+              signals.  It is permissible to attempt to unblock a signal
+              which is not blocked.
+
+       <b>SIG_SETMASK</b>
+              The set of blocked signals is set to the argument <i>set</i>.
+
+       If <i>oldset</i> is non-NULL, the previous value of the signal mask is
+       stored in <i>oldset</i>.
+
+       If <i>set</i> is NULL, then the signal mask is unchanged (i.e., <i>how</i> is
+       ignored), but the current value of the signal mask is nevertheless
+       returned in <i>oldset</i> (if it is not NULL).
+
+       A set of functions for modifying and inspecting variables of type
+       <i>sigset_t</i> ("signal sets") is described in <a href="../man3/sigsetops.3.html">sigsetops(3)</a>.
+
+       The use of <b>sigprocmask</b>() is unspecified in a multithreaded process;
+       see <a href="../man3/pthread_sigmask.3.html">pthread_sigmask(3)</a>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sigprocmask</b>() returns 0 on success and -1 on error.  In the event of
+       an error, <i><a href="../man3/errno.3.html">errno</a></i> is set to indicate the cause.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b>The <i>set</i> or <i>oldset</i> argument points outside the process's
+              allocated address space.
+
+       <b>EINVAL </b>Either the value specified in <i>how</i> was invalid or the kernel
+              does not support the size passed in <i>sigsetsize.</i>
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       It is not possible to block <b>SIGKILL </b>or <b>SIGSTOP</b>.  Attempts to do so
+       are silently ignored.
+
+       Each of the threads in a process has its own signal mask.
+
+       A child created via <a href="fork.2.html">fork(2)</a> inherits a copy of its parent's signal
+       mask; the signal mask is preserved across <a href="execve.2.html">execve(2)</a>.
+
+       If <b>SIGBUS</b>, <b>SIGFPE</b>, <b>SIGILL</b>, or <b>SIGSEGV </b>are generated while they are
+       blocked, the result is undefined, unless the signal was generated by
+       <a href="kill.2.html">kill(2)</a>, <a href="../man3/sigqueue.3.html">sigqueue(3)</a>, or <a href="../man3/raise.3.html">raise(3)</a>.
+
+       See <a href="../man3/sigsetops.3.html">sigsetops(3)</a> for details on manipulating signal sets.
+
+       Note that it is permissible (although not very useful) to specify
+       both <i>set</i> and <i>oldset</i> as NULL.
+
+   <b>C library/kernel differences</b>
+       The kernel's definition of <i>sigset_t</i> differs in size from that used by
+       the C library.  In this manual page, the former is referred to as
+       <i>kernel_sigset_t</i> (it is nevertheless named <i>sigset_t</i> in the kernel
+       sources).
+
+       The glibc wrapper function for <b>sigprocmask</b>() silently ignores
+       attempts to block the two real-time signals that are used internally
+       by the NPTL threading implementation.  See <a href="../man7/nptl.7.html">nptl(7)</a> for details.
+
+       The original Linux system call was named <b>sigprocmask</b>().  However,
+       with the addition of real-time signals in Linux 2.2, the fixed-size,
+       32-bit <i>sigset_t</i> (referred to as <i>old_kernel_sigset_t</i> in this manual
+       page) type supported by that system call was no longer fit for
+       purpose.  Consequently, a new system call, <b>rt_sigprocmask</b>(), was
+       added to support an enlarged <i>sigset_t</i> type (referred to as
+       <i>kernel_sigset_t</i> in this manual page).  The new system call takes a
+       fourth argument, <i>size_t sigsetsize</i>, which specifies the size in bytes
+       of the signal sets in <i>set</i> and <i>oldset</i>.  This argument is currently
+       required to have a fixed architecture specific value (equal to
+       <i>sizeof(kernel_sigset_t)</i>).
+
+       The glibc <b>sigprocmask</b>() wrapper function hides these details from us,
+       transparently calling <b>rt_sigprocmask</b>() when the kernel provides it.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="kill.2.html">kill(2)</a>, <a href="pause.2.html">pause(2)</a>, <a href="sigaction.2.html">sigaction(2)</a>, <a href="signal.2.html">signal(2)</a>, <a href="sigpending.2.html">sigpending(2)</a>,
+       <a href="sigsuspend.2.html">sigsuspend(2)</a>, <a href="../man3/pthread_sigmask.3.html">pthread_sigmask(3)</a>, <a href="../man3/sigqueue.3.html">sigqueue(3)</a>, <a href="../man3/sigsetops.3.html">sigsetops(3)</a>,
+       <a href="../man7/signal.7.html">signal(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                   SIGPROCMASK(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="clone.2.html">clone(2)</a>,&nbsp; 
+    <a href="poll.2.html">poll(2)</a>,&nbsp; 
+    <a href="ptrace.2.html">ptrace(2)</a>,&nbsp; 
+    <a href="rt_sigqueueinfo.2.html">rt_sigqueueinfo(2)</a>,&nbsp; 
+    <a href="seccomp.2.html">seccomp(2)</a>,&nbsp; 
+    <a href="select.2.html">select(2)</a>,&nbsp; 
+    <a href="select_tut.2.html">select_tut(2)</a>,&nbsp; 
+    <a href="sgetmask.2.html">sgetmask(2)</a>,&nbsp; 
+    <a href="sigaction.2.html">sigaction(2)</a>,&nbsp; 
+    <a href="signal.2.html">signal(2)</a>,&nbsp; 
+    <a href="signalfd.2.html">signalfd(2)</a>,&nbsp; 
+    <a href="sigpending.2.html">sigpending(2)</a>,&nbsp; 
+    <a href="sigsuspend.2.html">sigsuspend(2)</a>,&nbsp; 
+    <a href="sigwaitinfo.2.html">sigwaitinfo(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/getcontext.3.html">getcontext(3)</a>,&nbsp; 
+    <a href="../man3/makecontext.3.html">makecontext(3)</a>,&nbsp; 
+    <a href="../man3/posix_spawn.3.html">posix_spawn(3)</a>,&nbsp; 
+    <a href="../man3/pthread_sigmask.3.html">pthread_sigmask(3)</a>,&nbsp; 
+    <a href="../man3/sd_event_add_signal.3.html">sd_event_add_signal(3)</a>,&nbsp; 
+    <a href="../man3/sigpause.3.html">sigpause(3)</a>,&nbsp; 
+    <a href="../man3/sigset.3.html">sigset(3)</a>,&nbsp; 
+    <a href="../man3/sigsetops.3.html">sigsetops(3)</a>,&nbsp; 
+    <a href="../man3/sigvec.3.html">sigvec(3)</a>,&nbsp; 
+    <a href="../man3/system.3.html">system(3)</a>,&nbsp; 
+    <a href="../man7/nptl.7.html">nptl(7)</a>,&nbsp; 
+    <a href="../man7/signal.7.html">signal(7)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="sigprocmask.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

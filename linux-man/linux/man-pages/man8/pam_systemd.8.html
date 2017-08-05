@@ -1,0 +1,330 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pam_systemd(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#MODULE_TYPES_PROVIDED">MODULE&nbsp;TYPES&nbsp;PROVIDED</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PAM_SYSTEMD(8)                   pam_systemd                  PAM_SYSTEMD(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_systemd - Register user sessions in the systemd login manager
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pam_systemd.so
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pam_systemd </b>registers user sessions with the systemd login manager
+       <a href="systemd-logind.service.8.html">systemd-logind.service(8)</a>, and hence the systemd control group
+       hierarchy.
+
+       On login, this module — in conjunction with systemd-logind.service —
+       ensures the following:
+
+        1. If it does not exist yet, the user runtime directory
+           /run/user/$UID is either created or mounted as new "tmpfs" file
+           system with quota applied, and its ownership changed to the user
+           that is logging in.
+
+        2. The <i>$XDG_SESSION_ID</i> environment variable is initialized. If
+           auditing is available and <b>pam_loginuid.so </b>was run before this
+           module (which is highly recommended), the variable is initialized
+           from the auditing session id (/proc/self/sessionid). Otherwise,
+           an independent session counter is used.
+
+        3. A new systemd scope unit is created for the session. If this is
+           the first concurrent session of the user, an implicit per-user
+           slice unit below user.slice is automatically created and the
+           scope placed into it. An instance of the system service
+           user@.service, which runs the systemd user manager instance, is
+           started.
+
+       On logout, this module ensures the following:
+
+        1. If enabled in <a href="../man5/logind.conf.5.html">logind.conf(5)</a> (<i>KillUserProcesses=</i>), all processes
+           of the session are terminated. If the last concurrent session of
+           a user ends, the user's systemd instance will be terminated too,
+           and so will the user's slice unit.
+
+        2. If the last concurrent session of a user ends, the user runtime
+           directory /run/user/$UID and all its contents are removed, too.
+
+       If the system was not booted up with systemd as init system, this
+       module does nothing and immediately returns <b>PAM_SUCCESS</b>.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following options are understood:
+
+       <b>class=</b>
+           Takes a string argument which sets the session class. The
+           XDG_SESSION_CLASS environmental variable takes precedence. One of
+           "user", "greeter", "lock-screen" or "background". See
+           <a href="../man3/sd_session_get_class.3.html">sd_session_get_class(3)</a> for details about the session class.
+
+       <b>type=</b>
+           Takes a string argument which sets the session type. The
+           XDG_SESSION_TYPE environmental variable takes precedence. One of
+           "unspecified", "tty", "x11", "wayland" or "mir". See
+           <a href="../man3/sd_session_get_type.3.html">sd_session_get_type(3)</a> for details about the session type.
+
+       <b>debug[=]</b>
+           Takes an optional boolean argument. If yes or without the
+           argument, the module will log debugging information as it
+           operates.
+</pre>
+<h2><a id="MODULE_TYPES_PROVIDED" href="#MODULE_TYPES_PROVIDED"></a>MODULE TYPES PROVIDED  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Only <b>session </b>is provided.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following environment variables are set for the processes of the
+       user's session:
+
+       <i>$XDG_SESSION_ID</i>
+           A session identifier, suitable to be used in filenames. The
+           string itself should be considered opaque, although often it is
+           just the audit session ID as reported by /proc/self/sessionid.
+           Each ID will be assigned only once during machine uptime. It may
+           hence be used to uniquely label files or other resources of this
+           session.
+
+       <i>$XDG_RUNTIME_DIR</i>
+           Path to a user-private user-writable directory that is bound to
+           the user login time on the machine. It is automatically created
+           the first time a user logs in and removed on the user's final
+           logout. If a user logs in twice at the same time, both sessions
+           will see the same <i>$XDG_RUNTIME_DIR</i> and the same contents. If a
+           user logs in once, then logs out again, and logs in again, the
+           directory contents will have been lost in between, but
+           applications should not rely on this behavior and must be able to
+           deal with stale files. To store session-private data in this
+           directory, the user should include the value of <i>$XDG_SESSION_ID</i>
+           in the filename. This directory shall be used for runtime file
+           system objects such as <b>AF_UNIX </b>sockets, FIFOs, PID files and
+           similar. It is guaranteed that this directory is local and offers
+           the greatest possible file system feature set the operating
+           system provides. For further details, see the <b>XDG Base Directory</b>
+           <b>Specification</b><b></b>[1].  <i>$XDG_RUNTIME_DIR</i> is not set if the current
+           user is not the original user of the session.
+
+       The following environment variables are read by the module and may be
+       used by the PAM service to pass metadata to the module:
+
+       <i>$XDG_SESSION_TYPE</i>
+           The session type. This may be used instead of <b>session= </b>on the
+           module parameter line, and is usually preferred.
+
+       <i>$XDG_SESSION_CLASS</i>
+           The session class. This may be used instead of <b>class= </b>on the
+           module parameter line, and is usually preferred.
+
+       <i>$XDG_SESSION_DESKTOP</i>
+           A single, short identifier string for the desktop environment.
+           This may be used to indicate the session desktop used, where this
+           applies and if this information is available. For example:
+           "GNOME", or "KDE". It is recommended to use the same identifiers
+           and capitalization as for <i>$XDG_CURRENT_DESKTOP</i>, as defined by the
+           <b>Desktop Entry Specification</b><b></b>[2]. (However, note that
+           <i>$XDG_SESSION_DESKTOP</i> only takes a single item, and not a
+           colon-separated list like <i>$XDG_CURRENT_DESKTOP</i>.) See
+           <a href="../man3/sd_session_get_desktop.3.html">sd_session_get_desktop(3)</a> for more details.
+
+       <i>$XDG_SEAT</i>
+           The seat name the session shall be registered for, if any.
+
+       <i>$XDG_VTNR</i>
+           The VT number the session shall be registered for, if any. (Only
+           applies to seats with a VT available, such as "seat0")
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           #%PAM-1.0
+           auth       required     pam_unix.so
+           auth       required     pam_nologin.so
+           account    required     pam_unix.so
+           password   required     pam_unix.so
+           session    required     pam_unix.so
+           session    required     pam_loginuid.so
+           session    required     pam_systemd.so
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="systemd-logind.service.8.html">systemd-logind.service(8)</a>, <a href="../man5/logind.conf.5.html">logind.conf(5)</a>, <a href="../man1/loginctl.1.html">loginctl(1)</a>,
+       <a href="../man5/pam.conf.5.html">pam.conf(5)</a>, <a href="../man5/pam.d.5.html">pam.d(5)</a>, <a href="pam.8-2.html">pam(8)</a>, <a href="pam_loginuid.8.html">pam_loginuid(8)</a>, <a href="../man5/systemd.scope.5.html">systemd.scope(5)</a>,
+       <a href="../man5/systemd.slice.5.html">systemd.slice(5)</a>, <a href="../man5/systemd.service.5.html">systemd.service(5)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. XDG Base Directory Specification
+           <a href="http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html">http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html</a>
+
+        2. Desktop Entry Specification
+           <a href="http://standards.freedesktop.org/desktop-entry-spec/latest/">http://standards.freedesktop.org/desktop-entry-spec/latest/</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                   PAM_SYSTEMD(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="systemd-logind.service.8.html">systemd-logind.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

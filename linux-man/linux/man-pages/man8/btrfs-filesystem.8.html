@@ -1,0 +1,621 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>btrfs-filesystem(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SUBCOMMAND">SUBCOMMAND</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">BTRFS-FILESYSTEM(8)             Btrfs Manual             BTRFS-FILESYSTEM(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       btrfs-filesystem - command group of btrfs that usually work on the
+       whole filesystem
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>btrfs filesystem </b><i>&lt;subcommand&gt; &lt;args&gt;</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>btrfs filesystem </b>is used to perform several whole filesystem level
+       tasks, including all the regular filesystem operations like resizing,
+       space stats, label setting/getting, and defragmentation. There are
+       other whole filesystem tasks like scrub or balance that are grouped
+       in separate commands.
+</pre>
+<h2><a id="SUBCOMMAND" href="#SUBCOMMAND"></a>SUBCOMMAND  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>df </b>[options] <i>&lt;path&gt;</i>
+           Show a terse summary information about allocation of block group
+           types of a given mount point. The original purpose of this
+           command was a debugging helper. The output needs to be further
+           interpreted and is not suitable for quick overview.
+
+           An example with description:
+
+           ·   device size: <i>1.9TiB</i>, one device, no RAID
+
+           ·   filesystem size: <i>1.9TiB</i>
+
+           ·   created with: <i>mkfs.btrfs -d single -m single</i>
+
+               $ btrfs filesystem df /path
+               Data, single: total=1.15TiB, used=1.13TiB
+               System, single: total=32.00MiB, used=144.00KiB
+               Metadata, single: total=12.00GiB, used=6.45GiB
+               GlobalReserve, single: total=512.00MiB, used=0.00B
+
+           ·   <i>Data</i>, <i>System</i> and <i>Metadata</i> are separate block group types.
+               <i>GlobalReserve</i> is an artificial and internal emergency space,
+               see below.
+
+           ·   <i>single</i> — the allocation profile, defined at mkfs time
+
+           ·   <i>total</i> — sum of space reserved for all allocation profiles of
+               the given type, ie. all Data/single. Note that it’s not total
+               size of filesystem.
+
+           ·   <i>used</i> — sum of used space of the above, ie. file extents,
+               metadata blocks
+
+           <i>GlobalReserve</i> is an artificial and internal emergency space. It
+           is used eg. when the filesystem is full. Its <i>total</i> size is
+           dynamic based on the filesystem size, usually not larger than
+           512MiB, <i>used</i> may fluctuate.
+
+           The global block reserve is accounted within Metadata. In case
+           the filesystem metadata are exhausted, <i>GlobalReserve/total +</i>
+           <i>Metadata/used = Metadata/total</i>.
+
+           <b>Options</b>
+
+           -b|--raw
+               raw numbers in bytes, without the <i>B</i> suffix
+
+           -h|--human-readable
+               print human friendly numbers, base 1024, this is the default
+
+           -H
+               print human friendly numbers, base 1000
+
+           --iec
+               select the 1024 base for the following options, according to
+               the IEC standard
+
+           --si
+               select the 1000 base for the following options, according to
+               the SI standard
+
+           -k|--kbytes
+               show sizes in KiB, or kB with --si
+
+           -m|--mbytes
+               show sizes in MiB, or MB with --si
+
+           -g|--gbytes
+               show sizes in GiB, or GB with --si
+
+           -t|--tbytes
+               show sizes in TiB, or TB with --si
+
+               If conflicting options are passed, the last one takes
+               precedence.
+
+       <b>defragment </b>[options] <i>&lt;file&gt;</i>|<i>&lt;dir&gt;</i> [<i>&lt;file&gt;</i>|<i>&lt;dir&gt;</i>...]
+           Defragment file data on a mounted filesystem. Requires kernel
+           2.6.33 and newer.
+
+           If <i>-r</i> is passed, files in dir will be defragmented recursively.
+           The start position and the number of bytes to defragment can be
+           specified by start and length using <i>-s</i> and <i>-l</i> options below.
+           Extents bigger than value given by <i>-t</i> will be skipped, otherwise
+           this value is used as a target extent size, but is only advisory
+           and may not be reached if the free space is too fragmented. Use 0
+           to take the kernel default, which is 256kB but may change in the
+           future. You can also turn on compression in defragment
+           operations.
+
+               <b>Warning</b>
+               Defragmenting with Linux kernel versions &lt; 3.9 or ≥ 3.14-rc2
+               as well as with Linux stable kernel versions ≥ 3.10.31, ≥
+               3.12.12 or ≥ 3.13.4 will break up the ref-links of COW data
+               (for example files copied with <b>cp --reflink</b>, snapshots or
+               de-duplicated data). This may cause considerable increase of
+               space usage depending on the broken up ref-links.
+
+               <b>Note</b>
+               Directory arguments without <i>-r</i> do not defragment files
+               recursively but will defragment certain internal trees
+               (extent tree and the subvolume tree). This has been confusing
+               and could be removed in the future.
+           For <i>start</i>, <i>len</i>, <i>size</i> it is possible to append units designator:
+           'K', 'M', 'G', 'T', 'P', or 'E', which represent KiB, MiB, GiB,
+           TiB, PiB, or EiB, respectively (case does not matter).
+
+           <b>Options</b>
+
+           -v
+               be verbose, print file names as they’re submitted for
+               defragmentation
+
+           -c[<i>&lt;algo&gt;</i>]
+               compress file contents while defragmenting. Optional argument
+               selects the compression algorithm, <i>zlib</i> (default) or <i>lzo</i>.
+               Currently it’s not possible to select no compression. See
+               also section <i>EXAMPLES</i>.
+
+           -r
+               defragment files recursively in given directories
+
+           -f
+               flush data for each file before going to the next file.
+
+               This will limit the amount of dirty data to current file,
+               otherwise the amount accumulates from several files and will
+               increase system load. This can also lead to ENOSPC if there’s
+               too much dirty data to write and it’s not possible to make
+               the reservations for the new data (ie. how the COW design
+               works).
+
+           -s <i>&lt;start&gt;</i>[kKmMgGtTpPeE]
+               defragmentation will start from the given offset, default is
+               beginning of a file
+
+           -l <i>&lt;len&gt;</i>[kKmMgGtTpPeE]
+               defragment only up to <i>len</i> bytes, default is the file size
+
+           -t <i>&lt;size&gt;</i>[kKmMgGtTpPeE]
+               target extent size, do not touch extents bigger than <i>size</i>,
+               default: 32M
+
+               The value is only advisory and the final size of the extents
+               may differ, depending on the state of the free space and
+               fragmentation or other internal logic. Reasonable values are
+               from tens to hundreds of megabytes.
+
+       <b>du </b>[options] <i>&lt;path&gt;</i> [<i>&lt;path&gt;</i>..]
+           Calculate disk usage of the target files using FIEMAP. For
+           individual files, it will report a count of total bytes, and
+           exclusive (not shared) bytes. We also calculate a <i>set shared</i>
+           value which is described below.
+
+           Each argument to <i>btrfs filesystem du</i> will have a <i>set shared</i> value
+           calculated for it. We define each <i>set</i> as those files found by a
+           recursive search of an argument. The <i>set shared</i> value then is a
+           sum of all shared space referenced by the set.
+
+           <i>set shared</i> takes into account overlapping shared extents, hence
+           it isn’t as simple as adding up shared extents.
+
+           <b>Options</b>
+
+           -s|--summarize
+               display only a total for each argument
+
+           --raw
+               raw numbers in bytes, without the <i>B</i> suffix.
+
+           --human-readable
+               print human friendly numbers, base 1024, this is the default
+
+           --iec
+               select the 1024 base for the following options, according to
+               the IEC standard.
+
+           --si
+               select the 1000 base for the following options, according to
+               the SI standard.
+
+           --kbytes
+               show sizes in KiB, or kB with --si.
+
+           --mbytes
+               show sizes in MiB, or MB with --si.
+
+           --gbytes
+               show sizes in GiB, or GB with --si.
+
+           --tbytes
+               show sizes in TiB, or TB with --si.
+
+       <b>label </b>[<i>&lt;device&gt;</i>|<i>&lt;mountpoint&gt;</i>] [<i>&lt;newlabel&gt;</i>]
+           Show or update the label of a filesystem. This works on a mounted
+           filesystem or a filesystem image.
+
+           The <i>newlabel</i> argument is optional. Current label is printed if
+           the the argument is omitted.
+
+               <b>Note</b>
+               the maximum allowable length shall be less than 256 chars and
+               must not contain a newline. The trailing newline is stripped
+               automatically.
+
+       <b>resize </b>[<i>&lt;devid&gt;</i>:][+/-]<i>&lt;size&gt;</i>[kKmMgGtTpPeE]|[<i>&lt;devid&gt;</i>:]max <i>&lt;path&gt;</i>
+           Resize a mounted filesystem identified by <i>path</i>. A particular
+           device can be resized by specifying a <i>devid</i>.
+
+               <b>Warning</b>
+               If <i>path</i> is a file containing a BTRFS image then resize does
+               not work as expected and does not resize the image. This
+               would resize the underlying filesystem instead.
+           The <i>devid</i> can be found in the output of <b>btrfs filesystem show </b>and
+           defaults to 1 if not specified. The <i>size</i> parameter specifies the
+           new size of the filesystem. If the prefix <i>+</i> or <i>-</i> is present the
+           size is increased or decreased by the quantity <i>size</i>. If no units
+           are specified, bytes are assumed for <i>size</i>. Optionally, the size
+           parameter may be suffixed by one of the following unit
+           designators: 'K', 'M', 'G', 'T', 'P', or 'E', which represent
+           KiB, MiB, GiB, TiB, PiB, or EiB, respectively (case does not
+           matter).
+
+           If <i>max</i> is passed, the filesystem will occupy all available space
+           on the device respecting <i>devid</i> (remember, devid 1 by default).
+
+           The resize command does not manipulate the size of underlying
+           partition. If you wish to enlarge/reduce a filesystem, you must
+           make sure you can expand the partition before enlarging the
+           filesystem and shrink the partition after reducing the size of
+           the filesystem. This can done using <a href="fdisk.8.html">fdisk(8)</a> or <a href="parted.8.html">parted(8)</a> to
+           delete the existing partition and recreate it with the new
+           desired size. When recreating the partition make sure to use the
+           same starting partition offset as before.
+
+           Growing is usually instant as it only updates the size. However,
+           shrinking could take a long time if there are data in the device
+           area that’s beyond the new end. Relocation of the data takes
+           time.
+
+           See also section <i>EXAMPLES</i>.
+
+       <b>show </b>[options] [<i>&lt;path&gt;</i>|<i>&lt;uuid&gt;</i>|<i>&lt;device&gt;</i>|<i>&lt;label&gt;</i>]
+           Show the btrfs filesystem with some additional info about devices
+           and space allocation.
+
+           If no option none of <i>path</i>/<i>uuid</i>/<i>device</i>/<i>label</i> is passed,
+           information about all the BTRFS filesystems is shown, both
+           mounted and unmounted.
+
+           <b>Options</b>
+
+           -m|--mounted
+               probe kernel for mounted BTRFS filesystems
+
+           -d|--all-devices
+               scan all devices under /dev, otherwise the devices list is
+               extracted from the /proc/partitions file. This is a fallback
+               option if there’s no device node manager (like udev)
+               available in the system.
+
+           --raw
+               raw numbers in bytes, without the <i>B</i> suffix
+
+           --human-readable
+               print human friendly numbers, base 1024, this is the default
+
+           --iec
+               select the 1024 base for the following options, according to
+               the IEC standard
+
+           --si
+               select the 1000 base for the following options, according to
+               the SI standard
+
+           --kbytes
+               show sizes in KiB, or kB with --si
+
+           --mbytes
+               show sizes in MiB, or MB with --si
+
+           --gbytes
+               show sizes in GiB, or GB with --si
+
+           --tbytes
+               show sizes in TiB, or TB with --si
+
+       <b>sync </b><i>&lt;path&gt;</i>
+           Force a sync of the filesystem at <i>path</i>. This is done via a
+           special ioctl and will also trigger cleaning of deleted
+           subvolumes. Besides that it’s equivalent to the <a href="../man1/sync.1.html">sync(1)</a> command.
+
+       <b>usage </b>[options] <i>&lt;path&gt;</i> [<i>&lt;path&gt;</i>...]
+           Show detailed information about internal filesystem usage. This
+           is supposed to replace the <b>btrfs filesystem df </b>command in the
+           long run.
+
+           The level of detail can differ if the command is run under a
+           regular or the root user (due to use of restricted ioctl). For
+           both there’s a summary section with information about space
+           usage:
+
+               $ btrfs filesystem usage /path
+               WARNING: cannot read detailed chunk info, RAID5/6 numbers will be incorrect, run as root
+               Overall:
+                   Device size:                   1.82TiB
+                   Device allocated:              1.17TiB
+                   Device unallocated:          669.99GiB
+                   Device missing:                  0.00B
+                   Used:                          1.14TiB
+                   Free (estimated):            692.57GiB      (min: 692.57GiB)
+                   Data ratio:                       1.00
+                   Metadata ratio:                   1.00
+                   Global reserve:              512.00MiB      (used: 0.00B)
+
+           The root user will also see stats broken down by block group
+           types:
+
+               Data,single: Size:1.15TiB, Used:1.13TiB
+                  /dev/sdb        1.15TiB
+
+               Metadata,single: Size:12.00GiB, Used:6.45GiB
+                  /dev/sdb       12.00GiB
+
+               System,single: Size:32.00MiB, Used:144.00KiB
+                  /dev/sdb       32.00MiB
+
+               Unallocated:
+                  /dev/sdb      669.99GiB
+
+           <b>Options</b>
+
+           -b|--raw
+               raw numbers in bytes, without the <i>B</i> suffix
+
+           -h|--human-readable
+               print human friendly numbers, base 1024, this is the default
+
+           -H
+               print human friendly numbers, base 1000
+
+           --iec
+               select the 1024 base for the following options, according to
+               the IEC standard
+
+           --si
+               select the 1000 base for the following options, according to
+               the SI standard
+
+           -k|--kbytes
+               show sizes in KiB, or kB with --si
+
+           -m|--mbytes
+               show sizes in MiB, or MB with --si
+
+           -g|--gbytes
+               show sizes in GiB, or GB with --si
+
+           -t|--tbytes
+               show sizes in TiB, or TB with --si
+
+           -T
+               show data in tabular format
+
+               If conflicting options are passed, the last one takes
+               precedence.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>$ btrfs filesystem defrag -v -r dir/</b>
+
+       Recursively defragment files under <i>dir/</i>, print files as they are
+       processed. The file names will be printed in batches, similarly the
+       amount of data triggered by defragmentation will be proportional to
+       last N printed files. The system dirty memory throttling will slow
+       down the defragmentation but there can still be a lot of IO load and
+       the system may stall for a moment.
+
+       <b>$ btrfs filesystem defrag -v -r -f dir/</b>
+
+       Recursively defragment files under <i>dir/</i>, be verbose and wait until
+       all blocks are flushed before processing next file. You can note
+       slower progress of the output and lower IO load (proportional to
+       currently defragmented file).
+
+       <b>$ btrfs filesystem defrag -v -r -f -clzo dir/</b>
+
+       Recursively defragment files under <i>dir/</i>, be verbose, wait until all
+       blocks are flushed and force file compression.
+
+       <b>$ btrfs filesystem defrag -v -r -t 64M dir/</b>
+
+       Recursively defragment files under <i>dir/</i>, be verbose and try to merge
+       extents to be about 64MiB. As stated above, the success rate depends
+       on actual free space fragmentation and the final result is not
+       guaranteed to meet the target even if run repeatedly.
+
+       <b>$ btrfs filesystem resize -1G /path</b>
+
+       <b>$ btrfs filesystem resize 1:-1G /path</b>
+
+       Shrink size of the filesystem’s device id 1 by 1GiB. The first syntax
+       expects a device with id 1 to exist, otherwise fails. The second is
+       equivalent and more explicit. For a single-device filesystem it’s
+       typically not necessary to specify the devid though.
+
+       <b>$ btrfs filesystem resize max /path</b>
+
+       <b>$ btrfs filesystem resize 1:max /path</b>
+
+       Let’s assume that devid 1 exists, the filesystem does not occupy the
+       whole block device, eg. it has been enlarged and we wan the grow the
+       filesystem. Simply using <i>max</i> as size we will achieve that.
+
+           <b>Note</b>
+           There are two ways to minimize the filesystem on a given device.
+           The <b>btrfs inspect-internal min-dev-size </b>command, or iteratively
+           shrink in steps.
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>btrfs filesystem </b>returns a zero exit status if it succeeds. Non zero
+       is returned in case of failure.
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>btrfs </b>is part of btrfs-progs. Please refer to the btrfs wiki
+       <b>http://btrfs.wiki.kernel.org </b><b></b>for further details.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="mkfs.btrfs.8.html">mkfs.btrfs(8)</a>,
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>btrfs-progs</i> (btrfs filesystem tools)
+       project.  Information about the project can be found at 
+       ⟨<a href="https://btrfs.wiki.kernel.org/index.php/Btrfs_source_repositories">https://btrfs.wiki.kernel.org/index.php/Btrfs_source_repositories</a>⟩.
+       If you have a bug report for this manual page, see 
+       ⟨<a href="https://btrfs.wiki.kernel.org/index.php/Problem_FAQ#How_do_I_report_bugs_and_issues.3F">https://btrfs.wiki.kernel.org/index.php/Problem_FAQ#How_do_I_report_bugs_and_issues.3F</a>⟩.
+       This page was obtained from the project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/kernel/git/kdave/btrfs-progs.git⟩
+       on 2017-07-05.  If you discover any rendering problems in this HTML
+       version of the page, or you believe there is a better or more up-to-
+       date source for the page, or you have corrections or improvements to
+       the information in this COLOPHON (which is <i>not</i> part of the original
+       manual page), send a mail to man-pages@man7.org
+
+<span class="footline">Btrfs v4.6.1                     07/05/2017              BTRFS-FILESYSTEM(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="btrfs.8.html">btrfs(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

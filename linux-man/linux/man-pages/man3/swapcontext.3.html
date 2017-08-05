@@ -1,0 +1,330 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>makecontext(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline"></span>
+MAKECONTEXT(3)            Linux Programmer's Manual           MAKECONTEXT(3)
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       makecontext, swapcontext - manipulate user context
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;ucontext.h&gt;</b>
+
+       <b>void makecontext(ucontext_t *</b><i>ucp</i><b>, void (*</b><i>func</i><b>)(), int </b><i>argc</i><b>, ...);</b>
+
+       <b>int swapcontext(ucontext_t *</b><i>oucp</i><b>, const ucontext_t *</b><i>ucp</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In a System V-like environment, one has the type <i>ucontext_t</i> defined
+       in <i>&lt;ucontext.h&gt;</i> and the four functions <a href="getcontext.3.html">getcontext(3)</a>, <a href="setcontext.3.html">setcontext(3)</a>,
+       <b>makecontext</b>() and <b>swapcontext</b>() that allow user-level context
+       switching between multiple threads of control within a process.
+
+       For the type and the first two functions, see <a href="getcontext.3.html">getcontext(3)</a>.
+
+       The <b>makecontext</b>() function modifies the context pointed to by <i>ucp</i>
+       (which was obtained from a call to <a href="getcontext.3.html">getcontext(3)</a>).  Before invoking
+       <b>makecontext</b>(), the caller must allocate a new stack for this context
+       and assign its address to <i>ucp-&gt;uc_stack</i>, and define a successor
+       context and assign its address to <i>ucp-&gt;uc_link</i>.
+
+       When this context is later activated (using <a href="setcontext.3.html">setcontext(3)</a> or
+       <b>swapcontext</b>()) the function <i>func</i> is called, and passed the series of
+       integer (<i>int</i>) arguments that follow <i>argc</i>; the caller must specify the
+       number of these arguments in <i>argc</i>.  When this function returns, the
+       successor context is activated.  If the successor context pointer is
+       NULL, the thread exits.
+
+       The <b>swapcontext</b>() function saves the current context in the structure
+       pointed to by <i>oucp</i>, and then activates the context pointed to by <i>ucp</i>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When successful, <b>swapcontext</b>() does not return.  (But we may return
+       later, in case <i>oucp</i> is activated, in which case it looks like
+       <b>swapcontext</b>() returns 0.)  On error, <b>swapcontext</b>() returns -1 and
+       sets <i><a href="errno.3.html">errno</a></i> appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ENOMEM </b>Insufficient stack space left.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>makecontext</b>() and <b>swapcontext</b>() are provided in glibc since version
+       2.1.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────┬───────────────┬────────────────────────────┐
+       │<b>Interface     </b>│ <b>Attribute     </b>│ <b>Value                      </b>│
+       ├──────────────┼───────────────┼────────────────────────────┤
+       │<b>makecontext</b>() │ Thread safety │ MT-Safe race:ucp           │
+       ├──────────────┼───────────────┼────────────────────────────┤
+       │<b>swapcontext</b>() │ Thread safety │ MT-Safe race:oucp race:ucp │
+       └──────────────┴───────────────┴────────────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       SUSv2, POSIX.1-2001.  POSIX.1-2008 removes the specifications of
+       <b>makecontext</b>() and <b>swapcontext</b>(), citing portability issues, and
+       recommending that applications be rewritten to use POSIX threads
+       instead.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The interpretation of <i>ucp-&gt;uc_stack</i> is just as in <a href="../man2/sigaltstack.2.html">sigaltstack(2)</a>,
+       namely, this struct contains the start and length of a memory area to
+       be used as the stack, regardless of the direction of growth of the
+       stack.  Thus, it is not necessary for the user program to worry about
+       this direction.
+
+       On architectures where <i>int</i> and pointer types are the same size (e.g.,
+       x86-32, where both types are 32 bits), you may be able to get away
+       with passing pointers as arguments to <b>makecontext</b>() following <i>argc</i>.
+       However, doing this is not guaranteed to be portable, is undefined
+       according to the standards, and won't work on architectures where
+       pointers are larger than <i>int</i>s.  Nevertheless, starting with version
+       2.8, glibc makes some changes to <b>makecontext</b>(), to permit this on
+       some 64-bit architectures (e.g., x86-64).
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The example program below demonstrates the use of <a href="getcontext.3.html">getcontext(3)</a>,
+       <b>makecontext</b>(), and <b>swapcontext</b>().  Running the program produces the
+       following output:
+
+           $ <b>./a.out</b>
+           main: swapcontext(&amp;uctx_main, &amp;uctx_func2)
+           func2: started
+           func2: swapcontext(&amp;uctx_func2, &amp;uctx_func1)
+           func1: started
+           func1: swapcontext(&amp;uctx_func1, &amp;uctx_func2)
+           func2: returning
+           func1: returning
+           main: exiting
+
+   <b>Program source</b>
+
+       #include &lt;ucontext.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+
+       static ucontext_t uctx_main, uctx_func1, uctx_func2;
+
+       #define handle_error(msg) \
+           do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
+       static void
+       func1(void)
+       {
+           printf("func1: started\n");
+           printf("func1: swapcontext(&amp;uctx_func1, &amp;uctx_func2)\n");
+           if (swapcontext(&amp;uctx_func1, &amp;uctx_func2) == -1)
+               handle_error("swapcontext");
+           printf("func1: returning\n");
+       }
+
+       static void
+       func2(void)
+       {
+           printf("func2: started\n");
+           printf("func2: swapcontext(&amp;uctx_func2, &amp;uctx_func1)\n");
+           if (swapcontext(&amp;uctx_func2, &amp;uctx_func1) == -1)
+               handle_error("swapcontext");
+           printf("func2: returning\n");
+       }
+
+       int
+       main(int argc, char *argv[])
+       {
+           char func1_stack[16384];
+           char func2_stack[16384];
+
+           if (getcontext(&amp;uctx_func1) == -1)
+               handle_error("getcontext");
+           uctx_func1.uc_stack.ss_sp = func1_stack;
+           uctx_func1.uc_stack.ss_size = sizeof(func1_stack);
+           uctx_func1.uc_link = &amp;uctx_main;
+           makecontext(&amp;uctx_func1, func1, 0);
+
+           if (getcontext(&amp;uctx_func2) == -1)
+               handle_error("getcontext");
+           uctx_func2.uc_stack.ss_sp = func2_stack;
+           uctx_func2.uc_stack.ss_size = sizeof(func2_stack);
+           /* Successor context is f1(), unless argc &gt; 1 */
+           uctx_func2.uc_link = (argc &gt; 1) ? NULL : &amp;uctx_func1;
+           makecontext(&amp;uctx_func2, func2, 0);
+
+           printf("main: swapcontext(&amp;uctx_main, &amp;uctx_func2)\n");
+           if (swapcontext(&amp;uctx_main, &amp;uctx_func2) == -1)
+               handle_error("swapcontext");
+
+           printf("main: exiting\n");
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/sigaction.2.html">sigaction(2)</a>, <a href="../man2/sigaltstack.2.html">sigaltstack(2)</a>, <a href="../man2/sigprocmask.2.html">sigprocmask(2)</a>, <a href="getcontext.3.html">getcontext(3)</a>,
+       <a href="sigsetjmp.3.html">sigsetjmp(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2015-03-02                   MAKECONTEXT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="getcontext.3.html">getcontext(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="makecontext.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

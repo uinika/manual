@@ -1,0 +1,299 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-fetch-pack(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-FETCH-PACK(1)                Git Manual                GIT-FETCH-PACK(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-fetch-pack - Receive missing objects from another repository
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git fetch-pack</i> [--all] [--quiet|-q] [--keep|-k] [--thin] [--include-tag]
+               [--upload-pack=&lt;git-upload-pack&gt;]
+               [--depth=&lt;n&gt;] [--no-progress]
+               [-v] &lt;repository&gt; [&lt;refs&gt;...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Usually you would want to use <i>git fetch</i>, which is a higher level
+       wrapper of this command, instead.
+
+       Invokes <i>git-upload-pack</i> on a possibly remote repository and asks it
+       to send objects missing from this repository, to update the named
+       heads. The list of commits available locally is found out by scanning
+       the local refs/ hierarchy and sent to <i>git-upload-pack</i> running on the
+       other end.
+
+       This command degenerates to download everything to complete the asked
+       refs from the remote side when the local side does not have a common
+       ancestor commit.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       --all
+           Fetch all remote refs.
+
+       --stdin
+           Take the list of refs from stdin, one per line. If there are refs
+           specified on the command line in addition to this option, then
+           the refs from stdin are processed after those on the command
+           line.
+
+           If <b>--stateless-rpc </b>is specified together with this option then
+           the list of refs must be in packet format (pkt-line). Each ref
+           must be in a separate packet, and the list must end with a flush
+           packet.
+
+       -q, --quiet
+           Pass <b>-q </b>flag to <i>git unpack-objects</i>; this makes the cloning
+           process less verbose.
+
+       -k, --keep
+           Do not invoke <i>git unpack-objects</i> on received data, but create a
+           single packfile out of it instead, and store it in the object
+           database. If provided twice then the pack is locked against
+           repacking.
+
+       --thin
+           Fetch a "thin" pack, which records objects in deltified form
+           based on objects not included in the pack to reduce network
+           traffic.
+
+       --include-tag
+           If the remote side supports it, annotated tags objects will be
+           downloaded on the same connection as the other objects if the
+           object the tag references is downloaded. The caller must
+           otherwise determine the tags this option made available.
+
+       --upload-pack=&lt;git-upload-pack&gt;
+           Use this to specify the path to <i>git-upload-pack</i> on the remote
+           side, if is not found on your $PATH. Installations of sshd
+           ignores the user’s environment setup scripts for login shells
+           (e.g. .bash_profile) and your privately installed git may not be
+           found on the system default $PATH. Another workaround suggested
+           is to set up your $PATH in ".bashrc", but this flag is for people
+           who do not want to pay the overhead for non-interactive shells by
+           having a lean .bashrc file (they set most of the things up in
+           .bash_profile).
+
+       --exec=&lt;git-upload-pack&gt;
+           Same as --upload-pack=&lt;git-upload-pack&gt;.
+
+       --depth=&lt;n&gt;
+           Limit fetching to ancestor-chains not longer than n.
+           <i>git-upload-pack</i> treats the special depth 2147483647 as infinite
+           even if there is an ancestor-chain that long.
+
+       --shallow-since=&lt;date&gt;
+           Deepen or shorten the history of a shallow’repository to include
+           all reachable commits after &lt;date&gt;.
+
+       --shallow-exclude=&lt;revision&gt;
+           Deepen or shorten the history of a shallow repository to exclude
+           commits reachable from a specified remote branch or tag. This
+           option can be specified multiple times.
+
+       --deepen-relative
+           Argument --depth specifies the number of commits from the current
+           shallow boundary instead of from the tip of each remote branch
+           history.
+
+       --no-progress
+           Do not show the progress.
+
+       --check-self-contained-and-connected
+           Output "connectivity-ok" if the received pack is self-contained
+           and connected.
+
+       -v
+           Run verbosely.
+
+       &lt;repository&gt;
+           The URL to the remote repository.
+
+       &lt;refs&gt;...
+           The remote heads to update from. This is relative to $GIT_DIR
+           (e.g. "HEAD", "refs/heads/master"). When unspecified, update from
+           all heads the remote side has.
+
+           If the remote has enabled the options
+           <b>uploadpack.allowTipSHA1InWant</b>,
+           <b>uploadpack.allowReachableSHA1InWant</b>, or
+           <b>uploadpack.allowAnySHA1InWant</b>, they may alternatively be 40-hex
+           sha1s present on the remote.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="git-fetch.1.html">git-fetch(1)</a>
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.12.0.rc2                   02/18/2017                GIT-FETCH-PACK(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-config.1.html">git-config(1)</a>,&nbsp; 
+    <a href="git-receive-pack.1.html">git-receive-pack(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

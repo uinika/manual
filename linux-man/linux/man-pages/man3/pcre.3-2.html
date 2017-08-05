@@ -1,0 +1,358 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pcre(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#PLEASE_TAKE_NOTE">PLEASE&nbsp;TAKE&nbsp;NOTE</a> | <a href="#INTRODUCTION">INTRODUCTION</a> | <a href="#SECURITY_CONSIDERATIONS">SECURITY&nbsp;CONSIDERATIONS</a> | <a href="#USER_DOCUMENTATION">USER&nbsp;DOCUMENTATION</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#REVISION">REVISION</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PCRE(3)                   Library Functions Manual                   PCRE(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       PCRE - Perl-compatible regular expressions (original API)
+</pre>
+<h2><a id="PLEASE_TAKE_NOTE" href="#PLEASE_TAKE_NOTE"></a>PLEASE TAKE NOTE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       This document relates to PCRE releases that use the original API,
+       with library names libpcre, libpcre16, and libpcre32. January 2015
+       saw the first release of a new API, known as PCRE2, with release
+       numbers starting at 10.00 and library names libpcre2-8, libpcre2-16,
+       and libpcre2-32. The old libraries (now called PCRE1) are still being
+       maintained for bug fixes, but there will be no new development. New
+       projects are advised to use the new PCRE2 libraries.
+</pre>
+<h2><a id="INTRODUCTION" href="#INTRODUCTION"></a>INTRODUCTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       The PCRE library is a set of functions that implement regular
+       expression pattern matching using the same syntax and semantics as
+       Perl, with just a few differences. Some features that appeared in
+       Python and PCRE before they appeared in Perl are also available using
+       the Python syntax, there is some support for one or two .NET and
+       Oniguruma syntax items, and there is an option for requesting some
+       minor changes that give better JavaScript compatibility.
+
+       Starting with release 8.30, it is possible to compile two separate
+       PCRE libraries: the original, which supports 8-bit character strings
+       (including UTF-8 strings), and a second library that supports 16-bit
+       character strings (including UTF-16 strings). The build process
+       allows either one or both to be built. The majority of the work to
+       make this possible was done by Zoltan Herczeg.
+
+       Starting with release 8.32 it is possible to compile a third separate
+       PCRE library that supports 32-bit character strings (including UTF-32
+       strings). The build process allows any combination of the 8-, 16- and
+       32-bit libraries. The work to make this possible was done by
+       Christian Persch.
+
+       The three libraries contain identical sets of functions, except that
+       the names in the 16-bit library start with <b>pcre16_ </b>instead of <b>pcre_</b>,
+       and the names in the 32-bit library start with <b>pcre32_ </b>instead of
+       <b>pcre_</b>. To avoid over-complication and reduce the documentation
+       maintenance load, most of the documentation describes the 8-bit
+       library, with the differences for the 16-bit and 32-bit libraries
+       described separately in the <b>pcre16 </b>and <b>pcre32 </b>pages. References to
+       functions or structures of the form <i>pcre[16|32]_xxx</i> should be read as
+       meaning "<i>pcre_xxx</i> when using the 8-bit library, <i>pcre16_xxx</i> when using
+       the 16-bit library, or <i>pcre32_xxx</i> when using the 32-bit library".
+
+       The current implementation of PCRE corresponds approximately with
+       Perl 5.12, including support for UTF-8/16/32 encoded strings and
+       Unicode general category properties. However, UTF-8/16/32 and Unicode
+       support has to be explicitly enabled; it is not the default. The
+       Unicode tables correspond to Unicode release 6.3.0.
+
+       In addition to the Perl-compatible matching function, PCRE contains
+       an alternative function that matches the same compiled patterns in a
+       different way. In certain circumstances, the alternative function has
+       some advantages.  For a discussion of the two matching algorithms,
+       see the <b>pcrematching </b>page.
+
+       PCRE is written in C and released as a C library. A number of people
+       have written wrappers and interfaces of various kinds. In particular,
+       Google Inc.  have provided a comprehensive C++ wrapper for the 8-bit
+       library. This is now included as part of the PCRE distribution. The
+       <b>pcrecpp </b>page has details of this interface. Other people's
+       contributions can be found in the <i>Contrib</i> directory at the primary
+       FTP site, which is:
+
+       ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre
+
+       Details of exactly which Perl regular expression features are and are
+       not supported by PCRE are given in separate documents. See the
+       <b>pcrepattern </b>and <b>pcrecompat </b>pages. There is a syntax summary in the
+       <b>pcresyntax </b>page.
+
+       Some features of PCRE can be included, excluded, or changed when the
+       library is built. The <b>pcre_config() </b>function makes it possible for a
+       client to discover which features are available. The features
+       themselves are described in the <b>pcrebuild </b>page. Documentation about
+       building PCRE for various operating systems can be found in the
+       <b>README </b>and <b>NON-AUTOTOOLS_BUILD </b>files in the source distribution.
+
+       The libraries contains a number of undocumented internal functions
+       and data tables that are used by more than one of the exported
+       external functions, but which are not intended for use by external
+       callers. Their names all begin with "_pcre_" or "_pcre16_" or
+       "_pcre32_", which hopefully will not provoke any name clashes. In
+       some environments, it is possible to control which external symbols
+       are exported when a shared library is built, and in these cases the
+       undocumented symbols are not exported.
+</pre>
+<h2><a id="SECURITY_CONSIDERATIONS" href="#SECURITY_CONSIDERATIONS"></a>SECURITY CONSIDERATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       If you are using PCRE in a non-UTF application that permits users to
+       supply arbitrary patterns for compilation, you should be aware of a
+       feature that allows users to turn on UTF support from within a
+       pattern, provided that PCRE was built with UTF support. For example,
+       an 8-bit pattern that begins with "(*UTF8)" or "(*UTF)" turns on
+       UTF-8 mode, which interprets patterns and subjects as strings of
+       UTF-8 characters instead of individual 8-bit characters.  This causes
+       both the pattern and any data against which it is matched to be
+       checked for UTF-8 validity. If the data string is very long, such a
+       check might use sufficiently many resources as to cause your
+       application to lose performance.
+
+       One way of guarding against this possibility is to use the
+       <b>pcre_fullinfo() </b>function to check the compiled pattern's options for
+       UTF.  Alternatively, from release 8.33, you can set the
+       PCRE_NEVER_UTF option at compile time. This causes an compile time
+       error if a pattern contains a UTF-setting sequence.
+
+       If your application is one that supports UTF, be aware that validity
+       checking can take time. If the same data string is to be matched many
+       times, you can use the PCRE_NO_UTF[8|16|32]_CHECK option for the
+       second and subsequent matches to save redundant checks.
+
+       Another way that performance can be hit is by running a pattern that
+       has a very large search tree against a string that will never match.
+       Nested unlimited repeats in a pattern are a common example. PCRE
+       provides some protection against this: see the PCRE_EXTRA_MATCH_LIMIT
+       feature in the <b>pcreapi </b>page.
+</pre>
+<h2><a id="USER_DOCUMENTATION" href="#USER_DOCUMENTATION"></a>USER DOCUMENTATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       The user documentation for PCRE comprises a number of different
+       sections. In the "man" format, each of these is a separate "man
+       page". In the HTML format, each is a separate page, linked from the
+       index page. In the plain text format, the descriptions of the
+       <b>pcregrep </b>and <b>pcretest </b>programs are in files called <b>pcregrep.txt </b>and
+       <b>pcretest.txt</b>, respectively. The remaining sections, except for the
+       <b>pcredemo </b>section (which is a program listing), are concatenated in
+       <b>pcre.txt</b>, for ease of searching. The sections are as follows:
+
+         pcre              this document
+         pcre-config       show PCRE installation configuration information
+         pcre16            details of the 16-bit library
+         pcre32            details of the 32-bit library
+         pcreapi           details of PCRE's native C API
+         pcrebuild         building PCRE
+         pcrecallout       details of the callout feature
+         pcrecompat        discussion of Perl compatibility
+         pcrecpp           details of the C++ wrapper for the 8-bit library
+         pcredemo          a demonstration C program that uses PCRE
+         pcregrep          description of the <b>pcregrep </b>command (8-bit only)
+         pcrejit           discussion of the just-in-time optimization
+       support
+         pcrelimits        details of size and other limits
+         pcrematching      discussion of the two matching algorithms
+         pcrepartial       details of the partial matching facility
+         pcrepattern       syntax and semantics of supported
+                             regular expressions
+         pcreperform       discussion of performance issues
+         pcreposix         the POSIX-compatible C API for the 8-bit library
+         pcreprecompile    details of saving and re-using precompiled
+       patterns
+         pcresample        discussion of the pcredemo program
+         pcrestack         discussion of stack usage
+         pcresyntax        quick syntax reference
+         pcretest          description of the <b>pcretest </b>testing command
+         pcreunicode       discussion of Unicode and UTF-8/16/32 support
+
+       In the "man" and HTML formats, there is also a short page for each C
+       library function, listing its arguments and results.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       Philip Hazel
+       University Computing Service
+       Cambridge CB2 3QH, England.
+
+       Putting an actual email address here seems to have been a spam
+       magnet, so I've taken it away. If you want to email me, use my two
+       initials, followed by the two digits 10, at the domain cam.ac.uk.
+</pre>
+<h2><a id="REVISION" href="#REVISION"></a>REVISION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       Last updated: 10 February 2015
+       Copyright (c) 1997-2015 University of Cambridge.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCRE</i> (Perl Compatible Regular Expressions)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.pcre.org/">http://www.pcre.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨<a href="http://bugs.exim.org/enter_bug.cgi?product=PCRE">http://bugs.exim.org/enter_bug.cgi?product=PCRE</a>⟩.  This
+       page was obtained from the tarball pcre-8.40.tar.gz fetched from 
+       ⟨ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">PCRE 8.37                     10 February 2015                       PCRE(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pcre-config.1.html">pcre-config(1)</a>,&nbsp; 
+    <a href="../man1/pcretest.1.html">pcretest(1)</a>,&nbsp; 
+    <a href="pcrepattern.3.html">pcrepattern(3)</a>,&nbsp; 
+    <a href="pcresyntax.3.html">pcresyntax(3)</a>,&nbsp; 
+    <a href="../man8/sefcontext_compile.8.html">sefcontext_compile(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

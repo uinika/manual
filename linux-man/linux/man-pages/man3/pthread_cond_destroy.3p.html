@@ -1,0 +1,349 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pthread_cond_destroy.3p - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#PROLOG">PROLOG</a> | <a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#APPLICATION_USAGE">APPLICATION&nbsp;USAGE</a> | <a href="#RATIONALE">RATIONALE</a> | <a href="#FUTURE_DIRECTIONS">FUTURE&nbsp;DIRECTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYRIGHT">COPYRIGHT</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PTHREAD_COND_DESTROY(3P)  POSIX Programmer's Manual PTHREAD_COND_DESTROY(3P)</span>
+</pre>
+<h2><a id="PROLOG" href="#PROLOG"></a>PROLOG  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page is part of the POSIX Programmer's Manual.  The Linux
+       implementation of this interface may differ (consult the
+       corresponding Linux manual page for details of Linux behavior), or
+       the interface may not be implemented on Linux.
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pthread_cond_destroy, pthread_cond_init — destroy and initialize
+       condition variables
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;pthread.h&gt;
+
+       int pthread_cond_destroy(pthread_cond_t *<i>cond</i>);
+       int pthread_cond_init(pthread_cond_t *restrict <i>cond</i>,
+           const pthread_condattr_t *restrict <i>attr</i>);
+       pthread_cond_t <i>cond</i> = PTHREAD_COND_INITIALIZER;
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>pthread_cond_destroy</i>() function shall destroy the given condition
+       variable specified by <i>cond</i>; the object becomes, in effect,
+       uninitialized. An implementation may cause <i>pthread_cond_destroy</i>() to
+       set the object referenced by <i>cond</i> to an invalid value. A destroyed
+       condition variable object can be reinitialized using
+       <i>pthread_cond_init</i>(); the results of otherwise referencing the object
+       after it has been destroyed are undefined.
+
+       It shall be safe to destroy an initialized condition variable upon
+       which no threads are currently blocked. Attempting to destroy a
+       condition variable upon which other threads are currently blocked
+       results in undefined behavior.
+
+       The <i>pthread_cond_init</i>() function shall initialize the condition
+       variable referenced by <i>cond</i> with attributes referenced by <i>attr</i>.  If
+       <i>attr</i> is NULL, the default condition variable attributes shall be
+       used; the effect is the same as passing the address of a default
+       condition variable attributes object. Upon successful initialization,
+       the state of the condition variable shall become initialized.
+
+       Only <i>cond</i> itself may be used for performing synchronization. The
+       result of referring to copies of <i>cond</i> in calls to
+       <i>pthread_cond_wait</i>(), <i>pthread_cond_timedwait</i>(), <i>pthread_cond_signal</i>(),
+       <i>pthread_cond_broadcast</i>(), and <i>pthread_cond_destroy</i>() is undefined.
+
+       Attempting to initialize an already initialized condition variable
+       results in undefined behavior.
+
+       In cases where default condition variable attributes are appropriate,
+       the macro PTHREAD_COND_INITIALIZER can be used to initialize
+       condition variables. The effect shall be equivalent to dynamic
+       initialization by a call to <i>pthread_cond_init</i>() with parameter <i>attr</i>
+       specified as NULL, except that no error checks are performed.
+
+       The behavior is undefined if the value specified by the <i>cond</i> argument
+       to <i>pthread_cond_destroy</i>() does not refer to an initialized condition
+       variable.
+
+       The behavior is undefined if the value specified by the <i>attr</i> argument
+       to <i>pthread_cond_init</i>() does not refer to an initialized condition
+       variable attributes object.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If successful, the <i>pthread_cond_destroy</i>() and <i>pthread_cond_init</i>()
+       functions shall return zero; otherwise, an error number shall be
+       returned to indicate the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>pthread_cond_init</i>() function shall fail if:
+
+       <b>EAGAIN </b>The system lacked the necessary resources (other than memory)
+              to initialize another condition variable.
+
+       <b>ENOMEM </b>Insufficient memory exists to initialize the condition
+              variable.
+
+       These functions shall not return an error code of <b>[EINTR]</b>.
+
+       <i>The following sections are informative.</i>
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A condition variable can be destroyed immediately after all the
+       threads that are blocked on it are awakened. For example, consider
+       the following code:
+
+           <b>struct list {</b>
+               <b>pthread_mutex_t lm;</b>
+               <b>...</b>
+           <b>}</b>
+
+           struct elt {
+               key k;
+               int busy;
+               pthread_cond_t notbusy;
+               ...
+           }
+
+           /* Find a list element and reserve it. */
+           struct elt *
+           list_find(struct list *lp, key k)
+           {
+               struct elt *ep;
+
+               pthread_mutex_lock(&amp;lp-&gt;lm);
+               while ((ep = find_elt(l, k) != NULL) &amp;&amp; ep-&gt;busy)
+                   pthread_cond_wait(&amp;ep-&gt;notbusy, &amp;lp-&gt;lm);
+               if (ep != NULL)
+                   ep-&gt;busy = 1;
+               pthread_mutex_unlock(&amp;lp-&gt;lm);
+               return(ep);
+           }
+
+           delete_elt(struct list *lp, struct elt *ep)
+           {
+               pthread_mutex_lock(&amp;lp-&gt;lm);
+               assert(ep-&gt;busy);
+               ... remove ep from list ...
+               ep-&gt;busy = 0;  /* Paranoid. */
+           (A) pthread_cond_broadcast(&amp;ep-&gt;notbusy);
+               pthread_mutex_unlock(&amp;lp-&gt;lm);
+           (B) pthread_cond_destroy(&amp;rp-&gt;notbusy);
+               free(ep);
+           }
+
+       In this example, the condition variable and its list element may be
+       freed (line B) immediately after all threads waiting for it are
+       awakened (line A), since the mutex and the code ensure that no other
+       thread can touch the element to be deleted.
+</pre>
+<h2><a id="APPLICATION_USAGE" href="#APPLICATION_USAGE"></a>APPLICATION USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="RATIONALE" href="#RATIONALE"></a>RATIONALE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If an implementation detects that the value specified by the <i>cond</i>
+       argument to <i>pthread_cond_destroy</i>() does not refer to an initialized
+       condition variable, it is recommended that the function should fail
+       and report an <b>[EINVAL] </b>error.
+
+       If an implementation detects that the value specified by the <i>cond</i>
+       argument to <i>pthread_cond_destroy</i>() or <i>pthread_cond_init</i>() refers to a
+       condition variable that is in use (for example, in a
+       <i>pthread_cond_wait</i>() call) by another thread, or detects that the
+       value specified by the <i>cond</i> argument to <i>pthread_cond_init</i>() refers to
+       an already initialized condition variable, it is recommended that the
+       function should fail and report an <b>[EBUSY] </b>error.
+
+       If an implementation detects that the value specified by the <i>attr</i>
+       argument to <i>pthread_cond_init</i>() does not refer to an initialized
+       condition variable attributes object, it is recommended that the
+       function should fail and report an <b>[EINVAL] </b>error.
+
+       See also <a href="pthread_mutex_destroy.3p.html">pthread_mutex_destroy(3p)</a>.
+</pre>
+<h2><a id="FUTURE_DIRECTIONS" href="#FUTURE_DIRECTIONS"></a>FUTURE DIRECTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="pthread_cond_broadcast.3p.html">pthread_cond_broadcast(3p)</a>, <a href="pthread_cond_timedwait.3p.html">pthread_cond_timedwait(3p)</a>,
+       <a href="pthread_mutex_destroy.3p.html">pthread_mutex_destroy(3p)</a>
+
+       The Base Definitions volume of POSIX.1‐2008, <a href="../man0/pthread.h.0p.html">pthread.h(0p)</a>
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Portions of this text are reprinted and reproduced in electronic form
+       from IEEE Std 1003.1, 2013 Edition, Standard for Information
+       Technology -- Portable Operating System Interface (POSIX), The Open
+       Group Base Specifications Issue 7, Copyright (C) 2013 by the
+       Institute of Electrical and Electronics Engineers, Inc and The Open
+       Group.  (This is POSIX.1-2008 with the 2013 Technical Corrigendum 1
+       applied.) In the event of any discrepancy between this version and
+       the original IEEE and The Open Group Standard, the original IEEE and
+       The Open Group Standard is the referee document. The original
+       Standard can be obtained online at <a href="http://www.unix.org/online.html">http://www.unix.org/online.html</a> .
+
+       Any typographical or formatting errors that appear in this page are
+       most likely to have been introduced during the conversion of the
+       source files to man page format. To report such errors, see
+       <a href="https://www.kernel.org/doc/man-pages/reporting_bugs.html">https://www.kernel.org/doc/man-pages/reporting_bugs.html</a> .
+
+<span class="footline">IEEE/The Open Group                 2013            PTHREAD_COND_DESTROY(3P)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man0/pthread.h.0p.html">pthread.h(0p)</a>,&nbsp; 
+    <a href="pthread_condattr_destroy.3p.html">pthread_condattr_destroy(3p)</a>,&nbsp; 
+    <a href="pthread_condattr_getclock.3p.html">pthread_condattr_getclock(3p)</a>,&nbsp; 
+    <a href="pthread_condattr_getpshared.3p.html">pthread_condattr_getpshared(3p)</a>,&nbsp; 
+    <a href="pthread_cond_broadcast.3p.html">pthread_cond_broadcast(3p)</a>,&nbsp; 
+    <a href="pthread_mutexattr_destroy.3p.html">pthread_mutexattr_destroy(3p)</a>,&nbsp; 
+    <a href="pthread_mutexattr_getprioceiling.3p.html">pthread_mutexattr_getprioceiling(3p)</a>,&nbsp; 
+    <a href="pthread_mutexattr_getprotocol.3p.html">pthread_mutexattr_getprotocol(3p)</a>,&nbsp; 
+    <a href="pthread_mutexattr_getpshared.3p.html">pthread_mutexattr_getpshared(3p)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

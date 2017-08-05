@@ -1,0 +1,304 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.swap(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#AUTOMATIC_DEPENDENCIES">AUTOMATIC&nbsp;DEPENDENCIES</a> | <a href="#FSTAB">FSTAB</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.SWAP(5)                 systemd.swap                 SYSTEMD.SWAP(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.swap - Swap unit configuration
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>swap</i>.swap
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A unit configuration file whose name ends in ".swap" encodes
+       information about a swap device or file for memory paging controlled
+       and supervised by systemd.
+
+       This man page lists the configuration options specific to this unit
+       type. See <a href="systemd.unit.5.html">systemd.unit(5)</a> for the common options of all unit
+       configuration files. The common configuration items are configured in
+       the generic [Unit] and [Install] sections. The swap specific
+       configuration options are configured in the [Swap] section.
+
+       Additional options are listed in <a href="systemd.exec.5.html">systemd.exec(5)</a>, which define the
+       execution environment the <a href="../man8/swapon.8.html">swapon(8)</a> binary is executed in, in
+       <a href="systemd.kill.5.html">systemd.kill(5)</a>, which define the way these processes are terminated,
+       and in <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>, which configure resource control
+       settings for these processes of the unit.
+
+       Swap units must be named after the devices or files they control.
+       Example: the swap device /dev/sda5 must be configured in a unit file
+       dev-sda5.swap. For details about the escaping logic used to convert a
+       file system path to a unit name, see <a href="systemd.unit.5.html">systemd.unit(5)</a>. Note that swap
+       units cannot be templated, nor is possible to add multiple names to a
+       swap unit by creating additional symlinks to it.
+</pre>
+<h2><a id="AUTOMATIC_DEPENDENCIES" href="#AUTOMATIC_DEPENDENCIES"></a>AUTOMATIC DEPENDENCIES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All swap units automatically get the <i>BindsTo=</i> and <i>After=</i> dependencies
+       on the device units or the mount units of the files they are
+       activated from.
+
+       Swap units with <i>DefaultDependencies=</i> set to its default <b>yes </b>value in
+       the "[Unit]" section enabled implicitly acquire a <i>Conflicts=</i> and a
+       <i>Before=</i> dependency on umount.target so that they are deactivated at
+       shutdown as well as a <i>Before=swap.target</i> dependency.
+
+       Additional implicit dependencies may be added as result of execution
+       and resource control parameters as documented in <a href="systemd.exec.5.html">systemd.exec(5)</a> and
+       <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>.
+</pre>
+<h2><a id="FSTAB" href="#FSTAB"></a>FSTAB  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Swap units may either be configured via unit files, or via /etc/fstab
+       (see <a href="fstab.5.html">fstab(5)</a> for details). Swaps listed in /etc/fstab will be
+       converted into native units dynamically at boot and when the
+       configuration of the system manager is reloaded. See
+       <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a> for details about the conversion.
+
+       If a swap device or file is configured in both /etc/fstab and a unit
+       file, the configuration in the latter takes precedence.
+
+       When reading /etc/fstab, a few special options are understood by
+       systemd which influence how dependencies are created for swap units.
+
+       <b>noauto</b>, <b>auto</b>
+           With <b>noauto</b>, the swap unit will not be added as a dependency for
+           swap.target. This means that it will not be activated
+           automatically during boot, unless it is pulled in by some other
+           unit. The <b>auto </b>option has the opposite meaning and is the
+           default.
+
+       <b>nofail</b>
+           With <b>nofail</b>, the swap unit will be only wanted, not required by
+           swap.target. This means that the boot will continue even if this
+           swap device is not activated successfully.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Swap files must include a [Swap] section, which carries information
+       about the swap device it supervises. A number of options that may be
+       used in this section are shared with other unit types. These options
+       are documented in <a href="systemd.exec.5.html">systemd.exec(5)</a> and <a href="systemd.kill.5.html">systemd.kill(5)</a>. The options
+       specific to the [Swap] section of swap units are the following:
+
+       <i>What=</i>
+           Takes an absolute path of a device node or file to use for
+           paging. See <a href="../man8/swapon.8.html">swapon(8)</a> for details. If this refers to a device
+           node, a dependency on the respective device unit is automatically
+           created. (See <a href="systemd.device.5.html">systemd.device(5)</a> for more information.) If this
+           refers to a file, a dependency on the respective mount unit is
+           automatically created. (See <a href="systemd.mount.5.html">systemd.mount(5)</a> for more
+           information.) This option is mandatory. Note that the usual
+           specifier expansion is applied to this setting, literal percent
+           characters should hence be written as "%%".
+
+       <i>Priority=</i>
+           Swap priority to use when activating the swap device or file.
+           This takes an integer. This setting is optional and ignored when
+           the priority is set by <b>pri= </b>in the <i>Options=</i> key.
+
+       <i>Options=</i>
+           May contain an option string for the swap device. This may be
+           used for controlling discard options among other functionality,
+           if the swap backing device supports the discard or trim
+           operation. (See <a href="../man8/swapon.8.html">swapon(8)</a> for more information.) Note that the
+           usual specifier expansion is applied to this setting, literal
+           percent characters should hence be written as "%%".
+
+       <i>TimeoutSec=</i>
+           Configures the time to wait for the swapon command to finish. If
+           a command does not exit within the configured time, the swap will
+           be considered failed and be shut down again. All commands still
+           running will be terminated forcibly via <b>SIGTERM</b>, and after
+           another delay of this time with <b>SIGKILL</b>. (See <b>KillMode= </b>in
+           <a href="systemd.kill.5.html">systemd.kill(5)</a>.) Takes a unit-less value in seconds, or a time
+           span value such as "5min 20s". Pass "0" to disable the timeout
+           logic. Defaults to <i>DefaultTimeoutStartSec=</i> from the manager
+           configuration file (see <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>).
+
+       Check <a href="systemd.exec.5.html">systemd.exec(5)</a> and <a href="systemd.kill.5.html">systemd.kill(5)</a> for more settings.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man1/systemctl.1.html">systemctl(1)</a>, <a href="systemd.unit.5.html">systemd.unit(5)</a>, <a href="systemd.exec.5.html">systemd.exec(5)</a>,
+       <a href="systemd.kill.5.html">systemd.kill(5)</a>, <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>, <a href="systemd.device.5.html">systemd.device(5)</a>,
+       <a href="systemd.mount.5.html">systemd.mount(5)</a>, <a href="../man8/swapon.8.html">swapon(8)</a>, <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a>,
+       <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                  SYSTEMD.SWAP(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemd.1.html">systemd(1)</a>,&nbsp; 
+    <a href="systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="systemd.kill.5.html">systemd.kill(5)</a>,&nbsp; 
+    <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>,&nbsp; 
+    <a href="systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-gpt-auto-generator.8.html">systemd-gpt-auto-generator(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

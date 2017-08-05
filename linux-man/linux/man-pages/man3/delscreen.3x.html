@@ -1,0 +1,361 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>curs_initscr.3x - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#PORTABILITY">PORTABILITY</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">curs_initscr(3X)                                            curs_initscr(3X)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>initscr</b>, <b>newterm</b>, <b>endwin</b>, <b>isendwin</b>, <b>set_term</b>, <b>delscreen </b>- <b>curses</b>
+       screen initialization and manipulation routines
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;curses.h&gt;</b>
+
+       <b>WINDOW *initscr(void);</b>
+       <b>int endwin(void);</b>
+       <b>bool isendwin(void);</b>
+       <b>SCREEN *newterm(char *</b><i>type</i><b>, FILE *</b><i>outfd</i><b>, FILE *</b><i>infd</i><b>);</b>
+       <b>SCREEN *set_term(SCREEN *</b><i>new</i><b>);</b>
+       <b>void delscreen(SCREEN* </b><i>sp</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>initscr</b>
+       <b>initscr </b>is normally the first <b>curses </b>routine to call when
+       initializing a program.  A few special routines sometimes need to be
+       called before it; these are <b>slk_init</b>(3X), <b>filter</b>, <b>ripoffline</b>,
+       <b>use_env</b>.  For multiple-terminal applications, <b>newterm </b>may be called
+       before <b>initscr</b>.
+
+       The initscr code determines the terminal type and initializes all
+       <b>curses </b>data structures.  <b>initscr </b>also causes the first call to
+       <b>refresh</b>(3X) to clear the screen.  If errors occur, <b>initscr </b>writes an
+       appropriate error message to standard error and exits; otherwise, a
+       pointer is returned to <b>stdscr</b>.
+
+   <b>newterm</b>
+       A program that outputs to more than one terminal should use the
+       <b>newterm </b>routine for each terminal instead of <b>initscr</b>.  A program that
+       needs to inspect capabilities, so it can continue to run in a line-
+       oriented mode if the terminal cannot support a screen-oriented
+       program, would also use <b>newterm</b>.  The routine <b>newterm </b>should be
+       called once for each terminal.  It returns a variable of type <b>SCREEN</b>
+       <b>* </b>which should be saved as a reference to that terminal.  <b>newterm</b>'s
+       arguments are
+
+       ·   the <i>type</i> of the terminal to be used in place of <b>$TERM</b>,
+
+       ·   a file pointer for output to the terminal, and
+
+       ·   another file pointer for input from the terminal
+
+       If the <i>type</i> parameter is <b>NULL</b>, <b>$TERM </b>will be used.
+
+   <b>endwin</b>
+       The program must also call <b>endwin </b>for each terminal being used before
+       exiting from <b>curses</b>.  If <b>newterm </b>is called more than once for the
+       same terminal, the first terminal referred to must be the last one
+       for which <b>endwin </b>is called.
+
+       A program should always call <b>endwin </b>before exiting or escaping from
+       <b>curses </b>mode temporarily.  This routine
+
+       ·   resets colors to correspond with the default color pair 0,
+
+       ·   moves the cursor to the lower left-hand corner of the screen,
+
+       ·   clears the remainder of the line so that it uses the default
+           colors,
+
+       ·   sets the cursor to normal visibility (see <b>curs_set</b>(3X)),
+
+       ·   stops cursor-addressing mode using the <i>exit_ca_mode</i> terminal
+           capability,
+
+       ·   restores tty modes (see <b>reset_shell_mode</b>(3X)).
+
+       Calling <b>refresh</b>(3X) or <b>doupdate</b>(3X) after a temporary escape causes
+       the program to resume visual mode.
+
+   <b>isendwin</b>
+       The <b>isendwin </b>routine returns <b>TRUE </b>if <b>endwin </b>has been called without
+       any subsequent calls to <b>wrefresh</b>, and <b>FALSE </b>otherwise.
+
+   <b>set_term</b>
+       The <b>set_term </b>routine is used to switch between different terminals.
+       The screen reference <b>new </b>becomes the new current terminal.  The
+       previous terminal is returned by the routine.  This is the only
+       routine which manipulates <b>SCREEN </b>pointers; all other routines affect
+       only the current terminal.
+
+   <b>delscreen</b>
+       The <b>delscreen </b>routine frees storage associated with the <b>SCREEN </b>data
+       structure.  The <b>endwin </b>routine does not do this, so <b>delscreen </b>should
+       be called after <b>endwin </b>if a particular <b>SCREEN </b>is no longer needed.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>endwin </b>returns the integer <b>ERR </b>upon failure and <b>OK </b>upon successful
+       completion.
+
+       Routines that return pointers always return <b>NULL </b>on error.
+
+       X/Open defines no error conditions.  In this implementation
+
+       ·   <b>endwin </b>returns an error if the terminal was not initialized.
+
+       ·   <b>newterm </b>returns an error if it cannot allocate the data
+           structures for the screen, or for the top-level windows within
+           the screen, i.e., <b>curscr</b>, <b>newscr</b>, or <b>stdscr</b>.
+
+       ·   <b>set_term </b>returns no error.
+</pre>
+<h2><a id="PORTABILITY" href="#PORTABILITY"></a>PORTABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions were described in the XSI Curses standard, Issue 4.
+       As of 2015, the current document is X/Open Curses, Issue 7.
+
+   <b>Differences</b>
+       X/Open specifies that portable applications must not call <b>initscr</b>
+       more than once:
+
+       ·   The portable way to use <b>initscr </b>is once only, using <b>refresh </b>(see
+           curs_refresh(3X)) to restore the screen after <b>endwin</b>.
+
+       ·   This implementation allows using <b>initscr </b>after <b>endwin</b>.
+
+       Old versions of curses, e.g., BSD 4.4, may have returned a null
+       pointer from <b>initscr </b>when an error is detected, rather than exiting.
+       It is safe but redundant to check the return value of <b>initscr </b>in XSI
+       Curses.
+
+   <b>Unset TERM Variable</b>
+       If the TERM variable is missing or empty, <b>initscr </b>uses the value
+       “unknown”, which normally corresponds to a terminal entry with the
+       <i>generic</i> (<i>gn</i>) capability.  Generic entries are detected by <b>setupterm</b>
+       (see curs_terminfo(3X)) and cannot be used for full-screen operation.
+       Other implementations may handle a missing/empty TERM variable
+       differently.
+
+   <b>Signal Handlers</b>
+       Quoting from X/Open Curses, section 3.1.1:
+
+            <i>Curses implementations may provide for special handling of the</i>
+            <b>SIGINT</b><i>,</i> <b>SIGQUIT </b><i>and</i> <b>SIGTSTP </b><i>signals if their disposition is</i>
+            <b>SIG_DFL </b><i>at the time</i> <b>initscr </b><i>is called</i> <b>...</b>
+
+            <i>Any special handling for these signals may remain in effect for</i>
+            <i>the life of the process or until the process changes the</i>
+            <i>disposition of the signal.</i>
+
+            <i>None of the Curses functions are required to be safe with</i>
+            <i>respect to signals</i> ...
+
+       This implementation establishes signal handlers during
+       initialization, e.g., <b>initscr </b>or <b>newterm</b>.  Applications which must
+       handle these signals should set up the corresponding handlers <i>after</i>
+       initializing the library:
+
+       <b>SIGINT</b>
+            The handler <i>attempts</i> to cleanup the screen on exit.  Although it
+            <i>usually</i> works as expected, there are limitations:
+
+            ·   Walking the <b>SCREEN </b>list is unsafe, since all list management
+                is done without any signal blocking.
+
+            ·   On systems which have <b>REENTRANT </b>turned on, <b>set_term </b>uses
+                functions which could deadlock or misbehave in other ways.
+
+            ·   <b>endwin </b>calls other functions, many of which use stdio or
+                other library functions which are clearly unsafe.
+
+       <b>SIGTERM</b>
+            This uses the same handler as <b>SIGINT</b>, with the same limitations.
+            It is not mentioned in X/Open Curses, but is more suitable for
+            this purpose than <b>SIGQUIT </b>(which is used in debugging).
+
+       <b>SIGTSTP</b>
+            This handles the <i>stop</i> signal, used in job control.  When
+            resuming the process, this implementation discards pending input
+            with <b>flushinput </b>(see curs_util(3X)), and repaints the screen
+            assuming that it has been completely altered.  It also updates
+            the saved terminal modes with <b>def_shell_mode </b>(see
+            curs_kernel(3X)).
+
+       <b>SIGWINCH</b>
+            This handles the window-size changes which were ignored in the
+            standardization efforts.  The handler sets a (signal-safe)
+            variable which is later tested in <b>wgetch </b>(see curs_getch(3X)).
+            If <b>keypad </b>has been enabled for the corresponding window, <b>wgetch</b>
+            returns the key symbol <b>KEY_RESIZE</b>.  At the same time, <b>wgetch</b>
+            calls <b>resizeterm </b>to adjust the standard screen <b>stdscr</b>, and
+            update other data such as <b>LINES </b>and <b>COLS</b>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>curses</b>(3X), <b>curs_kernel</b>(3X), <b>curs_refresh</b>(3X), <b>curs_slk</b>(3X),
+       <b>curs_terminfo</b>(3X), <b>curs_util</b>(3X), <b>curs_variables</b>(3X).
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>ncurses</i> (new curses) project.  Information
+       about the project can be found at 
+       ⟨<a href="https://www.gnu.org/software/ncurses/ncurses.html">https://www.gnu.org/software/ncurses/ncurses.html</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       bug-ncurses-request@gnu.org.  This page was obtained from the
+       project's upstream Git mirror of the CVS repository 
+       ⟨git://ncurses.scripts.mit.edu/ncurses.git⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                                            curs_initscr(3X)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

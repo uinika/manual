@@ -1,0 +1,366 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.generator(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#WRITING_GENERATORS">WRITING&nbsp;GENERATORS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.GENERATOR(7)          systemd.generator         SYSTEMD.GENERATOR(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.generator - Systemd unit generators
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>/path/to/generator </b><i>normal-dir early-dir late-dir</i>
+
+       /run/systemd/system-generators/*
+       /etc/systemd/system-generators/*
+       /usr/local/lib/systemd/system-generators/*
+       /usr/lib/systemd/system-generators/*
+
+       /run/systemd/user-generators/*
+       /etc/systemd/user-generators/*
+       /usr/local/lib/systemd/user-generators/*
+       /usr/lib/systemd/user-generators/*
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Generators are small binaries that live in
+       /usr/lib/systemd/user-generators/ and other directories listed above.
+       <a href="../man1/systemd.1.html">systemd(1)</a> will execute those binaries very early at bootup and at
+       configuration reload time — before unit files are loaded. Generators
+       can dynamically generate unit files or create symbolic links to unit
+       files to add additional dependencies, thus extending or overriding
+       existing definitions. Their main purpose is to convert configuration
+       files that are not native unit files dynamically into native unit
+       files.
+
+       Generators are loaded from a set of paths determined during
+       compilation, as listed above. System and user generators are loaded
+       from directories with names ending in system-generators/ and
+       user-generators/, respectively. Generators found in directories
+       listed earlier override the ones with the same name in directories
+       lower in the list. A symlink to /dev/null or an empty file can be
+       used to mask a generator, thereby preventing it from running. Please
+       note that the order of the two directories with the highest priority
+       is reversed with respect to the unit load path, and generators in
+       /run overwrite those in /etc.
+
+       After installing new generators or updating the configuration,
+       <b>systemctl daemon-reload </b>may be executed. This will delete the
+       previous configuration created by generators, re-run all generators,
+       and cause <b>systemd </b>to reload units from disk. See <a href="../man1/systemctl.1.html">systemctl(1)</a> for
+       more information.
+</pre>
+<h2><a id="WRITING_GENERATORS" href="#WRITING_GENERATORS"></a>WRITING GENERATORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Generators are invoked with three arguments: paths to runtime
+       directories where generators can place their generated unit files or
+       symlinks.
+
+        1. <i>normal-dir</i>
+
+           argv[1] may be used to override unit files in /usr, but not those
+           in /etc. This means that unit files placed in this directory take
+           precedence over vendor unit configuration but not over native
+           user/administrator unit configuration.
+
+        2. <i>early-dir</i>
+
+           argv[2] may be used to override unit files in /usr and in /etc.
+           This means that unit files placed in this directory take
+           precedence over all configuration, both vendor and
+           user/administrator.
+
+        3. <i>late-dir</i>
+
+           argv[3] may be used to extend the unit file tree without
+           overriding any other unit files. Any native configuration files
+           supplied by the vendor or user/administrator take precedence over
+           the generated ones placed in this directory.
+
+   <b>Notes</b>
+       ·   All generators are executed in parallel. That means all
+           executables are started at the very same time and need to be able
+           to cope with this parallelism.
+
+       ·   Generators are run very early at boot and cannot rely on any
+           external services. They may not talk to any other process. That
+           includes simple things such as logging to <a href="../man3/syslog.3.html">syslog(3)</a>, or <b>systemd</b>
+           itself (this means: no <a href="../man1/systemctl.1.html">systemctl(1)</a>)! Non-essential file systems
+           like /var and /home are mounted after generators have run.
+           Generators can however rely on the most basic kernel
+           functionality to be available, including a mounted /sys, /proc,
+           /dev, /usr.
+
+       ·   Units written by generators are removed when the configuration is
+           reloaded. That means the lifetime of the generated units is
+           closely bound to the reload cycles of <b>systemd </b>itself.
+
+       ·   Generators should only be used to generate unit files, not any
+           other kind of configuration. Due to the lifecycle logic mentioned
+           above, generators are not a good fit to generate dynamic
+           configuration for other services. If you need to generate dynamic
+           configuration for other services, do so in normal services you
+           order before the service in question.
+
+       ·   Since <a href="../man3/syslog.3.html">syslog(3)</a> is not available (see above), log messages have
+           to be written to /dev/kmsg instead.
+
+       ·   It is a good idea to use the <i>SourcePath=</i> directive in generated
+           unit files to specify the source configuration file you are
+           generating the unit from. This makes things more easily
+           understood by the user and also has the benefit that systemd can
+           warn the user about configuration files that changed on disk but
+           have not been read yet by systemd.
+
+       ·   Generators may write out dynamic unit files or just hook unit
+           files into other units with the usual .wants/ or .requires/
+           symlinks. Often, it is nicer to simply instantiate a template
+           unit file from /usr with a generator instead of writing out
+           entirely dynamic unit files. Of course, this works only if a
+           single parameter is to be used.
+
+       ·   If you are careful, you can implement generators in shell
+           scripts. We do recommend C code however, since generators are
+           executed synchronously and hence delay the entire boot if they
+           are slow.
+
+       ·   Regarding overriding semantics: there are two rules we try to
+           follow when thinking about the overriding semantics:
+
+            1. User configuration should override vendor configuration. This
+               (mostly) means that stuff from /etc should override stuff
+               from /usr.
+
+            2. Native configuration should override non-native
+               configuration. This (mostly) means that stuff you generate
+               should never override native unit files for the same purpose.
+
+           Of these two rules the first rule is probably the more important
+           one and breaks the second one sometimes. Hence, when deciding
+           whether to user argv[1], argv[2], or argv[3], your default choice
+           should probably be argv[1].
+
+       ·   Instead of heading off now and writing all kind of generators for
+           legacy configuration file formats, please think twice! It is
+           often a better idea to just deprecate old stuff instead of
+           keeping it artificially alive.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Example 1. systemd-fstab-generator</b>
+
+       <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a> converts /etc/fstab into native mount
+       units. It uses argv[1] as location to place the generated unit files
+       in order to allow the user to override /etc/fstab with her own native
+       unit files, but also to ensure that /etc/fstab overrides any vendor
+       default from /usr.
+
+       After editing /etc/fstab, the user should invoke <b>systemctl</b>
+       <b>daemon-reload</b>. This will re-run all generators and cause <b>systemd </b>to
+       reload units from disk. To actually mount new directories added to
+       fstab, <b>systemctl start </b><i>/path/to/mountpoint</i> or <b>systemctl start</b>
+       <b>local-fs.target </b>may be used.
+
+       <b>Example 2. systemd-system-update-generator</b>
+
+       <a href="../man8/systemd-system-update-generator.8.html">systemd-system-update-generator(8)</a> temporarily redirects
+       default.target to system-update.target, if a system update is
+       scheduled. Since this needs to override the default user
+       configuration for default.target, it uses argv[2]. For details about
+       this logic, see <a href="systemd.offline-updates.7.html">systemd.offline-updates(7)</a>.
+
+       <b>Example 3. Debugging a generator</b>
+
+           dir=$(mktemp -d)
+           SYSTEMD_LOG_LEVEL=debug /usr/lib/systemd/system-generators/systemd-fstab-generator \
+                   "$dir" "$dir" "$dir"
+           find $dir
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <b>systemd-cryptsetup-generator</b>(8),
+       <a href="../man8/systemd-debug-generator.8.html">systemd-debug-generator(8)</a>, <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a>, <a href="../man5/fstab.5.html">fstab(5)</a>,
+       <a href="../man8/systemd-getty-generator.8.html">systemd-getty-generator(8)</a>, <a href="../man8/systemd-gpt-auto-generator.8.html">systemd-gpt-auto-generator(8)</a>,
+       <a href="../man8/systemd-hibernate-resume-generator.8.html">systemd-hibernate-resume-generator(8)</a>,
+       <a href="../man8/systemd-system-update-generator.8.html">systemd-system-update-generator(8)</a>, <a href="../man8/systemd-sysv-generator.8.html">systemd-sysv-generator(8)</a>,
+       <a href="../man5/systemd.unit.5.html">systemd.unit(5)</a>, <a href="../man1/systemctl.1.html">systemctl(1)</a>, <a href="systemd.environment-generator.7.html">systemd.environment-generator(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                             SYSTEMD.GENERATOR(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemctl.1.html">systemctl(1)</a>,&nbsp; 
+    <a href="../man1/systemd.1.html">systemd(1)</a>,&nbsp; 
+    <a href="../man5/systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="systemd.environment-generator.7.html">systemd.environment-generator(7)</a>,&nbsp; 
+    <a href="systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="systemd.offline-updates.7.html">systemd.offline-updates(7)</a>,&nbsp; 
+    <a href="../man8/systemd-debug-generator.8.html">systemd-debug-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-environment-d-generator.8.html">systemd-environment-d-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-getty-generator.8.html">systemd-getty-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-gpt-auto-generator.8.html">systemd-gpt-auto-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-system-update-generator.8.html">systemd-system-update-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-sysv-generator.8.html">systemd-sysv-generator(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

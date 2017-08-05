@@ -1,0 +1,319 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>xattr(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">XATTR(7)                  Linux Programmer's Manual                 XATTR(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       xattr - Extended attributes
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Extended attributes are name:value pairs associated permanently with
+       files and directories, similar to the environment strings associated
+       with a process.  An attribute may be defined or undefined.  If it is
+       defined, its value may be empty or non-empty.
+
+       Extended attributes are extensions to the normal attributes which are
+       associated with all inodes in the system (i.e., the <a href="../man2/stat.2.html">stat(2)</a> data).
+       They are often used to provide additional functionality to a
+       filesystem—for example, additional security features such as Access
+       Control Lists (ACLs) may be implemented using extended attributes.
+
+       Users with search access to a file or directory may use <a href="../man2/listxattr.2.html">listxattr(2)</a>
+       to retrieve a list of attribute names defined for that file or
+       directory.
+
+       Extended attributes are accessed as atomic objects.  Reading
+       (<a href="../man2/getxattr.2.html">getxattr(2)</a>) retrieves the whole value of an attribute and stores it
+       in a buffer.  Writing (<a href="../man2/setxattr.2.html">setxattr(2)</a>) replaces any previous value with
+       the new value.
+
+       Space consumed for extended attributes may be counted towards the
+       disk quotas of the file owner and file group.
+
+   <b>Extended attribute namespaces</b>
+       Attribute names are null-terminated strings.  The attribute name is
+       always specified in the fully qualified <i>namespace.attribute</i> form, for
+       example, <i>user.mime_type</i>, <i>trusted.md5sum</i>, <i>system.posix_acl_access</i>, or
+       <i>security.selinux</i>.
+
+       The namespace mechanism is used to define different classes of
+       extended attributes.  These different classes exist for several
+       reasons; for example, the permissions and capabilities required for
+       manipulating extended attributes of one namespace may differ to
+       another.
+
+       Currently, the <i>security</i>, <i>system</i>, <i>trusted</i>, and <i>user</i> extended attribute
+       classes are defined as described below.  Additional classes may be
+       added in the future.
+
+   <b>Extended security attributes</b>
+       The security attribute namespace is used by kernel security modules,
+       such as Security Enhanced Linux, and also to implement file
+       capabilities (see <a href="capabilities.7.html">capabilities(7)</a>).  Read and write access
+       permissions to security attributes depend on the policy implemented
+       for each security attribute by the security module.  When no security
+       module is loaded, all processes have read access to extended security
+       attributes, and write access is limited to processes that have the
+       <b>CAP_SYS_ADMIN </b>capability.
+
+   <b>Extended system attributes</b>
+       Extended system attributes are used by the kernel to store system
+       objects such as Access Control Lists.  Read and write access
+       permissions to system attributes depend on the policy implemented for
+       each system attribute implemented by filesystems in the kernel.
+
+   <b>Trusted extended attributes</b>
+       Trusted extended attributes are visible and accessible only to
+       processes that have the <b>CAP_SYS_ADMIN </b>capability.  Attributes in this
+       class are used to implement mechanisms in user space (i.e., outside
+       the kernel) which keep information in extended attributes to which
+       ordinary processes should not have access.
+
+   <b>Extended user attributes</b>
+       Extended user attributes may be assigned to files and directories for
+       storing arbitrary additional information such as the mime type,
+       character set or encoding of a file.  The access permissions for user
+       attributes are defined by the file permission bits: read permission
+       is required to retrieve the attribute value, and writer permission is
+       required to change it.
+
+       The file permission bits of regular files and directories are
+       interpreted differently from the file permission bits of special
+       files and symbolic links.  For regular files and directories the file
+       permission bits define access to the file's contents, while for
+       device special files they define access to the device described by
+       the special file.  The file permissions of symbolic links are not
+       used in access checks.  These differences would allow users to
+       consume filesystem resources in a way not controllable by disk quotas
+       for group or world writable special files and directories.
+
+       For this reason, extended user attributes are allowed only for
+       regular files and directories, and access to extended user attributes
+       is restricted to the owner and to users with appropriate capabilities
+       for directories with the sticky bit set (see the <a href="../man1/chmod.1.html">chmod(1)</a> manual page
+       for an explanation of the sticky bit).
+
+   <b>Filesystem differences</b>
+       The kernel and the filesystem may place limits on the maximum number
+       and size of extended attributes that can be associated with a file.
+       The VFS imposes limitations that an attribute names is limited to 255
+       bytes and an attribute value is limited to 64 kB.  The list of
+       attribute names that can be returned is also limited to 64 kB (see
+       BUGS in <a href="../man2/listxattr.2.html">listxattr(2)</a>).
+
+       Some filesystems, such as Reiserfs (and, historically, ext2 and
+       ext3), require the filesystem to be mounted with the <b>user_xattr </b>mount
+       option in order for extended user attributes to be used.
+
+       In the current ext2, ext3, and ext4 filesystem implementations, the
+       total bytes used by the names and values of all of a file's extended
+       attributes must fit in a single filesystem block (1024, 2048 or 4096
+       bytes, depending on the block size specified when the filesystem was
+       created).
+
+       In the Btrfs, XFS, and Reiserfs filesystem implementations, there is
+       no practical limit on the number of extended attributes associated
+       with a file, and the algorithms used to store extended attribute
+       information on disk are scalable.
+
+       In the JFS, XFS, and Reiserfs filesystem implementations, the limit
+       on bytes used in an EA value is the ceiling imposed by the VFS.
+
+       In the Btrfs filesystem implementation, the total bytes used for the
+       name, value, and implementation overhead bytes is limited to the
+       filesystem <i>nodesize</i> value (16 kB by default).
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Extended attributes are not specified in POSIX.1, but some other
+       systems (e.g., the BSDs and Solaris) provide a similar feature.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Since the filesystems on which extended attributes are stored might
+       also be used on architectures with a different byte order and machine
+       word size, care should be taken to store attribute values in an
+       architecture-independent format.
+
+       This page was formerly named <a href="../man5/attr.5.html">attr(5)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/getfattr.1.html">getfattr(1)</a>, <a href="../man1/setfattr.1.html">setfattr(1)</a>, <a href="../man2/getxattr.2.html">getxattr(2)</a>, <a href="../man2/ioctl_iflags.2.html">ioctl_iflags(2)</a>, <a href="../man2/listxattr.2.html">listxattr(2)</a>,
+       <a href="../man2/removexattr.2.html">removexattr(2)</a>, <a href="../man2/setxattr.2.html">setxattr(2)</a>, <a href="../man5/acl.5.html">acl(5)</a>, <a href="capabilities.7.html">capabilities(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                         XATTR(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/chacl.1.html">chacl(1)</a>,&nbsp; 
+    <a href="../man1/getfattr.1.html">getfattr(1)</a>,&nbsp; 
+    <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a>,&nbsp; 
+    <a href="../man2/getxattr.2.html">getxattr(2)</a>,&nbsp; 
+    <a href="../man2/ioctl_iflags.2.html">ioctl_iflags(2)</a>,&nbsp; 
+    <a href="../man2/listxattr.2.html">listxattr(2)</a>,&nbsp; 
+    <a href="../man2/removexattr.2.html">removexattr(2)</a>,&nbsp; 
+    <a href="../man2/setxattr.2.html">setxattr(2)</a>,&nbsp; 
+    <a href="../man3/selinux_restorecon.3.html">selinux_restorecon(3)</a>,&nbsp; 
+    <a href="../man5/ext4.5.html">ext4(5)</a>,&nbsp; 
+    <a href="../man5/tmpfiles.d.5.html">tmpfiles.d(5)</a>,&nbsp; 
+    <a href="../man5/tmpfs.5.html">tmpfs(5)</a>,&nbsp; 
+    <a href="capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="xattr.7.html">xattr(7)</a>,&nbsp; 
+    <a href="../man8/mount.8.html">mount(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="xattr.7.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

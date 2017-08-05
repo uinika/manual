@@ -1,0 +1,281 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sandbox(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SANDBOX(8)                      User Commands                     SANDBOX(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sandbox - Run cmd under an SELinux sandbox
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sandbox </b>[-C] [-s] [ -d DPI ] [-l level ] [[-M | -X]  -H homedir -T
+       tempdir ] [-I includefile ] [ -W windowmanager ] [ -w windowsize ]
+       [[-i file ]...] [ -t type ] cmd
+
+       <b>sandbox </b>[-C] [-s] [ -d DPI ] [-l level ] [[-M | -X]  -H homedir -T
+       tempdir ] [-I includefile ] [ -W windowmanager ] [ -w windowsize ]
+       [[-i file ]...] [ -t type ] -S
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Run the <i>cmd</i> application within a tightly confined SELinux domain.
+       The default sandbox domain only allows applications the ability to
+       read and write stdin, stdout and any other file descriptors handed to
+       it. It is not allowed to open any other files.  The -M option will
+       mount an alternate homedir and tmpdir to be used by the sandbox.
+
+       If you have the <i>policycoreutils-sandbox</i> package installed, you can
+       use the -X option and the -M option.  <b>sandbox -X </b>allows you to run X
+       applications within a sandbox.  These applications will start up
+       their own X Server and create a temporary home directory and /tmp.
+       The default SELinux policy does not allow any capabilities or network
+       access.  It also prevents all access to the users other processes and
+       files.  Files specified on the command that are in the home directory
+       or /tmp will be copied into the sandbox directories.
+
+       If directories are specified with -H or -T the directory will have
+       its context modified with chcon(1) unless a level is specified with
+       -l.  If the MLS/MCS security level is specified, the user is
+       responsible to set the correct labels.
+
+       <b>-h --help</b>
+              display usage message
+
+       <b>-H --homedir</b>
+              Use alternate homedir to mount over your home directory.
+              Defaults to temporary. Requires -X or -M.
+
+       <b>-i --include</b>
+              Copy this file into the appropriate temporary sandbox
+              directory. Command can be repeated.
+
+       <b>-I --includefile</b>
+              Copy all files listed in inputfile into the appropriate
+              temporary sandbox directories.
+
+       <b>-l --level</b>
+              Specify the MLS/MCS Security Level to run the sandbox with.
+              Defaults to random.
+
+       <b>-M --mount</b>
+              Create a Sandbox with temporary files for $HOME and /tmp.
+
+       <b>-s --shred</b>
+              Shred temporary files created in $HOME and /tmp, before
+              deleting.
+
+       <b>-t --type</b>
+              Use alternate sandbox type, defaults to sandbox_t or
+              sandbox_x_t for -X.
+
+              <b>Examples:</b>
+              sandbox_t -    No X, No Network Access, No Open, read/write on
+              passed in file descriptors.
+              sandbox_min_t  -    No Network Access
+              sandbox_x_t    -    Ports for X applications to run locally
+              sandbox_web_t  -    Ports required for web browsing
+              sandbox_net_t  -         Network ports (for server software)
+              sandbox_net_client_t     -    All network ports
+
+       <b>-T --tmpdir</b>
+              Use alternate temporary directory to mount on /tmp.  Defaults
+              to tmpfs. Requires -X or -M.
+
+       <b>-S --session</b>
+              Run a full desktop session, Requires level, and home and
+              tmpdir.
+
+       <b>-w --windowsize</b>
+
+              Specifies the windowsize when creating an X based Sandbox. The
+              default windowsize is 1000x700.
+
+       <b>-W --windowmanager</b>
+              Select alternative window manager to run within <b>sandbox -X.</b>
+              Default to /usr/bin/openbox.
+
+       <b>-X     </b>Create an X based Sandbox for gui apps, temporary files for
+              $HOME and /tmp, secondary Xserver, defaults to sandbox_x_t
+
+       <b>-d --dpi</b>
+              Set the DPI value for the sandbox X Server. Defaults to the
+              current X Sever DPI.
+
+       <b>-C --capabilities </b>Use capabilities within the
+              sandbox. By default applications executed within the sandbox
+              will not be allowed to use capabilities (setuid apps), with
+              the -C flag, you can use programs requiring capabilities.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       runcon(1), seunshare(8), selinux(8)
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page was written by <i>Dan Walsh &lt;dwalsh@redhat.com&gt;</i> and
+       <i>Thomas Liu &lt;tliu@fedoraproject.org&gt;</i>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">sandbox                           May 2010                        SANDBOX(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

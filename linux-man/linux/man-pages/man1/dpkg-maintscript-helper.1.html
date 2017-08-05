@@ -1,0 +1,400 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dpkg-maintscript-helper(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#COMMANDS_AND_PARAMETERS">COMMANDS&nbsp;AND&nbsp;PARAMETERS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#COMMON_PARAMETERS">COMMON&nbsp;PARAMETERS</a> | <a href="#CONFFILE_RELATED_TASKS">CONFFILE&nbsp;RELATED&nbsp;TASKS</a> | <a href="#SYMLINK_AND_DIRECTORY_SWITCHES">SYMLINK&nbsp;AND&nbsp;DIRECTORY&nbsp;SWITCHES</a> | <a href="#INTEGRATION_IN_PACKAGES">INTEGRATION&nbsp;IN&nbsp;PACKAGES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">dpkg-maintscript-helper(1)       dpkg suite       dpkg-maintscript-helper(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dpkg-maintscript-helper  -  works  around  known  dpkg limitations in
+       maintainer scripts
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dpkg-maintscript-helper </b><i>command</i> [<i>parameter</i>...] <b>-- </b><i>maint-script-</i>
+       <i>parameter</i>...
+</pre>
+<h2><a id="COMMANDS_AND_PARAMETERS" href="#COMMANDS_AND_PARAMETERS"></a>COMMANDS AND PARAMETERS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>supports </b><i>command</i>
+
+       <b>rm_conffile </b><i>conffile</i> [<i>prior-version</i> [<i>package</i>]]
+
+       <b>mv_conffile </b><i>old-conffile new-conffile</i> [<i>prior-version</i> [<i>package</i>]]
+
+       <b>symlink_to_dir </b><i>pathname old-target</i> [<i>prior-version</i> [<i>package</i>]]
+
+       <b>dir_to_symlink </b><i>pathname new-target</i> [<i>prior-version</i> [<i>package</i>]]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This program is designed to be run within maintainer scripts to
+       achieve some tasks that <b>dpkg </b>can't (yet) handle natively either
+       because of design decisions or due to current limitations.
+
+       Many of those tasks require coordinated actions from several
+       maintainer scripts (<b>preinst</b>, <b>postinst</b>, <b>prerm</b>, <b>postrm</b>). To avoid
+       mistakes the same call simply needs to be put in all scripts and the
+       program will automatically adapt its behaviour based on the
+       environment variable <b>DPKG_MAINTSCRIPT_NAME </b>and on the maintainer
+       scripts arguments that you have to forward after a double hyphen.
+</pre>
+<h2><a id="COMMON_PARAMETERS" href="#COMMON_PARAMETERS"></a>COMMON PARAMETERS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>prior-version</i>
+              Defines the latest version of the package whose upgrade should
+              trigger the operation. It is important to calculate <i>prior-</i>
+              <i>version</i> correctly so that the operations are correctly
+              performed even if the user rebuilt the package with a local
+              version. If <i>prior-version</i> is empty or omitted, then the
+              operation is tried on every upgrade (note: it's safer to give
+              the version and have the operation tried only once).
+
+              If the conffile has not been shipped for several versions, and
+              you are now modifying the maintainer scripts to clean up the
+              obsolete file, <i>prior-version</i> should be based on the version of
+              the package that you are now preparing, not the first version
+              of the package that lacked the conffile. This applies to all
+              other actions in the same way.
+
+              For example, for a conffile removed in version <b>2.0-1 </b>of a
+              package, <i>prior-version</i> should be set to <b>2.0-1~</b>. This will
+              cause the conffile to be removed even if the user rebuilt the
+              previous version <b>1.0-1 </b>as <b>1.0-1local1</b>. Or a package switching
+              a path from a symlink (shipped in version <b>1.0-1</b>) to a
+              directory (shipped in version <b>2.0-1</b>), but only performing the
+              actual switch in the maintainer scripts in version <b>3.0-1</b>,
+              should set <i>prior-version</i> to <b>3.0-1~</b>.
+
+       <i>package</i>
+              The package name. When the package is “Multi-Arch: same” this
+              parameter must include the architecture qualifier, otherwise
+              it should <b>not </b>usually include the architecture qualifier (as
+              it would disallow cross-grades, or switching from being
+              architecture specific to architecture <b>all </b>or vice versa).  If
+              the parameter is empty or omitted, the
+              <b>DPKG_MAINTSCRIPT_PACKAGE </b>and <b>DPKG_MAINTSCRIPT_ARCH </b>environment
+              variables (as set by <b>dpkg</b>) will be used to generate an arch-
+              qualified package name.
+
+       <b>--     </b>All the parameters of the maintainer scripts have to be
+              forwarded to the program after <b>--</b>.
+</pre>
+<h2><a id="CONFFILE_RELATED_TASKS" href="#CONFFILE_RELATED_TASKS"></a>CONFFILE RELATED TASKS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When upgrading a package, <b>dpkg </b>will not automatically remove a
+       conffile (a configuration file for which <b>dpkg </b>should preserve user
+       changes) if it is not present in the newer version. There are two
+       principal reasons for this; the first is that the conffile could've
+       been dropped by accident and the next version could restore it, users
+       wouldn't want their changes thrown away. The second is to allow
+       packages to transition files from a dpkg-maintained conffile to a
+       file maintained by the package's maintainer scripts, usually with a
+       tool like debconf or ucf.
+
+       This means that if a package is intended to rename or remove a
+       conffile, it must explicitly do so and <b>dpkg-maintscript-helper </b>can be
+       used to implement graceful deletion and moving of conffiles within
+       maintainer scripts.
+
+   <b>Removing a conffile</b>
+       If a conffile is completely removed, it should be removed from disk,
+       unless the user has modified it. If there are local modifications,
+       they should be preserved. If the package upgrades aborts, the newly
+       obsolete conffile should not disappear.
+
+       All of this is implemented by putting the following shell snippet in
+       the <b>preinst</b>, <b>postinst </b>and <b>postrm </b>maintainer scripts:
+
+           dpkg-maintscript-helper rm_conffile \
+               <i>conffile prior-version package</i> -- "$@"
+
+       <i>conffile</i> is the filename of the conffile to remove.
+
+       Current implementation: in the <b>preinst</b>, it checks if the conffile was
+       modified and renames it either to <i>conffile</i><b>.dpkg-remove </b>(if not
+       modified) or to <i>conffile</i><b>.dpkg-backup </b>(if modified). In the <b>postinst</b>,
+       the latter file is renamed to <i>conffile</i><b>.dpkg-bak </b>and kept for
+       reference as it contains user modifications but the former will be
+       removed. If the package upgrade aborts, the <b>postrm </b>reinstalls the
+       original conffile. During purge, the <b>postrm </b>will also delete the
+       <b>.dpkg-bak </b>file kept up to now.
+
+   <b>Renaming a conffile</b>
+       If a conffile is moved from one location to another, you need to make
+       sure you move across any changes the user has made. This may seem a
+       simple change to the <b>preinst </b>script at first, however that will
+       result in the user being prompted by <b>dpkg </b>to approve the conffile
+       edits even though they are not responsible of them.
+
+       Graceful renaming can be implemented by putting the following shell
+       snippet in the <b>preinst</b>, <b>postinst </b>and <b>postrm </b>maintainer scripts:
+
+           dpkg-maintscript-helper mv_conffile \
+               <i>old-conffile new-conffile prior-version package</i> -- "$@"
+
+       <i>old-conffile</i> and <i>new-conffile</i> are the old and new name of the
+       conffile to rename.
+
+       Current implementation: the <b>preinst </b>checks if the conffile has been
+       modified, if yes it's left on place otherwise it's renamed to <i>old-</i>
+       <i>conffile</i><b>.dpkg-remove</b>. On configuration, the <b>postinst </b>removes <i>old-</i>
+       <i>conffile</i><b>.dpkg-remove </b>and renames <i>old-conffile</i> to <i>new-conffile</i> if <i>old-</i>
+       <i>conffile</i> is still available. On abort-upgrade/abort-install, the
+       <b>postrm </b>renames <i>old-conffile</i><b>.dpkg-remove </b>back to <i>old-conffile</i> if
+       required.
+</pre>
+<h2><a id="SYMLINK_AND_DIRECTORY_SWITCHES" href="#SYMLINK_AND_DIRECTORY_SWITCHES"></a>SYMLINK AND DIRECTORY SWITCHES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When upgrading a package, <b>dpkg </b>will not automatically switch a
+       symlink to a directory or vice-versa. Downgrades are not supported
+       and the path will be left as is.
+
+   <b>Switching a symlink to directory</b>
+       If a symlink is switched to a real directory, you need to make sure
+       before unpacking that the symlink is removed. This may seem a simple
+       change to the <b>preinst </b>script at first, however that will result in
+       some problems in case of admin local customization of the symlink or
+       when downgrading the package.
+
+       Graceful renaming can be implemented by putting the following shell
+       snippet in the <b>preinst</b>, <b>postinst </b>and <b>postrm </b>maintainer scripts:
+
+           dpkg-maintscript-helper symlink_to_dir \
+               <i>pathname old-target prior-version package</i> -- "$@"
+
+       <i>pathname</i> is the absolute name of the old symlink (the path will be a
+       directory at the end of the installation) and <i>old-target</i> is the
+       target name of the former symlink at <i>pathname</i>. It can either be
+       absolute or relative to the directory containing <i>pathname</i>.
+
+       Current implementation: the <b>preinst </b>checks if the symlink exists and
+       points to <i>old-target</i>, if not then it's left in place, otherwise it's
+       renamed to <i>pathname</i><b>.dpkg-backup</b>. On configuration, the <b>postinst</b>
+       removes <i>pathname</i><b>.dpkg-backup </b>if <i>pathname</i><b>.dpkg-backup </b>is still a
+       symlink. On abort-upgrade/abort-install, the <b>postrm </b>renames
+       <i>pathname</i><b>.dpkg-backup </b>back to <i>pathname</i> if required.
+
+   <b>Switching a directory to symlink</b>
+       If a real directory is switched to a symlink, you need to make sure
+       before unpacking that the directory is removed. This may seem a
+       simple change to the <b>preinst </b>script at first, however that will
+       result in some problems in case the directory contains conffiles,
+       pathnames owned by other packages, locally created pathnames, or when
+       downgrading the package.
+
+       Graceful switching can be implemented by putting the following shell
+       snippet in the <b>preinst</b>, <b>postinst </b>and <b>postrm </b>maintainer scripts:
+
+           dpkg-maintscript-helper dir_to_symlink \
+               <i>pathname new-target prior-version package</i> -- "$@"
+
+       <i>pathname</i> is the absolute name of the old directory (the path will be
+       a symlink at the end of the installation) and <i>new-target</i> is the
+       target of the new symlink at <i>pathname</i>. It can either be absolute or
+       relative to the directory containing <i>pathname</i>.
+
+       Current implementation: the <b>preinst </b>checks if the directory exists,
+       does not contain conffiles, pathnames owned by other packages, or
+       locally created pathnames, if not then it's left in place, otherwise
+       it's renamed to <i>pathname</i><b>.dpkg-backup</b>, and an empty staging directory
+       named <i>pathname</i> is created, marked with a file so that dpkg can track
+       it. On configuration, the <b>postinst </b>finishes the switch if
+       <i>pathname</i><b>.dpkg-backup </b>is still a directory and <i>pathname</i> is the staging
+       directory; it removes the staging directory mark file, moves the
+       newly created files inside the staging directory to the symlink
+       target <i>new-target</i>/, replaces the now empty staging directory <i>pathname</i>
+       with a symlink to <i>new-target</i>, and removes <i>pathname</i><b>.dpkg-backup</b>. On
+       abort-upgrade/abort-install, the <b>postrm </b>renames <i>pathname</i><b>.dpkg-backup</b>
+       back to <i>pathname</i> if required.
+</pre>
+<h2><a id="INTEGRATION_IN_PACKAGES" href="#INTEGRATION_IN_PACKAGES"></a>INTEGRATION IN PACKAGES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When using a packaging helper, please check if it has native <b>dpkg-</b>
+       <b>maintscript-helper </b>integration, which might make your life easier.
+       See for example <b>dh_installdeb</b>(1).
+
+       Given that <b>dpkg-maintscript-helper </b>is used in the <b>preinst</b>, using it
+       unconditionally requires a pre-dependency to ensure that the required
+       version of <b>dpkg </b>has been unpacked before. The required version
+       depends on the command used, for <b>rm_conffile </b>and <b>mv_conffile </b>it is
+       1.15.7.2, for <b>symlink_to_dir </b>and <b>dir_to_symlink </b>it is 1.17.14:
+
+           <b>Pre-Depends: </b>dpkg (&gt;= 1.17.14)
+
+       But in many cases the operation done by the program is not critical
+       for the package, and instead of using a pre-dependency we can call
+       the program only if we know that the required command is supported by
+       the currently installed <b>dpkg</b>:
+
+           if dpkg-maintscript-helper supports <i>command</i>; then
+               dpkg-maintscript-helper <i>command</i> ...
+           fi
+
+       The command <b>supports </b>will return 0 on success, 1 otherwise. The
+       <b>supports </b>command will check if the environment variables as set by
+       dpkg and required by the script are present, and will consider it a
+       failure in case the environment is not sufficient.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dh_installdeb</b>(1).
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01       dpkg-maintscript-helper(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

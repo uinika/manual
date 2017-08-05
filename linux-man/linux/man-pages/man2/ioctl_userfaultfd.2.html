@@ -1,0 +1,524 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ioctl_userfaultfd(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">IOCTL_USERFAULTFD(2)      Linux Programmer's Manual     IOCTL_USERFAULTFD(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       userfaultfd  -  create  a file descriptor for handling page faults in
+       user space
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/ioctl.h&gt;</b>
+
+       <b>int ioctl(int </b><i>fd</i><b>, int </b><i>cmd</i><b>, ...);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Various <a href="ioctl.2.html">ioctl(2)</a> operations can be performed on a userfaultfd object
+       (created by a call to <a href="userfaultfd.2.html">userfaultfd(2)</a>) using calls of the form:
+
+           ioctl(fd, cmd, argp);
+
+       In the above, <i>fd</i> is a file descriptor referring to a userfaultfd
+       object, <i>cmd</i> is one of the commands listed below, and <i>argp</i> is a
+       pointer to a data structure that is specific to <i>cmd</i>.
+
+       The various <a href="ioctl.2.html">ioctl(2)</a> operations are described below.  The <b>UFFDIO_API,</b>
+       <b>UFFDIO_REGISTER</b>, and <b>UFFDIO_UNREGISTER </b>operations are used to
+       <i>configure</i> userfaultfd behavior.  These operations allow the caller to
+       choose what features will be enabled and what kinds of events will be
+       delivered to the application.  The remaining operations are <i>range</i>
+       operations.  These operations enable the calling application to
+       resolve page-fault events.
+
+   <b>UFFDIO_API</b>
+       (Since Linux 4.3.)  Enable operation of the userfaultfd and perform
+       API handshake.
+
+       The <i>argp</i> argument is a pointer to a <i>uffdio_api</i> structure, defined as:
+
+           struct uffdio_api {
+               __u64 api;        /* Requested API version (input) */
+               __u64 features;   /* Currently must be zero (input) */
+               __u64 ioctls;     /* Available ioctl() operations (output) */
+           };
+
+       The <i>api</i> field denotes the API version requested by the application.
+
+       The kernel verifies that it can support the requested API version,
+       and sets the <i>features</i> and <i>ioctls</i> fields to bit masks representing all
+       the available features and the generic <a href="ioctl.2.html">ioctl(2)</a> operations available.
+
+       For Linux kernel versions before 4.11, the <i>features</i> field must be
+       initialized to zero before the call to <i>UFFDIO_API</i>, and zero (i.e., no
+       feature bits) is placed in the <i>features</i> field by the kernel upon
+       return from <a href="ioctl.2.html">ioctl(2)</a>.
+
+       Starting from Linux 4.11, the <i>features</i> field can be used to ask
+       whether particular features are supported and explicitly enable
+       userfaultfd features that are disabled by default.  The kernel always
+       reports all the available features in the <i>features</i> field.
+
+       To enable userfaultfd features the application should set a bit
+       corresponding to each feature it wants to enable in the <i>features</i>
+       field.  If the kernel supports all the requested features it will
+       enable them.  Otherwise it will zero out the returned <i>uffdio_api</i>
+       structure and return <b>EINVAL</b>.
+
+       Since Linux 4.11, the following feature bits may be set:
+
+       <b>UFFD_FEATURE_EVENT_FORK</b>
+              When this feature is enabled, the userfaultfd objects
+              associated with a parent process are duplicated into the child
+              process during <a href="fork.2.html">fork(2)</a> and a <b>UFFD_EVENT_FORK </b>event is
+              delivered to the userfaultfd monitor
+
+       <b>UFFD_FEATURE_EVENT_REMAP</b>
+              If this feature is enabled, when the faulting process invokes
+              <a href="mremap.2.html">mremap(2)</a>, the userfaultfd monitor will receive an event of
+              type <b>UFFD_EVENT_REMAP</b>.
+
+       <b>UFFD_FEATURE_EVENT_REMOVE</b>
+              If this feature is enabled, when the faulting process calls
+              <a href="madvise.2.html">madvise(2)</a> with the <b>MADV_DONTNEED </b>or <b>MADV_REMOVE </b>advice value
+              to free a virtual memory area the userfaultfd monitor will
+              receive an event of type <b>UFFD_EVENT_REMOVE</b>.
+
+       <b>UFFD_FEATURE_EVENT_UNMAP</b>
+              If this feature is enabled, when the faulting process unmaps
+              virtual memory either explicitly with <a href="munmap.2.html">munmap(2)</a>, or implicitly
+              during either <a href="mmap.2.html">mmap(2)</a> or <a href="mremap.2.html">mremap(2)</a>.  the userfaultfd monitor
+              will receive an event of type <b>UFFD_EVENT_UNMAP</b>.
+
+       <b>UFFD_FEATURE_MISSING_HUGETLBFS</b>
+              If this feature bit is set, the kernel supports registering
+              userfaultfd ranges on hugetlbfs virtual memory areas
+
+       <b>UFFD_FEATURE_MISSING_SHMEM</b>
+              If this feature bit is set, the kernel supports registering
+              userfaultfd ranges on shared memory areas.  This includes all
+              kernel shared memory APIs: System V shared memory, <a href="../man5/tmpfs.5.html">tmpfs(5)</a>,
+              shared mappings of <i>/dev/zero</i>, <a href="mmap.2.html">mmap(2)</a> with the <b>MAP_SHARED </b>flag
+              set, <a href="memfd_create.2.html">memfd_create(2)</a>, and so on.
+
+              The returned <i>ioctls</i> field can contain the following bits:
+
+       <b>1 &lt;&lt; _UFFDIO_API</b>
+              The <b>UFFDIO_API </b>operation is supported.
+
+       <b>1 &lt;&lt; _UFFDIO_REGISTER</b>
+              The <b>UFFDIO_REGISTER </b>operation is supported.
+
+       <b>1 &lt;&lt; _UFFDIO_UNREGISTER</b>
+              The <b>UFFDIO_UNREGISTER </b>operation is supported.
+
+       This <a href="ioctl.2.html">ioctl(2)</a> operation returns 0 on success.  On error, -1 is
+       returned and <i><a href="../man3/errno.3.html">errno</a></i> is set to indicate the cause of the error.
+       Possible errors include:
+
+       <b>EFAULT </b><i>argp</i> refers to an address that is outside the calling
+              process's accessible address space.
+
+       <b>EINVAL </b>The userfaultfd has already been enabled by a previous
+              <b>UFFDIO_API </b>operation.
+
+       <b>EINVAL </b>The API version requested in the <i>api</i> field is not supported by
+              this kernel, or the <i>features</i> field passed to the kernel
+              includes feature bits that are not supported by the current
+              kernel version.
+
+   <b>UFFDIO_REGISTER</b>
+       (Since Linux 4.3.)  Register a memory address range with the
+       userfaultfd object.  The pages in the range must be "compatible".
+
+       Up to Linux kernel 4.11, only private anonymous ranges are compatible
+       for registering with <b>UFFDIO_REGISTER</b>.
+
+       Since Linux 4.11, hugetlbfs and shared memory ranges are also
+       compatible with <b>UFFDIO_REGISTER</b>.
+
+       The <i>argp</i> argument is a pointer to a <i>uffdio_register</i> structure,
+       defined as:
+
+           struct uffdio_range {
+               __u64 start;    /* Start of range */
+               __u64 len;      /* Length of range (bytes) */
+           };
+
+           struct uffdio_register {
+               struct uffdio_range range;
+               __u64 mode;     /* Desired mode of operation (input) */
+               __u64 ioctls;   /* Available ioctl() operations (output) */
+           };
+
+       The <i>range</i> field defines a memory range starting at <i>start</i> and
+       continuing for <i>len</i> bytes that should be handled by the userfaultfd.
+
+       The <i>mode</i> field defines the mode of operation desired for this memory
+       region.  The following values may be bitwise ORed to set the
+       userfaultfd mode for the specified range:
+
+       <b>UFFDIO_REGISTER_MODE_MISSING</b>
+              Track page faults on missing pages.
+
+       <b>UFFDIO_REGISTER_MODE_WP</b>
+              Track page faults on write-protected pages.
+
+       Currently, the only supported mode is <b>UFFDIO_REGISTER_MODE_MISSING</b>.
+
+       If the operation is successful, the kernel modifies the <i>ioctls</i> bit-
+       mask field to indicate which <a href="ioctl.2.html">ioctl(2)</a> operations are available for
+       the specified range.  This returned bit mask is as for <b>UFFDIO_API</b>.
+
+       This <a href="ioctl.2.html">ioctl(2)</a> operation returns 0 on success.  On error, -1 is
+       returned and <i><a href="../man3/errno.3.html">errno</a></i> is set to indicate the cause of the error.
+       Possible errors include:
+
+       <b>EBUSY  </b>A mapping in the specified range is registered with another
+              userfaultfd object.
+
+       <b>EFAULT </b><i>argp</i> refers to an address that is outside the calling
+              process's accessible address space.
+
+       <b>EINVAL </b>An invalid or unsupported bit was specified in the <i>mode</i> field;
+              or the <i>mode</i> field was zero.
+
+       <b>EINVAL </b>There is no mapping in the specified address range.
+
+       <b>EINVAL </b><i>range.start</i> or <i>range.len</i> is not a multiple of the system page
+              size; or, <i>range.len</i> is zero; or these fields are otherwise
+              invalid.
+
+       <b>EINVAL </b>There as an incompatible mapping in the specified address
+              range.
+
+   <b>UFFDIO_UNREGISTER</b>
+       (Since Linux 4.3.)  Unregister a memory address range from
+       userfaultfd.  The pages in the range must be "compatible" (see the
+       description of <b>UFFDIO_REGISTER</b>.)
+
+       The address range to unregister is specified in the <i>uffdio_range</i>
+       structure pointed to by <i>argp</i>.
+
+       This <a href="ioctl.2.html">ioctl(2)</a> operation returns 0 on success.  On error, -1 is
+       returned and <i><a href="../man3/errno.3.html">errno</a></i> is set to indicate the cause of the error.
+       Possible errors include:
+
+       <b>EINVAL </b>Either the <i>start</i> or the <i>len</i> field of the <i>ufdio_range</i> structure
+              was not a multiple of the system page size; or the <i>len</i> field
+              was zero; or these fields were otherwise invalid.
+
+       <b>EINVAL </b>There as an incompatible mapping in the specified address
+              range.
+
+       <b>EINVAL </b>There was no mapping in the specified address range.
+
+   <b>UFFDIO_COPY</b>
+       (Since Linux 4.3.)  Atomically copy a continuous memory chunk into
+       the userfault registered range and optionally wake up the blocked
+       thread.  The source and destination addresses and the number of bytes
+       to copy are specified by the <i>src</i>, <i>dst</i>, and <i>len</i> fields of the
+       <i>uffdio_copy</i> structure pointed to by <i>argp</i>:
+
+           struct uffdio_copy {
+               __u64 dst;    /* Source of copy */
+               __u64 src;    /* Destination of copy */
+               __u64 len;    /* Number of bytes to copy */
+               __u64 mode;   /* Flags controlling behavior of copy */
+               __s64 copy;   /* Number of bytes copied, or negated error */
+           };
+
+       The following value may be bitwise ORed in <i>mode</i> to change the
+       behavior of the <b>UFFDIO_COPY </b>operation:
+
+       <b>UFFDIO_COPY_MODE_DONTWAKE</b>
+              Do not wake up the thread that waits for page-fault resolution
+
+       The <i>copy</i> field is used by the kernel to return the number of bytes
+       that was actually copied, or an error (a negated <i><a href="../man3/errno.3.html">errno</a></i>-style value).
+       If the value returned in <i>copy</i> doesn't match the value that was
+       specified in <i>len</i>, the operation fails with the error <b>EAGAIN</b>.  The
+       <i>copy</i> field is output-only; it is not read by the <b>UFFDIO_COPY</b>
+       operation.
+
+       This <a href="ioctl.2.html">ioctl(2)</a> operation returns 0 on success.  In this case, the
+       entire area was copied.  On error, -1 is returned and <i><a href="../man3/errno.3.html">errno</a></i> is set to
+       indicate the cause of the error.  Possible errors include:
+
+       <b>EAGAIN </b>The number of bytes copied (i.e., the value returned in the
+              <i>copy</i> field) does not equal the value that was specified in the
+              <i>len</i> field.
+
+       <b>EINVAL </b>Either <i>dst</i> or <i>len</i> was not a multiple of the system page size,
+              or the range specified by <i>src</i> and <i>len</i> or <i>dst</i> and <i>len</i> was
+              invalid.
+
+       <b>EINVAL </b>An invalid bit was specified in the <i>mode</i> field.
+
+       <b>ENOENT </b>(since Linux 4.11)
+              The faulting process has changed its virtual memory layout
+              simultaneously with an outstanding <i>UFFDIO_COPY</i> operation.
+
+       <b>ENOSPC </b>(since Linux 4.11)
+              The faulting process has exited at the time of a <i>UFFDIO_COPY</i>
+              operation.
+
+   <b>UFFDIO_ZEROPAGE</b>
+       (Since Linux 4.3.)  Zero out a memory range registered with
+       userfaultfd.
+
+       The requested range is specified by the <i>range</i> field of the
+       <i>uffdio_zeropage</i> structure pointed to by <i>argp</i>:
+
+           struct uffdio_zeropage {
+               struct uffdio_range range;
+               __u64 mode;     /* Flags controlling behavior of copy */
+               __s64 zeropage; /* Number of bytes zeroed, or negated error */
+           };
+
+       The following value may be bitwise ORed in <i>mode</i> to change the
+       behavior of the <b>UFFDIO_ZERO </b>operation:
+
+       <b>UFFDIO_ZEROPAGE_MODE_DONTWAKE</b>
+              Do not wake up the thread that waits for page-fault
+              resolution.
+
+       The <i>zeropage</i> field is used by the kernel to return the number of
+       bytes that was actually zeroed, or an error in the same manner as
+       <b>UFFDIO_COPY</b>.  If the value returned in the <i>zeropage</i> field doesn't
+       match the value that was specified in <i>range.len</i>, the operation fails
+       with the error <b>EAGAIN</b>.  The <i>zeropage</i> field is output-only; it is not
+       read by the <b>UFFDIO_ZERO </b>operation.
+
+       This <a href="ioctl.2.html">ioctl(2)</a> operation returns 0 on success.  In this case, the
+       entire area was zeroed.  On error, -1 is returned and <i><a href="../man3/errno.3.html">errno</a></i> is set to
+       indicate the cause of the error.  Possible errors include:
+
+       <b>EAGAIN </b>The number of bytes zeroed (i.e., the value returned in the
+              <i>zeropage</i> field) does not equal the value that was specified in
+              the <i>range.len</i> field.
+
+       <b>EINVAL </b>Either <i>range.start</i> or <i>range.len</i> was not a multiple of the
+              system page size; or <i>range.len</i> was zero; or the range
+              specified was invalid.
+
+       <b>EINVAL </b>An invalid bit was specified in the <i>mode</i> field.
+
+   <b>UFFDIO_WAKE</b>
+       (Since Linux 4.3.)  Wake up the thread waiting for page-fault
+       resolution on a specified memory address range.
+
+       The <b>UFFDIO_WAKE </b>operation is used in conjunction with <b>UFFDIO_COPY </b>and
+       <b>UFFDIO_ZEROPAGE </b>operations that have the <b>UFFDIO_COPY_MODE_DONTWAKE </b>or
+       <b>UFFDIO_ZEROPAGE_MODE_DONTWAKE </b>bit set in the <i>mode</i> field.  The
+       userfault monitor can perform several <b>UFFDIO_COPY </b>and <b>UFFDIO_ZEROPAGE</b>
+       operations in a batch and then explicitly wake up the faulting thread
+       using <b>UFFDIO_WAKE</b>.
+
+       The <i>argp</i> argument is a pointer to a <i>uffdio_range</i> structure (shown
+       above) that specifies the address range.
+
+       This <a href="ioctl.2.html">ioctl(2)</a> operation returns 0 on success.  On error, -1 is
+       returned and <i><a href="../man3/errno.3.html">errno</a></i> is set to indicate the cause of the error.
+       Possible errors include:
+
+       <b>EINVAL </b>The <i>start</i> or the <i>len</i> field of the <i>ufdio_range</i> structure was
+              not a multiple of the system page size; or <i>len</i> was zero; or
+              the specified range was otherwise invalid.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       See descriptions of the individual operations, above.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       See descriptions of the individual operations, above.  In addition,
+       the following general errors can occur for all of the operations
+       described above:
+
+       <b>EFAULT </b><i>argp</i> does not point to a valid memory address.
+
+       <b>EINVAL </b>(For all operations except <b>UFFDIO_API</b>.)  The userfaultfd
+              object has not yet been enabled (via the <b>UFFDIO_API</b>
+              operation).
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These <a href="ioctl.2.html">ioctl(2)</a> operations are Linux-specific.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       See <a href="userfaultfd.2.html">userfaultfd(2)</a>.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In order to detect available userfault features and enable some
+       subset of those features the userfaultfd file descriptor must be
+       closed after the first <b>UFFDIO_API </b>operation that queries features
+       availability and reopened before the second <b>UFFDIO_API </b>operation that
+       actually enables the desired features.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="ioctl.2.html">ioctl(2)</a>, <a href="mmap.2.html">mmap(2)</a>, <a href="userfaultfd.2.html">userfaultfd(2)</a>
+
+       <i>Documentation/vm/userfaultfd.txt</i> in the Linux kernel source tree
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03             IOCTL_USERFAULTFD(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="ioctl.2.html">ioctl(2)</a>,&nbsp; 
+    <a href="userfaultfd.2.html">userfaultfd(2)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="ioctl_userfaultfd.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,343 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>lxc-create(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#COMMON_OPTIONS">COMMON&nbsp;OPTIONS</a> | <a href="#DIAGNOSTIC">DIAGNOSTIC</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LXC-CREATE(1)                                                  LXC-CREATE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       lxc-create - creates a container
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lxc-create -n </b><i>name</i> [ <b>-f </b><i>config_file</i> ]  <b>-t </b><i>template</i> [ <b>-B </b><i>backingstore</i>
+       ]  [ <b>-- </b><i>template-options</i> ]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lxc-create </b>creates a system object where is stored the configuration
+       information and where can be stored user information. The identifier
+       <i>name</i> is used to specify the container to be used with the different
+       lxc commands.
+
+       The object is a directory created in <i>/usr/local/var/lib/lxc</i> and
+       identified by its name.
+
+       The object is the definition of the different resources an
+       application can use or can see. The more the configuration file
+       contains information, the more the container is isolated and the more
+       the application is jailed.
+
+       If the configuration file <i>config_file</i> is not specified, the container
+       will be created with the default isolation: processes, sysv ipc and
+       mount points.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-f, --config </b><i>config_file</i>
+              Specify the configuration file to configure the virtualization
+              and isolation functionalities for the container.
+
+       <b>-t, --template </b><i>template</i>
+              'template' is the short name of an existing 'lxc-template'
+              script that is called by lxc-create, eg. busybox, debian,
+              fedora, ubuntu or sshd.  Refer to the examples in
+              <i>/usr/local/share/lxc/templates</i> for details of the expected
+              script structure.  Alternatively, the full path to an
+              executable template script can also be passed as a parameter.
+              "none" can be used to force lxc-create to skip rootfs
+              creation.
+
+       <b>-B, --bdev </b><i>backingstore</i>
+              'backingstore' is one of 'dir', 'lvm', 'loop', 'btrfs', 'zfs',
+              'rbd', or 'best'. The default is 'dir', meaning that the
+              container root filesystem will be a directory under
+              <i>/usr/local/var/lib/lxc/container/rootfs</i>.  This backing store
+              type allows the optional <i>--dir ROOTFS</i> to be specified, meaning
+              that the container rootfs should be placed under the specified
+              path, rather than the default. (The 'none' backingstore type
+              is an alias for 'dir'.) If 'btrfs' is specified, then the
+              target filesystem must be btrfs, and the container rootfs will
+              be created as a new subvolume. This allows snapshotted clones
+              to be created, but also causes rsync --one-filesystem to treat
+              it as a separate filesystem.  If backingstore is 'lvm', then
+              an lvm block device will be used and the following further
+              options are available: <i>--lvname lvname1</i> will create an LV
+              named <i>lvname1</i> rather than the default, which is the container
+              name. <i>--vgname vgname1</i> will create the LV in volume group
+              <i>vgname1</i> rather than the default, <i>lxc</i>.  <i>--thinpool thinpool1</i>
+              will create the LV as a thin-provisioned volume in the pool
+              named <i>thinpool1</i> rather than the default, <i>lxc</i>.  <i>--fstype FSTYPE</i>
+              will create an FSTYPE filesystem on the LV, rather than the
+              default, which is ext4.  <i>--fssize SIZE</i> will create a LV (and
+              filesystem) of size SIZE rather than the default, which is 1G.
+
+              If backingstore is 'loop', you can use <i>--fstype FSTYPE</i> and
+              <i>--fssize SIZE</i> as 'lvm'. The default values for these options
+              are the same as 'lvm'.
+
+              If backingstore is 'rbd', then you will need to have a valid
+              configuration in <i>ceph.conf</i> and a <i>ceph.client.admin.keyring</i>
+              defined.  You can specify the following options : <i>--rbdname</i>
+              <i>RBDNAME</i> will create a blockdevice named RBDNAME rather than
+              the default, which is the container name.  <i>--rbdpool POOL</i> will
+              create the blockdevice in the pool named POOL, rather than the
+              default, which is 'lxc'.
+
+              If backingstore is 'best', then lxc will try, in order, btrfs,
+              zfs, lvm, and finally a directory backing store.
+
+       <b>-- </b><i>template-options</i>
+              This will pass <i>template-options</i> to the template as arguments.
+              To see the list of options supported by the template, you can
+              run <b>lxc-create -t TEMPLATE -h</b>.
+</pre>
+<h2><a id="COMMON_OPTIONS" href="#COMMON_OPTIONS"></a>COMMON OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These options are common to most of lxc commands.
+
+       <b>-?, -h, --help</b>
+              Print a longer usage message than normal.
+
+       <b>--usage</b>
+              Give the usage message
+
+       <b>-q, --quiet</b>
+              mute on
+
+       <b>-P, --lxcpath=</b><i>PATH</i>
+              Use an alternate container path. The default is
+              /usr/local/var/lib/lxc.
+
+       <b>-o, --logfile=</b><i>FILE</i>
+              Output to an alternate log <i>FILE</i>. The default is no log.
+
+       <b>-l, --logpriority=</b><i>LEVEL</i>
+              Set log priority to <i>LEVEL</i>. The default log priority is ERROR.
+              Possible values are : FATAL, CRIT, WARN, ERROR, NOTICE, INFO,
+              DEBUG.
+
+              Note that this option is setting the priority of the events
+              log in the alternate log file. It do not have effect on the
+              ERROR events log on stderr.
+
+       <b>-n, --name=</b><i>NAME</i>
+              Use container identifier <i>NAME</i>.  The container identifier
+              format is an alphanumeric string.
+
+       <b>--rcfile=</b><i>FILE</i>
+              Specify the configuration file to configure the virtualization
+              and isolation functionalities for the container.
+
+              This configuration file if present will be used even if there
+              is already a configuration file present in the previously
+              created container (via lxc-create).
+
+       <b>--version</b>
+              Show the version number.
+</pre>
+<h2><a id="DIAGNOSTIC" href="#DIAGNOSTIC"></a>DIAGNOSTIC  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>The container already exists</b>
+              As the message mention it, you try to create a container but
+              there is a container with the same name. You can use the <b>lxc-</b>
+              <b>ls </b>command to list the available containers on the system.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man7/lxc.7.html">lxc(7)</a>, <a href="lxc-create.1.html">lxc-create(1)</a>, <a href="lxc-copy.1.html">lxc-copy(1)</a>, <a href="lxc-destroy.1.html">lxc-destroy(1)</a>, <a href="lxc-start.1.html">lxc-start(1)</a>,
+       <a href="lxc-stop.1.html">lxc-stop(1)</a>, <a href="lxc-execute.1.html">lxc-execute(1)</a>, <a href="lxc-console.1.html">lxc-console(1)</a>, <a href="lxc-monitor.1.html">lxc-monitor(1)</a>,
+       <a href="lxc-wait.1.html">lxc-wait(1)</a>, <a href="lxc-cgroup.1.html">lxc-cgroup(1)</a>, <a href="lxc-ls.1.html">lxc-ls(1)</a>, <a href="lxc-info.1.html">lxc-info(1)</a>, <a href="lxc-freeze.1.html">lxc-freeze(1)</a>,
+       <a href="lxc-unfreeze.1.html">lxc-unfreeze(1)</a>, <a href="lxc-attach.1.html">lxc-attach(1)</a>, <a href="../man5/lxc.conf.5.html">lxc.conf(5)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Daniel Lezcano &lt;daniel.lezcano@free.fr&gt;
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>lxc</i> (Linux containers) project.  Information
+       about the project can be found at ⟨<a href="http://linuxcontainers.org/">http://linuxcontainers.org/</a>⟩.  If
+       you have a bug report for this manual page, send it to
+       lxc-devel@lists.linuxcontainers.org.  This page was obtained from the
+       project's upstream Git repository ⟨git://github.com/lxc/lxc⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">                                 2017-07-05                    LXC-CREATE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="lxc-attach.1.html">lxc-attach(1)</a>,&nbsp; 
+    <a href="lxc-autostart.1.html">lxc-autostart(1)</a>,&nbsp; 
+    <a href="lxc-cgroup.1.html">lxc-cgroup(1)</a>,&nbsp; 
+    <a href="lxc-checkconfig.1.html">lxc-checkconfig(1)</a>,&nbsp; 
+    <a href="lxc-checkpoint.1.html">lxc-checkpoint(1)</a>,&nbsp; 
+    <a href="lxc-config.1.html">lxc-config(1)</a>,&nbsp; 
+    <a href="lxc-console.1.html">lxc-console(1)</a>,&nbsp; 
+    <a href="lxc-copy.1.html">lxc-copy(1)</a>,&nbsp; 
+    <a href="lxc-create.1.html">lxc-create(1)</a>,&nbsp; 
+    <a href="lxc-destroy.1.html">lxc-destroy(1)</a>,&nbsp; 
+    <a href="lxc-device.1.html">lxc-device(1)</a>,&nbsp; 
+    <a href="lxc-execute.1.html">lxc-execute(1)</a>,&nbsp; 
+    <a href="lxc-freeze.1.html">lxc-freeze(1)</a>,&nbsp; 
+    <a href="lxc-info.1.html">lxc-info(1)</a>,&nbsp; 
+    <a href="lxc-ls.1.html">lxc-ls(1)</a>,&nbsp; 
+    <a href="lxc-monitor.1.html">lxc-monitor(1)</a>,&nbsp; 
+    <a href="lxc-snapshot.1.html">lxc-snapshot(1)</a>,&nbsp; 
+    <a href="lxc-start.1.html">lxc-start(1)</a>,&nbsp; 
+    <a href="lxc-stop.1.html">lxc-stop(1)</a>,&nbsp; 
+    <a href="lxc-top.1.html">lxc-top(1)</a>,&nbsp; 
+    <a href="lxc-unfreeze.1.html">lxc-unfreeze(1)</a>,&nbsp; 
+    <a href="lxc-unshare.1.html">lxc-unshare(1)</a>,&nbsp; 
+    <a href="lxc-usernsexec.1.html">lxc-usernsexec(1)</a>,&nbsp; 
+    <a href="lxc-wait.1.html">lxc-wait(1)</a>,&nbsp; 
+    <a href="../man5/lxc.container.conf.5.html">lxc.container.conf(5)</a>,&nbsp; 
+    <a href="../man5/lxc.system.conf.5.html">lxc.system.conf(5)</a>,&nbsp; 
+    <a href="../man7/lxc.7.html">lxc(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

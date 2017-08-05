@@ -1,0 +1,341 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>curs_addch.3x - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#NOTES">NOTES</a> | <a href="#PORTABILITY">PORTABILITY</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">curs_addch(3X)                                                curs_addch(3X)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>addch</b>, <b>waddch</b>, <b>mvaddch</b>, <b>mvwaddch</b>, <b>echochar</b>, <b>wechochar </b>- add a charac‐
+       ter (with attributes) to a <b>curses </b>window, then advance the cursor
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;curses.h&gt;</b>
+
+       <b>int addch(const chtype ch);</b>
+       <b>int waddch(WINDOW *win, const chtype ch);</b>
+       <b>int mvaddch(int y, int x, const chtype ch);</b>
+       <b>int mvwaddch(WINDOW *win, int y, int x, const chtype ch);</b>
+       <b>int echochar(const chtype ch);</b>
+       <b>int wechochar(WINDOW *win, const chtype ch);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Adding characters</b>
+       The <b>addch</b>, <b>waddch</b>, <b>mvaddch </b>and <b>mvwaddch </b>routines put the character <i>ch</i>
+       into the given window at its current window position, which is then
+       advanced.  They are analogous to <a href="putchar.3.html">putchar(3)</a> in <a href="stdio.3.html">stdio(3)</a>.  If the
+       advance is at the right margin:
+
+       ·   The cursor automatically wraps to the beginning of the next line.
+
+       ·   At the bottom of the current scrolling region, and if <b>scrollok </b>is
+           enabled, the scrolling region is scrolled up one line.
+
+       ·   If <b>scrollok </b>is not enabled, writing a character at the lower
+           right margin succeeds.  However, an error is returned because it
+           is not possible to wrap to a new line
+
+       If <i>ch</i> is a tab, newline, carriage return or backspace, the cursor is
+       moved appropriately within the window:
+
+       ·   Backspace moves the cursor one character left; at the left edge
+           of a window it does nothing.
+
+       ·   Carriage return moves the cursor to the window left margin on the
+           current line.
+
+       ·   Newline does a <b>clrtoeol</b>, then moves the cursor to the window left
+           margin on the next line, scrolling the window if on the last
+           line.
+
+       ·   Tabs are considered to be at every eighth column.  The tab
+           interval may be altered by setting the <b>TABSIZE </b>variable.
+
+       If <i>ch</i> is any other control character, it is drawn in <b>^</b><i>X</i> notation.
+       Calling <b>winch </b>after adding a control character does not return the
+       character itself, but instead returns the ^-representation of the
+       control character.
+
+       Video attributes can be combined with a character argument passed to
+       <b>addch </b>or related functions by logical-ORing them into the character.
+       (Thus, text, including attributes, can be copied from one place to
+       another using <b>inch</b>(3X) and <b>addch</b>.)  See the <b>curs_attr</b>(3X) page for
+       values of predefined video attribute constants that can be usefully
+       OR'ed into characters.
+
+   <b>Echoing characters</b>
+       The <b>echochar </b>and <b>wechochar </b>routines are equivalent to a call to <b>addch</b>
+       followed by a call to <b>refresh</b>(3X), or a call to <b>waddch </b>followed by a
+       call to <b>wrefresh</b>.  The knowledge that only a single character is
+       being output is used and, for non-control characters, a considerable
+       performance gain may be seen by using these routines instead of their
+       equivalents.
+
+   <b>Line Graphics</b>
+       The following variables may be used to add line drawing characters to
+       the screen with routines of the <b>addch </b>family.  The default character
+       listed below is used if the <b>acsc </b>capability does not define a
+       terminal-specific replacement for it, or if the terminal and locale
+       configuration requires Unicode but the library is unable to use
+       Unicode.
+
+       The names are taken from VT100 nomenclature.
+
+       <b>ACS            ACS       acsc   Glyph</b>
+       <b>Name           Default   char   Name</b>
+       ─────────────────────────────────────────────────────────
+       ACS_BLOCK      #         0      solid square block
+       ACS_BOARD      #         h      board of squares
+       ACS_BTEE       +         v      bottom tee
+       ACS_BULLET     o         ~      bullet
+       ACS_CKBOARD    :         a      checker board (stipple)
+       ACS_DARROW     v         .      arrow pointing down
+       ACS_DEGREE     '         f      degree symbol
+       ACS_DIAMOND    +         `      diamond
+       ACS_GEQUAL     &gt;         &gt;      greater-than-or-equal-to
+       ACS_HLINE      -         q      horizontal line
+       ACS_LANTERN    #         i      lantern symbol
+       ACS_LARROW     &lt;         ,      arrow pointing left
+       ACS_LEQUAL     &lt;         y      less-than-or-equal-to
+       ACS_LLCORNER   +         m      lower left-hand corner
+       ACS_LRCORNER   +         j      lower right-hand corner
+       ACS_LTEE       +         t      left tee
+       ACS_NEQUAL     !         |      not-equal
+       ACS_PI         *         {      greek pi
+       ACS_PLMINUS    #         g      plus/minus
+       ACS_PLUS       +         n      plus
+       ACS_RARROW     &gt;         +      arrow pointing right
+       ACS_RTEE       +         u      right tee
+       ACS_S1         -         o      scan line 1
+       ACS_S3         -         p      scan line 3
+       ACS_S7         -         r      scan line 7
+       ACS_S9         _         s      scan line 9
+       ACS_STERLING   f         }      pound-sterling symbol
+       ACS_TTEE       +         w      top tee
+       ACS_UARROW     ^         -      arrow pointing up
+       ACS_ULCORNER   +         l      upper left-hand corner
+       ACS_URCORNER   +         k      upper right-hand corner
+       ACS_VLINE      |         x      vertical line
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All routines return the integer <b>ERR </b>upon failure and <b>OK </b>on success
+       (the SVr4 manuals specify only “an integer value other than <b>ERR</b>”)
+       upon successful completion, unless otherwise noted in the preceding
+       routine descriptions.
+
+       Functions with a “mv” prefix first perform a cursor movement using
+       <b>wmove</b>, and return an error if the position is outside the window, or
+       if the window pointer is null.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Note that <b>addch</b>, <b>mvaddch</b>, <b>mvwaddch</b>, and <b>echochar </b>may be macros.
+</pre>
+<h2><a id="PORTABILITY" href="#PORTABILITY"></a>PORTABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All these functions are described in the XSI Curses standard, Issue
+       4.  The defaults specified for forms-drawing characters apply in the
+       POSIX locale.
+
+       X/Open Curses states that the <i>ACS_</i> definitions are <b>char </b>constants.
+       For the wide-character implementation (see <b>curs_add_wch</b>), there are
+       analogous <i>WACS_</i> definitions which are <b>cchar_t </b>constants.
+
+       Some ACS symbols (ACS_S3, ACS_S7, ACS_LEQUAL, ACS_GEQUAL, ACS_PI,
+       ACS_NEQUAL, ACS_STERLING) were not documented in any publicly
+       released System V.  However, many publicly available terminfos
+       include <b>acsc </b>strings in which their key characters (pryz{|}) are
+       embedded, and a second-hand list of their character descriptions has
+       come to light.  The ACS-prefixed names for them were invented for
+       <b>ncurses</b>(3X).
+
+       The <i>displayed</i> values for the <i>ACS_</i> and <i>WACS_</i> constants depend on
+
+       ·   the library configuration, i.e., <b>ncurses </b>versus <b>ncursesw</b>, where
+           the latter is capable of displaying Unicode while the former is
+           not, and
+
+       ·   whether the <i>locale</i> uses UTF-8 encoding.
+
+       In certain cases, the terminal is unable to display line-drawing
+       characters except by using UTF-8 (see the discussion of
+       <b>NCURSES_NO_UTF8_ACS </b>in ncurses(3X)).
+
+       The <b>TABSIZE </b>variable is implemented in some versions of curses, but
+       is not part of X/Open curses.
+
+       If <i>ch</i> is a carriage return, the cursor is moved to the beginning of
+       the current row of the window.  This is true of other
+       implementations, but is not documented.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>curses</b>(3X), <b>curs_attr</b>(3X), <b>curs_clear</b>(3X), <b>curs_inch</b>(3X),
+       <b>curs_outopts</b>(3X), <b>curs_refresh</b>(3X), <b>curs_variables</b>(3X), <a href="putc.3.html">putc(3)</a>.
+
+       Comparable functions in the wide-character (ncursesw) library are
+       described in <b>curs_add_wch</b>(3X).
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>ncurses</i> (new curses) project.  Information
+       about the project can be found at 
+       ⟨<a href="https://www.gnu.org/software/ncurses/ncurses.html">https://www.gnu.org/software/ncurses/ncurses.html</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       bug-ncurses-request@gnu.org.  This page was obtained from the
+       project's upstream Git mirror of the CVS repository 
+       ⟨git://ncurses.scripts.mit.edu/ncurses.git⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                                              curs_addch(3X)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,278 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>swapon(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SWAPON(2)                 Linux Programmer's Manual                SWAPON(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       swapon, swapoff - start/stop swapping to file/device
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;unistd.h&gt;</b>
+       <b>#include &lt;sys/swap.h&gt;</b>
+
+       <b>int swapon(const char *</b><i>path</i><b>, int </b><i>swapflags</i><b>);</b>
+       <b>int swapoff(const char *</b><i>path</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>swapon</b>() sets the swap area to the file or block device specified by
+       <i>path</i>.  <b>swapoff</b>() stops swapping to the file or block device specified
+       by <i>path</i>.
+
+       If the <b>SWAP_FLAG_PREFER </b>flag is specified in the <b>swapon</b>() <i>swapflags</i>
+       argument, the new swap area will have a higher priority than default.
+       The priority is encoded within <i>swapflags</i> as:
+
+           <i>(prio &lt;&lt; SWAP_FLAG_PRIO_SHIFT) &amp; SWAP_FLAG_PRIO_MASK</i>
+
+       If the <b>SWAP_FLAG_DISCARD </b>flag is specified in the <b>swapon</b>() <i>swapflags</i>
+       argument, freed swap pages will be discarded before they are reused,
+       if the swap device supports the discard or trim operation.  (This may
+       improve performance on some Solid State Devices, but often it does
+       not.)  See also NOTES.
+
+       These functions may be used only by a privileged process (one having
+       the <b>CAP_SYS_ADMIN </b>capability).
+
+   <b>Priority</b>
+       Each swap area has a priority, either high or low.  The default
+       priority is low.  Within the low-priority areas, newer areas are even
+       lower priority than older areas.
+
+       All priorities set with <i>swapflags</i> are high-priority, higher than
+       default.  They may have any nonnegative value chosen by the caller.
+       Higher numbers mean higher priority.
+
+       Swap pages are allocated from areas in priority order, highest
+       priority first.  For areas with different priorities, a higher-
+       priority area is exhausted before using a lower-priority area.  If
+       two or more areas have the same priority, and it is the highest
+       priority available, pages are allocated on a round-robin basis
+       between them.
+
+       As of Linux 1.3.6, the kernel usually follows these rules, but there
+       are exceptions.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EBUSY  </b>(for <b>swapon</b>()) The specified <i>path</i> is already being used as a
+              swap area.
+
+       <b>EINVAL </b>The file <i>path</i> exists, but refers neither to a regular file nor
+              to a block device;
+
+       <b>EINVAL </b>(<b>swapon</b>()) The indicated path does not contain a valid swap
+              signature or resides on an in-memory filesystem such as
+              <a href="../man5/tmpfs.5.html">tmpfs(5)</a>.
+
+       <b>EINVAL </b>(since Linux 3.4)
+              (<b>swapon</b>()) An invalid flag value was specified in <i>flags</i>.
+
+       <b>EINVAL </b>(<b>swapoff</b>()) <i>path</i> is not currently a swap area.
+
+       <b>ENFILE </b>The system-wide limit on the total number of open files has
+              been reached.
+
+       <b>ENOENT </b>The file <i>path</i> does not exist.
+
+       <b>ENOMEM </b>The system has insufficient memory to start swapping.
+
+       <b>EPERM  </b>The caller does not have the <b>CAP_SYS_ADMIN </b>capability.
+              Alternatively, the maximum number of swap files are already in
+              use; see NOTES below.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are Linux-specific and should not be used in programs
+       intended to be portable.  The second <i>swapflags</i> argument was
+       introduced in Linux 1.3.2.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The partition or path must be prepared with <a href="../man8/mkswap.8.html">mkswap(8)</a>.
+
+       There is an upper limit on the number of swap files that may be used,
+       defined by the kernel constant <b>MAX_SWAPFILES</b>.  Before kernel 2.4.10,
+       <b>MAX_SWAPFILES </b>has the value 8; since kernel 2.4.10, it has the value
+       32.  Since kernel 2.6.18, the limit is decreased by 2 (thus: 30) if
+       the kernel is built with the <b>CONFIG_MIGRATION </b>option (which reserves
+       two swap table entries for the page migration features of <a href="mbind.2.html">mbind(2)</a>
+       and <a href="migrate_pages.2.html">migrate_pages(2)</a>).  Since kernel 2.6.32, the limit is further
+       decreased by 1 if the kernel is built with the <b>CONFIG_MEMORY_FAILURE</b>
+       option.
+
+       Discard of swap pages was introduced in kernel 2.6.29, then made
+       conditional on the <b>SWAP_FLAG_DISCARD </b>flag in kernel 2.6.36, which
+       still discards the entire swap area when <b>swapon</b>() is called, even if
+       that flag bit is not set.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/mkswap.8.html">mkswap(8)</a>, <a href="../man8/swapoff.8.html">swapoff(8)</a>, <a href="../man8/swapon.8.html">swapon(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-12-12                        SWAPON(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="../man8/swapon.8.html">swapon(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="swapon.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

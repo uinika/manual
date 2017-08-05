@@ -1,0 +1,247 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>xfs_bmap(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">xfs_bmap(8)                System Manager's Manual               xfs_bmap(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       xfs_bmap - print block mapping for an XFS file
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>xfs_bmap </b>[ <b>-adlpv </b>] [ <b>-n </b><i>num_extents</i> ] <i>file</i>
+       <b>xfs_bmap -V</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>xfs_bmap </b>prints the map of disk blocks used by files in an XFS
+       filesystem.  The map lists each <i>extent</i> used by the file, as well as
+       regions in the file that do not have any corresponding blocks
+       (holes).  Each line of the listings takes the following form:
+
+              <i>extent</i>: [<i>startoffset</i>..<i>endoffset</i>]: <i>startblock</i>..<i>endblock</i>
+
+       Holes are marked by replacing the <i>startblock</i>..<i>endblock</i> with <i>hole</i>.
+       All the file offsets and disk blocks are in units of 512-byte blocks,
+       no matter what the filesystem's block size is.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-a     </b>If this option is specified, information about the file's
+              attribute fork is printed instead of the default data fork.
+
+       <b>-c     </b>If this option is specified, information about the file's copy
+              on write fork is printed instead of the default data fork.
+
+       <b>-d     </b>If portions of the file have been migrated offline by a DMAPI
+              application, a DMAPI read event will be generated to bring
+              those portions back online before the disk block map is
+              printed.  However if the <b>-d </b>option is used, no DMAPI read
+              event will be generated for a DMAPI file and offline portions
+              will be reported as holes.
+
+       <b>-e     </b>If this option is used, <b>xfs_bmap </b>obtains all delayed
+              allocation extents, and does not flush dirty pages to disk
+              before querying extent data. With the <b>-v </b>option, the <i>flags</i>
+              column will show which extents have not yet been allocated.
+
+       <b>-l     </b>If this option is used, then
+
+                   &lt;<i>nblocks</i>&gt;  blocks
+
+              will be appended to each line.  <i>nblocks</i> is the length of the
+              extent described on the line in units of 512-byte blocks.
+
+              This flag has no effect if the <b>-v </b>option is used.
+
+       <b>-n </b><i>num_extents</i>
+              If this option is given, <b>xfs_bmap </b>obtains the extent list of
+              the file in groups of <i>num_extents</i> extents. In the absence of
+              <b>-n</b>, <b>xfs_bmap </b>queries the system for the number of extents in
+              the file and uses that value to compute the group size.
+
+       <b>-p     </b>If this option is used, <b>xfs_bmap </b>obtains all unwritten
+              (preallocated) extents that do not contain written data. With
+              the <b>-v </b>option, the <i>flags</i> column will show which extents are
+              preallocated/unwritten.
+
+       <b>-v     </b>Shows verbose information. When this flag is specified,
+              additional AG specific information is appended to each line in
+              the following form:
+
+                   <i>agno</i> (<i>startagoffset</i>..<i>endagoffset</i>) <i>nblocks flags</i>
+
+              A second <b>-v </b>option will print out the <i>flags</i> legend.
+
+       <b>-V     </b>Prints the version number and exits.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="xfs_fsr.8.html">xfs_fsr(8)</a>, <a href="../man5/xfs.5.html">xfs(5)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>xfsprogs</i> (utilities for XFS filesystems)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://xfs.org/">http://xfs.org/</a>⟩.  If you have a bug report for this manual page, see
+       ⟨<a href="http://oss.sgi.com/bugzilla/buglist.cgi?product=XFS">http://oss.sgi.com/bugzilla/buglist.cgi?product=XFS</a>⟩.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨git://oss.sgi.com/xfs/cmds/xfsprogs⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                                                 xfs_bmap(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="xfs_io.8.html">xfs_io(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

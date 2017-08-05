@@ -1,0 +1,252 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>rpcbind(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#LINUX_PORT">LINUX&nbsp;PORT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline"></span>
+RPCBIND(8)               BSD System Manager's Manual              RPCBIND(8)
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>rpcbind </b>— universal addresses to RPC program number mapper
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>rpcbind </b>[<b>-adhiLls</b>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     The <b>rpcbind </b>utility is a server that converts RPC program numbers into
+     universal addresses.  It must be running on the host to be able to make
+     RPC calls on a server on that machine.
+
+     When an RPC service is started, it tells <b>rpcbind </b>the address at which
+     it is listening, and the RPC program numbers it is prepared to serve.
+     When a client wishes to make an RPC call to a given program number, it
+     first contacts <b>rpcbind </b>on the server machine to determine the address
+     where RPC requests should be sent.
+
+     The <b>rpcbind </b>utility should be started before any other RPC service.
+     Normally, standard RPC servers are started by port monitors, so <b>rpcbind</b>
+     must be started before port monitors are invoked.
+
+     When <b>rpcbind </b>is started, it checks that certain name-to-address trans‐
+     lation-calls function correctly.  If they fail, the network configura‐
+     tion databases may be corrupt.  Since RPC services cannot function cor‐
+     rectly in this situation, <b>rpcbind </b>reports the condition and terminates.
+
+     The <b>rpcbind </b>utility can only be started by the super-user.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>-a      </b>When debugging (<b>-d</b>), do an abort on errors.
+
+     <b>-d      </b>Run in debug mode.  In this mode, <b>rpcbind </b>will log additional
+             information during operation, and will abort on certain errors
+             if <b>-a </b>is also specified.  With this option, the name-to-address
+             translation consistency checks are shown in detail.
+
+     <b>-f      </b>Do not fork and become a background process.
+
+     <b>-h      </b>Specify specific IP addresses to bind to for UDP requests.
+             This option may be specified multiple times and is typically
+             necessary when running on a multi-homed host.  If no <b>-h </b>option
+             is specified, <b>rpcbind </b>will bind to INADDR_ANY, which could lead
+             to problems on a multi-homed host due to <b>rpcbind </b>returning a
+             UDP packet from a different IP address than it was sent to.
+             Note that when specifying IP addresses with <b>-h</b>, <b>rpcbind </b>will
+             automatically add 127.0.0.1 and if IPv6 is enabled, ::1 to the
+             list.
+
+     <b>-i      </b>“Insecure” mode.  Allow calls to SET and UNSET from any host.
+             Normally <b>rpcbind </b>accepts these requests only from the loopback
+             interface for security reasons.  This change is necessary for
+             programs that were compiled with earlier versions of the rpc
+             library and do not make those requests using the loopback
+             interface.
+
+     <b>-l      </b>Turn on libwrap connection logging.
+
+     <b>-s      </b>Cause <b>rpcbind </b>to change to the user daemon as soon as possible.
+             This causes <b>rpcbind </b>to use non-privileged ports for outgoing
+             connections, preventing non-privileged clients from using
+             <b>rpcbind </b>to connect to services from a privileged port.
+
+     <b>-w      </b>Cause <b>rpcbind </b>to do a "warm start" by read a state file when
+             <b>rpcbind </b>starts up. The state file is created when <b>rpcbind </b>ter‐
+             minates.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     All RPC servers must be restarted if <b>rpcbind </b>is restarted.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     rpcinfo(8)
+</pre>
+<h2><a id="LINUX_PORT" href="#LINUX_PORT"></a>LINUX PORT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     This page is part of the <i>rpcbind</i> (convert RPC numbers to universal
+     addresses) project.  Information about the project can be found at
+     <a href="http://sourceforge.net/projects/rpcbind/">http://sourceforge.net/projects/rpcbind/</a>.  If you have a bug report for
+     this manual page, see
+     <a href="http://sourceforge.net/p/rpcbind/bugs/?source=navbar">http://sourceforge.net/p/rpcbind/bugs/?source=navbar</a>.  This page was
+     obtained from the project's upstream Git repository
+     git://linux-nfs.org/~steved/rpcbind on 2017-07-05.  If you discover any
+     rendering problems in this HTML version of the page, or you believe
+     there is a better or more up-to-date source for the page, or you have
+     corrections or improvements to the information in this COLOPHON (which
+     is <i>not</i> part of the original manual page), send a mail to
+     man-pages@man7.org
+
+<span class="footline">BSD                          September 14, 1992                          BSD</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="statd.8.html">statd(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

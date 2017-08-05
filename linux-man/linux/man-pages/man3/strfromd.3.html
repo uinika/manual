@@ -1,0 +1,298 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>strfromd(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">STRFROMD(3)               Linux Programmer's Manual              STRFROMD(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       strfromd,  strfromf, strfroml - convert a floating-point value into a
+       string
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdlib.h&gt;</b>
+
+       <b>int strfromd(char *restrict </b><i>str</i><b>, size_t </b><i>n</i><b>,</b>
+                    <b>const char *restrict </b><i>format</i><b>, double </b><i>fp</i><b>);</b>
+       <b>int strfromf(char *restrict </b><i>str</i><b>, size_t </b><i>n</i><b>,</b>
+                    <b>const char *restrict </b><i>format</i><b>, float </b><i>fp</i><b>);</b>
+       <b>int strfroml(char *restrict </b><i>str</i><b>, size_t </b><i>n</i><b>,</b>
+                    <b>const char *restrict </b><i>format</i><b>, long double </b><i>fp</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>strfromd</b>(), <b>strfromf</b>(), <b>strfroml</b>():
+           __STDC_WANT_IEC_60559_BFP_EXT__
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions convert a floating-point value, <i>fp</i>, into a string of
+       characters, <i>str</i>, with a configurable <i>format</i> string.  At most <i>n</i>
+       characters are stored into <i>str</i>.
+
+       The terminating null character ('\0') is written if and only if <i>n</i> is
+       sufficiently large, otherwise the written string is truncated at <i>n</i>
+       characters.
+
+       The <b>strfromd</b>(), <b>strfromf</b>(), and <b>strfroml</b>() functions are equivalent
+       to
+
+           snprintf(str, n, format, fp);
+
+       except for the <i>format</i> string.
+
+   <b>Format of the format string</b>
+       The <i>format</i> string must start with the character '%'.  This is
+       followed by an optional precision which starts with the period
+       character (.), followed by an optional decimal integer.  If no
+       integer is specified after the period character, a precision of zero
+       is used.  Finally, the format string should have one of the
+       conversion specifiers <b>a</b>, <b>A</b>, <b>e</b>, <b>E</b>, <b>f</b>, <b>F</b>, <b>g</b>, or <b>G</b>.
+
+       The conversion specifier is applied based on the floating-point type
+       indicated by the function suffix.  Therefore, unlike <b>snprintf</b>(), the
+       format string does not have a length modifier character.  See
+       <a href="snprintf.3.html">snprintf(3)</a> for a detailed description of these conversion
+       specifiers.
+
+       The implementation conforms to the C99 standard on conversion of NaN
+       and infinity values:
+
+              If <i>fp</i> is a NaN, +NaN, or -NaN, and <b>f </b>(or <b>a</b>, <b>e</b>, <b>g</b>) is the
+              conversion specifier, the conversion is to "nan", "nan", or
+              "-nan", respectively.  If <b>F </b>(or <b>A</b>, <b>E</b>, <b>G</b>) is the conversion
+              specifier, the conversion is to "NAN" or "-NAN".
+
+              Likewise if <i>fp</i> is infinity, it is converted to [-]inf or
+              [-]INF.
+
+       A malformed <i>format</i> string results in undefined behavior.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>strfromd</b>(), <b>strfromf</b>(), and <b>strfroml</b>() functions return the
+       number of characters that would have been written in <i>str</i> if <i>n</i> had
+       enough space, not counting the terminating null character.  Thus, a
+       return value of <i>n</i> or greater means that the output was truncated.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>strfromd</b>(), <b>strfromf</b>(), and <b>strfroml</b>() functions are available in
+       glibc since version 2.25.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a> and the <b>POSIX Safety Concepts </b>section in GNU C Library
+       manual.
+
+       ┌────────────┬──────────────────────────────────┬────────────────┐
+       │<b>Interface   </b>│ <b>Attribute                        </b>│ <b>Value          </b>│
+       ├────────────┼──────────────────────────────────┼────────────────┤
+       │            │ Thread safety                    │ MT-Safe locale │
+       │<b>strfromd</b>(), ├──────────────────────────────────┼────────────────┤
+       │<b>strfromf</b>(), │ Asynchronous signal safety       │ AS-Unsafe heap │
+       │<b>strfroml</b>()  ├──────────────────────────────────┼────────────────┤
+       │            │ Asynchronous cancellation safety │ AC-Unsafe mem  │
+       └────────────┴──────────────────────────────────┴────────────────┘
+       Note: these attributes are preliminary.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       C99, ISO/IEC TS 18661-1.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>strfromd</b>(), <b>strfromf</b>(), and <b>strfroml</b>() functions take account of
+       the <b>LC_NUMERIC </b>category of the current locale.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       To convert the value 12.1 as a float type to a string using decimal
+       notation, resulting in "12.100000":
+
+           #define __STDC_WANT_IEC_60559_BFP_EXT__
+           #include &lt;stdlib.h&gt;
+           int ssize = 10;
+           char s[ssize];
+           strfromf(s, ssize, "%f", 12.1);
+
+       To convert the value 12.3456 as a float type to a string using
+       decimal notation with two digits of precision, resulting in "12.35":
+
+           #define __STDC_WANT_IEC_60559_BFP_EXT__
+           #include &lt;stdlib.h&gt;
+           int ssize = 10;
+           char s[ssize];
+           strfromf(s, ssize, "%.2f", 12.3456);
+
+       To convert the value 12.345e19 as a double type to a string using
+       scientific notation with zero digits of precision, resulting in
+       "1E+20":
+
+           #define __STDC_WANT_IEC_60559_BFP_EXT__
+           #include &lt;stdlib.h&gt;
+           int ssize = 10;
+           char s[ssize];
+           strfromd(s, ssize, "%.E", 12.345e19);
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="atof.3.html">atof(3)</a>, <a href="snprintf.3.html">snprintf(3)</a>, <a href="strtod.3.html">strtod(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2016-12-02                      STRFROMD(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="atof.3.html">atof(3)</a>,&nbsp; 
+    <a href="printf.3.html">printf(3)</a>,&nbsp; 
+    <a href="strtod.3.html">strtod(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="strfromd.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

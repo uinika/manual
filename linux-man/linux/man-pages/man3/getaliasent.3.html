@@ -1,0 +1,296 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>setaliasent(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#FILES">FILES</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SETALIASENT(3)            Linux Programmer's Manual           SETALIASENT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       setaliasent, endaliasent, getaliasent, getaliasent_r, getaliasbyname,
+       getaliasbyname_r - read an alias entry
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;aliases.h&gt;</b>
+
+       <b>void setaliasent(void);</b>
+
+       <b>void endaliasent(void);</b>
+
+       <b>struct aliasent *getaliasent(void);</b>
+
+       <b>int getaliasent_r(struct aliasent *</b><i>result</i><b>,</b>
+               <b>char *</b><i>buffer</i><b>, size_t </b><i>buflen</i><b>, struct aliasent **</b><i>res</i><b>);</b>
+
+       <b>struct aliasent *getaliasbyname(const char *</b><i>name</i><b>);</b>
+
+       <b>int getaliasbyname_r(const char *</b><i>name</i><b>, struct aliasent *</b><i>result</i><b>,</b>
+               <b>char *</b><i>buffer</i><b>, size_t </b><i>buflen</i><b>, struct aliasent **</b><i>res</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       One of the databases available with the Name Service Switch (NSS) is
+       the aliases database, that contains mail aliases.  (To find out which
+       databases are supported, try <i>getent --help</i>.)  Six functions are
+       provided to access the aliases database.
+
+       The <b>getaliasent</b>() function returns a pointer to a structure
+       containing the group information from the aliases database.  The
+       first time it is called it returns the first entry; thereafter, it
+       returns successive entries.
+
+       The <b>setaliasent</b>() function rewinds the file pointer to the beginning
+       of the aliases database.
+
+       The <b>endaliasent</b>() function closes the aliases database.
+
+       <b>getaliasent_r</b>() is the reentrant version of the previous function.
+       The requested structure is stored via the first argument but the
+       programmer needs to fill the other arguments also.  Not providing
+       enough space causes the function to fail.
+
+       The function <b>getaliasbyname</b>() takes the name argument and searches
+       the aliases database.  The entry is returned as a pointer to a <i>struct</i>
+       <i>aliasent</i>.
+
+       <b>getaliasbyname_r</b>() is the reentrant version of the previous function.
+       The requested structure is stored via the second argument but the
+       programmer needs to fill the other arguments also.  Not providing
+       enough space causes the function to fail.
+
+       The <i>struct aliasent</i> is defined in <i>&lt;aliases.h&gt;</i>:
+
+           struct aliasent {
+               char    *alias_name;             /* alias name */
+               size_t   alias_members_len;
+               char   **alias_members;          /* alias name list */
+               int      alias_local;
+           };
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The functions <b>getaliasent_r</b>() and <b>getaliasbyname_r</b>() return a nonzero
+       value on error.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The default alias database is the file <i>/etc/aliases</i>.  This can be
+       changed in the <i>/etc/nsswitch.conf</i> file.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────────────┬───────────────┬────────────────┐
+       │<b>Interface           </b>│ <b>Attribute     </b>│ <b>Value          </b>│
+       ├────────────────────┼───────────────┼────────────────┤
+       │<b>setaliasent</b>(),      │ Thread safety │ MT-Safe locale │
+       │<b>endaliasent</b>(),      │               │                │
+       │<b>getaliasent_r</b>(),    │               │                │
+       │<b>getaliasbyname_r</b>()  │               │                │
+       ├────────────────────┼───────────────┼────────────────┤
+       │<b>getaliasent</b>(),      │ Thread safety │ MT-Unsafe      │
+       │<b>getaliasbyname</b>()    │               │                │
+       └────────────────────┴───────────────┴────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These routines are glibc-specific.  The NeXT system has similar
+       routines:
+
+           #include &lt;aliasdb.h&gt;
+
+           void alias_setent(void);
+           void alias_endent(void);
+           alias_ent *alias_getent(void);
+           alias_ent *alias_getbyname(char *name);
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following example compiles with <i>gcc example.c -o example</i>.  It
+       will dump all names in the alias database.
+
+       #include &lt;aliases.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;errno.h&gt;
+
+       int
+       main(void)
+       {
+           struct aliasent *al;
+           setaliasent();
+           for (;;) {
+               al = getaliasent();
+               if (al == NULL)
+                   break;
+               printf("Name: %s\n", al-&gt;alias_name);
+           }
+           if (errno) {
+               perror("reading alias");
+               exit(EXIT_FAILURE);
+           }
+           endaliasent();
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="getgrent.3.html">getgrent(3)</a>, <a href="getpwent.3.html">getpwent(3)</a>, <a href="getspent.3.html">getspent(3)</a>, <b>aliases</b>(5)
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2015-07-23                   SETALIASENT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/getent.1.html">getent(1)</a>,&nbsp; 
+    <a href="../man5/nsswitch.conf.5.html">nsswitch.conf(5)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="setaliasent.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>mkstemp(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MKSTEMP(3)                Linux Programmer's Manual               MKSTEMP(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       mkstemp,  mkostemp,  mkstemps,  mkostemps - create a unique temporary
+       file
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdlib.h&gt;</b>
+
+       <b>int mkstemp(char *</b><i>template</i><b>);</b>
+
+       <b>int mkostemp(char *</b><i>template</i><b>, int </b><i>flags</i><b>);</b>
+
+       <b>int mkstemps(char *</b><i>template</i><b>, int </b><i>suffixlen</i><b>);</b>
+
+       <b>int mkostemps(char *</b><i>template</i><b>, int </b><i>suffixlen</i><b>, int </b><i>flags</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>mkstemp</b>():
+           _XOPEN_SOURCE &gt;= 500
+               || /* Since glibc 2.12: */ _POSIX_C_SOURCE &gt;= 200809L
+               || /* Glibc versions &lt;= 2.19: */ _SVID_SOURCE || _BSD_SOURCE
+
+       <b>mkostemp</b>(): _GNU_SOURCE
+       <b>mkstemps</b>():
+           /* Glibc since 2.19: */ _DEFAULT_SOURCE
+               || /* Glibc versions &lt;= 2.19: */ _SVID_SOURCE || _BSD_SOURCE
+       <b>mkostemps</b>(): _GNU_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>mkstemp</b>() function generates a unique temporary filename from
+       <i>template</i>, creates and opens the file, and returns an open file
+       descriptor for the file.
+
+       The last six characters of <i>template</i> must be "XXXXXX" and these are
+       replaced with a string that makes the filename unique.  Since it will
+       be modified, <i>template</i> must not be a string constant, but should be
+       declared as a character array.
+
+       The file is created with permissions 0600, that is, read plus write
+       for owner only.  The returned file descriptor provides both read and
+       write access to the file.  The file is opened with the <a href="../man2/open.2.html">open(2)</a> <b>O_EXCL</b>
+       flag, guaranteeing that the caller is the process that creates the
+       file.
+
+       The <b>mkostemp</b>() function is like <b>mkstemp</b>(), with the difference that
+       the following bits—with the same meaning as for <a href="../man2/open.2.html">open(2)</a>—may be
+       specified in <i>flags</i>: <b>O_APPEND</b>, <b>O_CLOEXEC</b>, and <b>O_SYNC</b>.  Note that when
+       creating the file, <b>mkostemp</b>() includes the values <b>O_RDWR</b>, <b>O_CREAT</b>,
+       and <b>O_EXCL </b>in the <i>flags</i> argument given to <a href="../man2/open.2.html">open(2)</a>; including these
+       values in the <i>flags</i> argument given to <b>mkostemp</b>() is unnecessary, and
+       produces errors on some systems.
+
+       The <b>mkstemps</b>() function is like <b>mkstemp</b>(), except that the string in
+       <i>template</i> contains a suffix of <i>suffixlen</i> characters.  Thus, <i>template</i>
+       is of the form <i>prefixXXXXXXsuffix</i>, and the string XXXXXX is modified
+       as for <b>mkstemp</b>().
+
+       The <b>mkostemps</b>() function is to <b>mkstemps</b>() as <b>mkostemp</b>() is to
+       <b>mkstemp</b>().
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, these functions return the file descriptor of the
+       temporary file.  On error, -1 is returned, and <i><a href="errno.3.html">errno</a></i> is set
+       appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EEXIST </b>Could not create a unique temporary filename.  Now the
+              contents of <i>template</i> are undefined.
+
+       <b>EINVAL </b>For <b>mkstemp</b>() and <b>mkostemp</b>(): The last six characters of
+              <i>template</i> were not XXXXXX; now <i>template</i> is unchanged.
+
+              For <b>mkstemps</b>() and <b>mkostemps</b>(): <i>template</i> is less than <i>(6 +</i>
+              <i>suffixlen)</i> characters long, or the last 6 characters before
+              the suffix in <i>template</i> were not XXXXXX.
+
+       These functions may also fail with any of the errors described for
+       <a href="../man2/open.2.html">open(2)</a>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mkostemp</b>() is available since glibc 2.7.  <b>mkstemps</b>() and <b>mkostemps</b>()
+       are available since glibc 2.11.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────────────────┬───────────────┬─────────┐
+       │<b>Interface               </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────────────────┼───────────────┼─────────┤
+       │<b>mkstemp</b>(), <b>mkostemp</b>(),  │ Thread safety │ MT-Safe │
+       │<b>mkstemps</b>(), <b>mkostemps</b>() │               │         │
+       └────────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mkstemp</b>(): 4.3BSD, POSIX.1-2001.
+
+       <b>mkstemps</b>(): unstandardized, but appears on several other systems.
+
+       <b>mkostemp</b>() and <b>mkostemps</b>(): are glibc extensions.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In glibc versions 2.06 and earlier, the file is created with
+       permissions 0666, that is, read and write for all users.  This old
+       behavior may be a security risk, especially since other UNIX flavors
+       use 0600, and somebody might overlook this detail when porting
+       programs.  POSIX.1-2008 adds a requirement that the file be created
+       with mode 0600.
+
+       More generally, the POSIX specification of <b>mkstemp</b>() does not say
+       anything about file modes, so the application should make sure its
+       file mode creation mask (see <a href="../man2/umask.2.html">umask(2)</a>) is set appropriately before
+       calling <b>mkstemp</b>() (and <b>mkostemp</b>()).
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="mkdtemp.3.html">mkdtemp(3)</a>, <a href="mktemp.3.html">mktemp(3)</a>, <a href="tempnam.3.html">tempnam(3)</a>, <a href="tmpfile.3.html">tmpfile(3)</a>, <a href="tmpnam.3.html">tmpnam(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2016-10-08                       MKSTEMP(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/getpid.2.html">getpid(2)</a>,&nbsp; 
+    <a href="mkdtemp.3.html">mkdtemp(3)</a>,&nbsp; 
+    <a href="mktemp.3.html">mktemp(3)</a>,&nbsp; 
+    <a href="pmprintf.3.html">pmprintf(3)</a>,&nbsp; 
+    <a href="tempnam.3.html">tempnam(3)</a>,&nbsp; 
+    <a href="tmpfile.3.html">tmpfile(3)</a>,&nbsp; 
+    <a href="tmpnam.3.html">tmpnam(3)</a>,&nbsp; 
+    <a href="../man7/file-hierarchy.7.html">file-hierarchy(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="mkstemp.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

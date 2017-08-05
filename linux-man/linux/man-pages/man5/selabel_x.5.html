@@ -1,0 +1,355 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>selabel_x(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#FILES">FILES</a> | <a href="#Object_Name_String_Values">Object&nbsp;Name&nbsp;String&nbsp;Values</a> | <a href="#FILE_FORMAT">FILE&nbsp;FORMAT</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">selabel_x(5)              SELinux API documentation             selabel_x(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       selabel_x  -  userspace  SELinux labeling interface and configuration
+       file format for the X Window System contexts backend. This backend is
+       also used to determine the default context for labeling remotely con‐
+       nected X clients
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;selinux/label.h&gt;</b>
+
+       <b>int selabel_lookup(struct selabel_handle *</b><i>hnd</i><b>,</b>
+                          <b>char **</b><i>context</i><b>,</b>
+                          <b>const char *</b><i>object_name</i><b>, int </b><i>object_type</i><b>);</b>
+
+       <b>int selabel_lookup_raw(struct selabel_handle *</b><i>hnd</i><b>,</b>
+                          <b>char **</b><i>context</i><b>,</b>
+                          <b>const char *</b><i>object_name</i><b>, int </b><i>object_type</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The X contexts backend maps from X Window System object names into
+       security contexts. It is used to find the appropriate context for X
+       Window System objects whose significance and/or usage semantics are
+       determined primarily by name. The returned <i>context</i> must be freed
+       using <a href="../man3/freecon.3.html">freecon(3)</a>.
+       <a href="../man3/selabel_lookup.3.html">selabel_lookup(3)</a> describes the function with its return and error
+       codes.
+
+       This backend is also used to determine the default context for
+       labeling remotely connected X clients.
+
+       The <i>object_type</i> argument should be set to one of the following
+       values:
+
+              <b>SELABEL_X_PROP</b>
+                     The <i>object_name</i> argument specifies the name of a window
+                     property, such as "WM_NAME".
+
+              <b>SELABEL_X_SELN</b>
+                     The <i>object_name</i> argument specifies the name of a
+                     selection, such as "PRIMARY".
+
+              <b>SELABEL_X_EXT</b>
+                     The <i>object_name</i> argument specifies the name of a
+                     protocol extension, such as "RENDER".
+
+              <b>SELABEL_X_EVENT</b>
+                     The <i>object_name</i> argument specifies the name of an event
+                     type, such as "X11:ButtonPress".
+
+              <b>SELABEL_X_CLIENT</b>
+                     The <i>object_name</i> argument is ignored, however it should
+                     be set to either <i>*</i> (an asterisk or 'wildcard' that will
+                     select the default entry) or a specific entry such as
+                     "remote" in the X contexts file as shown in the <b>EXAMPLE</b>
+                     section. The default context for labeling remote X
+                     clients is then returned.
+
+              <b>SELABEL_X_POLYPROP</b>
+                     Like <b>SELABEL_X_PROP</b>, but checks if the property was
+                     marked as being polyinstantiated. See <b>NOTES </b>below.
+
+              <b>SELABEL_X_POLYSELN</b>
+                     Like <b>SELABEL_X_SELN</b>, but checks if the selection was
+                     marked as being polyinstantiated. See <b>NOTES </b>below.
+
+       Any messages generated by <a href="../man3/selabel_lookup.3.html">selabel_lookup(3)</a> are sent to <i>stderr</i> by
+       default, although this can be changed by <a href="../man3/selinux_set_callback.3.html">selinux_set_callback(3)</a>.
+
+       <b>selabel_lookup_raw </b>behaves identically to <b>selabel_lookup </b>but does not
+       perform context translation.
+
+       The <b>FILES </b>section details the configuration files used to determine
+       the X object context.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In addition to the global options described in <a href="../man3/selabel_open.3.html">selabel_open(3)</a>, this
+       backend recognizes the following options:
+
+              <b>SELABEL_OPT_PATH</b>
+                     A non-null value for this option specifies a path to a
+                     file that will be opened in lieu of the standard X
+                     contexts file (see the <b>FILES </b>section for details).
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The X context file used to retrieve a default context depends on the
+       <b>SELABEL_OPT_PATH </b>parameter passed to <a href="../man3/selabel_open.3.html">selabel_open(3)</a>. If <i>NULL</i>, then
+       the <b>SELABEL_OPT_PATH </b>value will default to the active policy X
+       contexts location (as returned by <a href="../man3/selinux_x_context_path.3.html">selinux_x_context_path(3)</a>),
+       otherwise the actual <b>SELABEL_OPT_PATH </b>value specified is used.
+
+       The default X object contexts file is:
+              <i>/etc/selinux/{SELINUXTYPE}/contexts/x_contexts</i>
+
+       Where <i>{SELINUXTYPE}</i> is the entry from the selinux configuration file
+       <i>config</i> (see <a href="selinux_config.5.html">selinux_config(5)</a>).
+
+       The entries within the X contexts file are shown in the <b>Object Name</b>
+       <b>String Values </b>and <b>FILE FORMAT </b>sections.
+</pre>
+<h2><a id="Object_Name_String_Values" href="#Object_Name_String_Values"></a>Object Name String Values  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The string name assigned to each <i>object_type</i> argument that can be
+       present in the X contexts file are:
+
+                       ┌───────────────────┬────────────────┐
+                       │<i>object_type</i>        │ <b>Text Name      </b>│
+                       ├───────────────────┼────────────────┤
+                       │<b>SELABEL_X_PROP     </b>│ property       │
+                       ├───────────────────┼────────────────┤
+                       │<b>SELABEL_X_SELN     </b>│ selection      │
+                       ├───────────────────┼────────────────┤
+                       │<b>SELABEL_X_EXT      </b>│ extension      │
+                       ├───────────────────┼────────────────┤
+                       │<b>SELABEL_X_EVENT    </b>│ event          │
+                       ├───────────────────┼────────────────┤
+                       │<b>SELABEL_X_CLIENT   </b>│ client         │
+                       ├───────────────────┼────────────────┤
+                       │<b>SELABEL_X_POLYPROP </b>│ poly_property  │
+                       ├───────────────────┼────────────────┤
+                       │<b>SELABEL_X_POLYSELN </b>│ poly_selection │
+                       └───────────────────┴────────────────┘
+</pre>
+<h2><a id="FILE_FORMAT" href="#FILE_FORMAT"></a>FILE FORMAT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Each line within the X contexts file is as follows:
+              <i>object_type object_name context</i>
+
+       Where:
+              <i>object_type</i>
+                     This is the string representation of the object type
+                     shown in the <b>Object Name String Values </b>section.  There
+                     can be multiple lines with the same <i>object_type</i> string
+                     that will form a block of entries (each with a
+                     different <i>object_name</i> entry).
+              <i>object_name</i>
+                     These are the object names of the specific X-server
+                     resource such as <b>PRIMARY</b>, <b>CUT_BUFFER0 </b>etc. They are
+                     generally defined in the X-server source code
+                     (<i>protocol.txt</i> and <i>BuiltInAtoms</i> in the dix directory of
+                     the xorg-server source package).  The entry can contain
+                     '*' for wildcard matching or '?' for substitution.
+                     Note that if the '*' is used, then be aware that the
+                     order of entries in the file is important. The '*' on
+                     its own is used to ensure a default fallback context is
+                     assigned and should be the last entry in the
+                     <i>object_type</i> block.
+              <i>context</i>
+                     The security context that will be applied to the
+                     object.
+
+       Example 1:
+
+       # object_type  object_name  context
+       selection      PRIMARY      system_u:object_r:clipboard_xselection_t:s0
+       selection      *            system_u:object_r:xselection_t:s0
+
+       Example 2 - This example shows how a client entry can be configured
+       to ensure an entry is always found:
+
+       # object_type  object_name  context
+       client         *            system_u:object_r:remote_t:s0
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       1.  Properties and selections are marked as either polyinstantiated
+           or not. For these name types, the "POLY" option searches only the
+           names marked as being polyinstantiated, while the other option
+           searches only the names marked as not being polyinstantiated.
+           Users of the interface should check both mappings, optionally
+           taking action based on the result (e.g. polyinstantiating the
+           object).
+
+       2.  If contexts are to be validated, then the global option
+           <b>SELABEL_OPT_VALIDATE </b>must be set before calling <a href="../man3/selabel_open.3.html">selabel_open(3)</a>.
+           If this is not set, then it is possible for an invalid context to
+           be returned.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/selinux.8-2.html">selinux(8)</a>, <a href="../man3/selabel_open.3.html">selabel_open(3)</a>, <a href="../man3/selabel_lookup.3.html">selabel_lookup(3)</a>, <a href="../man3/selabel_stats.3.html">selabel_stats(3)</a>,
+       <a href="../man3/selabel_close.3.html">selabel_close(3)</a>, <a href="../man3/selinux_set_callback.3.html">selinux_set_callback(3)</a>, <a href="../man3/selinux_x_context_path.3.html">selinux_x_context_path(3)</a>,
+       <a href="../man3/freecon.3.html">freecon(3)</a>, <a href="selinux_config.5.html">selinux_config(5)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Security Enhanced Linux          29 Nov 2011                    selabel_x(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man3/selabel_open.3.html">selabel_open(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

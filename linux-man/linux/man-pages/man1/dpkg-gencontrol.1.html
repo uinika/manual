@@ -1,0 +1,299 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dpkg-gencontrol(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">dpkg-gencontrol(1)               dpkg suite               dpkg-gencontrol(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dpkg-gencontrol - generate Debian control files
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dpkg-gencontrol </b>[<i>option</i>...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dpkg-gencontrol </b>reads information from an unpacked Debian source tree
+       and generates a binary package control file (which defaults to
+       debian/tmp/DEBIAN/control); during this process it will simplify the
+       relation fields.
+
+       Thus <b>Pre-Depends</b>, <b>Depends</b>, <b>Recommends </b>and <b>Suggests </b>are simplified in
+       this order by removing dependencies which are known to be true
+       according to the stronger dependencies already parsed. It will also
+       remove any self-dependency (in fact it will remove any dependency
+       which evaluates to true given the current version of the package as
+       installed). Logically it keeps the intersection of multiple
+       dependencies on the same package. The order of dependencies is
+       preserved as best as possible: if any dependency must be discarded
+       due to another dependency appearing further in the field, the
+       superseding dependency will take the place of the discarded one.
+
+       The other relation fields (<b>Enhances</b>, <b>Conflicts</b>, <b>Breaks</b>, <b>Replaces </b>and
+       <b>Provides</b>) are also simplified individually by computing the union of
+       the various dependencies when a package is listed multiple times in
+       the field.
+
+       <b>dpkg-gencontrol </b>also adds an entry for the binary package to
+       <b>debian/files</b>.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-v</b><i>version</i>
+              Sets the version number of the binary package which will be
+              generated.
+
+       <b>-V</b><i>name</i><b>=</b><i>value</i>
+              Set an output substitution variable. See <a href="../man5/deb-substvars.5.html">deb-substvars(5)</a> for
+              discussion of output substitution.
+
+       <b>-T</b><i>substvars-file</i>
+              Read substitution variables in <i>substvars-file</i>; the default is
+              <b>debian/substvars</b>.  This option can be used multiple times to
+              read substitution variables from multiple files (since dpkg
+              1.15.6).
+
+       <b>-D</b><i>field</i><b>=</b><i>value</i>
+              Override or add an output control file field.
+
+       <b>-U</b><i>field</i>
+              Remove an output control file field.
+
+       <b>-c</b><i>control-file</i>
+              Specifies the main source control file to read information
+              from. The default is <b>debian/control</b>.
+
+       <b>-l</b><i>changelog-file</i>
+              Specifies the changelog file to read information from. The
+              default is <b>debian/changelog</b>.
+
+       <b>-f</b><i>files-list-file</i>
+              Read or write the list of files to be uploaded here, rather
+              than using <b>debian/files</b>.
+
+       <b>-F</b><i>changelog-format</i>
+              Specifies the format of the changelog. See
+              <a href="dpkg-parsechangelog.1.html">dpkg-parsechangelog(1)</a> for information about alternative
+              formats.
+
+       <b>-p</b><i>package</i>
+              Generate information for the binary package <i>package</i>.  If the
+              source control file lists only one binary package then this
+              option may be omitted; otherwise it is essential to select
+              which binary package's information to generate.
+
+       <b>-n</b><i>filename</i>
+              Assume the filename of the package will be <i>filename</i> instead of
+              the normal package_version_arch.deb filename.
+
+       <b>-is</b>, <b>-ip</b>, <b>-isp</b>
+              These options are ignored for compatibility with older
+              versions of the dpkg build scripts but are now deprecated.
+              Previously they were used to tell <b>dpkg-gencontrol </b>to include
+              the Section and Priority fields in the control file. This is
+              now the default behaviour. If you want to get the old
+              behaviour you can use the <b>-U </b>option to delete the fields from
+              the control file.
+
+       <b>-P</b><i>package-build-dir</i>
+              Tells <b>dpkg-source </b>that the package is being built in <i>package-</i>
+              <i>build-dir</i> instead of <b>debian/tmp</b>.  This value is used to find
+              the default value of the <b>Installed-Size </b>substitution variable
+              and control file field (using <b>du</b>), and for the default
+              location of the output file.
+
+       <b>-O</b>[<i>filename</i>]
+              Print the control file to standard output (or <i>filename</i> if
+              specified, since dpkg 1.17.2), rather than to
+              <b>debian/tmp/DEBIAN/control </b>(or <i>package-build-dir</i><b>/DEBIAN/control</b>
+              if <b>-P </b>was used).
+
+       <b>-?</b>, <b>--help</b>
+              Show the usage message and exit.
+
+       <b>--version</b>
+              Show the version and exit.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>debian/control</b>
+              The main source control information file, giving version-
+              independent information about the source package and the
+              binary packages it can produce.
+
+       <b>debian/files</b>
+              The list of generated files which are part of the upload being
+              prepared.  <b>dpkg-gencontrol </b>adds the presumed filenames of
+              binary packages whose control files it generates here.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man5/deb-substvars.5.html">deb-substvars(5)</a>, <a href="../man5/deb-src-control.5.html">deb-src-control(5)</a>, <a href="../man5/deb-changelog.5.html">deb-changelog(5)</a>,
+       <a href="../man5/deb-control.5.html">deb-control(5)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01               dpkg-gencontrol(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/deb-substvars.5.html">deb-substvars(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

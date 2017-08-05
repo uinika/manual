@@ -1,0 +1,427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="Dynamic Host Configuration Protocol 主机的设定问题(类似 IP 分享器的后端功能)">
+	<title>鸟哥的 Linux 私房菜 -- DHCP 服务器</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0340dhcp.php">
+    <span class="text_head0">第十二章、网络参数控管者：<span class="text_head_en"> DHCP </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/07/27</span>
+    </div>
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+12.2 <a href="#server">DHCP 服务器端的设定</a><br>
+	<span class="text_h2">
+	　　12.2.1 <a href="#server_pkg">所需软件与档案结构</a><br>
+	　　12.2.2 <a href="#server_dhcpd.conf">主要配置文件 /etc/dhcp/dhcpd.conf 的语法</a><br>
+	　　12.2.3 <a href="#server_case">一个局域网络的 DHCP 服务器设定案例</a><br>
+	　　12.2.4 <a href="#server_start">DHCP 服务器的启动与观察</a><br>
+	　　12.2.5 <a href="#server_host">内部主机的 IP 对应</a><br>
+	</span>
+</span></div>
+<!-- 本文的正式部分 -->
+<hr><a name="server"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">12.2 DHCP 服务器端的设定</span><br>
+<div class="block1">
+	<p>事实上，目前市面上的 IP 分享器已经便宜到爆了！而 IP 分享器本身就含有 DHCP 的功能。
+	所以如果你只是想要单纯的使用 DHCP 在你的局域网络当中而已，那么建议你直接购买一部 IP 分享器来使用即可，
+	因为至少它很省电。如果你还有其他考虑的话，才来架设 DHCP 吧！底下我们以一个简单的范例来架设 DHCP 先。<br><br></p>
+
+	<hr><a name="server_pkg"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">12.2.1 所需软件与档案结构</span><br>
+	<div class="block2">
+		<p>DHCP 的软件需求很简单，就是只要服务器端软件即可，在 CentOS 6.x 上面，这个软件的名称就是
+		dhcp 啰！如果是默认安装，那么这个软件是不会安装的，请自行使用 yum 去装好这个软件吧！安装完毕之后，
+		你可以使用『 rpm -ql dhcp 』来看看这个软件提供了哪些档案，基本上，比较重要的档案数据如下：</p>
+
+		<ul style="padding-left: 25px">
+		<li><span class="text_import1">/etc/dhcp/dhcpd.conf</span><br>
+		这个就是 dhcp 服务器的主要配置文件咯！在某些 Linux 版本上头这个档案可能不存在，所以如果你确定有安装 dhcp 
+		软件却找不到这个档案时，请手动自行建立它即可。<br>
+		<div style="padding: 10pt 0pt 10pt 0pt ;" align="right"><table width="90%"><tbody><tr><td><b>Tips:</b><br><span style="color : #009000"><font size="-1">		其实 dhcp 软件在释出的时候都会附上一个范例档案，你可以使用『 rpm -ql dhcp 』来查询到 
+		dhcpd.conf.sample 这个范例档案，然后将该档案复制成为 /etc/dhcp/dhcpd.conf 后，再手动去修改即可，这样设定比较容易啦！
+		</font></span></td><td><img src="0340dhcp_files/vbird_face.gif" alt="鸟哥的图示" title="鸟哥的图示"></td></tr></tbody></table></div></li>
+
+		<li><span class="text_import1">/usr/sbin/dhcpd</span><br>
+		启动整个 dhcp daemon 的执行档啊！其实最详细的执行方式应该要使用『 man dhcpd 』来查阅一番的呢！^_^<br><br></li>
+
+		<li><span class="text_import1">/var/lib/dhcp/dhcpd.leases</span><br>
+		这档案颇有趣的！我们前面原理部分不是有提到『租约』吗？DHCP 
+		服务器端与客户端租约建立的启始与到期日就是记录在这个档案当中的咯！</li>
+		</ul>
+
+		<p>就跟你说很简单吧！整个软件数据也不过才如此而已呢！<br></p>
+	</div>
+
+	<hr><a name="server_dhcpd.conf"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">12.2.2 主要配置文件 /etc/dhcp/dhcpd.conf 
+	的语法</span><br>
+	<div class="block2">
+		<p>在 CentOS 5.x 以前，这个档案都被放置到 /etc/dhcpd.conf 的，新版的才放置于此处。其实 DHCP 
+		的设定很简单啊，只要将 dhcpd.conf 设定好就可以启动了。不过编辑这个档案时你必须要留意底下的规范：</p>
+		<ul class="text_import2">
+		<li>『 # 』为批注符号；</li>
+		<li>除了右括号 ")" 后面之外，其他的每一行设定最后都要以『 ; 』做为结尾！重要！</li>
+		<li>设定项目语法主要为：『 &lt;参数代号&gt;  &lt;设定内容&gt; 』，例如：<br>
+		<span style="font-family: '细明体'">default-lease-time 259200;</span></li>
+		<li>某些设定项目必须以 option 来设定，基本方式为『 option &lt;参数代码&gt; &lt;设定内容&gt; 』例如：<br>
+		<span style="font-family: '细明体'">option domain-name "your.domain.name";</span></li>
+		</ul>
+
+		<p>基本上，我们刚刚前面提过说， DHCP 的 IP 分配可分为给予动态 IP 与固定 IP ，其中又需要了解的是，
+		<span class="text_import2">如果需要设定固定 IP 的话，那么就必须要知道要设定成固定 IP 的那部计算机的硬件地址 
+		(MAC)</span> 才行，请使用 arp 或 ifconfig 来查知你的接口的 MAC 吧！好了，那么需要设定的项目有哪些呢？
+		其实 dhcpd.conf 里头的设定主要分为两大项目，一个是服务器运作的整体设定 (Global) 一个是 IP 设定模式 (动态或固定)，
+		每个项目的设定值大概有底下这几项：<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>整体设定 (Global)</li></ul>
+
+		<p>假设你的 dhcpd 只管理一个区段的区网，那么除了 IP 之外的许多网络参数就可以放在整体设定的区域中，这包括有租约期限、DNS 
+		主机的 IP 地址、路由器的 IP 地址还有动态 DNS (DDNS) 更新的类型等等。当固定 IP 及动态 IP 
+		内没有规范到某些设定时，则以整体设定值为准。这些参数的设定名称为：</p>
+
+		<ul style="padding-left: 25px">
+		<li><span class="text_import2">default-lease-time 时间</span>：<br>
+		用户的计算机也能够要求一段特定长度的租约时间，但若使用者没有特别要求租约时间的话，
+		那么就以此为预设的租约时间。后面的时间参数默认单位为秒；<br><br></li>
+
+		<li><span class="text_import2">max-lease-time 时间</span>：<br>
+		与上面的预设租约时间类似，不过，这个设定值是在规范使用者所能要求的最大租约时间。也就是说，
+		使用者要求的租约时间若超过此设定值，则以此值为准；<br><br></li>
+
+		<li><span class="text_import2">option domain-name "领域名"</span>：<br>
+		如果你在 /etc/resolv.conf 里面设定了一个『 search google.com 』的话，这表示当你要搜寻主机名时，
+		DNS 系统会主动帮你加上这个领域名的意思。<br><br></li>
+
+		<li><span class="text_import2">option domain-name-servers IP1, IP2</span>：<br>
+		这个设定参数可以修改客户端的 /etc/resolv.conf 档案！就是 nameserver 后面接的那个 DNS IP 
+		啰！特别注意设定参数最末尾为『servers』 (有 s 喔)；<br><br></li>
+
+		<li><span class="text_import2">ddns-update-style 类型</span>：<br>因为 DHCP 
+		客户端所取得的 IP 通常是一直变动的，所以某部主机的主机名与 IP 的对应就很难处理。此时 DHCP 可以透过 ddns 
+		(请参考<a href="http://linux.vbird.org/linux_server/0270dynamic_dns.php">第十章</a>与<a href="http://linux.vbird.org/linux_server/0350dns.php">第十九章 DNS</a> 的说明) 
+		来更新主机名与 IP 的对应。不过我们这里不谈这么复杂的东西，<span class="text_import2">所以你可以将他设定为 none
+		喔</span>。<br><br></li>
+
+		<li><span class="text_import2">ignore client-updates</span>：<br>
+		与上一个设定值较相关，客户端可以透过 dhcpd 服务器来更新 DNS 相关的信息。不过，这里我们也先不谈这个，
+		因此就将它设定为 ignore (忽略) 了。<br><br></li>
+
+		<li><span class="text_import2">option routers 路由器的地址</span>：<br>
+		设定路由器的 IP 所在，记得那个『 routers 』要加 s 才对！<br><br></li>
+		</ul>
+
+		<ul class="list1"><li class="text_import1"><hr>IP 设定模式 (动态或固定)</li></ul>
+
+		<p>由于 dhcpd 主要是针对局域网络来给予 IP 参数的，因此在设定 IP 之前，我们得要指定一个区网才行。
+		指定区网的方式使用如下的参数：</p>
+
+		<span class="text_import2" style="font-family: '细明体'">subnet NETWORK_IP netmask NETMASK_IP { ... }</span><br>
+
+		<p>我们知道区网要给予 network / netmask IP 这两个参数才行，例如之前谈过的： 192.168.100.0 / 255.255.255.0 这样的设定值。
+		上头设定值当中， subnet 与 netmask 是关键词，而大写部分就填上你的区网参数啰。那在括号内还有什么参数需要设定的？
+		那就是到底 IP 是固定的还是动态的设定啊：</p>
+
+		<ul class="padding-left: 25px">
+		<li><span class="text_import2">range IP1 IP2：</span><br>
+		在这个区网当中，给予一个连续的 IP 群用来发放成动态 IP 的设定，那个 IP1 IP2 指的是开放的 IP 范围。
+		举例来说，你想要开放 192.168.100.101 到 192.168.100.200 这 100 个 IP 用来作为动态分配，那就是：
+		<span class="text_import2">range 192.168.100.101 192.168.100.200;</span><br><br></li>
+
+		<li><span class="text_import2">host 主机名 { ... }; </span><br>
+		这个 host 就是指定固定 IP 对应到固定 MAC 的设定值，那个主机名可以自己想想再给予即可。
+		不过在大括号内就得要指定 MAC 与固定的 IP 啰！那这两个设定值怎么设定呢？看看底下啰：<br><br>
+
+		<ul style="padding-left: 25px">
+		<li><span class="text_import2">hardware ethernet 硬件地址</span>：<br>
+		利用网络卡上面的固定硬件地址来设定，亦即该设定仅针对这个硬件地址有效的意思；<br><br></li>
+
+		<li><span class="text_import2">fixed-address IP地址</span>：<br>
+		给予一个固定的 IP 地址的意思。</li>
+		</ul></li>
+		</ul>
+		说再多也没有什么用啦！让我们实际来玩一个案例吧！你就知道该如何处理了。<br><br>
+	</div>
+
+	<hr><a name="server_case"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">12.2.3 一个局域网络的 DHCP 
+	服务器设定案例</span><br>
+	<div class="block2">
+		<p>假设我的环境当中，Linux 主机除了 NAT 服务器之外还得要负责其他服务器，例如邮件服务器的支持。
+		而在后端局域网络中则想要提供 DHCP 的服务。整个硬件配置的情况就如同<a href="http://linux.vbird.org/linux_server/0120intranet.php#fig3.2-1">第三章的图 3.2-1</a>所示的内部独立区网 (centos.vbird 网域)。
+		需要注意的是，在图中 Linux Router 有两块接口，其中 eth1 对内而 eth0 对外，至于其他的网络参数设计为：</p>
+
+		<ul>
+		<li>Linux 主机对内的 eth1 的 IP 设定为 192.168.100.254 这个；</li>
+		<li>内部网段设定为 192.168.100.0/24 这一段，且内部计算机的 router 为 192.168.100.254 ，此外 DNS 主机的 IP 
+		为中华电信的 168.95.1.1 及 Seednet 的 139.175.10.20 这两个；</li>
+		<li>我想要让每个使用者预设租约为 3 天，最长为 6 天；</li>
+		<li>只想要分配的 IP 只有 192.168.100.101 到 192.168.100.200 这几个，其他的 IP 则保留下来；</li>
+		<li>我还有一部主机，他的 MAC 是『 08:00:27:11:EB:C2 』，我要给他的主机名为 win7 ，且 IP 为 
+		192.168.100.30 这个 (请对照图 3.2-1 喔！)。</li>
+		</ul>
+
+		<p>那我的配置文件就会像底下这个样子了：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /etc/dhcp/dhcpd.conf</span>
+<span class="term_write"><span class="term_say"># 1. 整体的环境设定</span>
+ddns-update-style            none;            <span class="term_note">&lt;==不要更新 DDNS 的设定</span>
+ignore client-updates;                        <span class="term_note">&lt;==忽略客户端的 DNS 更新功能</span>
+default-lease-time           259200;          <span class="term_note">&lt;==预设租约为 3 天</span>
+max-lease-time               518400;          <span class="term_note">&lt;==最大租约为 6 天</span>
+option routers               192.168.100.254; <span class="term_note">&lt;==这就是预设路由</span>
+option domain-name           "centos.vbird";  <span class="term_note">&lt;==给予一个领域名</span>
+option domain-name-servers   168.95.1.1, 139.175.10.20;
+<span class="term_say"># 上面是 DNS 的 IP 设定，这个设定值会修改客户端的 /etc/resolv.conf 档案内容</span>
+
+<span class="term_say"># 2. 关于动态分配的 IP</span>
+subnet 192.168.100.0 netmask 255.255.255.0 {
+    range 192.168.100.101 192.168.100.200;  <span class="term_note">&lt;==分配的 IP 范围</span>
+
+    <span class="term_say"># 3. 关于固定的 IP 啊！</span>
+    host win7 {
+        hardware ethernet    08:00:27:11:EB:C2; <span class="term_say">&lt;==客户端网卡 MAC</span>
+        fixed-address        192.168.100.30;    <span class="term_say">&lt;==给予固定的 IP</span>
+    }
+}</span>
+<span class="term_say"># 相关的设定参数意义，请查询前一小节的介绍，或者 man dhcpd.conf</span>
+</pre></td></tr></tbody></table>
+
+		<p>够简单吧！这样就设定好了！你可以复制上头的数据然后修改一下，让里头的 IP 参数符合你的环境，
+		就能够设定好你的 DHCP 服务器了。接下来理论上你就能够启动 dhcp 了。不过，在某些早期的 Linux distribution 上面，
+		当你的 Linux 主机具有多个接口时，你的一个设定可能会让多个接口同时来监听，那就可能会发生错误了。</p>
+
+		<p>举例来说，我们现在的设定是 192.168.100.0/24 这个在 eth1 上头的网域，假设你还有一个界面 eth2 在 192.168.2.0/24 好了，
+		那万一你的 DHCP 同时监听两块接口的话，想一想，如果 192.168.2.0/24 网域的客户端发送出 dhcp 封包的要求时，
+		他会取得什么 IP ？当然是 192.168.100.X ！所以啰，我们就得要针对 dhcpd 这个执行文件设定他监听的接口，
+		而不是针对所有的接口都监听啊！你说是吧！^_^！那如何处理呢？在 CentOS (Red Hat 系统) 可以这样做：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /etc/sysconfig/dhcpd</span>
+DHCPDARGS=<span class="term_write">"eth0"</span>
+</pre></td></tr></tbody></table>
+
+		<p>不过这个动作在 CentOS 5.x 以后的版本上面已经不需要了，因为新版本的 dhcp 会主动的分析服务器的网段与实际的 dhcpd.conf 设定，
+		如果两者无法吻合，就会有错误提示，人性化多了。 ^_^！接下来我们可以开始启动 dhcp 试看看啰！</p>
+	</div>
+
+	<hr><a name="server_start"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">12.2.4 DHCP 服务器的启动与观察</span><br>
+	<div class="block2">
+		<p>开始来启动 dhcp 吧！在启动前你得要注意几件事情喔：</p>
+
+		<ul class="text_import2">
+		<li>你的 Linux 服务器网络环境已经设定好，例如 eth1 已经是 192.168.100.254；</li>
+		<li>你的防火墙规则已经处理好，例如：(1)放行内部区网的联机、(2)iptables.rule 的 NAT 服务已经设定妥当；</li>
+		</ul>
+
+		<p>另外你要注意的是：dhcpd 使用的埠口是 port 67 ，并且启动的结果会记录在 /var/log/messages
+		档案内，你最好能去观察一下 /var/log/messages 所显示的 dhcpd 相关信息才好。</p>
+
+<table class="term"><tbody><tr><td class="term"><pre><span class="term_hd"># 1. 启动后观察一下埠口的变化：</span>
+[root@www ~]# <span class="term_command">/etc/init.d/dhcpd start</span>
+[root@www ~]# <span class="term_command">chkconfig dhcpd on</span>
+[root@www ~]# <span class="term_command">netstat -tlunp | grep dhcp</span>
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address Foreign Address PID/Program name
+udp        0      <span class="term_write">0 0.0.0.0:67</span>    0.0.0.0:*       1581/dhcpd
+
+<span class="term_hd"># 2. 固定去看看登录文件的输出信息</span>
+[root@www ~]# <span class="term_command">tail -n 30 /var/log/messages</span>
+Jul 27 01:51:24 www dhcpd: Internet Systems Consortium DHCP Server 4.1.1-P1
+Jul 27 01:51:24 www dhcpd: Copyright 2004-2010 Internet Systems Consortium.
+Jul 27 01:51:24 www dhcpd: All rights reserved.
+Jul 27 01:51:24 www dhcpd: For info, please visit https://www.isc.org/software/dhcp/
+Jul 27 01:51:24 www dhcpd: WARNING: Host declarations are global.  They are not 
+limited to the scope you declared them in.
+Jul 27 01:51:24 www dhcpd: Not searching LDAP since ldap-server, ldap-port and 
+ldap-base-dn were not specified in the config file
+Jul 27 01:51:24 www dhcpd: <span class="term_write">Wrote 0 deleted host decls to leases file.</span>
+Jul 27 01:51:24 www dhcpd: <span class="term_write">Wrote 0 new dynamic host decls to leases file.</span>
+Jul 27 01:51:24 www dhcpd: <span class="term_write">Wrote 0 leases to leases file.</span>
+Jul 27 01:51:24 www dhcpd: Listening on LPF/eth1/08:00:27:2a:30:14/192.168.100.0/24
+Jul 27 01:51:24 www dhcpd: Sending on   LPF/eth1/08:00:27:2a:30:14/192.168.100.0/24
+<span class="term_say">....(以下省略)....</span>
+</pre></td></tr></tbody></table>
+
+		<p>看到这些资料就是成功的象征啦！尤其是上述有特殊字体的部分。恭喜你啊！真是『福气啦！』不过，
+		万一你看到的登录档是类似底下的模样呢？</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>Jul 27 01:56:30 www dhcpd: <span class="term_write">/etc/dhcp/dhcpd.conf line 7</span>: unknown option 
+dhcp.domain-name-server
+Jul 27 01:56:30 www dhcpd: option domain-name-server#011168.
+Jul 27 01:56:30 www dhcpd:         ^
+Jul 27 01:56:30 www dhcpd: <span class="term_write">/etc/dhcp/dhcpd.conf line 9</span>: Expecting netmask
+Jul 27 01:56:30 www dhcpd: subnet 192.168.100.0 network
+Jul 27 01:56:30 www dhcpd:                       ^
+Jul 27 01:56:30 www dhcpd: Configuration file errors encountered -- exiting
+</pre></td></tr></tbody></table>
+
+		<p>上述的数据表示在第 7, 9 行恐怕有点设定错误，设定错误的地方在行号底下还有指数符号 (^) 特别标注出来！
+		由上面的情况来看，第 7 行的地方应该是 domain-name-servers 忘了加 s 了，而第 9 行则是参数下错，
+		应该是 netmask 而非 network ！这样了解乎？</p>
+	</div>
+
+	<hr><a name="server_host"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">12.2.5 内部主机的 IP 对应</span><br>
+	<div class="block2">
+		<p>如果你有仔细的瞧过第二章的<a href="http://linux.vbird.org/linux_server/0110network_basic.php">网络基础</a>的话，那么应该还会记得那个 
+		<a href="http://linux.vbird.org/linux_server/0130internet_connect.php#problem_hosts">/etc/hosts (第四章 4.4.1)</a> 
+		会影响内部计算机在联机阶段的等待时间吧？那么我现在使用 DHCP 之后，糟糕！我怎么知道哪一部 PC 
+		连上我的主机，那要怎么填写 /etc/hosts 的内容呢？这真是太简单了！就将所有可能的计算机 IP 
+		都加进去该档案呀！ ^_^ ！以鸟哥为例，在这个例子中，鸟哥的分配的 IP 至少有 192.168.100.30, 192.168.100.101 ~ 
+		192.168.100.200 ，所以 /etc/hosts 可以写成：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@www ~]# <span class="term_command">vim /etc/hosts</span>
+127.0.0.1　　 localhost.localdomain localhost
+<span class="term_write">192.168.100.254   vbird-server
+192.168.100.30 　 win7
+192.168.100.101 　dynamic-101
+192.168.100.102 　dynamic-102
+<span class="term_say">....(中间省略)....</span>
+192.168.100.200   dynamic-200</span>
+</pre></td></tr></tbody></table>
+
+		<p>这样一来，所有可能连进来的 IP 都已经有纪录了，哈哈！当然没有什么大问题啰！ ^_^！不过，
+		<span class="text_import2">更好的解决方案则是架设内部的 DNS 服务器，这样一来，内部的其他 Linux 服务器也不必更改 
+		/etc/hosts 就能够取得每部主机的 IP 与主机名对应</span>，那样就更加妥当啦！</p>
+	</div>
+</div>
+<hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

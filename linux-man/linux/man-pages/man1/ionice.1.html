@@ -1,0 +1,300 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ionice(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#NOTES">NOTES</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">IONICE(1)                       User Commands                      IONICE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ionice - set or get process I/O scheduling class and priority
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ionice </b>[<b>-c </b><i>class</i>] [<b>-n </b><i>level</i>] [<b>-t</b>] <b>-p </b><i>PID</i>...
+       <b>ionice </b>[<b>-c </b><i>class</i>] [<b>-n </b><i>level</i>] [<b>-t</b>] <b>-P </b><i>PGID</i>...
+       <b>ionice </b>[<b>-c </b><i>class</i>] [<b>-n </b><i>level</i>] [<b>-t</b>] <b>-u </b><i>UID</i>...
+       <b>ionice </b>[<b>-c </b><i>class</i>] [<b>-n </b><i>level</i>] [<b>-t</b>] <i>command</i> [<i>argument</i>...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This program sets or gets the I/O scheduling class and priority for a
+       program.  If no arguments or just <b>-p </b>is given, <b>ionice </b>will query the
+       current I/O scheduling class and priority for that process.
+
+       When <i>command</i> is given, <b>ionice </b>will run this command with the given
+       arguments.  If no <i>class</i> is specified, then <i>command</i> will be executed
+       with the "best-effort" scheduling class.  The default priority level
+       is 4.
+
+       As of this writing, a process can be in one of three scheduling
+       classes:
+
+       <b>Idle   </b>A program running with idle I/O priority will only get disk
+              time when no other program has asked for disk I/O for a
+              defined grace period.  The impact of an idle I/O process on
+              normal system activity should be zero.  This scheduling class
+              does not take a priority argument.  Presently, this scheduling
+              class is permitted for an ordinary user (since kernel 2.6.25).
+
+       <b>Best-effort</b>
+              This is the effective scheduling class for any process that
+              has not asked for a specific I/O priority.  This class takes a
+              priority argument from <i>0-7</i>, with a lower number being higher
+              priority.  Programs running at the same best-effort priority
+              are served in a round-robin fashion.
+
+              Note that before kernel 2.6.26 a process that has not asked
+              for an I/O priority formally uses "<b>none</b>" as scheduling class,
+              but the I/O scheduler will treat such processes as if it were
+              in the best-effort class.  The priority within the best-effort
+              class will be dynamically derived from the CPU nice level of
+              the process: io_priority = (cpu_nice + 20) / 5.
+
+              For kernels after 2.6.26 with the CFQ I/O scheduler, a process
+              that has not asked for an I/O priority inherits its CPU
+              scheduling class.  The I/O priority is derived from the CPU
+              nice level of the process (same as before kernel 2.6.26).
+
+       <b>Realtime</b>
+              The RT scheduling class is given first access to the disk,
+              regardless of what else is going on in the system.  Thus the
+              RT class needs to be used with some care, as it can starve
+              other processes.  As with the best-effort class, 8 priority
+              levels are defined denoting how big a time slice a given
+              process will receive on each scheduling window.  This
+              scheduling class is not permitted for an ordinary (i.e., non-
+              root) user.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-c</b>, <b>--class </b><i>class</i>
+              Specify the name or number of the scheduling class to use; <i>0</i>
+              for none, <i>1</i> for realtime, <i>2</i> for best-effort, <i>3</i> for idle.
+
+       <b>-n</b>, <b>--classdata </b><i>level</i>
+              Specify the scheduling class data.  This only has an effect if
+              the class accepts an argument.  For realtime and best-effort,
+              <i>0-7</i> are valid data (priority levels), and <i>0</i> represents the
+              highest priority level.
+
+       <b>-p</b>, <b>--pid </b><i>PID</i>...
+              Specify the process IDs of running processes for which to get
+              or set the scheduling parameters.
+
+       <b>-P</b>, <b>--pgid </b><i>PGID</i>...
+              Specify the process group IDs of running processes for which
+              to get or set the scheduling parameters.
+
+       <b>-t</b>, <b>--ignore</b>
+              Ignore failure to set the requested priority.  If <i>command</i> was
+              specified, run it even in case it was not possible to set the
+              desired scheduling priority, which can happen due to
+              insufficient privileges or an old kernel version.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.
+
+       <b>-u</b>, <b>--uid </b><i>UID</i>...
+              Specify the user IDs of running processes for which to get or
+              set the scheduling parameters.
+
+       <b>-V</b>, <b>--version</b>
+              Display version information and exit.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       # <b>ionice </b>-c 3 -p 89
+
+       Sets process with PID 89 as an idle I/O process.
+
+       # <b>ionice </b>-c 2 -n 0 bash
+
+       Runs 'bash' as a best-effort program with highest priority.
+
+       # <b>ionice </b>-p 89 91
+
+       Prints the class and priority of the processes with PID 89 and 91.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Linux supports I/O scheduling priorities and classes since 2.6.13
+       with the CFQ I/O scheduler.
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Jens Axboe &lt;jens@axboe.dk&gt;
+       Karel Zak &lt;kzak@redhat.com&gt;
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/ioprio_set.2.html">ioprio_set(2)</a>
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The ionice command is part of the util-linux package and is available
+       from <a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                        July 2011                        IONICE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/ioprio_set.2.html">ioprio_set(2)</a>,&nbsp; 
+    <a href="../man8/btrfs-scrub.8.html">btrfs-scrub(8)</a>,&nbsp; 
+    <a href="../man8/iotop.8.html">iotop(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

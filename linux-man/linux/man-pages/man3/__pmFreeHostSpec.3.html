@@ -1,0 +1,252 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmparsehostspec(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMPARSEHOSTSPEC(3)        Library Functions Manual        PMPARSEHOSTSPEC(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>__pmParseHostSpec</b>,  <b>__pmUnparseHostSpec</b>,  <b>__pmFreeHostSpec  </b>- uniform
+       host specification parser
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pcp/pmapi.h&gt;</b>
+       <b>#include &lt;pcp/impl.h&gt;</b>
+
+       <b>int __pmParseHostSpec(const char *</b><i>string</i><b>, pmHostSpec **</b><i>hostsp</i><b>,</b>
+               <b>int *</b><i>count</i><b>, char **</b><i>errmsg</i><b>);</b>
+       <b>int __pmUnparseHostSpec(pmHostSpec *</b><i>hosts</i><b>, int </b><i>count</i><b>, char *</b><i>string</i><b>,</b>
+               <b>size_t </b><i>size</i><b>);</b>
+       <b>void __pmFreeHostSpec(pmHostSpec *</b><i>hosts</i><b>, int </b><i>count</i><b>);</b>
+
+       <b>cc ... -lpcp</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>__pmParseHostSpec </b>accepts a <b>string </b>specifying the location of a PCP
+       performance metric collector daemon.  The syntax of the various
+       formats of this <b>string </b>is described in <a href="../man1/PCPIntro.1.html">PCPIntro(1)</a> where several
+       examples are also presented.
+
+       The syntax allows the initial <a href="../man1/pmcd.1.html">pmcd(1)</a> hostname to be optionally
+       followed by a list of port numbers, which will be tried in order when
+       connecting to <b>pmcd </b>on that host.  The portlist is separated from the
+       hostname using a colon, and each port in the list is comma-separated.
+
+       In addition, one or more optional <a href="../man1/pmproxy.1.html">pmproxy(1)</a> hosts can be specified
+       (currently, only one proxy host is supported by the PCP protocols).
+       These are separated from each other and from the <b>pmcd </b>component using
+       the @ character.  These may also be followed by an optional port
+       list, using the same comma-separated syntax as before.
+
+       <b>__pmParseHostSpec </b>takes a null-terminated host specification <b>string</b>
+       and returns an array of <b>pmHostSpec </b>structures, where the array has
+       <b>count </b>entries.
+
+       These <b>pmHostSpec </b>structures that are returned via <b>hostsp </b>represent
+       each individual host in the specification <b>string </b>and has the
+       following declaration:
+
+           typedef struct {
+               char    *name;       /* hostname (always valid) */
+               int     *ports;      /* array of host port numbers */
+               int     nports;      /* number of ports in host port array */
+           } pmHostSpec;
+
+       <b>__pmUnparseHostSpec </b>performs the inverse operation, creating a <b>string</b>
+       representation from a number of <b>hosts </b>structures.  Where the <b>count </b>of
+       structures indicated by <b>hosts </b>is greater than one, the proxy syntax
+       is used to indicate a chain of proxied hosts.  The size of the
+       supplied <b>string </b>buffer must be provided by the caller using the <b>size</b>
+       parameter.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If the given <b>string </b>is successfully parsed <b>__pmParseHostSpec </b>returns
+       zero.  In this case the dynamic storage allocated by
+       <b>__pmParseHostSpec </b>can be released by calling <b>__pmFreeHostSpec </b>using
+       the address returned from <b>__pmParseHostSpec </b>via <b>hosts</b>.
+
+       <b>__pmParseHostSpec </b>returns <b>PM_ERR_GENERIC </b>and a dynamically allocated
+       error message string in <b>errmsg</b>, if the given <b>string </b>does not parse,
+       and the user-supplied <b>errmsg </b>pointer is non-null.  Be sure to <a href="free.3.html">free(3)</a>
+       the error message string in this situation.
+
+       In the case of an error, <b>hosts </b>is undefined.  In the case of success,
+       <b>errmsg </b>is undefined.
+
+       On success <b>__pmUnparseHostSpec </b>returns a positive value indicating
+       the number of characters written into the supplied buffer.  However,
+       if the supplied buffer was too small, a negative status code of
+       <b>-E2BIG </b>is returned.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/pmcd.1.html">pmcd(1)</a>, <a href="../man1/pmproxy.1.html">pmproxy(1)</a>, <a href="../man1/pmchart.1.html">pmchart(1)</a>, <a href="__pmParseHostAttrsSpec.3.html">__pmParseHostAttrsSpec(3)</a>, <a href="PMAPI.3.html">PMAPI(3)</a>
+       and <a href="pmNewContext.3.html">pmNewContext(3)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                  PMPARSEHOSTSPEC(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pmparsehostattrsspec.3.html">pmparsehostattrsspec(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

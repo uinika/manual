@@ -1,0 +1,402 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>cupsd-logs(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYRIGHT">COPYRIGHT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">cupsd-logs(5)                    Apple Inc.                    cupsd-logs(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       cupsd-logs - cupsd log files (access_log, error_log, and page_log)
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/cupsd.8.html">cupsd(8)</a> normally maintains three log files: <i>access_log</i> to track
+       requests that are submitted to the scheduler, <i>error_log</i> to track
+       progress and errors, and <i>page_log</i> to track pages that are printed.
+       Configuration directives in <a href="cupsd.conf.5.html">cupsd.conf(5)</a> and <a href="cups-files.conf.5.html">cups-files.conf(5)</a>
+       control what information is logged and where it is stored.
+
+   <b>ACCESS LOG FILE FORMAT</b>
+       The <i>access_log</i> file lists each HTTP resource that is accessed by a
+       web browser or client.  Each line is in an extended version of the
+       so-called "Common Log Format" used by many web servers and web
+       reporting tools:
+
+           <i>host group user date-time</i> "<i>method resource version</i>" <i>status bytes</i>
+             <i>ipp-operation ipp-status</i>
+
+       For example:
+
+           10.0.1.2 - - [01/Dec/2005:21:50:28 +0000] "POST / HTTP/1.1" 200 317
+             CUPS-Get-Printers successful-ok-ignored-or-substituted-attributes
+           localhost - - [01/Dec/2005:21:50:32 +0000] "GET /admin HTTP/1.1"
+             200 0 - -
+           localhost - - [01/Dec/2005:21:50:32 +0000] "POST / HTTP/1.1"
+             200 157 CUPS-Get-Printers
+             successful-ok-ignored-or-substituted-attributes
+           localhost - - [01/Dec/2005:21:50:32 +0000] "POST / HTTP/1.1"
+             200 1411 CUPS-Get-Devices -
+           localhost - - [01/Dec/2005:21:50:32 +0000] "GET /admin HTTP/1.1"
+             200 6667 - -
+
+       The <i>host</i> field will normally only be an IP address unless you have
+       enabled the HostNameLookups directive in the <i>cupsd.conf</i> file or if
+       the IP address corresponds to your local machine.
+
+       The <i>group</i> field always contains "-".
+
+       The <i>user</i> field is the authenticated username of the requesting user.
+       If no username and password is supplied for the request then this
+       field contains "-".
+
+       The <i>date-time</i> field is the date and time of the request in local time
+       and is in the format "[DD/MON/YYYY:HH:MM:SS +ZZZZ]".
+
+       The <i>method</i> field is the HTTP method used: "GET", "HEAD", "OPTIONS",
+       "POST", or "PUT".  "GET" requests are used to get files from the
+       server, both for the web interface and to get configuration and log
+       files.  "HEAD" requests are used to get information about a resource
+       prior to a "GET".  "OPTIONS" requests are used to upgrade connections
+       to TLS encryption.  "POST" requests are used for web interface forms
+       and IPP requests.  "PUT" requests are used to upload configuration
+       files.
+
+       The <i>resource</i> field is the filename of the requested resource.
+
+       The <i>version</i> field is the HTTP specification version used by the
+       client.  For CUPS clients this will always be "HTTP/1.1".
+
+       The <i>status</i> field contains the HTTP result status of the request, as
+       follows:
+
+            200  Successful operation.
+
+            201  File created/modified successfully.
+
+            304  The requested file has not changed.
+
+            400  Bad HTTP request; typically this means that you have a
+                 malicious program trying to access your server.
+
+            401  Unauthorized, authentication (username + password) is
+                 required.
+
+            403  Access is forbidden; typically this means that a client
+                 tried to access a file or resource they do not have
+                 permission to access.
+
+            404  The file or resource does not exist.
+
+            405  URL access method is not allowed; typically this means you
+                 have a web browser using your server as a proxy.
+
+            413  Request too large; typically this means that a client tried
+                 to print a file larger than the MaxRequestSize allows.
+
+            426  Upgrading to TLS-encrypted connection.
+
+            500  Server error; typically this happens when the server is
+                 unable to open/create a file - consult the error_log file
+                 for details.
+
+            501  The client requested encryption but encryption support is
+                 not enabled/compiled in.
+
+            505  HTTP version number not supported; typically this means
+                 that you have a malicious program trying to access your
+                 server.
+
+       The <i>bytes</i> field contains the number of bytes in the request.  For
+       POST requests the bytes field contains the number of bytes of non-IPP
+       data that is received from the client.
+
+       The <i>ipp-operation</i> field contains either "-" for non-IPP requests or
+       the IPP operation name for POST requests containing an IPP request.
+
+       The <i>ipp-status</i> field contains either "-" for non-IPP requests or the
+       IPP status code name for POST requests containing an IPP response.
+
+   <b>ERROR LOG FILE FORMAT</b>
+       The <i>error_log</i> file lists messages from the scheduler - errors,
+       warnings, etc. The LogLevel directive in the <a href="cupsd.conf.5.html">cupsd.conf(5)</a> file
+       controls which messages are logged:
+
+           level date-time message
+
+       For example:
+
+           I [20/May/1999:19:18:28 +0000] [Job 1] Queued on 'DeskJet' by 'mike'.
+           D [20/May/1999:19:18:28 +0000] [Job 1] argv[0]="DeskJet"
+           D [20/May/1999:19:18:28 +0000] [Job 1] argv[1]="1"
+           D [20/May/1999:19:18:28 +0000] [Job 1] argv[2]="mike"
+           D [20/May/1999:19:18:28 +0000] [Job 1] argv[3]="myjob"
+           D [20/May/1999:19:18:28 +0000] [Job 1] argv[4]="1"
+           D [20/May/1999:19:18:28 +0000] [Job 1] argv[5]="media=
+             na_letter_8.5x11in sides=one-sided"
+           D [20/May/1999:19:18:28 +0000] [Job 1] argv[6]="/var/spool/cups/
+             d000001-001"
+           I [20/May/1999:19:21:02 +0000] [Job 2] Queued on 'DeskJet' by 'mike'.
+           I [20/May/1999:19:22:24 +0000] [Job 2] Canceled by 'mike'.
+
+       The <i>level</i> field contains the type of message:
+
+       A    Alert message (LogLevel alert)
+
+       C    Critical error message (LogLevel crit)
+
+       D    Debugging message (LogLevel debug)
+
+       d    Detailed debugging message (LogLevel debug2)
+
+       E    Normal error message (LogLevel error)
+
+       I    Informational message (LogLevel info)
+
+       N    Notice message (LogLevel notice)
+
+       W    Warning message (LogLevel warn)
+
+       X    Emergency error message (LogLevel emerg)
+
+       The <i>date-time</i> field contains the date and time of when the page
+       started printing. The format of this field is identical to the data-
+       time field in the <i>access_log</i> file.
+
+       The <i>message</i> field contains a free-form textual message.  Messages
+       from job filters are prefixed with "[Job NNN]" where "NNN" is the job
+       ID.
+
+   <b>PAGE LOG FILE FORMAT</b>
+       The <i>page_log</i> file lists each page or group of pages that are sent to
+       a printer.  By default, each line contains the following information:
+
+           <i>printer user job-id date-time page-number num-copies job-billing</i>
+             <i>job-originating-host-name job-name media sides</i>
+
+           <i>printer user job-id date-time</i> <b>total </b><i>num-impressions job-billing</i>
+             <i>job-originating-host-name job-name media sides</i>
+
+       For example the entries for a two page job called "myjob" might look
+       like:
+
+           DeskJet root 1 [20/May/1999:19:21:05 +0000] 1 1 acme-123
+             localhost myjob na_letter_8.5x11in one-sided
+           DeskJet root 1 [20/May/1999:19:21:05 +0000] 2 1 acme-123
+             localhost myjob na_letter_8.5x11in one-sided
+
+           DeskJet root 1 [20/May/1999:19:21:06 +0000] total 2 acme-123
+             localhost myjob na_letter_8.5x11in one-sided
+
+       The PageLogFormat directive in the <a href="cupsd.conf.5.html">cupsd.conf(5)</a> file can be used to
+       change this information.
+
+       The <i>printer</i> field contains the name of the printer that printed the
+       page.  If you send a job to a printer class, this field will contain
+       the name of the printer that was assigned the job.
+
+       The <i>user</i> field contains the name of the user (the IPP requesting-
+       user-name attribute) that submitted this file for printing.
+
+       The <i>job-id</i> field contains the job number of the page being printed.
+
+       The <i>date-time</i> field contains the date and time of when the page
+       started printing.  The format of this field is identical to the data-
+       time field in the <i>access_log</i> file.
+
+       The <i>page-number</i> and <i>num-copies</i> fields contain the page number and
+       number of copies being printed of that page.  For printers that
+       cannot produce copies on their own, the num-copies field will always
+       be 1.
+
+       Lines containing the keyword "total" have a <i>num-impressions</i> field
+       instead which provides the total number of impressions (sides) that
+       have been printed on for the job.
+
+       The <i>job-billing</i> field contains a copy of the job-billing or job-
+       account-id attributes provided with the IPP Create-Job or Print-Job
+       requests or "-" if neither was provided.
+
+       The <i>job-originating-host-name</i> field contains the hostname or IP
+       address of the client that printed the job.
+
+       The <i>job-name</i> field contains a copy of the job-name attribute provided
+       with the IPP Create-Job or Print-Job requests or "-" if none was
+       provided.
+
+       The <i>media</i> field contains a copy of the media or media-col/media-size
+       attribute provided with the IPP Create-Job or Print-Job requests or
+       "-" if none was provided.
+
+       The <i>sides</i> field contains a copy of the sides attribute provided with
+       the IPP Create-Job or Print-Job requests or "-" if none was provided.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/cupsd.8.html">cupsd(8)</a>, <a href="cupsd.conf.5.html">cupsd.conf(5)</a>, <a href="cups-files.conf.5.html">cups-files.conf(5)</a>, CUPS Online Help
+       (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Copyright © 2007-2017 by Apple Inc.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>CUPS</i> (a standards-based, open source
+       printing system) project.  Information about the project can be found
+       at ⟨<a href="http://www.cups.org/">http://www.cups.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨<a href="http://www.cups.org/">http://www.cups.org/</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/apple/cups">https://github.com/apple/cups</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">11 June 2014                        CUPS                       cupsd-logs(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

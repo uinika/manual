@@ -1,0 +1,246 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>session-keyring(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SESSION-KEYRING(7)        Linux Programmer's Manual       SESSION-KEYRING(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       session-keyring - session shared process keyring
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The session keyring is a keyring used to anchor keys on behalf of a
+       process.  It is typically created by <a href="../man8/pam_keyinit.8.html">pam_keyinit(8)</a> when a user logs
+       in and a link will be added that refers to the <a href="user-keyring.7.html">user-keyring(7)</a>.
+       Optionally, PAM may revoke the session keyring on logout.  (In
+       typical configurations, PAM does do this revocation.)  The session
+       keyring has the name (description) <i>_ses</i>.
+
+       A special serial number value, <b>KEY_SPEC_SESSION_KEYRING</b>, is defined
+       that can be used in lieu of the actual serial number of the calling
+       process's session keyring.
+
+       From the <a href="../man1/keyctl.1.html">keyctl(1)</a> utility, '<b>@s</b>' can be used instead of a numeric key
+       ID in much the same way.
+
+       A process's session keyring is inherited across <a href="../man2/clone.2.html">clone(2)</a>, <a href="../man2/fork.2.html">fork(2)</a>,
+       and <a href="../man2/vfork.2.html">vfork(2)</a>.  The session keyring is preserved across <a href="../man2/execve.2.html">execve(2)</a>,
+       even when the executable is set-user-ID or set-group-ID or has
+       capabilities.  The session keyring is destroyed when the last process
+       that refers to it exits.
+
+       If a process doesn't have a session keyring when it is accessed,
+       then, under certain circumstances, the <a href="user-session-keyring.7.html">user-session-keyring(7)</a> will
+       be attached as the session keyring and under others a new session
+       keyring will be created.  (See <a href="user-session-keyring.7.html">user-session-keyring(7)</a> for further
+       details.)
+
+   <b>Special operations</b>
+       The <i>keyutils</i> library provides the following special operations for
+       manipulating session keyrings:
+
+       <a href="../man3/keyctl_join_session_keyring.3.html">keyctl_join_session_keyring(3)</a>
+              This operation allows the caller to change the session keyring
+              that it subscribes to.  The caller can join an existing
+              keyring with a specified name (description), create a new
+              keyring with a given name, or ask the kernel to create a new
+              "anonymous" session keyring with the name "_ses".  (This
+              function is an interface to the <a href="../man2/keyctl.2.html">keyctl(2)</a>
+              <b>KEYCTL_JOIN_SESSION_KEYRING </b>operation.)
+
+       <a href="../man3/keyctl_session_to_parent.3.html">keyctl_session_to_parent(3)</a>
+              This operation allows the caller to make the parent process's
+              session keyring to the same as its own.  For this to succeed,
+              the parent process must have identical security attributes and
+              must be single threaded.  (This function is an interface to
+              the <a href="../man2/keyctl.2.html">keyctl(2)</a> <b>KEYCTL_SESSION_TO_PARENT </b>operation.)
+
+       These operations are also exposed through the <a href="../man1/keyctl.1.html">keyctl(1)</a> utility as:
+
+           keyctl session
+           keyctl session - [&lt;prog&gt; &lt;arg1&gt; &lt;arg2&gt; ...]
+           keyctl session &lt;name&gt; [&lt;prog&gt; &lt;arg1&gt; &lt;arg2&gt; ...]
+
+       and:
+
+           keyctl new_session
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/keyctl.1.html">keyctl(1)</a>, <a href="../man3/keyctl.3.html">keyctl(3)</a>, <a href="../man3/keyctl_join_session_keyring.3.html">keyctl_join_session_keyring(3)</a>,
+       <a href="../man3/keyctl_session_to_parent.3.html">keyctl_session_to_parent(3)</a>, <a href="keyrings.7.html">keyrings(7)</a>, <a href="persistent-keyring.7.html">persistent-keyring(7)</a>,
+       <a href="process-keyring.7.html">process-keyring(7)</a>, <a href="thread-keyring.7.html">thread-keyring(7)</a>, <a href="user-keyring.7.html">user-keyring(7)</a>,
+       <a href="user-session-keyring.7.html">user-session-keyring(7)</a>, <a href="../man8/pam_keyinit.8.html">pam_keyinit(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-03-13               SESSION-KEYRING(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/add_key.2.html">add_key(2)</a>,&nbsp; 
+    <a href="../man2/keyctl.2.html">keyctl(2)</a>,&nbsp; 
+    <a href="../man2/request_key.2.html">request_key(2)</a>,&nbsp; 
+    <a href="../man3/keyctl_join_session_keyring.3.html">keyctl_join_session_keyring(3)</a>,&nbsp; 
+    <a href="../man3/keyctl_session_to_parent.3.html">keyctl_session_to_parent(3)</a>,&nbsp; 
+    <a href="keyrings.7.html">keyrings(7)</a>,&nbsp; 
+    <a href="keyutils.7.html">keyutils(7)</a>,&nbsp; 
+    <a href="persistent-keyring.7.html">persistent-keyring(7)</a>,&nbsp; 
+    <a href="process-keyring.7.html">process-keyring(7)</a>,&nbsp; 
+    <a href="thread-keyring.7.html">thread-keyring(7)</a>,&nbsp; 
+    <a href="user-keyring.7.html">user-keyring(7)</a>,&nbsp; 
+    <a href="user-session-keyring.7.html">user-session-keyring(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="session-keyring.7.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

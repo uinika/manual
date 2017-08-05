@@ -1,0 +1,303 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-replace(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#FORMATS">FORMATS</a> | <a href="#CREATING_REPLACEMENT_OBJECTS">CREATING&nbsp;REPLACEMENT&nbsp;OBJECTS</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-REPLACE(1)                   Git Manual                   GIT-REPLACE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-replace - Create, list, delete refs to replace objects
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git replace</i> [-f] &lt;object&gt; &lt;replacement&gt;
+       <i>git replace</i> [-f] --edit &lt;object&gt;
+       <i>git replace</i> [-f] --graft &lt;commit&gt; [&lt;parent&gt;...]
+       <i>git replace</i> -d &lt;object&gt;...
+       <i>git replace</i> [--format=&lt;format&gt;] [-l [&lt;pattern&gt;]]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Adds a <i>replace</i> reference in <b>refs/replace/ </b>namespace.
+
+       The name of the <i>replace</i> reference is the SHA-1 of the object that is
+       replaced. The content of the <i>replace</i> reference is the SHA-1 of the
+       replacement object.
+
+       The replaced object and the replacement object must be of the same
+       type. This restriction can be bypassed using <b>-f</b>.
+
+       Unless <b>-f </b>is given, the <i>replace</i> reference must not yet exist.
+
+       There is no other restriction on the replaced and replacement
+       objects. Merge commits can be replaced by non-merge commits and vice
+       versa.
+
+       Replacement references will be used by default by all Git commands
+       except those doing reachability traversal (prune, pack transfer and
+       fsck).
+
+       It is possible to disable use of replacement references for any
+       command using the <b>--no-replace-objects </b>option just after <i>git</i>.
+
+       For example if commit <i>foo</i> has been replaced by commit <i>bar</i>:
+
+           $ git --no-replace-objects cat-file commit foo
+
+       shows information about commit <i>foo</i>, while:
+
+           $ git cat-file commit foo
+
+       shows information about commit <i>bar</i>.
+
+       The <b>GIT_NO_REPLACE_OBJECTS </b>environment variable can be set to achieve
+       the same effect as the <b>--no-replace-objects </b>option.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -f, --force
+           If an existing replace ref for the same object exists, it will be
+           overwritten (instead of failing).
+
+       -d, --delete
+           Delete existing replace refs for the given objects.
+
+       --edit &lt;object&gt;
+           Edit an object’s content interactively. The existing content for
+           &lt;object&gt; is pretty-printed into a temporary file, an editor is
+           launched on the file, and the result is parsed to create a new
+           object of the same type as &lt;object&gt;. A replacement ref is then
+           created to replace &lt;object&gt; with the newly created object. See
+           <a href="git-var.1.html">git-var(1)</a> for details about how the editor will be chosen.
+
+       --raw
+           When editing, provide the raw object contents rather than
+           pretty-printed ones. Currently this only affects trees, which
+           will be shown in their binary form. This is harder to work with,
+           but can help when repairing a tree that is so corrupted it cannot
+           be pretty-printed. Note that you may need to configure your
+           editor to cleanly read and write binary data.
+
+       --graft &lt;commit&gt; [&lt;parent&gt;...]
+           Create a graft commit. A new commit is created with the same
+           content as &lt;commit&gt; except that its parents will be [&lt;parent&gt;...]
+           instead of &lt;commit&gt;'s parents. A replacement ref is then created
+           to replace &lt;commit&gt; with the newly created commit. See
+           contrib/convert-grafts-to-replace-refs.sh for an example script
+           based on this option that can convert grafts to replace refs.
+
+       -l &lt;pattern&gt;, --list &lt;pattern&gt;
+           List replace refs for objects that match the given pattern (or
+           all if no pattern is given). Typing "git replace" without
+           arguments, also lists all replace refs.
+
+       --format=&lt;format&gt;
+           When listing, use the specified &lt;format&gt;, which can be one of
+           <i>short</i>, <i>medium</i> and <i>long</i>. When omitted, the format defaults to
+           <i>short</i>.
+</pre>
+<h2><a id="FORMATS" href="#FORMATS"></a>FORMATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following format are available:
+
+       ·   <i>short</i>: &lt;replaced sha1&gt;
+
+       ·   <i>medium</i>: &lt;replaced sha1&gt; → &lt;replacement sha1&gt;
+
+       ·   <i>long</i>: &lt;replaced sha1&gt; (&lt;replaced type&gt;) → &lt;replacement sha1&gt;
+           (&lt;replacement type&gt;)
+</pre>
+<h2><a id="CREATING_REPLACEMENT_OBJECTS" href="#CREATING_REPLACEMENT_OBJECTS"></a>CREATING REPLACEMENT OBJECTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="git-filter-branch.1.html">git-filter-branch(1)</a>, <a href="git-hash-object.1.html">git-hash-object(1)</a> and <a href="git-rebase.1.html">git-rebase(1)</a>, among
+       other git commands, can be used to create replacement objects from
+       existing objects. The <b>--edit </b>option can also be used with <i>git replace</i>
+       to create a replacement object by editing an existing object.
+
+       If you want to replace many blobs, trees or commits that are part of
+       a string of commits, you may just want to create a replacement string
+       of commits and then only replace the commit at the tip of the target
+       string of commits with the commit at the tip of the replacement
+       string of commits.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Comparing blobs or trees that have been replaced with those that
+       replace them will not work properly. And using <b>git reset --hard </b>to go
+       back to a replaced commit will move the branch to the replacement
+       commit instead of the replaced commit.
+
+       There may be other problems when using <i>git rev-list</i> related to
+       pending objects.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="git-hash-object.1.html">git-hash-object(1)</a> <a href="git-filter-branch.1.html">git-filter-branch(1)</a> <a href="git-rebase.1.html">git-rebase(1)</a> <a href="git-tag.1.html">git-tag(1)</a>
+       <a href="git-branch.1.html">git-branch(1)</a> <a href="git-commit.1.html">git-commit(1)</a> <a href="git-var.1.html">git-var(1)</a> <a href="git.1.html">git(1)</a>
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.9.2.277.g2949358           07/16/2016                   GIT-REPLACE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="../man5/gitrepository-layout.5.html">gitrepository-layout(5)</a>,&nbsp; 
+    <a href="../man7/gitglossary.7.html">gitglossary(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

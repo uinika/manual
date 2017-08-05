@@ -1,0 +1,576 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-TW" lang="zh-TW"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="电子邮件主机之设定，主要介绍 Postfix ，不过亦有提及 Sendmail 的相关技巧">
+	<title>鸟哥的 Linux 私房菜 -- Mail Server</title>
+    <script src="../script/SpryMenuBar.js" type="text/javascript"></script>
+	<script src="../script/index.js" type="text/javascript"></script>
+	<link href="../css/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css" />
+    <link href="../css/main.css" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html','../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://linux.vbird.org/linux_server/0380mail.php">
+    <span class="text_head0">第二十二章、邮件服务器：<span class="text_head_en"> Postfix</span></span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2011/08/10</span>
+    </div>
+
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+22.1 <a href="#whatmail">邮件服务器的功能与运作原理</a><br>
+	<span class="text_h2">
+	　　22.1.1 <a href="#whatmail_work">电子邮件的功能与问题</a><br>
+	　　22.1.2 <a href="#whatmail_dns">Mail server 与 DNS 之间的关系</a><br>
+	　　22.1.3 <a href="#whatmail_mta">邮件传输所需要的组件 (MTA, MUA, MDA) 以及相关协议</a><br>
+	　　22.1.4 <a href="#whatmail_pop">使用者收信时服务器端所提供的相关协议： MRA</a><br>
+	　　22.1.5 <a href="#whatmail_relay">Relay 与认证机制的重要性</a><br>
+	　　22.1.6 <a href="#whatmail_mail">电子邮件的数据内容</a><br>
+	</span>
+</span></div>
+<!-- 本文的正式部分 -->
+<hr><a name="whatmail"></a><img src="../image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">22.1 邮件服务器的功能与运作原理</span><br>
+<div class="block1">
+	<p>电子邮件是个啥玩意儿？它是利用网络传递一些信息给远程服务器的一种信息传递行为，虽然消息正文是很冷很硬的计算机文字，
+	确实比不上手写信件来的让人觉得温暖，不过，对于具有时效性的信息来说，电子邮件可是个不可多得的好帮手！
+	但是，电子邮件系统蓬勃发展的现在却被某些少部分的特定人士所乱用，导致垃圾信件、色情广告信件等等的泛滥！
+	真是啊～伤脑筋～底下我们就先来谈一谈这个电子邮件相关的功能吧！</p>
+
+	<div style="padding: 10pt 0pt 10pt 0pt ;" align="right"><table width="90%"><tbody><tr><td><b>Tips:</b><br><span style="color : #009000"><font size="-1">	时至今日，Google 与几个大型的网络公司都有提供免费或者是付费的邮件服务器，其中，免费的电子邮件账号甚至已经提供高达数个 GB
+	的邮件储存量！对于一般用户来说真是非常够用了！因此，除非必要，现在我们都『不建议您架设 mail server』的！
+	因为玩过邮件主机的朋友都很清楚，在现在的环境当中想要搞定 Mail server 是很难的一件事情，
+	除了目前网络社会的广告信、垃圾信、病毒信实在是多的不象话，所以各主要的 ISP 对于邮件控管上面越来越严格，
+	而且基本功当中的 mail vs. DNS 相关性又太高！很难理解～
+	</font></span></td><td><img src="0380mail_files/vbird_face.gif" alt="鸟哥的图示" title="鸟哥的图示"></td></tr></tbody></table></div>
+	<hr><a name="whatmail_work"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">22.1.1 电子邮件的功能与问题</span><br>
+	<div class="block2">
+		<p>在目前的社会当中，没有电子邮件 (e-mail) 似乎是蛮奇怪的一件事！可以说，现在 e-mail 
+		已经成为一个很普遍的人与人之间的沟通管道了，
+		电子邮件可以很快速的帮你将文件或讯息传送到地球上的任何一个有网络存在的角落，当然，
+		你也可以在任何有网络的地方，连上 Internet 去收取你的信件！</p>
+
+		<p>不过，遗憾的是，只要是有人类的地方，就会有很多你意想不到的事情会出现了，当然 e-mail 也不例外，怎么说呢？
+		我们来慢慢的分析一下电子邮件产生的一些问题吧：</p>
+
+		<ul style="padding-left: 20px">
+		<li><span class="text_import2">夹带病毒的电子邮件问题：</span><br>
+		你可以常常听到电子邮件可能夹带病毒对吧！没错，利用电子邮件以及人们对于电子邮件的漫不经心的态度，
+		使得以电子邮件为媒介的计算机病毒更容易『深入人群』当中吶！<br><br></li>
+
+		<li><span class="text_import2">怪客透过邮件程序入侵：</span><br>
+		只要在 Internet 上面跑的数据就没有绝对保密的！你可以轻易的使用怪客软件 (Cracker) 就可以取得使用者在利用 e-mail 
+		传送过程当中所输入的账号与密码，若经过分析之后，还可能破解对方的邮件主机～哇！真是乱可怕一把的！<br><br></li>
+
+		<li><span class="text_import2">广告信与垃圾信等：</span><br>
+		这个可说是目前各大 ISP 心中永远的痛～这些垃圾信件可以占掉很多那少的可怜的带宽，
+		使得正常用户连接速度与质量下降，更可能造成网络的停顿～当然，常常收到垃圾信件的你，大概也不好过吧！<br><br></li>
+
+		<li><span class="text_import2">主机被大量不明信件塞爆：</span><br>
+		万一你没有将邮件服务器设定好，嘿嘿！送信者可以藉由你主机收信的功能，发送大量的信件，
+		让你『一次收个够！』灌爆你的服务器硬盘，想要不当机都粉难～<br><br></li>
+
+		<li><span class="text_import2">真实社会的讨厌情事：</span><br>
+		『黑函』！听到会不会很害怕？当然很害怕啦！偏偏使用 e-mail 就可以作很多的坏事～这真是太不道德了～<br><br></li>
+
+		<li><span class="text_import2">不实的信件内容：</span><br>
+		只要注意到消基会的讯息就可以知道啦，不明来源的电子邮件说的内容，不要轻易的相信！
+		因为很多可是以讹传讹，结果，大家都被耍了的～例如，你的朋友收到一封信，认为『哇！这是大事情』，
+		所以在没有求证的情况下，将信『转寄』给你看，嘿！你的朋友寄给你的，当然要相信他啦！
+		立刻再转寄，如此一再地循环，嘿嘿！这个错误内容的讯息马上就让大家知道，
+		更可怕的是『还会让大家接受～』所以，看到任何讯息时，请千万要记得求证一下吶！</li>
+		</ul>
+
+		<p>可怕吧！电子邮件会衍生出这么多的问题说～另外，这个 email 服务器的设定与管理真的是网管人员心中永远的痛！
+		为什么呢？因为人都是想要越便利越简单越好，但越便利越不管制的邮件服务器就越容易被攻击或遭利用！
+		反过来说，如果你针对邮件服务器管得太严厉，那就不太人性化，相信至少您的主管可能就不太满意，怎么办？</p>
+
+		<p>呵呵！没错啦！邮件服务器就是这么回事，让人又爱又怕的一个玩意儿，搞定他，恭喜您啊一切顺利圆满！
+		搞不定他，服务器被当成垃圾信件转运站事小，丢掉工作那可是『兹事体大』呦！就因为他是这么重要又难以搞定，
+		所以我们可得好好的学学他吶！</p>
+	</div>
+
+	<hr><a name="whatmail_dns"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">22.1.2 Mail server 与 DNS 之间的关系</span><br>
+	<div class="block2">
+		<p>既然要使用 e-mail ，当然就需要邮件服务器啰 (Mail Server)！不然你的信要怎样寄出去呢？事实上，
+		mail server 的原理说难不难，但是说简单吗～似乎又有点难以理解～，所以，
+		底下我们要来谈一谈他的原理部分，然后再针对服务器的设定来进行说明咯！我们首先要讲的就是『
+		<span class="text_import2">Mail server 系统与 DNS 系统有什么关连性？</span>』
+		这个部分新手最容易被搞混哩，<span class="text_import2">是否要架设 mail server 就『宿命』的一定得架设 
+		DNS server 在你的主机上面吗？</span><br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>Mail server 与合法的主机名</li></ul>
+
+		<p>事实上目前已经没有人会使用 IP 来寄信了，我们通常接收到的 email 都是使用『账号@主机名』的方式来处理的，
+		所以说，你的邮件服务器『<span class="text_import2">就一定要有一个合法注册过的主机名</span>』才可以。为什么呢？
+		因为网络恶意使用与垃圾邮件泛滥的种种因素，导致我们不允许直接利用主机的 IP 来寄信了，否则每部有 IP 的主机都能寄信...
+		因此，你想要架设 mail server 就『必需』要有<a href="http://linux.vbird.org/linux_server/0270dynamic_dns.php">合法的主机名</a>啰。</p>
+
+		<p>OK！既然我只要一个合法的主机名即可，那么表示我不需要架设一部 DNS 主机啰？
+		是的，你可以这样认为！只要你拥有合法的主机名，亦即在 DNS 的查询系统当中你的主机名拥有一个 A 的标志，
+		理论上你的 mail server 就可以架设成功。<span class="text_import2">只不过由于目前因特网上面的广告信、
+		垃圾信与病毒信等占用了太多的带宽，导致整个网络社会花费过多的成本在消耗这些垃圾资料。</span>
+		所以为了杜绝可恶的垃圾信件，目前的大型网络供货商 (ISP) 都会针对不明来源的邮件加以限制，
+		这也就是说『<span class="text_import2">想要架设一部简单可以运作的 mail server 越来越难了</span>』。<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>DNS 的反解也很重要！</li></ul>
+
+		<p>对于一般的服务器来说，我们只要使用正解让客户端可以正确的找到我们服务器的 IP 即可架站，举例来说 WWW 
+		服务器就是这样。不过，由于目前收信端的邮件服务器会针对邮件来源的 IP 进行反解，而如果你的网络环境是由拨接取得非固定的 
+		IP 时，该种 IP 在 ISP 方面通常会主动的以 xxx.dynamic.xxx 
+		之类的主机名来管理，偏偏这样的主机名会被主要的大型邮件服务器 (例如 hotmail, yahoo 等) 视为垃圾信件，
+		所以你的邮件服务器所发出的信件将可能被丢弃，那可就伤脑筋了！</p>
+
+		<p>所以啊，如果你想要架设一部 Mail server 的话，请『务必』向您的上层 ISP 申请 IP 反解的对应，
+		不要再使用预设的反解主机名，否则很容易导致您的邮件服务器所发出的信件会在 Internet 上面流浪啊！</p>
+
+		<div style="padding: 10pt 0pt 10pt 0pt ;" align="right"><table width="90%"><tbody><tr><td><b>Tips:</b><br><span style="color : #009000"><font size="-1">		其实你还是可以不用申请 IP 的反解，不过就得要利用所谓的 relayhost 或者是 smarthost 来处理邮件转递的问题，
+		这个部分又涉及到上层 ISP 的问题，挺复杂！我们会在后续作说明！
+		</font></span></td><td><img src="0380mail_files/vbird_face.gif" alt="鸟哥的图示" title="鸟哥的图示"></td></tr></tbody></table></div>
+		<ul class="list1"><li class="text_import1"><hr>需要 DNS 的 MX 及 A 标志啊 (超重要的 MX)！</li></ul>
+
+		<p>那么我们的邮件服务器系统到底是如何使用 DNS 的信息来进行邮件的传递的？还记得在<a href="http://linux.vbird.org/linux_server/0350dns.php">十九章 DNS 里面谈到的 MX</a> 这个标志吗？当时我们仅说过这个 MX 代表的是 Mail eXchanger，
+		当一封邮件要传送出去时，邮件主机会先分析那封信的『目标主机的 DNS 』，先取得 MX 标志 (注意，MX 标志可能会有多部主机喔)
+		然后以最优先 MX 主机为准将信发送出去。看不懂吗？没关系，我们以底下这个 DNS 范例来说：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>xyz.com.vbird  IN  MX 10 mail.xyz.com.vbird
+xyz.com.vbird  IN  MX 20 mail2.xyz.com.vbird
+xyz.com.vbird  IN  A     aaa.bbb.ccc.ddd
+</pre></td></tr></tbody></table>
+
+		<p>假如上述的 DNS 设定是正常的，那么：</p>
+
+		<ul>
+		<li>当有一封信要传给 user@xyz.com.vbird 时，由于 MX 标志最低者优先，所以该封信会先传送到 
+			mail.xyz.com.vbird 那部主机。</li>
+		<li>如果 mail.xyz.com.vbird 由于种种原因，导致无法收下该封信时，该封信将以次要 MX 主机来传送，那就是传送到
+			mail2.xyz.com.vbird 那部主机上头；</li>
+		<li>如果两部 MX 主机都无法负责的话，那么该封信会直接以 A 的标志，亦即直接传送到 aaa.bbb.ccc.ddd 那个 IP 上头去，
+			也就是 xyz.com.vbird 本身啦！</li>
+		</ul>
+
+		<p>在这个过程当中，你必需要注意到：mail.xyz.com.vbird 及 mail2.xyz.com.vbird 必需要是可以帮 xyz.com.vbird 
+		转信的主机才行，也就是说，<span class="text_import2">那两部主机通常是你公司的最上游的邮件主机，
+		并不是你随意填写的！</span>那两部主机还需要针对你的 xyz.com.vbird 来设定『邮件转递』才行！
+		否则你的信会被踢掉的。</p>
+
+		<p>由于现在的很多邮件服务器会去搜寻 MX 这个标志来判断目标邮件服务器是否为合法，所以你要架设 Mail server 
+		虽然不必自行设定 DNS 服务器，不过你最好要申请一个 MX 的标志才行。此外，<span class="text_import2">MX
+		标志一定要设定正确，否则你的信件将可能会直接被 MX 服务器踢掉。</span>为了要设定 MX 
+		但是我们没有上层邮件服务器时，<span class="text_import2">所以你可以指定 MX 为自己，利用自己当 
+		MX 服务器即可</span>。</p>
+
+		<p>那么你或许会想，这个 MX 有啥好处啊？一般来说，如果目标主机挂点时，你的邮件通常会直接退还给原发信者，
+		但如果有 MX 主机时，这部 MX 主机会先将该封信放在他的队列 (queue) 当中，等到你的目标主机重新提供邮件服务后，
+		MX 主机会将你的信件传送给目标主机，如此一来你的信件就比较不会遗失啊！这样说，您可以了解吧！ ^_^<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>Email 的地址写法</li></ul>
+
+		<p>刚刚上头说过 email 通常是『账号@主机名』的方式来处理，举例来说鸟哥的 www.centos.vbird 主机上面有个 dmtsai
+		的使用者，则我的 email 将会成为：『dmtsai@www.centos.vbird』，当有人要寄信给我时，
+		他会分析 @ 后面的主机名，亦即 www.centos.vbird 的 MX/A 标志等等，然后再透过刚刚说明的流程来传出信件。
+		而当我的 www.centos.vbird. 收到这封信时，他会将信放到 dmtsai 的信箱当中啦！底下我们就来谈一谈这个流程吧！</p>
+	</div>
+
+	<hr><a name="whatmail_mta"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">22.1.3 邮件传输所需要的组件 
+	(MTA, MUA, MDA) 以及相关协议</span><br>
+	<div class="block2">
+		<p>在开始介绍邮件的传送过程之前，我们先来想一想，你是如何寄出电子邮件的？假设你要寄信给一个使用者，
+		他的电子邮件是『a_user@gmail.com』好了，也就是说，你要寄一封信到 gmail.com 这个主机上的意思。
+		那你的桌面计算机 (举例来说， Windows 系统) 是否能够将这封信『直接』透过网络送给 gmail.com 那个主机上？
+		当然不行啦！你得要设定帮你转信的邮件服务器才行！也就是说，<span class="text_import2">你必需要先向某一部邮件服务器注册，
+		以取得一个合法的电子邮件权限后，才能够发送邮件出去的。</span></p>
+
+		<p>所以说，你要寄出一封信件时是需要很多接口的帮忙的，底下列出一个简单的图示来说明：</p>
+
+		<a name="fig22.1-1"></a>
+		<center><img src="0380mail_files/mail_comps.gif" alt="电子邮件的『传送』过程示意图" title="电子邮件的『传送』过程示意图" border="0"><br>
+		图 22.1-1、电子邮件的『传送』过程示意图<br></center>
+
+		<p>我们先来解释一些专有名词吧！然后再来说明传送的流程：</p>
+
+		<hr>
+		<ol style="padding-left: 25px" type="A">
+		<li><span class="text_import1">MUA (Mail User Agent)：</span><br><br>
+
+		顾名思义 MUA 就是『邮件使用者代理人』的意思，因为除非你可以直接利用类似 telnet 
+		之类的软件登入邮件服务器来主动发出信件，否则您就得要透过 MUA 来帮你送信到邮件服务器上头去。
+		最常见的 MUA 像是 <a href="http://moztw.org/" target="_blank">Mozilla</a> 推出的
+		<a href="http://moztw.org/thunderbird/" target="_blank">Thunderbird (雷鸟)</a> 自由软件，
+		或者是 Linux 桌面 KDE 常见的 Kmail ，及 Windows 内件的 Outlook Express (OE) 等。
+		<span class="text_import2">MUA 主要的功能就是收受邮件主机的电子邮件，以及提供用户浏览与编写邮件的功能！
+		</span><br><br></li>
+
+		<li><span class="text_import1">MTA (Mail Transfer Agent)：</span><br><br>
+
+		MUA 帮用户传送邮件到邮件主机上，那这部邮件主机如果能够帮用户将这封信寄出去，那他就是一部邮件传送主机 
+		(MTA) 啦！这个 MTA 就是『邮件传送代理人』的意思。也来顾名思义一下，既然是『传送代理人』，
+		那么使用者寄出的信，帮用户将属于该用户的信件收下时，就是找它 (MTA) 就对啦！基本上，MTA 的功能有这些：<br><br>
+
+		<ol>
+		<li><span class="text_import2">收受信件：使用简单邮件传送协议(SMTP)</span><br>
+		MTA 主机最主要的功能就是：将来自客户端或者是其他 MTA 的来信收下来，这个时候 MTA 使用的是 
+		Simple Mail Transfer Protocol (SMTP)，他使用的是 port 25 啦！<br><br></li>
+		<li><span class="text_import2">转递信件：</span><br>
+		如果该封信件的目的地并不是本身的用户，且该封信的相关数据符合使用 MTA 的权力，
+		那么咱们的 MTA 就会将该封信再传送到下一部主机上。这即是所谓的转递 (Relay) 的功能。<br><br></li>
+		</ol>
+
+		总之，我们一般提到的 Mail Server 就是 MTA 啦！而严格来说， MTA 其实仅是指 SMTP 这个协议而已。而达成 MTA 的 SMTP 
+		功能的主要软件包括老牌的 sendmail，后起之秀的 postfix，还有 qmail 等等。底下我们来看看，那么在 MTA 
+		上头还有哪些重要的功能。<br><br></li>
+
+		<li><span class="text_import1">MDA (Mail Delivery Agent)：</span><br><br>
+
+		字面上的意思是『邮件递送代理人』的意思。事实上，这个 MDA 是挂在 MTA 底下的一个小程序，
+		最主要的功能就是：<span class="text_import2">分析由 MTA 所收到的信件表头或内容等数据，
+		来决定这封邮件的去向。</span>所以说，上面提到的 MTA 的信件转递功能，其实是由 MDA 达成的。
+		举例来说，如果 MTA 所收到的这封信目标是自己，那么 MDA 会将这封信给他转到使用者的信箱 (Mailbox) 去，
+		如果不是呢？那就准备要转递出去了。此外，MDA 还有分析与过滤邮件的功能喔！举例来说：<br><br>
+		<ol>
+		<li><span class="text_import2">过滤垃圾信件：</span><br>
+		可以根据该封邮件的表头资料，或者是特定的信件内容来加以分析过滤。例如某个广告信的主题都是固定的，
+		如『AV情色...』等等，那就可以透过 MDA 来过滤并去除该邮件。<br><br></li>
+		<li><span class="text_import2">自动回复：</span><br>
+		如果您出差了导致某一段时间内无法立即回信时，就可以透过 MDA 的功能让邮件主机可以自动发出回复信件，
+		如此您的朋友就不会认为你太大牌！^_^</li>
+		</ol><br>
+
+		各主要的 MTA 程序 (sendmail,postfix...) 都有自己的 MDA 功能，不过有些外挂的程序功能更强大，举例来说 procmail 
+		就是一个过滤的好帮手，另外 Mailscanner + Spamassassion 也是可以使用的一些 MDA 喔。<br><br></li>
+
+		<li><span class="text_import1">Mailbox：</span><br><br>
+		就是电子邮件信箱嘛！简单的说，就是某个账号专用的信件收受档案啰。我们的 Linux
+		系统默认的信箱都是放在 <span class="text_import2">/var/spool/mail/使用者账号</span> 中！
+		若 MTA 所收到的信件是本机的使用者，MDA 就会将信件送到该 mailbox 当中去啰！<br><br></li>
+		</ol><hr>
+
+		<p>好了，那么来想一想，你如何透过 MUA 来将信件送到对方的邮件信箱 (Mailbox) 去呢？</p>
+
+		<ul style="padding-left: 25px">
+		<li><span class="text_import2">Step 0：取得某部 MTA 的权限：</span><br><br>
+		就如<a href="#fig22.1-1">图 22.1-1</a> 所示，我们本地端的 MUA 想要使用 MTA 来传出信件时，
+		当然需要取得 MTA 的权限。通常就是说：我们必须要向 MTA 注册一组可使用 email 的账号与密码才行。<br><br></li>
+
+		<li><span class="text_import2">Step 1：使用者在 MUA 上编写信件后，传送至 MTA 上头：</span><br><br>
+		使用者在 MUA 上面编写信件，信件的数据主要有：<br><br>
+		<ul>
+		<li>信件标头：包括发件人与收件者的 email 地址，还有该封信件的主旨 (subject) 等；</li>
+		<li>信件内容：就是你要跟对方说明的内容啦！</li>
+		</ul><br>
+		编写完毕之后只要按下传送钮，该封信就会送至你的 MTA 服务器上面了，注意：是你的 MTA 而不是对方的 MTA ！
+		如果你确定可以使用该部 MTA，那么你的这封信就会被放置到 MTA 的队列 (queue) 当中并等待传送出去了。<br><br></li>
+
+		<li><span class="text_import2">Step 2.1：如果该封信的目标是本地端 MTA 自己的账号</span><br><br>
+		你是可以寄信给你自己的，所以如果你的 MTA 收到该封信件的目标是自己的用户时，那就会透过 MDA 
+		将这封信送到 Mailbox 去啰！<br><br></li>
+
+		<li><span class="text_import2">Step 2.2：如果该封信目的为其他 MTA ，则开始转递 (Relay) 的流程：</span><br><br>
+		那如果这封信的目标是其他的主机呢？这个时候我们的 MTA 就会开始分析该封信是否具有合法的权限，
+		若具有权限时，则我们的 MDA 会开始进行邮件转递，亦即该封信件会透过我们的 MTA 向下一部 MTA 的 smtp (port 25)
+		发送出去。如果该封信件顺利的发送出去了，那么该封信件就会由队列当中移除掉了。<br><br></li>
+
+		<li><span class="text_import2">Step 3：对方 MTA 服务器收受信件</span><br><br>
+		如果一切都没有问题的话，远程的 MTA 会收到我们 MTA 所发出的那封信，并将该信件放置到正确的使用者信箱当中，
+		等待使用者登入来读取或下载。</li>
+		</ul>
+
+		<p>在这整个过程当中，你会发现<span class="text_import2">你的信件是由我们的 MTA 帮忙发送出去的，此时 
+		MTA 提供的协议是简单邮件传输协议 (Simple Mail Transfer Protocol, smtp)，</span>
+		并且该封信最终是停留在对方主机的 MTA 上头！并不是你朋友的 MUA 上头啊！</p>
+
+		<div style="padding: 10pt 0pt 10pt 0pt ;" align="right"><table width="90%"><tbody><tr><td><b>Tips:</b><br><span style="color : #009000"><font size="-1">		为何特别强调这一点？因为以前有个朋有跟我说：『鸟哥啊，你要寄 email 给我的时候记得跟我讲，
+		那我下班前将计算机开着，以免你信寄不到我的信箱』，此时额头三条线突然跑出来～很不好意思～
+		所以这里才要特别强调，你的 MUA 不必开着啦！要收信时再打开即可。
+		</font></span></td><td><img src="0380mail_files/vbird_face.gif" alt="鸟哥的图示" title="鸟哥的图示"></td></tr></tbody></table></div>
+		<p>了解了传送信件时 MTA 需要启动 smtp (port 25) 之后，再来我们得要谈谈那这封信件对方要如何接收啊？</p>
+	</div>
+
+	<hr><a name="whatmail_pop"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">22.1.4 
+	使用者收信时服务器端所提供的相关协议： MRA</span><br>
+	<div class="block2">
+		<p>那使用者如果想要收信时，当然也可以透过 MUA 直接来联机取得自己的邮件信箱内的数据啊！整个过程有点像底下这样：</p>
+
+		<a name="fig22.1-2"></a>
+		<center><img src="0380mail_files/mail_comps_mra.gif" alt="客户端透过 MRA 收回信件的流程示意图" title="客户端透过 MRA 收回信件的流程示意图" border="0"><br>
+		图 22.1-2、客户端透过 MRA 收回信件的流程示意图<br></center>
+
+		<p>在上述的图示中，多了一个邮件组件，那就是 MRA：</p>
+
+		<ol start="5" style="padding-left: 25px" type="A">
+		<li><span class="text_import1">MRA (Mail Retrieval Agent)：</span><br><br>
+
+		使用者可以透过 MRA 服务器提供的邮政服务协议 (Post Office Protocol, POP) 来收下自己的信件，
+		也可以透过 IMAP (Internet Message Access Protocol) 协议将自己的信件保留在邮件主机上面，
+		并进一步建立邮件数据匣等进阶工作。也就是说，当客户端收受信件时，使用的是 MRA 的 POP3, IMAP 等通讯协议，并非 MTA 
+		的 SMTP 喔！</li>
+		</ol>
+
+		<p>我们先谈一谈 POP3 的收信方式吧：</p>
+
+		<ol class="text_import2">
+		<li>MUA 透过 POP3 (Post Office Protocol version 3) 的协议连接到 MRA 的 port 110，
+		并且输入账号与密码来取得正确的认证与授权；</li>
+		<li>MRA 确认该用户账号/密码没有问题后，会前往该使用者的 Mailbox (/var/spool/mail/使用者账号)
+		取得使用者的信件并传送给用户的 MUA 软件上；</li>
+		<li>当所有的信件传送完毕后，<u>用户的 mailbox 内的数据将会被删除</u>！</li>
+		</ol>
+
+		<p>在上述的流程当中我们知道 MRA 必须要启动 POP3 这个协议才行，不过这个协议的收件方式比较有趣，
+		因为使用者收信是由第一封信件开始收下直到最后一封信件传输完毕为止。<span class="text_import2">不过由于某些 MUA 
+		程序撰写的问题，若有些邮件有病毒的可能性时，透过防病毒软件将可能导致该 MUA 软件的断线！
+		如此一来由于传输没有完毕，因此 MRA 主机并不会将用户的信件删除。</span>
+		此时如果使用者又再一次的按下接收按键，呵呵！原来已接收的信件又会重复收到，而没有收到的还是收不到！</p>
+
+		<p>这个时候或许你可以透过登入主机利用 mail 这个指令来处理你有问题的邮件，
+		或许换一种 MUA 也是个不错的思考方向，又或者暂时将防病毒软件关掉也是可以考虑的手段之一。
+		转头过来想一想，因为 POP3 的协议预设会将信件删除，那如果我今天在办公室将我的信收到办公室的计算机中，
+		当我回家时再度启动 MUA 时，是否能够收到已经被接收的信件？当然不行，对吧！</p>
+
+		<p>或许你需要更有帮助的协议，亦即 <span class="text_import2">IMAP (Internet Messages Access Protocol) ，
+		这个协议可以让你将 mailbox 的数据转存到你主机上的家目录，亦即 /home/账号/ 那个目录下，
+		那你不但可以建立邮件数据匣，也可以针对信件分类管理</span>，而且在任何一个可连上网络的地方你只要登入主机，
+		原本的信件就还是存在吶！真是好啊！</p>
+
+		<p>不过，使用 IMAP 时，用户的目录最好能够加点限制，例如利用 quota 来管理用户的硬盘权限，
+		否则因为信件都在主机上头，如果用户过多且误用时，你的硬盘空间会被吃光光喔！注意注意！</p>
+
+		<p>OK！透过上面的说明你要知道，<span class="text_import2">要架设一部可以使用 MUA 进行收发信件的 MTA, MRA
+		服务器，你至少也需要启动 SMTP 以及 POP3 这两个协议才行！</span>而这两个协议的启动程序并不相同，
+		所以架设上还是得要小心注意啊！<br><br></p>
+
+		<ul class="list1"><li class="text_import1"><hr>pop3s, imap2 与 SMTP 的困扰</li></ul>
+
+		<p>邮件数据在因特网上面传输时，透过的 SMTP, POP3, IMAP 等通讯协议，通通是明码传输的！尤其 POP3, IMAP
+		这两个通讯协议中，使用者必须要输入账号/密码才能收受信件！因为涉及帐密，所以当然加密这两个通讯协议的数据较佳！
+		于是就有了 POP3s, IMAPs 通讯协议出现了！透过 SSL 加密嘛！那你会问，既然已经有 pop3s, imaps 了，
+		那有没有 smtps 呢？答案是，当然有！只不过没人用！</p>
+
+		<p>从<a href="#fig22.1-1">图 22.1-1</a> 及<a href="#fig22.1-2">图 22.1-2</a> 的流程来看，POP3, IMAP 只与 MRA
+		及自己的用户有关，因此你只要跟你的用户说，你服务器使用的 MRA 协议为何，通知你的用户改变即可，并不会影响到其他的服务器。
+		但是 MTA 就不同了！因为 MTA 必须与其他的 MTA 沟通，因此，若你使用了 smtps ，那么全世界与你的 MTA 沟通者，
+		通通需要改变为 smtps 通讯协议才行！这个工程实在太浩大了！目前还没有任何一家 ISP 有能力进行！
+		所以，就造成目前没有 SMTPs 的协议啰。</p>
+
+		<p>那么难道你的数据就一定要是明码吗？那倒不见得～既然你的 MTA 无法加密，那么你就自己将邮件数据加密后，再交由
+		MTA 传送即可！这也是目前很多急需加密数据的邮件用户所使用的手段啦！^_^</p>
+	</div>
+
+	<hr><a name="whatmail_relay"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">22.1.5 Relay 与认证机制的重要性</span><br>
+	<div class="block2">
+		<p>当你需要 MTA 帮你将信寄送到下一部 MTA 去时，这个动作就称为邮件转递 (Relay) 啰，那就是<a href="#fig22.1-1">图 22.1-1</a>当中的 Step 2.2 那个动作啦。那么我们来想一想，<span class="text_import2">如果『所有的人都可以藉由这一部 MTA 帮忙进行 Relay 时，
+		这个情况称之为 Open Relay 的动作』</span>。当你的 MTA 发生 Open Relay 时，会有什么问题？
+		问题可就大了！</p>
+
+		<p>当你的 MTA 由于设定不良的关系导致具有 Open Relay 的状况，加上你的 MTA 确实是连上因特网时，
+		由于因特网上面用 port scan 软件的闲人太多，你的 MTA 具有 Open Relay 的功能这件事情，
+		将会在短时间内就被很多人察觉，此时那些不法的广告信、色情垃圾信业者将会利用你的这部 Open Relay MTA 
+		发送他们的广告，所以你会发生的问题至少有：</p>
+
+		<ul class="text_import2">
+		<li>你主机所在的网域正常使用的连接速度将会变慢，因为网络带宽都被广告、垃圾信吃光了；</li>
+		<li>你的主机可能由于大量发送信件导致主机资源被耗尽，容易产生不明原因当机之类的问题；</li>
+		<li>你的 MTA 将会被因特网社会定义为『黑名单』，从此很多正常的邮件就会无法收发；</li>
+		<li>你 MTA 所在的这个 IP 将会被上层 ISP 所封锁，直到你解决这个 Open Relay 的问题为止；</li>
+		<li>某些用户将会对你的能力产生质疑，对您公司或者是你个人将会有信心障碍！甚至可能流失客源；</li>
+		<li>如果你的 MTA 被利用来发黑函，你是找不到原发信者的，所以你这部 MTA 将会被追踪为最终站！</li>
+		</ul>
+
+		<p>问题很大呦！所以啊，目前所有的 distributions 都一样，几乎都将 MTA 预设启动为仅监听内部循环接口 (lo)
+		而已，而且也将 Open Relay 的功能取消了。既然取消 Open Relay 的功能，那么怎么使用这部
+		MTA 的 Relay 来帮忙转信啊？呵呵！所以我们在上头才会一直说，你『必需』取得合法使用该 MTA 的权限啊！
+		这也就是说，设定谁可以使用 Relay 的功能就是我们管理员的任务啦！通常设定 Relay 的方法有这几种：</p>
+
+		<ul>
+		<li>规定某一个特定客户端的 IP 或网段，例如规定内部 LAN 的 192.168.1.0/24 可使用 Relay；</li>
+		<li>若客户端的 IP 不固定时 (例如拨接取得的非固定 IP) 可以利用认证机制来处理。</li>
+		<li>将 MUA 架设在 MTA 上面，例如 OpenWebMail 之类的 web 接口的 MUA 功能。</li>
+		</ul>
+
+		<p>认证机制上面常见的有 SMTP 邮件认证机制，以及 SMTP after POP 两种，不论是哪一种机制，
+		基本上都是透过让使用者输入认证用的账号与密码，来确定他有合法使用该 MTA 的权限，然后针对通过认证者开启 Relay 
+		的支持就是了。如此一来你的 MTA 不再启动 Open Relay  ，并且客户端还是可以正常的利用认证机制来收发信件，
+		身为管理员的你可就轻松多啰！ ^_^</p>
+	</div>
+
+	<hr><a name="whatmail_mail"></a><img src="../image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">22.1.6 电子邮件的数据内容</span><br>
+	<div class="block2">
+		<p>看过上头的数据后，您应该对于 Mail server 有一些程度的认识了。再来要谈的是，那么一封 email 
+		的内容有哪些部分呢？就跟人类社会的邮件有信封袋以及内部的信纸一样，email 也有所谓的标头 (header) 以及内容 (body) 
+		两部份喔！</p>
+
+		<p>email 的标头部分 (类似邮件信封) 会有几个重要信息，包括：这封信来自那个 MTA、是由谁所发送出来的、要送给谁、
+		主旨为何等等，至于内容 (类似信封内的信纸) 则是发信者所填写的一些说明啰。如果你使用 dmtsai 的身份下达这个指令：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[dmtsai@www ~]$ <span class="term_command">echo "HaHa.." | mail -s "from vbird" dmtsai</span>
+</pre></td></tr></tbody></table>
+
+		<p>然后将自己的信箱内容叫出来，如下所示：</p>
+
+<table class="term"><tbody><tr><td class="term"><pre>[dmtsai@www ~]$ <span class="term_command">cat /var/spool/mail/dmtsai</span>
+From dmtsai@www.centos.vbird  Mon Aug  8 18:53:32 2011  <span class="term_note">&lt;==发信者的 email</span>
+Return-Path: &lt;dmtsai@www.centos.vbird&gt;                  <span class="term_note">&lt;==这封信的来源</span>
+X-Original-To: dmtsai
+Delivered-To: dmtsai@www.centos.vbird
+<u>Received: by www.centos.vbird (Postfix, from userid 2007)</u>
+        id <u>6D1C8366A</u>; Mon,  8 Aug 2011 18:53:32 +0800 (CST) <span class="term_note">&lt;==邮件ID</span>
+<span class="term_say"># 这部份主要在讲这封 email 的来源与目标收件者 MTA 在哪里的信息～</span>
+Date: Mon, 08 Aug 2011 18:53:32 +0800     <span class="term_note">&lt;==收到信件的日期</span>
+To: dmtsai@www.centos.vbird               <span class="term_note">&lt;==收件者是谁啊！</span>
+Subject: from vbird                       <span class="term_note">&lt;==就是信件标题</span>
+User-Agent: Heirloom mailx 12.4 7/29/08
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Message-Id: &lt;<u>20110808105332.6D1C8366A</u>@www.centos.vbird&gt; <span class="term_note">&lt;==给机器看的邮件ID</span>
+From: dmtsai@www.centos.vbird             <span class="term_note">&lt;==发信者是谁啊！</span>
+
+HaHa..
+</pre></td></tr></tbody></table>
+
+		<p>由原本的信件内容我们可以看到 email 确实是两部份，在标头部分记录了比较详细的收、发件者数据，
+		以及相关的来源、目标之 MTA 信息等等。但你要注意的是，那个『Received:...』那一行资料是『会变动的』，
+		如同前面谈到的 MX 标志，如果一封信由 MUA 传送到 MTA 在由 MTA 传送到 MX 主机后，才传送到最终的 MTA 时，
+		那么这个 Received: 的数据将会记录每一部经手过的 MTA 信息喔！所以你可以借着这个记录数据慢慢的找回这封信的传递方向呢！</p>
+
+		<p>此外，这个邮件的标头以及内容的分析部分，你还可以藉由某些分析软件来进行过滤，
+		这部份我们将在后头再慢慢的介绍给大家了解喔！ ^_^！您先知道一封邮件至少有这些数据，以后咱们再慢慢的解释啰！</p>
+	</div>
+</div>
+<hr />
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://linux.vbird.org/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

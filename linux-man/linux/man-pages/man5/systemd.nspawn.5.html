@@ -1,0 +1,455 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.nspawn(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#.NSPAWN_FILE_DISCOVERY">.NSPAWN&nbsp;FILE&nbsp;DISCOVERY</a> | <a href="#[EXEC]_SECTION_OPTIONS">[EXEC]&nbsp;SECTION&nbsp;OPTIONS</a> | <a href="#[FILES]_SECTION_OPTIONS">[FILES]&nbsp;SECTION&nbsp;OPTIONS</a> | <a href="#[NETWORK]_SECTION_OPTIONS">[NETWORK]&nbsp;SECTION&nbsp;OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.NSPAWN(5)              systemd.nspawn              SYSTEMD.NSPAWN(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.nspawn - Container settings
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /etc/systemd/nspawn/<i>machine</i>.nspawn
+
+       /run/systemd/nspawn/<i>machine</i>.nspawn
+
+       /var/lib/machines/<i>machine</i>.nspawn
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       An nspawn container settings file (suffix .nspawn) encodes additional
+       runtime information about a local container, and is searched, read
+       and used by <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a> when starting a container. Files of
+       this type are named after the containers they define settings for.
+       They are optional, and only required for containers whose execution
+       environment shall differ from the defaults. Files of this type mostly
+       contain settings that may also be set on the <b>systemd-nspawn </b>command
+       line, and make it easier to persistently attach specific settings to
+       specific containers. The syntax of these files is inspired by
+       .desktop files following the <b>XDG Desktop Entry Specification</b><b></b>[1],
+       which in turn are inspired by Microsoft Windows .ini files.
+
+       Boolean arguments used in these settings files can be written in
+       various formats. For positive settings, the strings <b>1</b>, <b>yes</b>, <b>true </b>and
+       <b>on </b>are equivalent. For negative settings, the strings <b>0</b>, <b>no</b>, <b>false</b>
+       and <b>off </b>are equivalent.
+
+       Empty lines and lines starting with # or ; are ignored. This may be
+       used for commenting. Lines ending in a backslash are concatenated
+       with the following line while reading and the backslash is replaced
+       by a space character. This may be used to wrap long lines.
+</pre>
+<h2><a id=".NSPAWN_FILE_DISCOVERY" href="#.NSPAWN_FILE_DISCOVERY"></a>.NSPAWN FILE DISCOVERY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Files are searched by appending the .nspawn suffix to the machine
+       name of the container, as specified with the <b>--machine= </b>switch of
+       <b>systemd-nspawn</b>, or derived from the directory or image file name.
+       This file is first searched in /etc/systemd/nspawn/ and
+       /run/systemd/nspawn/. If found in these directories, its settings are
+       read and all of them take full effect (but are possibly overridden by
+       corresponding command line arguments). If not found, the file will
+       then be searched next to the image file or in the immediate parent of
+       the root directory of the container. If the file is found there, only
+       a subset of the settings will take effect however. All settings that
+       possibly elevate privileges or grant additional access to resources
+       of the host (such as files or directories) are ignored. To which
+       options this applies is documented below.
+
+       Persistent settings files created and maintained by the administrator
+       (and thus trusted) should be placed in /etc/systemd/nspawn/, while
+       automatically downloaded (and thus potentially untrusted) settings
+       files are placed in /var/lib/machines/ instead (next to the container
+       images), where their security impact is limited. In order to add
+       privileged settings to .nspawn files acquired from the image vendor,
+       it is recommended to copy the settings files into
+       /etc/systemd/nspawn/ and edit them there, so that the privileged
+       options become available. The precise algorithm for how the files are
+       searched and interpreted may be configured with <b>systemd-nspawn</b>'s
+       <b>--settings= </b>switch, see <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a> for details.
+</pre>
+<h2><a id="[EXEC]_SECTION_OPTIONS" href="#[EXEC]_SECTION_OPTIONS"></a>[EXEC] SECTION OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Settings files may include an "[Exec]" section, which carries various
+       execution parameters:
+
+       <i>Boot=</i>
+           Takes a boolean argument, which defaults to off. If enabled,
+           <b>systemd-nspawn </b>will automatically search for an init executable
+           and invoke it. In this case, the specified parameters using
+           <i>Parameters=</i> are passed as additional arguments to the init
+           process. This setting corresponds to the <b>--boot </b>switch on the
+           <b>systemd-nspawn </b>command line. This option may not be combined with
+           <i>ProcessTwo=yes</i>. This option is the default if the
+           systemd-nspawn@.service template unit file is used.
+
+       <i>ProcessTwo=</i>
+           Takes a boolean argument, which defaults to off. If enabled, the
+           specified program is run as PID 2. A stub init process is run as
+           PID 1. This setting corresponds to the <b>--as-pid2 </b>switch on the
+           <b>systemd-nspawn </b>command line. This option may not be combined with
+           <i>Boot=yes</i>.
+
+       <i>Parameters=</i>
+           Takes a space-separated list of arguments. This is either a
+           command line, beginning with the binary name to execute, or – if
+           <i>Boot=</i> is enabled – the list of arguments to pass to the init
+           process. This setting corresponds to the command line parameters
+           passed on the <b>systemd-nspawn </b>command line.
+
+       <i>Environment=</i>
+           Takes an environment variable assignment consisting of key and
+           value, separated by "=". Sets an environment variable for the
+           main process invoked in the container. This setting may be used
+           multiple times to set multiple environment variables. It
+           corresponds to the <b>--setenv= </b>command line switch.
+
+       <i>User=</i>
+           Takes a UNIX user name. Specifies the user name to invoke the
+           main process of the container as. This user must be known in the
+           container's user database. This corresponds to the <b>--user=</b>
+           command line switch.
+
+       <i>WorkingDirectory=</i>
+           Selects the working directory for the process invoked in the
+           container. Expects an absolute path in the container's file
+           system namespace. This corresponds to the <b>--chdir= </b>command line
+           switch.
+
+       <i>PivotRoot=</i>
+           Selects a directory to pivot to / inside the container when
+           starting up. Takes a single path, or a pair of two paths
+           separated by a colon. Both paths must be absolute, and are
+           resolved in the container's file system namespace. This
+           corresponds to the <b>--pivot-root= </b>command line switch.
+
+       <i>Capability=</i>, <i>DropCapability=</i>
+           Takes a space-separated list of Linux process capabilities (see
+           <a href="../man7/capabilities.7.html">capabilities(7)</a> for details). The <i>Capability=</i> setting specifies
+           additional capabilities to pass on top of the default set of
+           capabilities. The <i>DropCapability=</i> setting specifies capabilities
+           to drop from the default set. These settings correspond to the
+           <b>--capability= </b>and <b>--drop-capability= </b>command line switches. Note
+           that <i>Capability=</i> is a privileged setting, and only takes effect
+           in .nspawn files in /etc/systemd/nspawn/ and /run/system/nspawn/
+           (see above). On the other hand, <i>DropCapability=</i> takes effect in
+           all cases.
+
+       <i>KillSignal=</i>
+           Specify the process signal to send to the container's PID 1 when
+           nspawn itself receives SIGTERM, in order to trigger an orderly
+           shutdown of the container. Defaults to SIGRTMIN+3 if <b>Boot= </b>is
+           used (on systemd-compatible init systems SIGRTMIN+3 triggers an
+           orderly shutdown). For a list of valid signals, see <a href="../man7/signal.7.html">signal(7)</a>.
+
+       <i>Personality=</i>
+           Configures the kernel personality for the container. This is
+           equivalent to the <b>--personality= </b>switch.
+
+       <i>MachineID=</i>
+           Configures the 128-bit machine ID (UUID) to pass to the
+           container. This is equivalent to the <b>--uuid= </b>command line switch.
+           This option is privileged (see above).
+
+       <i>PrivateUsers=</i>
+           Configures support for usernamespacing. This is equivalent to the
+           <b>--private-users= </b>command line switch, and takes the same options.
+           This option is privileged (see above). This option is the default
+           if the systemd-nspawn@.service template unit file is used.
+
+       <i>NotifyReady=</i>
+           Configures support for notifications from the container's init
+           process. This is equivalent to use <b>--notify-ready= </b>command line
+           switch, and takes the same options. See <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a> for
+           details about the specific options supported.
+</pre>
+<h2><a id="[FILES]_SECTION_OPTIONS" href="#[FILES]_SECTION_OPTIONS"></a>[FILES] SECTION OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Settings files may include a "[Files]" section, which carries various
+       parameters configuring the file system of the container:
+
+       <i>ReadOnly=</i>
+           Takes a boolean argument, which defaults to off. If specified,
+           the container will be run with a read-only file system. This
+           setting corresponds to the <b>--read-only </b>command line switch.
+
+       <i>Volatile=</i>
+           Takes a boolean argument, or the special value "state". This
+           configures whether to run the container with volatile state
+           and/or configuration. This option is equivalent to <b>--volatile=</b>,
+           see <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a> for details about the specific options
+           supported.
+
+       <i>Bind=</i>, <i>BindReadOnly=</i>
+           Adds a bind mount from the host into the container. Takes a
+           single path, a pair of two paths separated by a colon, or a
+           triplet of two paths plus an option string separated by colons.
+           This option may be used multiple times to configure multiple bind
+           mounts. This option is equivalent to the command line switches
+           <b>--bind= </b>and <b>--bind-ro=</b>, see <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a> for details about
+           the specific options supported. This setting is privileged (see
+           above).
+
+       <i>TemporaryFileSystem=</i>
+           Adds a "tmpfs" mount to the container. Takes a path or a pair of
+           path and option string, separated by a colon. This option may be
+           used multiple times to configure multiple "tmpfs" mounts. This
+           option is equivalent to the command line switch <b>--tmpfs=</b>, see
+           <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a> for details about the specific options
+           supported. This setting is privileged (see above).
+
+       <i>Overlay=</i>, <i>OverlayReadOnly=</i>
+           Adds an overlay mount point. Takes a colon-separated list of
+           paths. This option may be used multiple times to configure
+           multiple overlay mounts. This option is equivalent to the command
+           line switches <b>--overlay= </b>and <b>--overlay-ro=</b>, see <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a>
+           for details about the specific options supported. This setting is
+           privileged (see above).
+
+       <i>PrivateUsersChown=</i>
+           Configures whether the ownership of the files and directories in
+           the container tree shall be adjusted to the UID/GID range used,
+           if necessary and user namespacing is enabled. This is equivalent
+           to the <b>--private-users-chown </b>command line switch. This option is
+           privileged (see above).
+</pre>
+<h2><a id="[NETWORK]_SECTION_OPTIONS" href="#[NETWORK]_SECTION_OPTIONS"></a>[NETWORK] SECTION OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Settings files may include a "[Network]" section, which carries
+       various parameters configuring the network connectivity of the
+       container:
+
+       <i>Private=</i>
+           Takes a boolean argument, which defaults to off. If enabled, the
+           container will run in its own network namespace and not share
+           network interfaces and configuration with the host. This setting
+           corresponds to the <b>--private-network </b>command line switch.
+
+       <i>VirtualEthernet=</i>
+           Takes a boolean argument. Configures whether to create a virtual
+           Ethernet connection ("veth") between host and the container. This
+           setting implies <i>Private=yes</i>. This setting corresponds to the
+           <b>--network-veth </b>command line switch. This option is privileged
+           (see above). This option is the default if the
+           systemd-nspawn@.service template unit file is used.
+
+       <i>VirtualEthernetExtra=</i>
+           Takes a colon-separated pair of interface names. Configures an
+           additional virtual Ethernet connection ("veth") between host and
+           the container. The first specified name is the interface name on
+           the host, the second the interface name in the container. The
+           latter may be omitted in which case it is set to the same name as
+           the host side interface. This setting implies <i>Private=yes</i>. This
+           setting corresponds to the <b>--network-veth-extra= </b>command line
+           switch, and maybe be used multiple times. It is independent of
+           <i>VirtualEthernet=</i>. This option is privileged (see above).
+
+       <i>Interface=</i>
+           Takes a space-separated list of interfaces to add to the
+           container. This option corresponds to the <b>--network-interface=</b>
+           command line switch and implies <i>Private=yes</i>. This option is
+           privileged (see above).
+
+       <i>MACVLAN=</i>, <i>IPVLAN=</i>
+           Takes a space-separated list of interfaces to add MACLVAN or
+           IPVLAN interfaces to, which are then added to the container.
+           These options correspond to the <b>--network-macvlan= </b>and
+           <b>--network-ipvlan= </b>command line switches and imply <i>Private=yes</i>.
+           These options are privileged (see above).
+
+       <i>Bridge=</i>
+           Takes an interface name. This setting implies <i>VirtualEthernet=yes</i>
+           and <i>Private=yes</i> and has the effect that the host side of the
+           created virtual Ethernet link is connected to the specified
+           bridge interface. This option corresponds to the
+           <b>--network-bridge= </b>command line switch. This option is privileged
+           (see above).
+
+       <i>Zone=</i>
+           Takes a network zone name. This setting implies
+           <i>VirtualEthernet=yes</i> and <i>Private=yes</i> and has the effect that the
+           host side of the created virtual Ethernet link is connected to an
+           automatically managed bridge interface named after the passed
+           argument, prefixed with "vz-". This option corresponds to the
+           <b>--network-zone= </b>command line switch. This option is privileged
+           (see above).
+
+       <i>Port=</i>
+           Exposes a TCP or UDP port of the container on the host. This
+           option corresponds to the <b>--port= </b>command line switch, see
+           <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a> for the precise syntax of the argument this
+           option takes. This option is privileged (see above).
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a>, <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. XDG Desktop Entry Specification
+           <a href="http://standards.freedesktop.org/desktop-entry-spec/latest/">http://standards.freedesktop.org/desktop-entry-spec/latest/</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                SYSTEMD.NSPAWN(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemd-nspawn.1.html">systemd-nspawn(1)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>vcs(4) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">VCS(4)                    Linux Programmer's Manual                   VCS(4)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       vcs, vcsa - virtual console memory
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/dev/vcs0</i> is a character device with major number 7 and minor number
+       0, usually of mode 0644 and owner root.tty.  It refers to the memory
+       of the currently displayed virtual console terminal.
+
+       <i>/dev/vcs[1-63]</i> are character devices for virtual console terminals,
+       they have major number 7 and minor number 1 to 63, usually mode 0644
+       and owner root.tty.  <i>/dev/vcsa[0-63]</i> are the same, but using <i>unsigned</i>
+       <i>short</i>s (in host byte order) that include attributes, and prefixed
+       with four bytes giving the screen dimensions and cursor position:
+       <i>lines</i>, <i>columns</i>, <i>x</i>, <i>y</i>.  (<i>x</i> = <i>y</i> = 0 at the top left corner of the
+       screen.)
+
+       When a 512-character font is loaded, the 9th bit position can be
+       fetched by applying the <a href="../man2/ioctl.2.html">ioctl(2)</a> <b>VT_GETHIFONTMASK </b>operation
+       (available in Linux kernels 2.6.18 and above) on <i>/dev/tty[1-63]</i>; the
+       value is returned in the <i>unsigned short</i> pointed to by the third
+       <a href="../man2/ioctl.2.html">ioctl(2)</a> argument.
+
+       These devices replace the screendump <a href="../man2/ioctl.2.html">ioctl(2)</a> operations of
+       <a href="../man2/ioctl_console.2.html">ioctl_console(2)</a>, so the system administrator can control access
+       using filesystem permissions.
+
+       The devices for the first eight virtual consoles may be created by:
+
+           for x in 0 1 2 3 4 5 6 7 8; do
+               mknod -m 644 /dev/vcs$x c 7 $x;
+               mknod -m 644 /dev/vcsa$x c 7 $[$x+128];
+           done
+           chown root:tty /dev/vcs*
+
+       No <a href="../man2/ioctl.2.html">ioctl(2)</a> requests are supported.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /dev/vcs[0-63]
+       /dev/vcsa[0-63]
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Introduced with version 1.1.92 of the Linux kernel.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       You may do a screendump on vt3 by switching to vt1 and typing
+
+           cat /dev/vcs3 &gt;foo
+
+       Note that the output does not contain newline characters, so some
+       processing may be required, like in
+
+           fold -w 81 /dev/vcs3 | lpr
+
+       or (horrors)
+
+           xetterm -dump 3 -file /proc/self/fd/1
+
+       The <i>/dev/vcsa0</i> device is used for Braille support.
+
+       This program displays the character and screen attributes under the
+       cursor of the second virtual console, then changes the background
+       color there:
+
+       #include &lt;unistd.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;fcntl.h&gt;
+       #include &lt;sys/ioctl.h&gt;
+       #include &lt;linux/vt.h&gt;
+
+       int
+       main(void)
+       {
+           int fd;
+           char *device = "/dev/vcsa2";
+           char *console = "/dev/tty2";
+           struct {unsigned char lines, cols, x, y;} scrn;
+           unsigned short s;
+           unsigned short mask;
+           unsigned char ch, attrib;
+
+           fd = open(console, O_RDWR);
+           if (fd &lt; 0) {
+               perror(console);
+               exit(EXIT_FAILURE);
+           }
+           if (ioctl(fd, VT_GETHIFONTMASK, &amp;mask) &lt; 0) {
+               perror("VT_GETHIFONTMASK");
+               exit(EXIT_FAILURE);
+           }
+           (void) close(fd);
+           fd = open(device, O_RDWR);
+           if (fd &lt; 0) {
+               perror(device);
+               exit(EXIT_FAILURE);
+           }
+           (void) read(fd, &amp;scrn, 4);
+           (void) lseek(fd, 4 + 2*(scrn.y*scrn.cols + scrn.x), 0);
+           (void) read(fd, &amp;s, 2);
+           ch = s &amp; 0xff;
+           if (attrib &amp; mask)
+               ch |= 0x100;
+           attrib = ((s &amp; ~mask) &gt;&gt; 8);
+           printf("ch='%c' attrib=0x%02x\n", ch, attrib);
+           attrib ^= 0x10;
+           (void) lseek(fd, -1, 1);
+           (void) write(fd, &amp;attrib, 1);
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/ioctl_console.2.html">ioctl_console(2)</a>, <a href="tty.4.html">tty(4)</a>, <a href="ttyS.4.html">ttyS(4)</a>, <b>gpm</b>(8)
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                           VCS(4)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/ioctl_console.2.html">ioctl_console(2)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="vcs.4.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

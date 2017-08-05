@@ -1,0 +1,321 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sadc(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#BUGS">BUGS</a> | <a href="#FILES">FILES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SADC(8)                      Linux User's Manual                     SADC(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sadc - System activity data collector.
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>/usr/local/lib64/sa/sadc [ -C </b><i>comment</i> <b>] [ -D ] [ -F ] [ -L ] [ -V ] [</b>
+       <b>-S { DISK | INT | IPV6 | POWER | SNMP | XDISK | ALL | XALL [,...] } ]</b>
+       <b>[ </b><i>interval</i> <b>[ </b><i>count</i> <b>] ] [ </b><i>outfile</i> <b>]</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>sadc </b>command samples system data a specified number of times
+       (<i>count</i>) at a specified interval measured in seconds (<i>interval</i>). It
+       writes in binary format to the specified <i>outfile</i> or to standard
+       output. If <i>outfile</i> is set to -, then <b>sadc </b>uses the standard system
+       activity daily data file (see below).  In this case, if the file
+       already exists, <b>sadc </b>will overwrite it if it is from a previous
+       month.  By default <b>sadc </b>collects most of the data available from the
+       kernel.  But there are also optional metrics, for which the relevant
+       options must be explicitly passed to <b>sadc </b>to be collected (see option
+       -S below).
+
+       The standard system activity daily data file is named <i>saDD</i> unless
+       option <b>-D </b>is used, in which case its name is <i>saYYYYMMDD</i>, where YYYY
+       stands for the current year, MM for the current month and DD for the
+       current day.  By default it is located in the <i>/var/log/sa</i> directory.
+       Yet it is possible to specify an alternate location for it: If
+       <i>outfile</i> is a directory (instead of a plain file) then it will be
+       considered as the directory where the standard system activity daily
+       data file will be saved.
+
+       When the <i>count</i> parameter is not specified, <b>sadc </b>writes its data
+       endlessly.  When both <i>interval</i> and <i>count</i> are not specified, and
+       option -C is not used, a dummy record, which is used at system
+       startup to mark the time when the counter restarts from 0, will be
+       written.  For example, one of the system startup script may write the
+       restart mark to the daily data file by the command entry:
+
+       <b>/usr/local/lib64/sa/sadc -</b>
+
+       The <b>sadc </b>command is intended to be used as a backend to the <b>sar</b>
+       command.
+
+       Note: The <b>sadc </b>command only reports on local activities.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -C comment
+              When neither the <i>interval</i> nor the <i>count</i> parameters are
+              specified, this option tells <b>sadc </b>to write a dummy record
+              containing the specified <i>comment</i> string.  This comment can
+              then be displayed with option -C of <b>sar</b>.
+
+       -D     Use <i>saYYYYMMDD</i> instead of <i>saDD</i> as the standard system activity
+              daily data file name.
+
+       -F     The creation of <i>outfile</i> will be forced. If the file already
+              exists and has a format unknown to <b>sadc </b>then it will be
+              truncated. This may be useful for daily data files created by
+              an older version of <b>sadc </b>and whose format is no longer
+              compatible with current one.
+
+       -L     <b>sadc </b>will try to get an exclusive lock on the <i>outfile</i> before
+              writing to it or truncating it. Failure to get the lock is
+              fatal, except in the case of trying to write a normal (i.e.
+              not a dummy and not a header) record to an existing file, in
+              which case <b>sadc </b>will try again at the next interval. Usually,
+              the only reason a lock would fail would be if another <b>sadc</b>
+              process were also writing to the file. This can happen when
+              cron is used to launch <b>sadc</b>.  If the system is under heavy
+              load, an old <b>sadc </b>might still be running when cron starts a
+              new one. Without locking, this situation can result in a
+              corrupted system activity file.
+
+       -S { DISK | INT | IPV6 | POWER | SNMP | XDISK | ALL | XALL [,...] }
+              Specify which optional activities should be collected by <b>sadc</b>.
+              Some activities are optional to prevent data files from
+              growing too large.  The <b>DISK </b>keyword indicates that <b>sadc</b>
+              should collect data for block devices.  The <b>INT </b>keyword
+              indicates that <b>sadc </b>should collect data for system interrupts.
+              The <b>IPV6 </b>keyword indicates that IPv6 statistics should be
+              collected by <b>sadc</b>.  The <b>POWER </b>keyword indicates that <b>sadc</b>
+              should collect power management statistics.  The <b>SNMP </b>keyword
+              indicates that SNMP statistics should be collected by <b>sadc</b>.
+              The <b>ALL </b>keyword is equivalent to specifying all the keywords
+              above and therefore all previous activities are collected.
+
+              The <b>XDISK </b>keyword is an extension to the <b>DISK </b>one and
+              indicates that partitions and filesystems statistics should be
+              collected by <b>sadc </b>in addition to disk statistics. This option
+              works only with kernels 2.6.25 and later.  The <b>XALL </b>keyword is
+              equivalent to specifying all the keywords above (including
+              keyword extensions) and therefore all possible activities are
+              collected.
+
+              Important note: The activities (including optional ones) saved
+              in an existing data file prevail over those selected with
+              option -S.  As a consequence, appending data to an existing
+              data file will result in option -S being ignored.
+
+       -V     Print version number then exit.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>sadc </b>command takes into account the following environment
+       variable:
+
+       S_TIME_DEF_TIME
+              If this variable exists and its value is <b>UTC </b>then <b>sadc </b>will
+              save its data in UTC time.  <b>sadc </b>will also use UTC time
+              instead of local time to determine the current daily data file
+              located in the <i>/var/log/sa</i> directory.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>/usr/local/lib64/sa/sadc 1 10 /tmp/datafile</b>
+              Write 10 records of one second intervals to the /tmp/datafile
+              binary file.
+
+       <b>/usr/local/lib64/sa/sadc -C Backup_Start /tmp/datafile</b>
+              Insert the comment Backup_Start into the file /tmp/datafile.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>/proc</i> filesystem must be mounted for the <b>sadc </b>command to work.
+
+       All the statistics are not necessarily available, depending on the
+       kernel version used.  <b>sadc </b>assumes that you are using at least a 2.6
+       kernel.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/var/log/sa/saDD</i>
+       <i>/var/log/sa/saYYYYMMDD</i>
+              The standard system activity daily data files and their
+              default location.  YYYY stands for the current year, MM for
+              the current month and DD for the current day.
+
+       <i>/proc</i> and <i>/sys</i> contain various files with system statistics.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Sebastien Godard (sysstat &lt;at&gt; orange.fr)
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/sar.1.html">sar(1)</a>, <a href="sa1.8.html">sa1(8)</a>, <a href="sa2.8.html">sa2(8)</a>, <a href="../man1/sadf.1.html">sadf(1)</a>, <a href="../man5/sysstat.5.html">sysstat(5)</a>
+
+       <i><a href="http://pagesperso-orange.fr/sebastien.godard/">http://pagesperso-orange.fr/sebastien.godard/</a> </i>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>sysstat</i> (sysstat performance monitoring
+       tools) project.  Information about the project can be found at 
+       ⟨<a href="http://sebastien.godard.pagesperso-orange.fr/">http://sebastien.godard.pagesperso-orange.fr/</a>⟩.  If you have a bug
+       report for this manual page, send it to systat-AT-orange.fr.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/sysstat/sysstat.git">https://github.com/sysstat/sysstat.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Linux                           DECEMBER 2016                        SADC(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/sadf.1.html">sadf(1)</a>,&nbsp; 
+    <a href="../man1/sar.1.html">sar(1)</a>,&nbsp; 
+    <a href="../man5/sysstat.5.html">sysstat(5)</a>,&nbsp; 
+    <a href="sa1.8.html">sa1(8)</a>,&nbsp; 
+    <a href="sa2.8.html">sa2(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

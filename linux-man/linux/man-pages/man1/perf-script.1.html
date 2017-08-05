@@ -1,0 +1,528 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>perf-script(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PERF-SCRIPT(1)                   perf Manual                  PERF-SCRIPT(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       perf-script - Read perf.data (created by perf record) and display
+       trace output
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>perf script</i> [&lt;options&gt;]
+       <i>perf script</i> [&lt;options&gt;] record &lt;script&gt; [&lt;record-options&gt;] &lt;command&gt;
+       <i>perf script</i> [&lt;options&gt;] report &lt;script&gt; [script-args]
+       <i>perf script</i> [&lt;options&gt;] &lt;script&gt; &lt;required-script-args&gt; [&lt;record-options&gt;] &lt;command&gt;
+       <i>perf script</i> [&lt;options&gt;] &lt;top-script&gt; [script-args]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This command reads the input file and displays the trace recorded.
+
+       There are several variants of perf script:
+
+           'perf script' to see a detailed trace of the workload that was
+           recorded.
+
+           You can also run a set of pre-canned scripts that aggregate and
+           summarize the raw trace data in various ways (the list of scripts is
+           available via 'perf script -l').  The following variants allow you to
+           record and run those scripts:
+
+           'perf script record &lt;script&gt; &lt;command&gt;' to record the events required
+           for 'perf script report'.  &lt;script&gt; is the name displayed in the
+           output of 'perf script --list' i.e. the actual script name minus any
+           language extension.  If &lt;command&gt; is not specified, the events are
+           recorded using the -a (system-wide) 'perf record' option.
+
+           'perf script report &lt;script&gt; [args]' to run and display the results
+           of &lt;script&gt;.  &lt;script&gt; is the name displayed in the output of 'perf
+           script --list' i.e. the actual script name minus any language
+           extension.  The perf.data output from a previous run of 'perf script
+           record &lt;script&gt;' is used and should be present for this command to
+           succeed.  [args] refers to the (mainly optional) args expected by
+           the script.
+
+           'perf script &lt;script&gt; &lt;required-script-args&gt; &lt;command&gt;' to both
+           record the events required for &lt;script&gt; and to run the &lt;script&gt;
+           using 'live-mode' i.e. without writing anything to disk.  &lt;script&gt;
+           is the name displayed in the output of 'perf script --list' i.e. the
+           actual script name minus any language extension.  If &lt;command&gt; is
+           not specified, the events are recorded using the -a (system-wide)
+           'perf record' option.  If &lt;script&gt; has any required args, they
+           should be specified before &lt;command&gt;.  This mode doesn't allow for
+           optional script args to be specified; if optional script args are
+           desired, they can be specified using separate 'perf script record'
+           and 'perf script report' commands, with the stdout of the record step
+           piped to the stdin of the report script, using the '-o -' and '-i -'
+           options of the corresponding commands.
+
+           'perf script &lt;top-script&gt;' to both record the events required for
+           &lt;top-script&gt; and to run the &lt;top-script&gt; using 'live-mode'
+           i.e. without writing anything to disk.  &lt;top-script&gt; is the name
+           displayed in the output of 'perf script --list' i.e. the actual
+           script name minus any language extension; a &lt;top-script&gt; is defined
+           as any script name ending with the string 'top'.
+
+           [&lt;record-options&gt;] can be passed to the record steps of 'perf script
+           record' and 'live-mode' variants; this isn't possible however for
+           &lt;top-script&gt; 'live-mode' or 'perf script report' variants.
+
+           See the 'SEE ALSO' section for links to language-specific
+           information on how to write and run your own trace scripts.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       &lt;command&gt;...
+           Any command you can specify in a shell.
+
+       -D, --dump-raw-trace=
+           Display verbose dump of the trace data.
+
+       -L, --Latency=
+           Show latency attributes (irqs/preemption disabled, etc).
+
+       -l, --list=
+           Display a list of available trace scripts.
+
+       -s [<i>lang</i>], --script=
+           Process trace data with the given script ([lang]:script[.ext]).
+           If the string <i>lang</i> is specified in place of a script name, a list
+           of supported languages will be displayed instead.
+
+       -g, --gen-script=
+           Generate perf-script.[ext] starter script for given language,
+           using current perf.data.
+
+       -a
+           Force system-wide collection. Scripts run without a &lt;command&gt;
+           normally use -a by default, while scripts run with a &lt;command&gt;
+           normally don’t - this option allows the latter to be run in
+           system-wide mode.
+
+       -i, --input=
+           Input file name. (default: perf.data unless stdin is a fifo)
+
+       -d, --debug-mode
+           Do various checks like samples ordering and lost events.
+
+       -F, --fields
+           Comma separated list of fields to print. Options are: comm, tid,
+           pid, time, cpu, event, trace, ip, sym, dso, addr, symoff,
+           srcline, period, iregs, brstack, brstacksym, flags, bpf-output,
+           brstackinsn, brstackoff, callindent, insn, insnlen, synth. Field
+           list can be prepended with the type, trace, sw or hw, to indicate
+           to which event type the field list applies. e.g., -F
+           sw:comm,tid,time,ip,sym and -F trace:time,cpu,trace
+
+               perf script -F &lt;fields&gt;
+
+               is equivalent to:
+
+               perf script -F trace:&lt;fields&gt; -F sw:&lt;fields&gt; -F hw:&lt;fields&gt;
+
+               i.e., the specified fields apply to all event types if the type string
+               is not given.
+
+               In addition to overriding fields, it is also possible to add or remove
+               fields from the defaults. For example
+
+               -F -cpu,+insn
+
+               removes the cpu field and adds the insn field. Adding/removing fields
+               cannot be mixed with normal overriding.
+
+               The arguments are processed in the order received. A later usage can
+               reset a prior request. e.g.:
+
+               -F trace: -F comm,tid,time,ip,sym
+
+               The first -F suppresses trace events (field list is ""), but then the
+               second invocation sets the fields to comm,tid,time,ip,sym. In this case a
+               warning is given to the user:
+
+               "Overriding previous field request for all events."
+
+               Alternatively, consider the order:
+
+               -F comm,tid,time,ip,sym -F trace:
+
+               The first -F sets the fields for all events and the second -F
+               suppresses trace events. The user is given a warning message about
+               the override, and the result of the above is that only S/W and H/W
+               events are displayed with the given fields.
+
+               For the 'wildcard' option if a user selected field is invalid for an
+               event type, a message is displayed to the user that the option is
+               ignored for that type. For example:
+
+               $ perf script -F comm,tid,trace
+               'trace' not valid for hardware events. Ignoring.
+               'trace' not valid for software events. Ignoring.
+
+               Alternatively, if the type is given an invalid field is specified it
+               is an error. For example:
+
+               perf script -v -F sw:comm,tid,trace
+               'trace' not valid for software events.
+
+               At this point usage is displayed, and perf-script exits.
+
+               The flags field is synthesized and may have a value when Instruction
+               Trace decoding. The flags are "bcrosyiABEx" which stand for branch,
+               call, return, conditional, system, asynchronous, interrupt,
+               transaction abort, trace begin, trace end, and in transaction,
+               respectively. Known combinations of flags are printed more nicely e.g.
+               "call" for "bc", "return" for "br", "jcc" for "bo", "jmp" for "b",
+               "int" for "bci", "iret" for "bri", "syscall" for "bcs", "sysret" for "brs",
+               "async" for "by", "hw int" for "bcyi", "tx abrt" for "bA", "tr strt" for "bB",
+               "tr end" for "bE". However the "x" flag will be display separately in those
+               cases e.g. "jcc     (x)" for a condition branch within a transaction.
+
+               The callindent field is synthesized and may have a value when
+               Instruction Trace decoding. For calls and returns, it will display the
+               name of the symbol indented with spaces to reflect the stack depth.
+
+               When doing instruction trace decoding insn and insnlen give the
+               instruction bytes and the instruction length of the current
+               instruction.
+
+               The synth field is used by synthesized events which may be created when
+               Instruction Trace decoding.
+
+               Finally, a user may not set fields to none for all event types.
+               i.e., -F "" is not allowed.
+
+               The brstack output includes branch related information with raw addresses using the
+               /v/v/v/v/cycles syntax in the following order:
+               FROM: branch source instruction
+               TO  : branch target instruction
+               M/P/-: M=branch target mispredicted or branch direction was mispredicted, P=target predicted or direction predicted, -=not supported
+               X/- : X=branch inside a transactional region, -=not in transaction region or not supported
+               A/- : A=TSX abort entry, -=not aborted region or not supported
+               cycles
+
+               The brstacksym is identical to brstack, except that the FROM and TO addresses are printed in a symbolic form if possible.
+
+               When brstackinsn is specified the full assembler sequences of branch sequences for each sample
+               is printed. This is the full execution path leading to the sample. This is only supported when the
+               sample was recorded with perf record -b or -j any.
+
+               The brstackoff field will print an offset into a specific dso/binary.
+
+       -k, --vmlinux=&lt;file&gt;
+           vmlinux pathname
+
+       --kallsyms=&lt;file&gt;
+           kallsyms pathname
+
+       --symfs=&lt;directory&gt;
+           Look for files with symbols relative to this directory.
+
+       -G, --hide-call-graph
+           When printing symbols do not display call chain.
+
+       --stop-bt
+           Stop display of callgraph at these symbols
+
+       -C, --cpu
+           Only report samples for the list of CPUs provided. Multiple CPUs
+           can be provided as a comma-separated list with no space: 0,1.
+           Ranges of CPUs are specified with -: 0-2. Default is to report
+           samples on all CPUs.
+
+       -c, --comms=
+           Only display events for these comms. CSV that understands
+           <b>file://filename </b><b></b>entries.
+
+       --pid=
+           Only show events for given process ID (comma separated list).
+
+       --tid=
+           Only show events for given thread ID (comma separated list).
+
+       -I, --show-info
+           Display extended information about the perf.data file. This adds
+           information which may be very large and thus may clutter the
+           display. It currently includes: cpu and numa topology of the host
+           system. It can only be used with the perf script report mode.
+
+       --show-kernel-path
+           Try to resolve the path of [kernel.kallsyms]
+
+       --show-task-events Display task related events (e.g. FORK, COMM,
+       EXIT).
+
+       --show-mmap-events Display mmap related events (e.g. MMAP, MMAP2).
+
+       --show-namespace-events Display namespace events i.e. events of type
+       PERF_RECORD_NAMESPACES.
+
+       --show-switch-events Display context switch events i.e. events of
+       type PERF_RECORD_SWITCH or PERF_RECORD_SWITCH_CPU_WIDE.
+
+       --demangle
+           Demangle symbol names to human readable form. It’s enabled by
+           default, disable with --no-demangle.
+
+       --demangle-kernel
+           Demangle kernel symbol names to human readable form (for C++
+           kernels).
+
+       --header Show perf.data header.
+
+       --header-only Show only perf.data header.
+
+       --itrace
+           Options for decoding instruction tracing data. The options are:
+
+               i       synthesize instructions events
+               b       synthesize branches events
+               c       synthesize branches events (calls only)
+               r       synthesize branches events (returns only)
+               x       synthesize transactions events
+               w       synthesize ptwrite events
+               p       synthesize power events
+               e       synthesize error events
+               d       create a debug log
+               g       synthesize a call chain (use with i or x)
+               l       synthesize last branch entries (use with i or x)
+               s       skip initial number of events
+
+               The default is all events i.e. the same as --itrace=ibxwpe
+
+               In addition, the period (default 100000) for instructions events
+               can be specified in units of:
+
+               i       instructions
+               t       ticks
+               ms      milliseconds
+               us      microseconds
+               ns      nanoseconds (default)
+
+               Also the call chain size (default 16, max. 1024) for instructions or
+               transactions events can be specified.
+
+               Also the number of last branch entries (default 64, max. 1024) for
+               instructions or transactions events can be specified.
+
+               It is also possible to skip events generated (instructions, branches, transactions,
+               ptwrite, power) at the beginning. This is useful to ignore initialization code.
+
+               --itrace=i0nss1000000
+
+               skips the first million instructions.
+
+               To disable decoding entirely, use --no-itrace.
+
+       --full-source-path
+           Show the full path for source files for srcline output.
+
+       --max-stack
+           Set the stack depth limit when parsing the callchain, anything
+           beyond the specified depth will be ignored. This is a trade-off
+           between information loss and faster processing especially for
+           workloads that can have a very long callchain stack. Note that
+           when using the --itrace option the synthesized callchain size
+           will override this value if the synthesized callchain size is
+           bigger.
+
+               Default: 127
+
+       --ns
+           Use 9 decimal places when displaying time (i.e. show the
+           nanoseconds)
+
+       -f, --force
+           Don’t do ownership validation.
+
+       --time
+           Only analyze samples within given time window: &lt;start&gt;,&lt;stop&gt;.
+           Times have the format seconds.microseconds. If start is not given
+           (i.e., time string is <i>,x.y</i>) then analysis starts at the beginning
+           of the file. If stop time is not given (i.e, time string is <i>x.y,</i>)
+           then analysis goes to end of file.
+
+       --max-blocks
+           Set the maximum number of program blocks to print with brstackasm
+           for each sample.
+
+       --inline
+           If a callgraph address belongs to an inlined function, the inline
+           stack will be printed. Each entry has function name and
+           file/line.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="perf-record.1.html">perf-record(1)</a>, <a href="perf-script-perl.1.html">perf-script-perl(1)</a>, <a href="perf-script-python.1.html">perf-script-python(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>perf</i> (Performance analysis tools for Linux
+       (in Linux source tree)) project.  Information about the project can
+       be found at ⟨<a href="https://perf.wiki.kernel.org/index.php/Main_Page">https://perf.wiki.kernel.org/index.php/Main_Page</a>⟩.  If
+       you have a bug report for this manual page, send it to
+       linux-kernel@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨<a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git">http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">perf                             07/05/2017                   PERF-SCRIPT(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="perf-script-perl.1.html">perf-script-perl(1)</a>,&nbsp; 
+    <a href="perf-script-python.1.html">perf-script-python(1)</a>,&nbsp; 
+    <a href="perf-trace.1.html">perf-trace(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

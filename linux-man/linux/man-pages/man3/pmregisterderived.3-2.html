@@ -1,0 +1,682 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmregisterderived(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEMANTIC_CHECKS_AND_RULES">SEMANTIC&nbsp;CHECKS&nbsp;AND&nbsp;RULES</a> | <a href="#EXPRESSION_EVALUATION">EXPRESSION&nbsp;EVALUATION</a> | <a href="#CAVEATS">CAVEATS</a> | <a href="#DIAGNOSTICS">DIAGNOSTICS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMREGISTERDERIVED(3)      Library Functions Manual      PMREGISTERDERIVED(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmRegisterDerived</b>, <b>pmRegisterDerivedMetric  </b>- register a derived met‐
+       ric name and definition
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pcp/pmapi.h&gt;</b>
+
+       <b>char *pmRegisterDerived(char *</b><i>name</i><b>, char *</b><i>expr</i><b>);</b>
+       <b>int pmRegisterDerivedMetric(char *</b><i>name</i><b>, char *</b><i>expr</i><b>, char **</b><i>errmsg</i><b>);</b>
+
+       <b>cc ... -lpcp</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Derived metrics provide a way of extending the Performance Metrics
+       Name Space (PMNS) with new metrics defined at the PCP client-side
+       using expressions over the existing performance metrics.
+
+       Typical uses would be to aggregate a number of similar metrics to
+       provide a higher-level summary metric or to support the ``delta V
+       over delta V'' class of metrics that are not possible in the base
+       data semantics of PCP.  An example of the latter class would be the
+       average I/O size, defined as
+                delta(disk.dev.total_bytes) / delta(disk.dev.total)
+       where both of the disk.dev metrics are counters, and what is required
+       is to to sample both metrics, compute the difference between the
+       current and previous values and then calculate the ratio of these
+       differences.
+
+       The arguments to <b>pmRegisterDerived </b>are the <i>name</i> of the new derived
+       metric and <i>expr</i> is an expression defining how the values of <i>name</i>
+       should be computed.
+
+       <b>pmRegisterDerivedMetric </b>is the exact functional equivalent to
+       <b>pmRegisterDerived </b>except that it provides a simplified model of error
+       handling, where a formatted message is returned via the <i>errmsg</i>
+       parameter.
+
+       Syntactic checking is performed at the time <b>pmRegisterDerived </b>is
+       called, but semantic checking is deferred until each new PMAPI
+       context is created with <a href="pmNewContext.3.html">pmNewContext(3)</a> or re-established with
+       <a href="pmReconnectContext.3.html">pmReconnectContext(3)</a>, at which time the PMNS and metadata is
+       available to allow semantic checking and the metadata of the derived
+       metrics to be determined.  This means <b>pmRegisterDerived </b>does not
+       apply retrospectively to any open PMAPI contexts, nor to any PMAPI
+       contexts already open at the time <b>pmRegisterDerived </b>is called, so the
+       normal use would be to make all calls to <b>pmRegisterDerived </b>(possibly
+       via <a href="pmLoadDerivedConfig.3.html">pmLoadDerivedConfig(3)</a>) or <b>pmRegisterDerivedMetric </b>and then call
+       <a href="pmNewContext.3.html">pmNewContext(3)</a>.
+
+       <i>name</i> should follow the syntactic rules for the names of performance
+       metrics, namely one or more components separated with a dot (``.''),
+       and each component must begin with an alphabetic followed by zero or
+       more characters drawn from the alphabetics, numerics and underscore
+       (``_'').  For more details, refer to <a href="../man1/PCPIntro.1.html">PCPIntro(1)</a> and <a href="../man5/pmns.5.html">pmns(5)</a>.
+
+       <i>name</i> must be unique across all derived metrics and should <b>not </b>match
+       the name of any regular metric in the PMNS.  It is acceptable for
+       <i>name</i> to share some part of its prefix with an existing subtree of the
+       PMNS, e.g. the average I/O size metric above could be named
+       disk.dev.avgsz which would place it amongst the other disk.dev
+       metrics in the PMNS.  Alternatively, derived metrics could populate
+       their own subtree of the PMNS, e.g. the average I/O size metric above
+       could be named my.summary.disk.avgsz.
+
+       The expression <i>expr</i> follows these syntactic rules:
+
+       * Terminal elements are either names of existing metrics or numeric
+         constants.  Recursive definitions are not allowed, so only the
+         names of regular metrics (not other derived metrics) may be used.
+         Numeric constants are either integers constrained to the precision
+         of 32-bit unsigned integers or double precision floating point
+         numbers.
+
+       * The usual binary arithmetic operators are supported, namely
+         addition (``+''), subtraction (``-''), multiplication (``*'') and
+         division (``/'') with the normal precedence rules where
+         multiplication and division have higher precedence than addition
+         and subtraction, so a+b*c is evaluated as a+(b*c).
+
+       * Unary negation may be used, e.g.  -3*some.metric.
+
+       * C-style relational operators are supported, namely ``&lt;'', ``&lt;='',
+         ``=='', ``&gt;='', ``&gt;'' and ``!=''.  Relational expresssions return a
+         value as a 32-bit unsigned number being 0 for false and 1 for true.
+         The expected operator precedence rules apply, so arithmetic
+         operators have higher precedence than relational operators, and a-
+         b&gt;c+d is evaluated as (a-b)&gt;(c+d).  All the relational operators
+         have equal precedence, so the (slightly odd) expression involving
+         consecutive relational operators a&gt;b!=c is evaluated as (a&gt;b)!=c.
+
+       * C-style boolean operators are supported, namely and (``&amp;&amp;'') and or
+         (``||'').  Boolean expresssions return a value as a 32-bit unsigned
+         number being 0 for false and 1 for true.  The expected operator
+         precedence rules apply, so relational operators have higher
+         precedence than boolean operators, and a&gt;b*c&amp;&amp;d&lt;=e+f is evaluated
+         as (a&gt;(b*c))&amp;&amp;(d&lt;=(e+f)).  Both the boolean operators have equal
+         precedence, so the expression involving consecutive boolean
+         operators a&gt;=b||b&gt;c&amp;&amp;d!=e||f&gt;g is evaluated as
+         (((a&gt;=b)||(b&gt;c))&amp;&amp;(d!=e))||(f&gt;g).
+
+       * Additionally, the ``!'' operator may be used to negate a boolean or
+         relational expression, returning a value as a 32-bit unsigned
+         number being 0 for false and 1 for true.  The expected operator
+         precedence rules apply, so boolean (and relational) operators have
+         higher precedence than boolean negation, and !a&gt;b||c&lt;d is evaluated
+         as !((a&gt;b)||(c&lt;d)), while !a&lt;b+c is evaluated as !(a&lt;(b+c)).
+
+       * C-style ternary conditional expressions are supported. In general
+         terms the expression check ? foo : bar is evaluated as foo (the
+         ``true'' operand) if check (the ``guard'') is true, else the
+         expression evaluates to bar (the ``false'' operand).  Some special
+         semantic rules apply to the ``guard'' expression and the other two
+         operand expressions:
+         (a) Each expression may involve a singular value or a set of values
+             (when the expression involves one or more metrics with an
+             instance domain).
+         (b) <b>All </b>expressions with a set of values must be defined over the
+             <b>same </b>instance domain.
+         (c) Both operand expressions must have the <b>same </b>metadata, so the
+             same metric type, semantics and units (dimension and scale).
+         (d) The ``guard'' expression must have an aritmetic or relational
+             or boolean value, so that it can be evaluated as 0 for false,
+             else true.
+         (e) If the ``guard'' expression has a singular value and one or
+             more of the other operand expressions involves an instance
+             domain, the ``guard'' applies to all instances.
+         (f) If the ``guard'' expression has a set of values and one or more
+             of the other operand expressions involves an instance domain,
+             the ``guard'' is evaluated once for each instance (there must
+             be one instance domain as per rule (b) above).
+         (g) If one of the operand expressions has a singular value and the
+             other has a set of values, and the singular value is selected
+             based on the evaluation of the ``guard'', then the result is a
+             set of values (all the same) with instance enumeration being
+             taken from the other operand expression. For example in the
+             expression: foo ? scalar : set, if foo is true, then the result
+             is a set of values (all having the same value, scalar) over the
+             instance domain of set.
+
+       * Numeric constants can also be specified using the mkconst()
+         constructor which takes a number of arguments: the first is a
+         numeric constant (either integer or floating point), then follow
+         one or more parameters of the form <i>tag=value</i> or <i>tag=</i> where the
+         allowed values of <i>tag</i> and <i>value</i> are as follows:
+
+             ┌──────────┬───────────────────────────────────────────────┐
+             │   <i>tag</i>    │                     <i>value</i>                     │
+             ├──────────┼───────────────────────────────────────────────┤
+             │type      │ one of the numeric metric types from          │
+             │          │ &lt;pcp/pmapi.h&gt;, stripped of the PM_TYPE_       │
+             │          │ prefix, so 32, U32, 64, U64, FLOAT or DOUBLE. │
+             ├──────────┼───────────────────────────────────────────────┤
+             │semantics │ one of the semantic types from &lt;pcp/pmapi.h&gt;, │
+             │          │ stripped of the PM_SEM_ prefix, so COUNTER,   │
+             │          │ INSTANT or DISCRETE.                          │
+             ├──────────┼───────────────────────────────────────────────┤
+             │units     │ a specification of dimension and scale        │
+             │          │ (together forming the units), in the syntax   │
+             │          │ accepted by <a href="pmParseUnitsStr.3.html">pmParseUnitsStr(3)</a>.               │
+             └──────────┴───────────────────────────────────────────────┘
+         The <i>value</i> may optionally be enclosed in double quotes, and may
+         appear in any mix of upper and/or lower case.  The <i>tag</i> must be in
+         lower case as shown in the table above.
+
+         This is most useful when the expression semantics require matching
+         type and/or semantics and/or units for operands, e.g.
+         idle = mem.util.free &gt; mkconst(10485760, units=Kbyte)
+         avg_io_size = delta(disk.dev.total) == 0 ? \
+             -mkconst(1.0, semantics=instant, units="kbyte / count") : \
+             delta(disk.dev.total_bytes) / delta(disk.dev.total)
+
+       * Expressions may be rescaled using the rescale function that takes
+         two arguments.  The first is an arithmetic expression to be
+         rescaled, and the second is the desired units after rescaling that
+         is a string value in the syntax accepted by <a href="pmParseUnitsStr.3.html">pmParseUnitsStr(3)</a>.
+         For example:
+         rescale(network.interface.total.bytes, "Mbytes/hour")
+
+         The expression and the desired units must both have the same
+         dimension, e.g Space=1, Time=-1 and Count=0 in the example above.
+
+       * The following unary functions operate on a single performance
+         metric and return one or more values.  For all functions (except
+         count(), defined() and instant()), the type of the operand metric
+         must be arithmetic (integer of various sizes and signedness, float
+         or double).
+
+            ┌───────────┬───────────────────────────────────────────────┐
+            │ Function  │                     Value                     │
+            ├───────────┼───────────────────────────────────────────────┤
+            │avg(x)     │ A singular instance being the average value   │
+            │           │ across all instances for the metric x.        │
+            ├───────────┼───────────────────────────────────────────────┤
+            │count(x)   │ A singular instance being the count of the    │
+            │           │ number of instances for the metric x.  As a   │
+            │           │ special case, if fetching the metric x        │
+            │           │ returns an error, then count(x) will be 0.    │
+            ├───────────┼───────────────────────────────────────────────┤
+            │defined(x) │ A boolean value that is true (``1'') if the   │
+            │           │ metric x is defined in the PMNS, else false   │
+            │           │ (``0'').  The function is evaluated when a    │
+            │           │ new PMAPI context is created with             │
+            │           │ <a href="pmNewContext.3.html">pmNewContext(3)</a> or re-established with        │
+            │           │ <a href="pmReconnectContext.3.html">pmReconnectContext(3)</a>.  So any subsequent     │
+            │           │ changes to the PMNS after the PMAPI context   │
+            │           │ has been established will not change the      │
+            │           │ value of this function in the expression      │
+            │           │ evaluation.                                   │
+            ├───────────┼───────────────────────────────────────────────┤
+            │delta(x)   │ Returns the difference in values for the      │
+            │           │ metric x between one call to <a href="pmFetch.3.html">pmFetch(3)</a> and   │
+            │           │ the next. There is one value in the result    │
+            │           │ for each instance that appears in both the    │
+            │           │ current and the previous sample.              │
+            ├───────────┼───────────────────────────────────────────────┤
+            │rate(x)    │ Returns the difference in values for the      │
+            │           │ metric x between one call to <a href="pmFetch.3.html">pmFetch(3)</a> and   │
+            │           │ the next divided by the elapsed time between  │
+            │           │ the calls to <a href="pmFetch.3.html">pmFetch(3)</a>.  The semantics of    │
+            │           │ the derived metric are based on the semantics │
+            │           │ of the operand (x) with the dimension in the  │
+            │           │ <b>time </b>domain decreased by one and scaling if   │
+            │           │ required in the time utilization case where   │
+            │           │ the operand is in units of time, and the      │
+            │           │ derived metric is unitless.  This mimics the  │
+            │           │ rate conversion applied to counter metrics by │
+            │           │ tools such as <a href="../man1/pmval.1.html">pmval(1)</a>, <a href="../man1/pmie.1.html">pmie(1)</a> and           │
+            │           │ <a href="../man1/pmchart.1.html">pmchart(1)</a>.  There is one value in the result │
+            │           │ for each instance that appears in both the    │
+            │           │ current and the previous sample.              │
+            ├───────────┼───────────────────────────────────────────────┤
+            │instant(x) │ Returns the current value of the metric x,    │
+            │           │ even it has the semantics of a counter, i.e.  │
+            │           │ PM_SEM_COUNTER.  The semantics of the derived │
+            │           │ metric are based on the semantics of the      │
+            │           │ operand (x); if x has semantics               │
+            │           │ PM_SEM_COUNTER, the semantics of instant(x)   │
+            │           │ is PM_SEM_INSTANT, otherwise the semantics of │
+            │           │ the derived metric is the same as the         │
+            │           │ semantics of the metric x.                    │
+            ├───────────┼───────────────────────────────────────────────┤
+            │max(x)     │ A singular instance being the maximum value   │
+            │           │ across all instances for the metric x.        │
+            ├───────────┼───────────────────────────────────────────────┤
+            │min(x)     │ A singular instance being the minimum value   │
+            │           │ across all instances for the metric x.        │
+            ├───────────┼───────────────────────────────────────────────┤
+            │sum(x)     │ A singular instance being the sum of the      │
+            │           │ values across all instances for the metric x. │
+            └───────────┴───────────────────────────────────────────────┘
+       * Parenthesis may be used for explicit grouping.
+
+       * Lines beginning with ``#'' are treated as comments and ignored.
+
+       * White space is ignored.
+</pre>
+<h2><a id="SEMANTIC_CHECKS_AND_RULES" href="#SEMANTIC_CHECKS_AND_RULES"></a>SEMANTIC CHECKS AND RULES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       There are a number of conversions required to determine the metadata
+       for a derived metric and to ensure the semantics of the expressions
+       are sound.
+
+       In an arithmetic expression or a relational expression, if the
+       semantics of both operands is not a counter (i.e. PM_SEM_INSTANT or
+       PM_SEM_DISCRETE) then the result will have semantics PM_SEM_INSTANT
+       unless both operands are PM_SEM_DISCRETE in which case the result is
+       also PM_SEM_DISCRETE.
+
+       For an arithmetic expression, the dimension of each operand must be
+       the same.  For a relational expression, the dimension of each operand
+       must be the same, except that numeric constants (with no dimension)
+       are allowed, e.g. in the expression network.interface.in.drops &gt; 0 .
+
+       To prevent arbitrary and non-sensical combinations some restrictions
+       apply to expressions that combine metrics with counter semantics to
+       produce a result with counter semantics.  For an arithmetic
+       expression, if both operands have the semantics of a counter, then
+       only addition or subraction is allowed, or if the left operand is a
+       counter and the right operand is not, then only multiplication or
+       division are allowed, or if the left operand is not a counter and the
+       right operand is a counter, then only multiplication is allowed.
+
+       Because relational expressions use the current value only and produce
+       a result that is not a counter, either or both operands of a
+       relational expression may be counters.
+
+       The mapping of the pmUnits of the metadata uses the following rules:
+
+       * If both operands have a dimension of Count and the scales are not
+         the same, use the larger scale and convert the values of the
+         operand with the smaller scale.
+
+       * If both operands have a dimension of Time and the scales are not
+         the same, use the larger scale and convert the values of the
+         operand with the smaller scale.
+
+       * If both operands have a dimension of Space and the scales are not
+         the same, use the larger scale and convert the values of the
+         operand with the smaller scale.
+
+       * For addition and subtraction all dimensions for each of the
+         operands and result are identical.
+
+       * For multiplication, the dimensions of the result are the sum of the
+         dimensions of the operands.
+
+       * For division, the dimensions of the result are the difference of
+         the dimensions of the operands.
+
+       Scale conversion involves division if the dimension is positive else
+       multiplication if the dimension is negative. If scale conversion is
+       applied to either of the operands, the result is promoted to type
+       PM_TYPE_DOUBLE.
+
+       Putting all of this together in an example, consider the derived
+       metric defined as follows:
+         x = network.interface.speed - delta(network.interface.in.bytes) /
+                            delta(sample.milliseconds)
+       The type, dimension and scale settings would propagate up the
+       expression tree as follows.
+
+       ┌────────────────────────┬────────┬───────────────┬─────────────────┐
+       │      Expression        │  Type  │  Dimension &amp;  │ Scale Factor(s) │
+       │                        │        │  Scale        │                 │
+       ├────────────────────────┼────────┼───────────────┼─────────────────┤
+       │sample.milliseconds     │ DOUBLE │ millisec      │                 │
+       │delta(...)              │ DOUBLE │ millisec      │                 │
+       │network...bytes         │ U64    │ byte          │                 │
+       │delta(...)              │ U64    │ byte          │                 │
+       │delta(...) / delta(...) │ DOUBLE │ byte/millisec │ /1048576 and    │
+       │                        │        │               │ *1000           │
+       │network...speed         │ FLOAT  │ Mbyte/sec     │                 │
+       │x                       │ DOUBLE │ Mbyte/sec     │                 │
+       └────────────────────────┴────────┴───────────────┴─────────────────┘
+       Because semantic checking cannot be done at the time
+       <b>pmRegisterDerived </b>is called, errors found during semantic checking
+       (when any subsequent calls to <a href="pmNewContext.3.html">pmNewContext(3)</a> or
+       <a href="pmReconnectContext.3.html">pmReconnectContext(3)</a> succeed) are reported using <a href="pmprintf.3.html">pmprintf(3)</a>.  These
+       include:
+
+       Error: derived metric &lt;name1&gt;: operand: &lt;name2&gt;: &lt;reason&gt;
+              There was a problem calling <a href="pmLookupName.3.html">pmLookupName(3)</a> to identify the
+              operand metric &lt;name2&gt; used in the definition of the derived
+              metric &lt;name1&gt;.
+
+       Error: derived metric &lt;name1&gt;: operand (&lt;name2&gt; [&lt;pmid2&gt;]): &lt;reason&gt;
+              There was a problem calling <a href="pmLookupDesc.3.html">pmLookupDesc(3)</a> to identify the
+              operand metric &lt;name2&gt; with PMID &lt;pmid2&gt; used in the
+              definition of the derived metric &lt;name1&gt;.
+
+       Semantic error: derived metric &lt;name&gt;: &lt;operand&gt; : &lt;operand&gt;
+       Different &lt;metadata&gt; for ternary operands
+              For a ternary expression, the ``true'' operand and the
+              ``false'' operand must have exactly the same metadata, so
+              type, semantics, instance domain, and units (dimension and
+              scale).
+
+       Semantic error: derived metric &lt;name&gt;: &lt;operand&gt; &lt;op&gt; &lt;operand&gt;:
+       Dimensions are not the same
+              Operands must have the same units (dimension and scale) for
+              each of addition, subtraction, the relational operators and
+              the boolean ``and'' or ``or'' operators.
+
+       Semantic error: derived metric &lt;name&gt;: &lt;operand&gt; &lt;op&gt; &lt;operand&gt;:
+       Illegal operator for counter and non-counter
+              Only multiplication or division are allowed if the left
+              operand has the semantics of a counter and the right operand
+              is <b>not </b>a counter.
+
+       Semantic error: derived metric &lt;name&gt;: &lt;operand&gt; &lt;op&gt; &lt;operand&gt;:
+       Illegal operator for counters
+              If both operands have the semantics of counter, only addition
+              or subtraction make sense, so multiplication and division are
+              not allowed.
+
+       Semantic error: derived metric &lt;name&gt;: &lt;operand&gt; &lt;op&gt; &lt;operand&gt;:
+       Illegal operator for non-counter and counter
+              Only multiplication is allowed if the right operand has the
+              semantics of a counter and the left operand is <b>not </b>a counter.
+
+       Semantic error: derived metric &lt;metric&gt; &lt;expr&gt; RESCALE &lt;units&gt;:
+       Incompatible dimensions
+              The parameters &lt;expr&gt; and &lt;units&gt; to the rescale function must
+              have the same dimension along the axes of Time, Space and
+              Count.
+
+       Semantic error: derived metric &lt;name&gt;: Incorrect time dimension for
+       operand
+              Rate conversion using the <b>rate</b>() function is only possible for
+              operand metrics with a Time dimension of 0 or 1 (see
+              <a href="pmLookupDesc.3.html">pmLookupDesc(3)</a>).  If the operand metric's Time dimension is
+              0, then the derived metrics has a value "per second" (Time
+              dimension of -1).  If the operand metric's Time dimension is
+              1, then the derived metrics has a value of time utilization
+              (Time dimension of 0).
+
+       Semantic error: derived metric &lt;name&gt;: &lt;function&gt;(&lt;operand&gt;): Non-
+       arithmetic operand for function
+              The unary functions are only defined if the operand has
+              arithmetic type.  Similarly the first argument to the rescale
+              function must be of arithmetic type.
+
+       Semantic error: derived metric &lt;name&gt;: &lt;expr&gt; ? ...: Non-arithmetic
+       operand for ternary guard
+              The first expression for a ternary operator must have an
+              arithmetic type.
+
+       Semantic error: derived metric &lt;name&gt;: ... - ...: Non-arithmetic
+       operand for unary negation
+              Unary negation only makes sense if the following expression
+              has an arithmetic type.
+
+       Semantic error: derived metric &lt;name&gt;: &lt;operand&gt; &lt;op&gt; &lt;operand&gt;: Non-
+       arithmetic type for &lt;left-or-right&gt; operand
+              The binary arithmetic operators are only allowed with operands
+              with an arithmetic type (integer of various sizes and
+              signedness, float or double).
+
+       Semantic error: derived metric &lt;name&gt;: &lt;operand&gt; &lt;op&gt; &lt;operand&gt;: Non-
+       counter and not dimensionless &lt;left-or-right&gt; operand
+              For multiplication or division or any of the relational
+              operators, if one of the operands has the semantics of a
+              counter and the other has the semantics of a non-counter
+              (instantaneous or discrete) then the non-counter operand must
+              have no units (dimension and scale).
+
+       Semantic error: derived metric &lt;name&gt;: &lt;expr&gt; ? &lt;expr&gt; : &lt;expr&gt;: Non-
+       scalar ternary guard with scalar expressions
+              If the ``true'' and ``false'' operands of a ternary expression
+              have a scalar value, then the ``guard'' expression must also
+              have a scalar value.
+
+       Semantic error: derived metric &lt;name&gt;: &lt;expr&gt; &lt;op&gt; &lt;expr&gt;: Operands
+       should have the same instance domain
+              For all of the binary operators (arithmetic and relational),
+              if both operands have non-scalar values, then they must be
+              defined over the same instance domain.
+</pre>
+<h2><a id="EXPRESSION_EVALUATION" href="#EXPRESSION_EVALUATION"></a>EXPRESSION EVALUATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For the binary arithmetic operators, if either operand must be scaled
+       (e.g. convert bytes to Kbytes) then the result is promoted to
+       PM_TYPE_DOUBLE.  Otherwise the type of the result is determined by
+       the types of the operands, as per the following table which is
+       evaluated from top to bottom until a match is found.
+
+              ┌─────────────────────────┬──────────┬────────────────┐
+              │     Operand Types       │ Operator │  Result Type   │
+              ├─────────────────────────┼──────────┼────────────────┤
+              │either is PM_TYPE_DOUBLE │ any      │ PM_TYPE_DOUBLE │
+              ├─────────────────────────┼──────────┼────────────────┤
+              │any                      │ division │ PM_TYPE_DOUBLE │
+              ├─────────────────────────┼──────────┼────────────────┤
+              │either is PM_TYPE_FLOAT  │ any      │ PM_TYPE_FLOAT  │
+              ├─────────────────────────┼──────────┼────────────────┤
+              │either is PM_TYPE_U64    │ any      │ PM_TYPE_U64    │
+              ├─────────────────────────┼──────────┼────────────────┤
+              │either is PM_TYPE_64     │ any      │ PM_TYPE_64     │
+              ├─────────────────────────┼──────────┼────────────────┤
+              │either is PM_TYPE_U32    │ any      │ PM_TYPE_U32    │
+              ├─────────────────────────┼──────────┼────────────────┤
+              │otherwise (both are      │ any      │ PM_TYPE_32     │
+              │PM_TYPE_32)              │          │                │
+              └─────────────────────────┴──────────┴────────────────┘
+</pre>
+<h2><a id="CAVEATS" href="#CAVEATS"></a>CAVEATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Derived metrics are not available when using <a href="pmFetchArchive.3.html">pmFetchArchive(3)</a> as
+       this routine does not use a target list of PMIDs that could be
+       remapped (as is done for <a href="pmFetch.3.html">pmFetch(3)</a>).
+
+       There is no <b>pmUnregisterDerived </b>method, so once registered a derived
+       metric persists for the life of the application.
+</pre>
+<h2><a id="DIAGNOSTICS" href="#DIAGNOSTICS"></a>DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>pmRegisterDerived </b>returns NULL.
+
+       If a syntactic error is found at the time of registration, the value
+       returned by <b>pmRegisterDerived </b>is a pointer into <i>expr</i> indicating <b>where</b>
+       the error was found.  To identify <b>what </b>the error was, the application
+       should call <a href="pmDerivedErrStr.3.html">pmDerivedErrStr(3)</a> to retrieve the corresponding parser
+       error message.
+
+       <b>pmRegisterDerivedMetric </b>returns 0 and <i>errmsg</i> is undefined if the
+       parsing is successful.
+
+       If the given <i>expr</i> does not conform to the required syntax
+       <b>pmRegisterDerivedMetric </b>returns -1 and a dynamically allocated error
+       message string in <i>errmsg</i>.  The error message is terminated with a
+       newline and includes both the input <i>name</i> and <i>expr</i>, along with an
+       indicator of the position at which the error was detected.  e.g.
+                 Error: pmRegisterDerivedMetric("my.disk.rates", ...) syntax
+                 error
+
+       The position indicator line may be followed by an additional
+       diagnostic line describing the nature of the error, when available.
+
+       In the case of an error, the caller is responsible for calling
+       <a href="free.3.html">free(3)</a> to release the space allocated for <i>errmsg</i>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/PCPIntro.1.html">PCPIntro(1)</a>, <a href="free.3.html">free(3)</a>, <a href="PMAPI.3.html">PMAPI(3)</a>, <a href="pmDerivedErrStr.3.html">pmDerivedErrStr(3)</a>, <a href="pmFetch.3.html">pmFetch(3)</a>,
+       <a href="pmLoadDerivedConfig.3.html">pmLoadDerivedConfig(3)</a>, <a href="pmNewContext.3.html">pmNewContext(3)</a>, <a href="pmprintf.3.html">pmprintf(3)</a> and
+       <a href="pmReconnectContext.3.html">pmReconnectContext(3)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                                    PMREGISTERDERIVED(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pmrep.1.html">pmrep(1)</a>,&nbsp; 
+    <a href="pmderivederrstr.3-2.html">pmderivederrstr(3)</a>,&nbsp; 
+    <a href="pmfetchgroup.3-2.html">pmfetchgroup(3)</a>,&nbsp; 
+    <a href="pmloadderivedconfig.3-2.html">pmloadderivedconfig(3)</a>,&nbsp; 
+    <a href="pmreconnectcontext.3-2.html">pmreconnectcontext(3)</a>,&nbsp; 
+    <a href="../man5/pmrep.conf.5.html">pmrep.conf(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

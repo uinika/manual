@@ -1,0 +1,462 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.mount(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#AUTOMATIC_DEPENDENCIES">AUTOMATIC&nbsp;DEPENDENCIES</a> | <a href="#FSTAB">FSTAB</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.MOUNT(5)                systemd.mount               SYSTEMD.MOUNT(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.mount - Mount unit configuration
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>mount</i>.mount
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A unit configuration file whose name ends in ".mount" encodes
+       information about a file system mount point controlled and supervised
+       by systemd.
+
+       This man page lists the configuration options specific to this unit
+       type. See <a href="systemd.unit.5.html">systemd.unit(5)</a> for the common options of all unit
+       configuration files. The common configuration items are configured in
+       the generic [Unit] and [Install] sections. The mount specific
+       configuration options are configured in the [Mount] section.
+
+       Additional options are listed in <a href="systemd.exec.5.html">systemd.exec(5)</a>, which define the
+       execution environment the <a href="../man8/mount.8.html">mount(8)</a> binary is executed in, and in
+       <a href="systemd.kill.5.html">systemd.kill(5)</a>, which define the way the processes are terminated,
+       and in <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>, which configure resource control
+       settings for the processes of the service. Note that the User= and
+       Group= options are not particularly useful for mount units specifying
+       a "Type=" option or using configuration not specified in /etc/fstab;
+       <a href="../man8/mount.8.html">mount(8)</a> will refuse options that are not listed in /etc/fstab if it
+       is not run as UID 0.
+
+       Mount units must be named after the mount point directories they
+       control. Example: the mount point /home/lennart must be configured in
+       a unit file home-lennart.mount. For details about the escaping logic
+       used to convert a file system path to a unit name, see
+       <a href="systemd.unit.5.html">systemd.unit(5)</a>. Note that mount units cannot be templated, nor is
+       possible to add multiple names to a mount unit by creating additional
+       symlinks to it.
+
+       Optionally, a mount unit may be accompanied by an automount unit, to
+       allow on-demand or parallelized mounting. See <a href="systemd.automount.5.html">systemd.automount(5)</a>.
+
+       Mount points created at runtime (independently of unit files or
+       /etc/fstab) will be monitored by systemd and appear like any other
+       mount unit in systemd. See /proc/self/mountinfo description in
+       <a href="proc.5.html">proc(5)</a>.
+
+       Some file systems have special semantics as API file systems for
+       kernel-to-userspace and userspace-to-userspace interfaces. Some of
+       them may not be changed via mount units, and cannot be disabled. For
+       a longer discussion see <b>API File Systems</b><b></b>[1].
+</pre>
+<h2><a id="AUTOMATIC_DEPENDENCIES" href="#AUTOMATIC_DEPENDENCIES"></a>AUTOMATIC DEPENDENCIES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If a mount unit is beneath another mount unit in the file system
+       hierarchy, both a requirement dependency and an ordering dependency
+       between both units are created automatically.
+
+       Block device backed file systems automatically gain <i>BindsTo=</i> and
+       <i>After=</i> type dependencies on the device unit encapsulating the block
+       device (see below).
+
+       If traditional file system quota is enabled for a mount unit,
+       automatic <i>Wants=</i> and <i>Before=</i> dependencies on
+       systemd-quotacheck.service and quotaon.service are added.
+
+       For mount units with <i>DefaultDependencies=yes</i> in the "[Unit]" section
+       (the default) a couple additional dependencies are added. Mount units
+       referring to local file systems automatically gain an <i>After=</i>
+       dependency on local-fs-pre.target. Network mount units automatically
+       acquire <i>After=</i> dependencies on remote-fs-pre.target, network.target
+       and network-online.target. Towards the latter a <i>Wants=</i> unit is added
+       as well. Mount units referring to local and network file systems are
+       distinguished by their file system type specification. In some cases
+       this is not sufficient (for example network block device based
+       mounts, such as iSCSI), in which case <b>_netdev </b>may be added to the
+       mount option string of the unit, which forces systemd to consider the
+       mount unit a network mount. Mount units (regardless if local or
+       network) also acquire automatic <i>Before=</i> and <i>Conflicts=</i> on
+       umount.target in order to be stopped during shutdown.
+
+       Additional implicit dependencies may be added as result of execution
+       and resource control parameters as documented in <a href="systemd.exec.5.html">systemd.exec(5)</a> and
+       <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>.
+</pre>
+<h2><a id="FSTAB" href="#FSTAB"></a>FSTAB  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Mount units may either be configured via unit files, or via
+       /etc/fstab (see <a href="fstab.5.html">fstab(5)</a> for details). Mounts listed in /etc/fstab
+       will be converted into native units dynamically at boot and when the
+       configuration of the system manager is reloaded. In general,
+       configuring mount points through /etc/fstab is the preferred
+       approach. See <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a> for details about the
+       conversion.
+
+       The NFS mount option <b>bg </b>for NFS background mounts as documented in
+       <a href="nfs.5.html">nfs(5)</a> is detected by <b>systemd-fstab-generator </b>and the options are
+       transformed so that systemd fulfills the job-control implications of
+       that option. Specifically <b>systemd-fstab-generator </b>acts as though
+       "x-systemd.mount-timout=infinity,retry=10000" was prepended to the
+       option list, and "fg,nofail" was appended. Depending on specific
+       requirements, it may be appropriate to provide some of these options
+       explicitly, or to make use of the "x-systemd.automount" option
+       described below instead of using "bg".
+
+       When reading /etc/fstab a few special mount options are understood by
+       systemd which influence how dependencies are created for mount
+       points. systemd will create a dependency of type <i>Wants=</i> or <b>Requires</b>
+       (see option <b>nofail </b>below), from either local-fs.target or
+       remote-fs.target, depending whether the file system is local or
+       remote.
+
+       <b>x-systemd.requires=</b>
+           Configures a <i>Requires=</i> and an <i>After=</i> dependency between the
+           created mount unit and another systemd unit, such as a device or
+           mount unit. The argument should be a unit name, or an absolute
+           path to a device node or mount point. This option may be
+           specified more than once. This option is particularly useful for
+           mount point declarations that need an additional device to be
+           around (such as an external journal device for journal file
+           systems) or an additional mount to be in place (such as an
+           overlay file system that merges multiple mount points). See
+           <i>After=</i> and <i>Requires=</i> in <a href="systemd.unit.5.html">systemd.unit(5)</a> for details.
+
+       <b>x-systemd.before=</b>, <b>x-systemd.after=</b>
+           Configures a <i>Before=</i> dependency or <i>After=</i> between the created
+           mount unit and another systemd unit, such as a mount unit. The
+           argument should be a unit name or an absolute path to a mount
+           point. This option may be specified more than once. This option
+           is particularly useful for mount point declarations with <b>nofail</b>
+           option that are mounted asynchronously but need to be mounted
+           before or after some unit start, for example, before
+           local-fs.target unit. See <i>Before=</i> and <i>After=</i> in <a href="systemd.unit.5.html">systemd.unit(5)</a>
+           for details.
+
+       <b>x-systemd.requires-mounts-for=</b>
+           Configures a <i>RequiresMountsFor=</i> dependency between the created
+           mount unit and other mount units. The argument must be an
+           absolute path. This option may be specified more than once. See
+           <i>RequiresMountsFor=</i> in <a href="systemd.unit.5.html">systemd.unit(5)</a> for details.
+
+       <b>x-systemd.device-bound</b>
+           The block device backed file system will be upgraded to <i>BindsTo=</i>
+           dependency. This option is only useful when mounting file systems
+           manually with <a href="../man8/mount.8.html">mount(8)</a> as the default dependency in this case is
+           <i>Requires=</i>. This option is already implied by entries in
+           /etc/fstab or by mount units.
+
+       <b>x-systemd.automount</b>
+           An automount unit will be created for the file system. See
+           <a href="systemd.automount.5.html">systemd.automount(5)</a> for details.
+
+       <b>x-systemd.idle-timeout=</b>
+           Configures the idle timeout of the automount unit. See
+           <i>TimeoutIdleSec=</i> in <a href="systemd.automount.5.html">systemd.automount(5)</a> for details.
+
+       <b>x-systemd.device-timeout=</b>
+           Configure how long systemd should wait for a device to show up
+           before giving up on an entry from /etc/fstab. Specify a time in
+           seconds or explicitly append a unit such as "s", "min", "h",
+           "ms".
+
+           Note that this option can only be used in /etc/fstab, and will be
+           ignored when part of the <i>Options=</i> setting in a unit file.
+
+       <b>x-systemd.mount-timeout=</b>
+           Configure how long systemd should wait for the mount command to
+           finish before giving up on an entry from /etc/fstab. Specify a
+           time in seconds or explicitly append a unit such as "s", "min",
+           "h", "ms".
+
+           Note that this option can only be used in /etc/fstab, and will be
+           ignored when part of the <i>Options=</i> setting in a unit file.
+
+           See <i>TimeoutSec=</i> below for details.
+
+       <b>noauto</b>, <b>auto</b>
+           With <b>noauto</b>, this mount will not be added as a dependency for
+           local-fs.target or remote-fs.target. This means that it will not
+           be mounted automatically during boot, unless it is pulled in by
+           some other unit. The <b>auto </b>option has the opposite meaning and is
+           the default.
+
+       <b>nofail</b>
+           With <b>nofail</b>, this mount will be only wanted, not required, by
+           local-fs.target or remote-fs.target. This means that the boot
+           will continue even if this mount point is not mounted
+           successfully.
+
+       <b>x-initrd.mount</b>
+           An additional filesystem to be mounted in the initramfs. See
+           initrd-fs.target description in <a href="../man7/systemd.special.7.html">systemd.special(7)</a>.
+
+       If a mount point is configured in both /etc/fstab and a unit file
+       that is stored below /usr, the former will take precedence. If the
+       unit file is stored below /etc, it will take precedence. This means:
+       native unit files take precedence over traditional configuration
+       files, but this is superseded by the rule that configuration in /etc
+       will always take precedence over configuration in /usr.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Mount files must include a [Mount] section, which carries information
+       about the file system mount points it supervises. A number of options
+       that may be used in this section are shared with other unit types.
+       These options are documented in <a href="systemd.exec.5.html">systemd.exec(5)</a> and <a href="systemd.kill.5.html">systemd.kill(5)</a>.
+       The options specific to the [Mount] section of mount units are the
+       following:
+
+       <i>What=</i>
+           Takes an absolute path of a device node, file or other resource
+           to mount. See <a href="../man8/mount.8.html">mount(8)</a> for details. If this refers to a device
+           node, a dependency on the respective device unit is automatically
+           created. (See <a href="systemd.device.5.html">systemd.device(5)</a> for more information.) This
+           option is mandatory. Note that the usual specifier expansion is
+           applied to this setting, literal percent characters should hence
+           be written as "%%".
+
+       <i>Where=</i>
+           Takes an absolute path of a directory of the mount point. If the
+           mount point does not exist at the time of mounting, it is
+           created. This string must be reflected in the unit filename. (See
+           above.) This option is mandatory.
+
+       <i>Type=</i>
+           Takes a string for the file system type. See <a href="../man8/mount.8.html">mount(8)</a> for
+           details. This setting is optional.
+
+       <i>Options=</i>
+           Mount options to use when mounting. This takes a comma-separated
+           list of options. This setting is optional. Note that the usual
+           specifier expansion is applied to this setting, literal percent
+           characters should hence be written as "%%".
+
+       <i>SloppyOptions=</i>
+           Takes a boolean argument. If true, parsing of the options
+           specified in <i>Options=</i> is relaxed, and unknown mount options are
+           tolerated. This corresponds with <a href="../man8/mount.8.html">mount(8)</a>'s <i>-s</i> switch. Defaults
+           to off.
+
+       <i>LazyUnmount=</i>
+           Takes a boolean argument. If true, detach the filesystem from the
+           filesystem hierarchy at time of the unmount operation, and clean
+           up all references to the filesystem as soon as they are not busy
+           anymore. This corresponds with <a href="../man8/umount.8.html">umount(8)</a>'s <i>-l</i> switch. Defaults to
+           off.
+
+       <i>ForceUnmount=</i>
+           Takes a boolean argument. If true, force an unmount (in case of
+           an unreachable NFS system). This corresponds with <a href="../man8/umount.8.html">umount(8)</a>'s <i>-f</i>
+           switch. Defaults to off.
+
+       <i>DirectoryMode=</i>
+           Directories of mount points (and any parent directories) are
+           automatically created if needed. This option specifies the file
+           system access mode used when creating these directories. Takes an
+           access mode in octal notation. Defaults to 0755.
+
+       <i>TimeoutSec=</i>
+           Configures the time to wait for the mount command to finish. If a
+           command does not exit within the configured time, the mount will
+           be considered failed and be shut down again. All commands still
+           running will be terminated forcibly via <b>SIGTERM</b>, and after
+           another delay of this time with <b>SIGKILL</b>. (See <b>KillMode= </b>in
+           <a href="systemd.kill.5.html">systemd.kill(5)</a>.) Takes a unit-less value in seconds, or a time
+           span value such as "5min 20s". Pass 0 to disable the timeout
+           logic. The default value is set from the manager configuration
+           file's <i>DefaultTimeoutStartSec=</i> variable.
+
+       Check <a href="systemd.exec.5.html">systemd.exec(5)</a> and <a href="systemd.kill.5.html">systemd.kill(5)</a> for more settings.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man1/systemctl.1.html">systemctl(1)</a>, <a href="systemd.unit.5.html">systemd.unit(5)</a>, <a href="systemd.exec.5.html">systemd.exec(5)</a>,
+       <a href="systemd.kill.5.html">systemd.kill(5)</a>, <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>, <a href="systemd.service.5.html">systemd.service(5)</a>,
+       <a href="systemd.device.5.html">systemd.device(5)</a>, <a href="proc.5.html">proc(5)</a>, <a href="../man8/mount.8.html">mount(8)</a>, <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a>,
+       <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. API File Systems
+           <a href="https://www.freedesktop.org/wiki/Software/systemd/APIFileSystems">https://www.freedesktop.org/wiki/Software/systemd/APIFileSystems</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                 SYSTEMD.MOUNT(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemd.1.html">systemd(1)</a>,&nbsp; 
+    <a href="../man1/systemd-mount.1.html">systemd-mount(1)</a>,&nbsp; 
+    <a href="systemd.automount.5.html">systemd.automount(5)</a>,&nbsp; 
+    <a href="systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="systemd.kill.5.html">systemd.kill(5)</a>,&nbsp; 
+    <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>,&nbsp; 
+    <a href="systemd.swap.5.html">systemd.swap(5)</a>,&nbsp; 
+    <a href="systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man8/systemd-fstab-generator.8.html">systemd-fstab-generator(8)</a>,&nbsp; 
+    <a href="../man8/systemd-gpt-auto-generator.8.html">systemd-gpt-auto-generator(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

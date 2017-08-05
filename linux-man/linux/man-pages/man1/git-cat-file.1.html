@@ -1,0 +1,443 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-cat-file(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#OUTPUT">OUTPUT</a> | <a href="#BATCH_OUTPUT">BATCH&nbsp;OUTPUT</a> | <a href="#CAVEATS">CAVEATS</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-CAT-FILE(1)                  Git Manual                  GIT-CAT-FILE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-cat-file - Provide content or type and size information for
+       repository objects
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git cat-file</i> (-t [--allow-unknown-type]| -s [--allow-unknown-type]| -e | -p | &lt;type&gt; | --textconv | --filters ) [--path=&lt;path&gt;] &lt;object&gt;
+       <i>git cat-file</i> (--batch | --batch-check) [ --textconv | --filters ] [--follow-symlinks]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In its first form, the command provides the content or the type of an
+       object in the repository. The type is required unless <b>-t </b>or <b>-p </b>is
+       used to find the object type, or <b>-s </b>is used to find the object size,
+       or <b>--textconv </b>or <b>--filters </b>is used (which imply type "blob").
+
+       In the second form, a list of objects (separated by linefeeds) is
+       provided on stdin, and the SHA-1, type, and size of each object is
+       printed on stdout. The output format can be overridden using the
+       optional <b>&lt;format&gt; </b>argument. If either <b>--textconv </b>or <b>--filters </b>was
+       specified, the input is expected to list the object names followed by
+       the path name, separated by a single white space, so that the
+       appropriate drivers can be determined.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       &lt;object&gt;
+           The name of the object to show. For a more complete list of ways
+           to spell object names, see the "SPECIFYING REVISIONS" section in
+           <a href="../man7/gitrevisions.7.html">gitrevisions(7)</a>.
+
+       -t
+           Instead of the content, show the object type identified by
+           &lt;object&gt;.
+
+       -s
+           Instead of the content, show the object size identified by
+           &lt;object&gt;.
+
+       -e
+           Suppress all output; instead exit with zero status if &lt;object&gt;
+           exists and is a valid object.
+
+       -p
+           Pretty-print the contents of &lt;object&gt; based on its type.
+
+       &lt;type&gt;
+           Typically this matches the real type of &lt;object&gt; but asking for a
+           type that can trivially be dereferenced from the given &lt;object&gt;
+           is also permitted. An example is to ask for a "tree" with
+           &lt;object&gt; being a commit object that contains it, or to ask for a
+           "blob" with &lt;object&gt; being a tag object that points at it.
+
+       --textconv
+           Show the content as transformed by a textconv filter. In this
+           case, &lt;object&gt; has to be of the form &lt;tree-ish&gt;:&lt;path&gt;, or
+           :&lt;path&gt; in order to apply the filter to the content recorded in
+           the index at &lt;path&gt;.
+
+       --filters
+           Show the content as converted by the filters configured in the
+           current working tree for the given &lt;path&gt; (i.e. smudge filters,
+           end-of-line conversion, etc). In this case, &lt;object&gt; has to be of
+           the form &lt;tree-ish&gt;:&lt;path&gt;, or :&lt;path&gt;.
+
+       --path=&lt;path&gt;
+           For use with --textconv or --filters, to allow specifying an
+           object name and a path separately, e.g. when it is difficult to
+           figure out the revision from which the blob came.
+
+       --batch, --batch=&lt;format&gt;
+           Print object information and contents for each object provided on
+           stdin. May not be combined with any other options or arguments
+           except <b>--textconv </b>or <b>--filters</b>, in which case the input lines
+           also need to specify the path, separated by white space. See the
+           section <b>BATCH OUTPUT </b>below for details.
+
+       --batch-check, --batch-check=&lt;format&gt;
+           Print object information for each object provided on stdin. May
+           not be combined with any other options or arguments except
+           <b>--textconv </b>or <b>--filters</b>, in which case the input lines also need
+           to specify the path, separated by white space. See the section
+           <b>BATCH OUTPUT </b>below for details.
+
+       --batch-all-objects
+           Instead of reading a list of objects on stdin, perform the
+           requested batch operation on all objects in the repository and
+           any alternate object stores (not just reachable objects).
+           Requires <b>--batch </b>or <b>--batch-check </b>be specified. Note that the
+           objects are visited in order sorted by their hashes.
+
+       --buffer
+           Normally batch output is flushed after each object is output, so
+           that a process can interactively read and write from <b>cat-file</b>.
+           With this option, the output uses normal stdio buffering; this is
+           much more efficient when invoking <b>--batch-check </b>on a large number
+           of objects.
+
+       --allow-unknown-type
+           Allow -s or -t to query broken/corrupt objects of unknown type.
+
+       --follow-symlinks
+           With --batch or --batch-check, follow symlinks inside the
+           repository when requesting objects with extended SHA-1
+           expressions of the form tree-ish:path-in-tree. Instead of
+           providing output about the link itself, provide output about the
+           linked-to object. If a symlink points outside the tree-ish (e.g.
+           a link to /foo or a root-level link to ../foo), the portion of
+           the link which is outside the tree will be printed.
+
+           This option does not (currently) work correctly when an object in
+           the index is specified (e.g.  <b>:link </b>instead of <b>HEAD:link</b>) rather
+           than one in the tree.
+
+           This option cannot (currently) be used unless <b>--batch </b>or
+           <b>--batch-check </b>is used.
+
+           For example, consider a git repository containing:
+
+               f: a file containing "hello\n"
+               link: a symlink to f
+               dir/link: a symlink to ../f
+               plink: a symlink to ../f
+               alink: a symlink to /etc/passwd
+
+           For a regular file <b>f</b>, <b>echo HEAD:f | git cat-file --batch </b>would
+           print
+
+               ce013625030ba8dba906f756967f9e9ca394464a blob 6
+
+           And <b>echo HEAD:link | git cat-file --batch --follow-symlinks </b>would
+           print the same thing, as would <b>HEAD:dir/link</b>, as they both point
+           at <b>HEAD:f</b>.
+
+           Without <b>--follow-symlinks</b>, these would print data about the
+           symlink itself. In the case of <b>HEAD:link</b>, you would see
+
+               4d1ae35ba2c8ec712fa2a379db44ad639ca277bd blob 1
+
+           Both <b>plink </b>and <b>alink </b>point outside the tree, so they would
+           respectively print:
+
+               symlink 4
+               ../f
+
+               symlink 11
+               /etc/passwd
+</pre>
+<h2><a id="OUTPUT" href="#OUTPUT"></a>OUTPUT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If <b>-t </b>is specified, one of the &lt;type&gt;.
+
+       If <b>-s </b>is specified, the size of the &lt;object&gt; in bytes.
+
+       If <b>-e </b>is specified, no output.
+
+       If <b>-p </b>is specified, the contents of &lt;object&gt; are pretty-printed.
+
+       If &lt;type&gt; is specified, the raw (though uncompressed) contents of the
+       &lt;object&gt; will be returned.
+</pre>
+<h2><a id="BATCH_OUTPUT" href="#BATCH_OUTPUT"></a>BATCH OUTPUT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If <b>--batch </b>or <b>--batch-check </b>is given, <b>cat-file </b>will read objects from
+       stdin, one per line, and print information about them. By default,
+       the whole line is considered as an object, as if it were fed to
+       <a href="git-rev-parse.1.html">git-rev-parse(1)</a>.
+
+       You can specify the information shown for each object by using a
+       custom <b>&lt;format&gt;</b>. The <b>&lt;format&gt; </b>is copied literally to stdout for each
+       object, with placeholders of the form <b>%(atom) </b>expanded, followed by a
+       newline. The available atoms are:
+
+       <b>objectname</b>
+           The 40-hex object name of the object.
+
+       <b>objecttype</b>
+           The type of of the object (the same as <b>cat-file -t </b>reports).
+
+       <b>objectsize</b>
+           The size, in bytes, of the object (the same as <b>cat-file -s</b>
+           reports).
+
+       <b>objectsize:disk</b>
+           The size, in bytes, that the object takes up on disk. See the
+           note about on-disk sizes in the <b>CAVEATS </b>section below.
+
+       <b>deltabase</b>
+           If the object is stored as a delta on-disk, this expands to the
+           40-hex sha1 of the delta base object. Otherwise, expands to the
+           null sha1 (40 zeroes). See <b>CAVEATS </b>below.
+
+       <b>rest</b>
+           If this atom is used in the output string, input lines are split
+           at the first whitespace boundary. All characters before that
+           whitespace are considered to be the object name; characters after
+           that first run of whitespace (i.e., the "rest" of the line) are
+           output in place of the <b>%(rest) </b>atom.
+
+       If no format is specified, the default format is <b>%(objectname)</b>
+       <b>%(objecttype) %(objectsize)</b>.
+
+       If <b>--batch </b>is specified, the object information is followed by the
+       object contents (consisting of <b>%(objectsize) </b>bytes), followed by a
+       newline.
+
+       For example, <b>--batch </b>without a custom format would produce:
+
+           &lt;sha1&gt; SP &lt;type&gt; SP &lt;size&gt; LF
+           &lt;contents&gt; LF
+
+       Whereas <b>--batch-check='%(objectname) %(objecttype)' </b>would produce:
+
+           &lt;sha1&gt; SP &lt;type&gt; LF
+
+       If a name is specified on stdin that cannot be resolved to an object
+       in the repository, then <b>cat-file </b>will ignore any custom format and
+       print:
+
+           &lt;object&gt; SP missing LF
+
+       If --follow-symlinks is used, and a symlink in the repository points
+       outside the repository, then <b>cat-file </b>will ignore any custom format
+       and print:
+
+           symlink SP &lt;size&gt; LF
+           &lt;symlink&gt; LF
+
+       The symlink will either be absolute (beginning with a /), or relative
+       to the tree root. For instance, if dir/link points to ../../foo, then
+       &lt;symlink&gt; will be ../foo. &lt;size&gt; is the size of the symlink in bytes.
+
+       If --follow-symlinks is used, the following error messages will be
+       displayed:
+
+           &lt;object&gt; SP missing LF
+
+       is printed when the initial symlink requested does not exist.
+
+           dangling SP &lt;size&gt; LF
+           &lt;object&gt; LF
+
+       is printed when the initial symlink exists, but something that it
+       (transitive-of) points to does not.
+
+           loop SP &lt;size&gt; LF
+           &lt;object&gt; LF
+
+       is printed for symlink loops (or any symlinks that require more than
+       40 link resolutions to resolve).
+
+           notdir SP &lt;size&gt; LF
+           &lt;object&gt; LF
+
+       is printed when, during symlink resolution, a file is used as a
+       directory name.
+</pre>
+<h2><a id="CAVEATS" href="#CAVEATS"></a>CAVEATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Note that the sizes of objects on disk are reported accurately, but
+       care should be taken in drawing conclusions about which refs or
+       objects are responsible for disk usage. The size of a packed
+       non-delta object may be much larger than the size of objects which
+       delta against it, but the choice of which object is the base and
+       which is the delta is arbitrary and is subject to change during a
+       repack.
+
+       Note also that multiple copies of an object may be present in the
+       object database; in this case, it is undefined which copy’s size or
+       delta base will be reported.
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.10.1.352.g0cf361           10/04/2016                  GIT-CAT-FILE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="git.1.html">git(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

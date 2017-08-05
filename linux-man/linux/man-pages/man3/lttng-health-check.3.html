@@ -1,0 +1,253 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>lttng-health-check(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#LIMITATIONS">LIMITATIONS</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LTTNG_HEALTH_CHECK(3)      LTTng Developer Manual      LTTNG_HEALTH_CHECK(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>DEPRECATED</b>
+
+       lttng_health_check - Monitor health of the session daemon
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;lttng/lttng.h&gt;</b>
+
+       <b>int lttng_health_check(enum lttng_health_component c);</b>
+
+       Link with -llttng-ctl.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>lttng_health_check</b>() is used to check the session daemon health
+       for either a specific component <b>c </b>or for all of them. Each component
+       represent a subsystem of the session daemon.  Those components are
+       set with health counters that are atomically incremented once
+       reached. An even value indicates progress in the execution of the
+       component. An odd value means that the code has entered a blocking
+       state which is not a poll(7) wait period.
+
+       A bad health is defined by a fatal error code path reached or any IPC
+       used in the session daemon that was blocked for more than 20 seconds
+       (default timeout).  The condition for this bad health to be detected
+       is that one or many of the counters are odd.
+
+       The health check mechanism of the session daemon can only be reached
+       through the health socket which is a different one from the command
+       and the application socket. An isolated thread serves this socket and
+       only computes the health counters across the code when asked by the
+       lttng control library (using this call). This subsystem is highly
+       unlikely to fail due to its simplicity.
+
+       The <b>c </b>argument can be one of the following values:
+
+       <b>LTTNG_HEALTH_CMD</b>
+              Command subsystem which handles user commands coming from the
+              liblttng-ctl or the <a href="../man1/lttng.1.html">lttng(1)</a> command line interface.
+
+       <b>LTTNG_HEALTH_APP_MANAGE</b>
+              The session daemon manages application socket in order to
+              route client command and check if they get closed which
+              indicates the application shutdown.
+
+       <b>LTTNG_HEALTH_APP_REG</b>
+              The application registration mechanism is an important and
+              vital part of for user space tracing. Upon startup,
+              applications instrumented with <a href="lttng-ust.3.html">lttng-ust(3)</a> try to register to
+              the session daemon through this subsystem.
+
+       <b>LTTNG_HEALTH_KERNEL</b>
+              Monitor the Kernel tracer streams and main channel of
+              communication (/proc/lttng). If this component malfunction,
+              the Kernel tracer is not usable anymore by lttng-tools.
+
+       <b>LTTNG_HEALTH_CONSUMER</b>
+              The session daemon can spawn up to <b>three </b>consumer daemon for
+              kernel, user space 32 and 64 bit. This subsystem monitors the
+              consumer daemon(s). A bad health state means that the
+              consumer(s) are not usable anymore hence likely making tracing
+              not usable.
+
+       <b>LTTNG_HEALTH_ALL</b>
+              Check all components. If only one of them is in a bad state, a
+              health check error is returned.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Return 0 if the health is OK, or 1 is it's in a bad state. A return
+       code of -1 indicates that the control library was not able to connect
+       to the session daemon health socket.
+</pre>
+<h2><a id="LIMITATIONS" href="#LIMITATIONS"></a>LIMITATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For the LTTNG_HEALTH_CONSUMER, you can not know which consumer daemon
+       has failed but only that either the consumer subsystem has failed or
+       that a lttng-consumerd died.
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       lttng-health-check was originally written by David Goulet and is
+       currently maintained by Jérémie Galarneau
+       &lt;jeremie.galarneau@efficios.com&gt;.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>LTTng-Tools</i> (    LTTng tools) project.
+       Information about the project can be found at ⟨<a href="http://lttng.org/">http://lttng.org/</a>⟩.
+       It is not known how to report bugs for this man page; if you know,
+       please send a mail to man-pages@man7.org.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.lttng.org/lttng-tools.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">LTTng                            2012-09-19            LTTNG_HEALTH_CHECK(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

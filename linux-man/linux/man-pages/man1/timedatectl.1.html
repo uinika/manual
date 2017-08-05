@@ -1,0 +1,343 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>timedatectl(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">TIMEDATECTL(1)                   timedatectl                  TIMEDATECTL(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       timedatectl - Control the system time and date
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>timedatectl [OPTIONS...] {COMMAND}</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>timedatectl </b>may be used to query and change the system clock and its
+       settings.
+
+       Use <a href="systemd-firstboot.1.html">systemd-firstboot(1)</a> to initialize the system time zone for
+       mounted (but not booted) system images.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following options are understood:
+
+       <b>--no-ask-password</b>
+           Do not query the user for authentication for privileged
+           operations.
+
+       <b>--adjust-system-clock</b>
+           If <b>set-local-rtc </b>is invoked and this option is passed, the system
+           clock is synchronized from the RTC again, taking the new setting
+           into account. Otherwise, the RTC is synchronized from the system
+           clock.
+
+       <b>-H</b>, <b>--host=</b>
+           Execute the operation remotely. Specify a hostname, or a username
+           and hostname separated by "@", to connect to. The hostname may
+           optionally be suffixed by a container name, separated by ":",
+           which connects directly to a specific container on the specified
+           host. This will use SSH to talk to the remote machine manager
+           instance. Container names may be enumerated with <b>machinectl -H</b>
+           <i>HOST</i>.
+
+       <b>-M</b>, <b>--machine=</b>
+           Execute operation on a local container. Specify a container name
+           to connect to.
+
+       <b>-h</b>, <b>--help</b>
+           Print a short help text and exit.
+
+       <b>--version</b>
+           Print a short version string and exit.
+
+       <b>--no-pager</b>
+           Do not pipe output into a pager.
+
+       The following commands are understood:
+
+       <b>status</b>
+           Show current settings of the system clock and RTC, including
+           whether network time synchronization is on. Note that whether
+           network time synchronization is on simply reflects whether the
+           systemd-timesyncd.service unit is enabled. Even if this command
+           shows the status as off, a different service might still
+           synchronize the clock with the network.
+
+       <b>set-time [TIME]</b>
+           Set the system clock to the specified time. This will also update
+           the RTC time accordingly. The time may be specified in the format
+           "2012-10-30 18:17:16".
+
+       <b>set-timezone [TIMEZONE]</b>
+           Set the system time zone to the specified value. Available
+           timezones can be listed with <b>list-timezones</b>. If the RTC is
+           configured to be in the local time, this will also update the RTC
+           time. This call will alter the /etc/localtime symlink. See
+           <a href="../man5/localtime.5.html">localtime(5)</a> for more information.
+
+       <b>list-timezones</b>
+           List available time zones, one per line. Entries from the list
+           can be set as the system timezone with <b>set-timezone</b>.
+
+       <b>set-local-rtc [BOOL]</b>
+           Takes a boolean argument. If "0", the system is configured to
+           maintain the RTC in universal time. If "1", it will maintain the
+           RTC in local time instead. Note that maintaining the RTC in the
+           local timezone is not fully supported and will create various
+           problems with time zone changes and daylight saving adjustments.
+           If at all possible, keep the RTC in UTC mode. Note that invoking
+           this will also synchronize the RTC from the system clock, unless
+           <b>--adjust-system-clock </b>is passed (see above). This command will
+           change the 3rd line of /etc/adjtime, as documented in <a href="../man8/hwclock.8.html">hwclock(8)</a>.
+
+       <b>set-ntp [BOOL]</b>
+           Takes a boolean argument. Controls whether network time
+           synchronization is active and enabled (if available). This
+           enables and starts, or disables and stops the
+           systemd-timesyncd.service unit. It does not affect the state of
+           any other, unrelated network time synchronization services that
+           might be installed on the system. This command is hence mostly
+           equivalent to: <b>systemctl enable --now systemd-timesyncd.service</b>
+           and <b>systemctl disable --now systemd-timesyncd.service</b>, but is
+           protected by a different access policy.
+
+           Note that even if time synchronization is turned off with this
+           command, another unrelated system service might still synchronize
+           the clock with the network. Also note that, strictly speaking,
+           systemd-timesyncd.service does more than just network time
+           synchronization, as it ensures a monotonic clock on systems
+           without RTC even if no network is available. See
+           <a href="../man8/systemd-timesyncd.service.8.html">systemd-timesyncd.service(8)</a> for details about this.
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, 0 is returned, a non-zero failure code otherwise.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>$SYSTEMD_PAGER</i>
+           Pager to use when <b>--no-pager </b>is not given; overrides <i>$PAGER</i>. If
+           neither <i>$SYSTEMD_PAGER</i> nor <i>$PAGER</i> are set, a set of well-known
+           pager implementations are tried in turn, including <a href="less.1.html">less(1)</a> and
+           <a href="more.1.html">more(1)</a>, until one is found. If no pager implementation is
+           discovered no pager is invoked. Setting this environment variable
+           to an empty string or the value "cat" is equivalent to passing
+           <b>--no-pager</b>.
+
+       <i>$SYSTEMD_LESS</i>
+           Override the options passed to <b>less </b>(by default "FRSXMK").
+
+       <i>$SYSTEMD_LESSCHARSET</i>
+           Override the charset passed to <b>less </b>(by default "utf-8", if the
+           invoking terminal is determined to be UTF-8 compatible).
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Show current settings:
+
+           $ timedatectl
+                 Local time: Di 2015-04-07 16:26:56 CEST
+             Universal time: Di 2015-04-07 14:26:56 UTC
+                   RTC time: Di 2015-04-07 14:26:56
+                  Time zone: Europe/Berlin (CEST, +0200)
+            Network time on: yes
+           NTP synchronized: yes
+            RTC in local TZ: no
+
+       Enable network time synchronization:
+
+           $ timedatectl set-ntp true
+           ==== AUTHENTICATING FOR org.freedesktop.timedate1.set-ntp ===
+           Authentication is required to control whether network time synchronization shall be enabled.
+           Authenticating as: user
+           Password: ********
+           ==== AUTHENTICATION COMPLETE ===
+
+           $ systemctl status systemd-timesyncd.service
+           ● systemd-timesyncd.service - Network Time Synchronization
+              Loaded: loaded (/usr/lib/systemd/system/systemd-timesyncd.service; enabled)
+              Active: active (running) since Mo 2015-03-30 14:20:38 CEST; 5s ago
+                Docs: man:systemd-timesyncd.service(8)
+            Main PID: 595 (systemd-timesyn)
+              Status: "Using Time Server 216.239.38.15:123 (time4.google.com)."
+              CGroup: /system.slice/systemd-timesyncd.service
+                      └─595 /usr/lib/systemd/systemd-timesyncd
+           ...
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="systemd.1.html">systemd(1)</a>, <a href="../man8/hwclock.8.html">hwclock(8)</a>, <a href="date.1.html">date(1)</a>, <a href="../man5/localtime.5.html">localtime(5)</a>, <a href="systemctl.1.html">systemctl(1)</a>,
+       <a href="../man8/systemd-timedated.service.8.html">systemd-timedated.service(8)</a>, <a href="../man8/systemd-timesyncd.service.8.html">systemd-timesyncd.service(8)</a>,
+       <a href="systemd-firstboot.1.html">systemd-firstboot(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                   TIMEDATECTL(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="systemd-firstboot.1.html">systemd-firstboot(1)</a>,&nbsp; 
+    <a href="../man5/localtime.5.html">localtime(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man8/systemd-timedated.service.8.html">systemd-timedated.service(8)</a>,&nbsp; 
+    <a href="../man8/systemd-timesyncd.service.8.html">systemd-timesyncd.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

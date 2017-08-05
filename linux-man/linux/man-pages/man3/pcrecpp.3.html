@@ -1,0 +1,507 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pcrecpp(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS_OF_C++_WRAPPER">SYNOPSIS&nbsp;OF&nbsp;C++&nbsp;WRAPPER</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#MATCHING_INTERFACE">MATCHING&nbsp;INTERFACE</a> | <a href="#QUOTING_METACHARACTERS">QUOTING&nbsp;METACHARACTERS</a> | <a href="#PARTIAL_MATCHES">PARTIAL&nbsp;MATCHES</a> | <a href="#UTF-8_AND_THE_MATCHING_INTERFACE">UTF-8&nbsp;AND&nbsp;THE&nbsp;MATCHING&nbsp;INTERFACE</a> | <a href="#PASSING_MODIFIERS_TO_THE_REGULAR_EXPRESSION_ENGINE">PASSING&nbsp;MODIFIERS&nbsp;TO&nbsp;THE&nbsp;REGULAR&nbsp;EXPRESSION&nbsp;ENGINE</a> | <a href="#SCANNING_TEXT_INCREMENTALLY">SCANNING&nbsp;TEXT&nbsp;INCREMENTALLY</a> | <a href="#PARSING_HEX/OCTAL/C-RADIX_NUMBERS">PARSING&nbsp;HEX/OCTAL/C-RADIX&nbsp;NUMBERS</a> | <a href="#REPLACING_PARTS_OF_STRINGS">REPLACING&nbsp;PARTS&nbsp;OF&nbsp;STRINGS</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#REVISION">REVISION</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PCRECPP(3)                Library Functions Manual                PCRECPP(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       PCRE - Perl-compatible regular expressions.
+</pre>
+<h2><a id="SYNOPSIS_OF_C++_WRAPPER" href="#SYNOPSIS_OF_C++_WRAPPER"></a>SYNOPSIS OF C++ WRAPPER  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       <b>#include &lt;pcrecpp.h&gt;</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       The C++ wrapper for PCRE was provided by Google Inc. Some additional
+       functionality was added by Giuseppe Maxia. This brief man page was
+       constructed from the notes in the <i>pcrecpp.h</i> file, which should be
+       consulted for further details. Note that the C++ wrapper supports
+       only the original 8-bit PCRE library. There is no 16-bit or 32-bit
+       support at present.
+</pre>
+<h2><a id="MATCHING_INTERFACE" href="#MATCHING_INTERFACE"></a>MATCHING INTERFACE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       The "FullMatch" operation checks that supplied text matches a
+       supplied pattern exactly. If pointer arguments are supplied, it
+       copies matched sub-strings that match sub-patterns into them.
+
+         Example: successful match
+            pcrecpp::RE re("h.*o");
+            re.FullMatch("hello");
+
+         Example: unsuccessful match (requires full match):
+            pcrecpp::RE re("e");
+            !re.FullMatch("hello");
+
+         Example: creating a temporary RE object:
+            pcrecpp::RE("h.*o").FullMatch("hello");
+
+       You can pass in a "const char*" or a "string" for "text". The
+       examples below tend to use a const char*. You can, as in the
+       different examples above, store the RE object explicitly in a
+       variable or use a temporary RE object. The examples below use one
+       mode or the other arbitrarily. Either could correctly be used for any
+       of these examples.
+
+       You must supply extra pointer arguments to extract matched subpieces.
+
+         Example: extracts "ruby" into "s" and 1234 into "i"
+            int i;
+            string s;
+            pcrecpp::RE re("(\\w+):(\\d+)");
+            re.FullMatch("ruby:1234", &amp;s, &amp;i);
+
+         Example: does not try to extract any extra sub-patterns
+            re.FullMatch("ruby:1234", &amp;s);
+
+         Example: does not try to extract into NULL
+            re.FullMatch("ruby:1234", NULL, &amp;i);
+
+         Example: integer overflow causes failure
+            !re.FullMatch("ruby:1234567891234", NULL, &amp;i);
+
+         Example: fails because there aren't enough sub-patterns:
+            !pcrecpp::RE("\\w+:\\d+").FullMatch("ruby:1234", &amp;s);
+
+         Example: fails because string cannot be stored in integer
+            !pcrecpp::RE("(.*)").FullMatch("ruby", &amp;i);
+
+       The provided pointer arguments can be pointers to any scalar numeric
+       type, or one of:
+
+          string        (matched piece is copied to string)
+          StringPiece   (StringPiece is mutated to point to matched piece)
+          T             (where "bool T::ParseFrom(const char*, int)" exists)
+          NULL          (the corresponding matched sub-pattern is not
+       copied)
+
+       The function returns true iff all of the following conditions are
+       satisfied:
+
+         a. "text" matches "pattern" exactly;
+
+         b. The number of matched sub-patterns is &gt;= number of supplied
+            pointers;
+
+         c. The "i"th argument has a suitable type for holding the
+            string captured as the "i"th sub-pattern. If you pass in
+            void * NULL for the "i"th argument, or a non-void * NULL
+            of the correct type, or pass fewer arguments than the
+            number of sub-patterns, "i"th captured sub-pattern is
+            ignored.
+
+       CAVEAT: An optional sub-pattern that does not exist in the matched
+       string is assigned the empty string. Therefore, the following will
+       return false (because the empty string is not a valid number):
+
+          int number;
+          pcrecpp::RE::FullMatch("abc", "[a-z]+(\\d+)?", &amp;number);
+
+       The matching interface supports at most 16 arguments per call.  If
+       you need more, consider using the more general interface
+       <b>pcrecpp::RE::DoMatch</b>. See <b>pcrecpp.h </b>for the signature for <b>DoMatch</b>.
+
+       NOTE: Do not use <b>no_arg</b>, which is used internally to mark the end of
+       a list of optional arguments, as a placeholder for missing arguments,
+       as this can lead to segfaults.
+</pre>
+<h2><a id="QUOTING_METACHARACTERS" href="#QUOTING_METACHARACTERS"></a>QUOTING METACHARACTERS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       You can use the "QuoteMeta" operation to insert backslashes before
+       all potentially meaningful characters in a string. The returned
+       string, used as a regular expression, will exactly match the original
+       string.
+
+         Example:
+            string quoted = RE::QuoteMeta(unquoted);
+
+       Note that it's legal to escape a character even if it has no special
+       meaning in a regular expression -- so this function does that. (This
+       also makes it identical to the perl function of the same name; see
+       "perldoc -f quotemeta".)  For example, "1.5-2.0?" becomes
+       "1\.5\-2\.0\?".
+</pre>
+<h2><a id="PARTIAL_MATCHES" href="#PARTIAL_MATCHES"></a>PARTIAL MATCHES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       You can use the "PartialMatch" operation when you want the pattern to
+       match any substring of the text.
+
+         Example: simple search for a string:
+            pcrecpp::RE("ell").PartialMatch("hello");
+
+         Example: find first number in a string:
+            int number;
+            pcrecpp::RE re("(\\d+)");
+            re.PartialMatch("x*100 + 20", &amp;number);
+            assert(number == 100);
+</pre>
+<h2><a id="UTF-8_AND_THE_MATCHING_INTERFACE" href="#UTF-8_AND_THE_MATCHING_INTERFACE"></a>UTF-8 AND THE MATCHING INTERFACE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       By default, pattern and text are plain text, one byte per character.
+       The UTF8 flag, passed to the constructor, causes both pattern and
+       string to be treated as UTF-8 text, still a byte stream but
+       potentially multiple bytes per character. In practice, the text is
+       likelier to be UTF-8 than the pattern, but the match returned may
+       depend on the UTF8 flag, so always use it when matching UTF8 text.
+       For example, "." will match one byte normally but with UTF8 set may
+       match up to three bytes of a multi-byte character.
+
+         Example:
+            pcrecpp::RE_Options options;
+            options.set_utf8();
+            pcrecpp::RE re(utf8_pattern, options);
+            re.FullMatch(utf8_string);
+
+         Example: using the convenience function UTF8():
+            pcrecpp::RE re(utf8_pattern, pcrecpp::UTF8());
+            re.FullMatch(utf8_string);
+
+       NOTE: The UTF8 flag is ignored if pcre was not configured with the
+             --enable-utf8 flag.
+</pre>
+<h2><a id="PASSING_MODIFIERS_TO_THE_REGULAR_EXPRESSION_ENGINE" href="#PASSING_MODIFIERS_TO_THE_REGULAR_EXPRESSION_ENGINE"></a>PASSING MODIFIERS TO THE REGULAR EXPRESSION ENGINE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       PCRE defines some modifiers to change the behavior of the regular
+       expression engine. The C++ wrapper defines an auxiliary class,
+       RE_Options, as a vehicle to pass such modifiers to a RE class.
+       Currently, the following modifiers are supported:
+
+          modifier              description               Perl corresponding
+
+          PCRE_CASELESS         case insensitive match      /i
+          PCRE_MULTILINE        multiple lines match        /m
+          PCRE_DOTALL           dot matches newlines        /s
+          PCRE_DOLLAR_ENDONLY   $ matches only at end       N/A
+          PCRE_EXTRA            strict escape parsing       N/A
+          PCRE_EXTENDED         ignore white spaces         /x
+          PCRE_UTF8             handles UTF8 chars          built-in
+          PCRE_UNGREEDY         reverses * and *?           N/A
+          PCRE_NO_AUTO_CAPTURE  disables capturing parens   N/A (*)
+
+       (*) Both Perl and PCRE allow non capturing parentheses by means of
+       the "?:" modifier within the pattern itself. e.g. (?:ab|cd) does not
+       capture, while (ab|cd) does.
+
+       For a full account on how each modifier works, please check the PCRE
+       API reference page.
+
+       For each modifier, there are two member functions whose name is made
+       out of the modifier in lowercase, without the "PCRE_" prefix. For
+       instance, PCRE_CASELESS is handled by
+
+         bool caseless()
+
+       which returns true if the modifier is set, and
+
+         RE_Options &amp; set_caseless(bool)
+
+       which sets or unsets the modifier. Moreover, PCRE_EXTRA_MATCH_LIMIT
+       can be accessed through the <b>set_match_limit() </b>and <b>match_limit()</b>
+       member functions. Setting <i>match_limit</i> to a non-zero value will limit
+       the execution of pcre to keep it from doing bad things like blowing
+       the stack or taking an eternity to return a result. A value of 5000
+       is good enough to stop stack blowup in a 2MB thread stack. Setting
+       <i>match_limit</i> to zero disables match limiting. Alternatively, you can
+       call <b>match_limit_recursion() </b>which uses
+       PCRE_EXTRA_MATCH_LIMIT_RECURSION to limit how much PCRE recurses.
+       <b>match_limit() </b>limits the number of matches PCRE does;
+       <b>match_limit_recursion() </b>limits the depth of internal recursion, and
+       therefore the amount of stack that is used.
+
+       Normally, to pass one or more modifiers to a RE class, you declare a
+       <i>RE_Options</i> object, set the appropriate options, and pass this object
+       to a RE constructor. Example:
+
+          RE_Options opt;
+          opt.set_caseless(true);
+          if (RE("HELLO", opt).PartialMatch("hello world")) ...
+
+       RE_options has two constructors. The default constructor takes no
+       arguments and creates a set of flags that are off by default. The
+       optional parameter <i>option_flags</i> is to facilitate transfer of legacy
+       code from C programs.  This lets you do
+
+          RE(pattern,
+            RE_Options(PCRE_CASELESS|PCRE_MULTILINE)).PartialMatch(str);
+
+       However, new code is better off doing
+
+          RE(pattern,
+            RE_Options().set_caseless(true).set_multiline(true))
+              .PartialMatch(str);
+
+       If you are going to pass one of the most used modifiers, there are
+       some convenience functions that return a RE_Options class with the
+       appropriate modifier already set: <b>CASELESS()</b>, <b>UTF8()</b>, <b>MULTILINE()</b>,
+       <b>DOTALL</b>(), and <b>EXTENDED()</b>.
+
+       If you need to set several options at once, and you don't want to go
+       through the pains of declaring a RE_Options object and setting
+       several options, there is a parallel method that give you such
+       ability on the fly. You can concatenate several <b>set_xxxxx() </b>member
+       functions, since each of them returns a reference to its class
+       object. For example, to pass PCRE_CASELESS, PCRE_EXTENDED, and
+       PCRE_MULTILINE to a RE with one statement, you may write:
+
+          RE(" ^ xyz \\s+ .* blah$",
+            RE_Options()
+              .set_caseless(true)
+              .set_extended(true)
+              .set_multiline(true)).PartialMatch(sometext);
+</pre>
+<h2><a id="SCANNING_TEXT_INCREMENTALLY" href="#SCANNING_TEXT_INCREMENTALLY"></a>SCANNING TEXT INCREMENTALLY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       The "Consume" operation may be useful if you want to repeatedly match
+       regular expressions at the front of a string and skip over them as
+       they match. This requires use of the "StringPiece" type, which
+       represents a sub-range of a real string. Like RE, StringPiece is
+       defined in the pcrecpp namespace.
+
+         Example: read lines of the form "var = value" from a string.
+            string contents = ...;                 // Fill string somehow
+            pcrecpp::StringPiece input(contents);  // Wrap in a StringPiece
+
+            string var;
+            int value;
+            pcrecpp::RE re("(\\w+) = (\\d+)\n");
+            while (re.Consume(&amp;input, &amp;var, &amp;value)) {
+              ...;
+            }
+
+       Each successful call to "Consume" will set "var/value", and also
+       advance "input" so it points past the matched text.
+
+       The "FindAndConsume" operation is similar to "Consume" but does not
+       anchor your match at the beginning of the string. For example, you
+       could extract all words from a string by repeatedly calling
+
+         pcrecpp::RE("(\\w+)").FindAndConsume(&amp;input, &amp;word)
+</pre>
+<h2><a id="PARSING_HEX/OCTAL/C-RADIX_NUMBERS" href="#PARSING_HEX/OCTAL/C-RADIX_NUMBERS"></a>PARSING HEX/OCTAL/C-RADIX NUMBERS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       By default, if you pass a pointer to a numeric value, the
+       corresponding text is interpreted as a base-10 number. You can
+       instead wrap the pointer with a call to one of the operators Hex(),
+       Octal(), or CRadix() to interpret the text in another base. The
+       CRadix operator interprets C-style "0" (base-8) and "0x" (base-16)
+       prefixes, but defaults to base-10.
+
+         Example:
+           int a, b, c, d;
+           pcrecpp::RE re("(.*) (.*) (.*) (.*)");
+           re.FullMatch("100 40 0100 0x40",
+                        pcrecpp::Octal(&amp;a), pcrecpp::Hex(&amp;b),
+                        pcrecpp::CRadix(&amp;c), pcrecpp::CRadix(&amp;d));
+
+       will leave 64 in a, b, c, and d.
+</pre>
+<h2><a id="REPLACING_PARTS_OF_STRINGS" href="#REPLACING_PARTS_OF_STRINGS"></a>REPLACING PARTS OF STRINGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       You can replace the first match of "pattern" in "str" with "rewrite".
+       Within "rewrite", backslash-escaped digits (\1 to \9) can be used to
+       insert text matching corresponding parenthesized group from the
+       pattern. \0 in "rewrite" refers to the entire matching text. For
+       example:
+
+         string s = "yabba dabba doo";
+         pcrecpp::RE("b+").Replace("d", &amp;s);
+
+       will leave "s" containing "yada dabba doo". The result is true if the
+       pattern matches and a replacement occurs, false otherwise.
+
+       <b>GlobalReplace </b>is like <b>Replace </b>except that it replaces all occurrences
+       of the pattern in the string with the rewrite. Replacements are not
+       subject to re-matching. For example:
+
+         string s = "yabba dabba doo";
+         pcrecpp::RE("b+").GlobalReplace("d", &amp;s);
+
+       will leave "s" containing "yada dada doo". It returns the number of
+       replacements made.
+
+       <b>Extract </b>is like <b>Replace</b>, except that if the pattern matches,
+       "rewrite" is copied into "out" (an additional argument) with
+       substitutions.  The non-matching portions of "text" are ignored.
+       Returns true iff a match occurred and the extraction happened
+       successfully;  if no match occurs, the string is left unaffected.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       The C++ wrapper was contributed by Google Inc.
+       Copyright (c) 2007 Google Inc.
+</pre>
+<h2><a id="REVISION" href="#REVISION"></a>REVISION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+
+       Last updated: 08 January 2012
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCRE</i> (Perl Compatible Regular Expressions)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.pcre.org/">http://www.pcre.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨<a href="http://bugs.exim.org/enter_bug.cgi?product=PCRE">http://bugs.exim.org/enter_bug.cgi?product=PCRE</a>⟩.  This
+       page was obtained from the tarball pcre-8.40.tar.gz fetched from 
+       ⟨ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">PCRE 8.30                      08 January 2012                    PCRECPP(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pcreapi.3.html">pcreapi(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

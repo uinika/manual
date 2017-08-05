@@ -1,0 +1,364 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dsc(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FIELDS">FIELDS</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">dsc(5)                           dpkg suite                           dsc(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dsc - Debian source packages' control file format
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>filename</i><b>.dsc</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Each Debian source package is composed of a .dsc control file, which
+       contains a number of fields.  Each field begins with a tag, such as
+       <b>Source </b>or <b>Binary </b>(case insensitive), followed by a colon, and the
+       body of the field.  Fields are delimited only by field tags.  In
+       other words, field text may be multiple lines in length, but the
+       installation tools will generally join lines when processing the body
+       of the field (except in case of the multiline fields <b>Package-List</b>,
+       <b>Files</b>, <b>Checksums-Sha1 </b>and <b>Checksums-Sha256</b>, see below).
+
+       The control data might be enclosed in an OpenPGP ASCII Armored
+       signature, as specified in RFC4880.
+</pre>
+<h2><a id="FIELDS" href="#FIELDS"></a>FIELDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Format: </b><i>format-version</i> (required)
+              The value of this field declares the format version of the
+              source package.  The field value is used by programs acting on
+              a source package to interpret the list of files in the source
+              package and determine how to unpack it.  The syntax of the
+              field value is a numeric major revision, a period, a numeric
+              minor revision, and then an optional subtype after whitespace,
+              which if specified is an alphanumeric word in parentheses.
+              The subtype is optional in the syntax but may be mandatory for
+              particular source format revisions.
+
+              The source formats currently supported by <b>dpkg </b>are <b>1.0</b>, <b>2.0</b>,
+              <b>3.0 (native)</b>, <b>3.0 (quilt)</b>, <b>3.0 (git)</b>, <b>3.0 (bzr) </b>and <b>3.0</b>
+              <b>(custom)</b>.
+
+       <b>Source: </b><i>source-name</i> (required)
+              The value of this field determines the package name, and is
+              used to generate file names by most installation tools.
+
+       <b>Binary: </b><i>binary-package-list</i>
+              This folded field lists binary packages which this source
+              package can produce, separated by commas.
+
+              This field has now been superseded by the <b>Package-List </b>field,
+              which gives enough information about what binary packages are
+              produced on which architecture, build-profile and other
+              involved restrictions.
+
+       <b>Architecture: </b><i>arch-list</i> (recommended)
+              A list of architectures and architecture wildcards separated
+              by spaces which specify the type of hardware this package can
+              be compiled for.  Common architecture names and architecture
+              wildcards are <b>amd64</b>, <b>armel</b>, <b>i386</b>, <b>linux-any</b>, <b>any-amd64</b>, etc.
+
+              Note that the <b>all </b>value is meant for packages that are
+              architecture independent, and <b>any </b>for packages that are
+              architecture dependent.  The list may include (or consist
+              solely of) the special value <b>all</b>.  When the list contains the
+              architecture wildcard <b>any</b>, the only other value allowed in the
+              list is <b>all</b>.
+
+              The field value is generally generated from <b>Architecture</b>
+              fields from in the <i>debian/control</i> in the source package.
+
+       <b>Version: </b><i>version-string</i> (required)
+              Typically, this is the original package's version number in
+              whatever form the program's author uses.  It may also include
+              a Debian revision number (for non-native packages).  The exact
+              format and sorting algorithm are described in <a href="deb-version.5.html">deb-version(5)</a>.
+
+       <b>Origin: </b><i>name</i>
+              The name of the distribution this package is originating from.
+
+       <b>Maintainer: </b><i>fullname-email</i> (recommended)
+              Should be in the format “Joe Bloggs &lt;jbloggs@foo.com&gt;”, and is
+              typically the person who created the package, as opposed to
+              the author of the software that was packaged.
+
+       <b>Uploaders: </b><i>fullname-email-list</i>
+              Lists all the names and email addresses of co-maintainers of
+              the package, in the same format as the <b>Maintainer </b>field.
+              Multiple co-maintainers should be separated by a comma.
+
+       <b>Homepage: </b><i>url</i>
+              The upstream project home page <i>url</i>.
+
+       <b>Standards-Version: </b><i>version-string</i> (recommended)
+              This documents the most recent version of the distribution
+              policy standards this package complies with.
+
+       <b>Vcs-Browser: </b><i>url</i>
+              The <i>url</i> of a web interface to browse the Version Control
+              System repository.
+
+       <b>Vcs-Arch: </b><i>url</i>
+       <b>Vcs-Bzr: </b><i>url</i>
+       <b>Vcs-Cvs: </b><i>url</i>
+       <b>Vcs-Darcs: </b><i>url</i>
+       <b>Vcs-Git: </b><i>url</i>
+       <b>Vcs-Hg: </b><i>url</i>
+       <b>Vcs-Mtn: </b><i>url</i>
+       <b>Vcs-Svn: </b><i>url</i>
+              These fields declare the <i>url</i> of the Version Control System
+              repository used to maintain this package.  See
+              <a href="deb-src-control.5.html">deb-src-control(5)</a> for more details.
+
+       <b>Testsuite: </b><i>name-list</i>
+              This field declares that the source package contains the
+              specified test suites.  The value is a space-separated list of
+              test suites.  If the <b>autopkgtest </b>value is present, a
+              <i>debian/tests/control</i> is expected to be present, if the file is
+              present but not the value, then <b>dpkg-source </b>will automatically
+              add it, preserving previous values.
+
+       <b>Testsuite-Triggers: </b><i>package-list</i>
+              This field declares the comma-separated union of all test
+              dependencies (<b>Depends </b>fields in <i>debian/tests/control</i> file),
+              with all restrictions removed, and OR dependencies flattened,
+              except for binaries generated by this source package and meta-
+              dependencies such as <b>@ </b>or <b>@builddeps@</b>.
+
+       <b>Build-Depends: </b><i>package-list</i>
+       <b>Build-Depends-Arch: </b><i>package-list</i>
+       <b>Build-Depends-Indep: </b><i>package-list</i>
+       <b>Build-Conflicts: </b><i>package-list</i>
+       <b>Build-Conflicts-Arch: </b><i>package-list</i>
+       <b>Build-Conflicts-Indep: </b><i>package-list</i>
+              These fields declare relationships between the source package
+              and packages used to build it.  They are discussed in the
+              <a href="deb-src-control.5.html">deb-src-control(5)</a> manpage.
+
+       <b>Package-List:</b>
+        <i>package package-type section priority key-value-list</i>
+              This multiline field contains a list of binary packages
+              generated by this source package.
+
+              The <i>package</i> is the binary package name.
+
+              The <i>package-type</i> is the binary package type, usually <b>deb</b>,
+              another common value is <b>udeb</b>.
+
+              The <i>section</i> and <i>priority</i> match the binary package fields of
+              the same name.
+
+              The <i>key-value-list</i> is a space separated <i>key</i><b>=</b><i>value</i> list, and
+              the currently known optional keys are:
+
+              <b>arch   </b>The architecture restriction from the binary package
+                     <b>Architecture </b>field, with spaces converted to ‘,’.
+
+              <b>profile</b>
+                     The normalized build-profile restriction formula from
+                     the binary package <b>Build-Profile </b>field, with ORs
+                     converted to ‘+’ and ANDs to ‘,’.
+
+              <b>essential</b>
+                     If the binary package is essential, this key will
+                     contain the value of the <b>Essential </b>field, that is a <b>yes</b>
+                     value.
+
+       <b>Files: </b>(required)
+       <b>Checksums-Sha1: </b>(required)
+       <b>Checksums-Sha256: </b>(required)
+        <i>checksum size filename</i>
+              These multiline fields contain a list of files with a checksum
+              and size for each one.  These fields have the same syntax and
+              differ only in the checksum algorithm used: MD5 for <b>Files</b>,
+              SHA-1 for <b>Checksums-Sha1 </b>and SHA-256 for <b>Checksums-Sha256</b>.
+
+              The first line of the field value (the part on the same line
+              as the field name followed by a colon) is always empty.  The
+              content of the field is expressed as continuation lines, one
+              line per file.  Each line consists of the checksum, a space,
+              the file size, a space, and the file name.
+
+              These fields list all files that make up the source package.
+              The list of files in these fields must match the list of files
+              in the other related fields.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>Format </b>field conflates the format for the <b>.dsc </b>file itself and
+       the format of the extracted source package.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="deb-src-control.5.html">deb-src-control(5)</a>, <a href="deb-version.5.html">deb-version(5)</a>, <a href="../man1/dpkg-source.1.html">dpkg-source(1)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01                           dsc(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/dpkg-source.1.html">dpkg-source(1)</a>,&nbsp; 
+    <a href="deb-src-control.5.html">deb-src-control(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,387 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ioprio_set(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">IOPRIO_SET(2)             Linux Programmer's Manual            IOPRIO_SET(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ioprio_get, ioprio_set - get/set I/O scheduling class and priority
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>int ioprio_get(int </b><i>which</i><b>, int </b><i>who</i><b>);</b>
+       <b>int ioprio_set(int </b><i>which</i><b>, int </b><i>who</i><b>, int </b><i>ioprio</i><b>);</b>
+
+       <i>Note</i>: There are no glibc wrappers for these system calls; see NOTES.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>ioprio_get</b>() and <b>ioprio_set</b>() system calls respectively get and
+       set the I/O scheduling class and priority of one or more threads.
+
+       The <i>which</i> and <i>who</i> arguments identify the thread(s) on which the
+       system calls operate.  The <i>which</i> argument determines how <i>who</i> is
+       interpreted, and has one of the following values:
+
+       <b>IOPRIO_WHO_PROCESS</b>
+              <i>who</i> is a process ID or thread ID identifying a single process
+              or thread.  If <i>who</i> is 0, then operate on the calling thread.
+
+       <b>IOPRIO_WHO_PGRP</b>
+              <i>who</i> is a process group ID identifying all the members of a
+              process group.  If <i>who</i> is 0, then operate on the process group
+              of which the caller is a member.
+
+       <b>IOPRIO_WHO_USER</b>
+              <i>who</i> is a user ID identifying all of the processes that have a
+              matching real UID.
+
+       If <i>which</i> is specified as <b>IOPRIO_WHO_PGRP </b>or <b>IOPRIO_WHO_USER </b>when
+       calling <b>ioprio_get</b>(), and more than one process matches <i>who</i>, then the
+       returned priority will be the highest one found among all of the
+       matching processes.  One priority is said to be higher than another
+       one if it belongs to a higher priority class (<b>IOPRIO_CLASS_RT </b>is the
+       highest priority class; <b>IOPRIO_CLASS_IDLE </b>is the lowest) or if it
+       belongs to the same priority class as the other process but has a
+       higher priority level (a lower priority number means a higher
+       priority level).
+
+       The <i>ioprio</i> argument given to <b>ioprio_set</b>() is a bit mask that
+       specifies both the scheduling class and the priority to be assigned
+       to the target process(es).  The following macros are used for
+       assembling and dissecting <i>ioprio</i> values:
+
+       <b>IOPRIO_PRIO_VALUE(</b><i>class</i><b>, </b><i>data</i><b>)</b>
+              Given a scheduling <i>class</i> and priority (<i>data</i>), this macro
+              combines the two values to produce an <i>ioprio</i> value, which is
+              returned as the result of the macro.
+
+       <b>IOPRIO_PRIO_CLASS(</b><i>mask</i><b>)</b>
+              Given <i>mask</i> (an <i>ioprio</i> value), this macro returns its I/O class
+              component, that is, one of the values <b>IOPRIO_CLASS_RT</b>,
+              <b>IOPRIO_CLASS_BE</b>, or <b>IOPRIO_CLASS_IDLE</b>.
+
+       <b>IOPRIO_PRIO_DATA(</b><i>mask</i><b>)</b>
+              Given <i>mask</i> (an <i>ioprio</i> value), this macro returns its priority
+              (<i>data</i>) component.
+
+       See the NOTES section for more information on scheduling classes and
+       priorities, as well as the meaning of specifying <i>ioprio</i> as 0.
+
+       I/O priorities are supported for reads and for synchronous (<b>O_DIRECT</b>,
+       <b>O_SYNC</b>) writes.  I/O priorities are not supported for asynchronous
+       writes because they are issued outside the context of the program
+       dirtying the memory, and thus program-specific priorities do not
+       apply.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>ioprio_get</b>() returns the <i>ioprio</i> value of the process with
+       highest I/O priority of any of the processes that match the criteria
+       specified in <i>which</i> and <i>who</i>.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set to indicate the error.
+
+       On success, <b>ioprio_set</b>() returns 0.  On error, -1 is returned, and
+       <i><a href="../man3/errno.3.html">errno</a></i> is set to indicate the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EINVAL </b>Invalid value for <i>which</i> or <i>ioprio</i>.  Refer to the NOTES section
+              for available scheduler classes and priority levels for
+              <i>ioprio</i>.
+
+       <b>EPERM  </b>The calling process does not have the privilege needed to
+              assign this <i>ioprio</i> to the specified process(es).  See the
+              NOTES section for more information on required privileges for
+              <b>ioprio_set</b>().
+
+       <b>ESRCH  </b>No process(es) could be found that matched the specification
+              in <i>which</i> and <i>who</i>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls have been available on Linux since kernel 2.6.13.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls are Linux-specific.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Glibc does not provide a wrapper for these system calls; call them
+       using <a href="syscall.2.html">syscall(2)</a>.
+
+       Two or more processes or threads can share an I/O context.  This will
+       be the case when <a href="clone.2.html">clone(2)</a> was called with the <b>CLONE_IO </b>flag.
+       However, by default, the distinct threads of a process will <b>not </b>share
+       the same I/O context.  This means that if you want to change the I/O
+       priority of all threads in a process, you may need to call
+       <b>ioprio_set</b>() on each of the threads.  The thread ID that you would
+       need for this operation is the one that is returned by <a href="gettid.2.html">gettid(2)</a> or
+       <a href="clone.2.html">clone(2)</a>.
+
+       These system calls have an effect only when used in conjunction with
+       an I/O scheduler that supports I/O priorities.  As at kernel 2.6.17
+       the only such scheduler is the Completely Fair Queuing (CFQ) I/O
+       scheduler.
+
+       If no I/O scheduler has been set for a thread, then by default the
+       I/O priority will follow the CPU nice value (<a href="setpriority.2.html">setpriority(2)</a>).  In
+       Linux kernels before version 2.6.24, once an I/O priority had been
+       set using <b>ioprio_set</b>(), there was no way to reset the I/O scheduling
+       behavior to the default.  Since Linux 2.6.24, specifying <i>ioprio</i> as 0
+       can be used to reset to the default I/O scheduling behavior.
+
+   <b>Selecting an I/O scheduler</b>
+       I/O schedulers are selected on a per-device basis via the special
+       file <i>/sys/block/&lt;device&gt;/queue/scheduler</i>.
+
+       One can view the current I/O scheduler via the <i>/sys</i> filesystem.  For
+       example, the following command displays a list of all schedulers
+       currently loaded in the kernel:
+
+              $ <b>cat /sys/block/sda/queue/scheduler</b>
+              noop anticipatory deadline [cfq]
+
+       The scheduler surrounded by brackets is the one actually in use for
+       the device (<i>sda</i> in the example).  Setting another scheduler is done
+       by writing the name of the new scheduler to this file.  For example,
+       the following command will set the scheduler for the <i>sda</i> device to
+       <i>cfq</i>:
+
+              $ <b>su</b>
+              Password:
+              # <b>echo cfq &gt; /sys/block/sda/queue/scheduler</b>
+
+   <b>The Completely Fair Queuing (CFQ) I/O scheduler</b>
+       Since version 3 (also known as CFQ Time Sliced), CFQ implements I/O
+       nice levels similar to those of CPU scheduling.  These nice levels
+       are grouped into three scheduling classes, each one containing one or
+       more priority levels:
+
+       <b>IOPRIO_CLASS_RT </b>(1)
+              This is the real-time I/O class.  This scheduling class is
+              given higher priority than any other class: processes from
+              this class are given first access to the disk every time.
+              Thus, this I/O class needs to be used with some care: one I/O
+              real-time process can starve the entire system.  Within the
+              real-time class, there are 8 levels of class data (priority)
+              that determine exactly how much time this process needs the
+              disk for on each service.  The highest real-time priority
+              level is 0; the lowest is 7.  In the future, this might change
+              to be more directly mappable to performance, by passing in a
+              desired data rate instead.
+
+       <b>IOPRIO_CLASS_BE </b>(2)
+              This is the best-effort scheduling class, which is the default
+              for any process that hasn't set a specific I/O priority.  The
+              class data (priority) determines how much I/O bandwidth the
+              process will get.  Best-effort priority levels are analogous
+              to CPU nice values (see <a href="getpriority.2.html">getpriority(2)</a>).  The priority level
+              determines a priority relative to other processes in the best-
+              effort scheduling class.  Priority levels range from 0
+              (highest) to 7 (lowest).
+
+       <b>IOPRIO_CLASS_IDLE </b>(3)
+              This is the idle scheduling class.  Processes running at this
+              level get I/O time only when no-one else needs the disk.  The
+              idle class has no class data.  Attention is required when
+              assigning this priority class to a process, since it may
+              become starved if higher priority processes are constantly
+              accessing the disk.
+
+       Refer to the kernel source file <i>Documentation/block/ioprio.txt</i> for
+       more information on the CFQ I/O Scheduler and an example program.
+
+   <b>Required permissions to set I/O priorities</b>
+       Permission to change a process's priority is granted or denied based
+       on two criteria:
+
+       <b>Process ownership</b>
+              An unprivileged process may set the I/O priority only for a
+              process whose real UID matches the real or effective UID of
+              the calling process.  A process which has the <b>CAP_SYS_NICE</b>
+              capability can change the priority of any process.
+
+       <b>What is the desired priority</b>
+              Attempts to set very high priorities (<b>IOPRIO_CLASS_RT</b>) require
+              the <b>CAP_SYS_ADMIN </b>capability.  Kernel versions up to 2.6.24
+              also required <b>CAP_SYS_ADMIN </b>to set a very low priority
+              (<b>IOPRIO_CLASS_IDLE</b>), but since Linux 2.6.25, this is no longer
+              required.
+
+       A call to <b>ioprio_set</b>() must follow both rules, or the call will fail
+       with the error <b>EPERM</b>.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Glibc does not yet provide a suitable header file defining the
+       function prototypes and macros described on this page.  Suitable
+       definitions can be found in <i>linux/ioprio.h</i>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/ionice.1.html">ionice(1)</a>, <a href="getpriority.2.html">getpriority(2)</a>, <a href="open.2.html">open(2)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>, <a href="../man7/cgroups.7.html">cgroups(7)</a>
+
+       <i>Documentation/block/ioprio.txt</i> in the Linux kernel source tree
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-05-09                    IOPRIO_SET(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/ionice.1.html">ionice(1)</a>,&nbsp; 
+    <a href="gettid.2.html">gettid(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="../man7/cgroups.7.html">cgroups(7)</a>,&nbsp; 
+    <a href="../man7/credentials.7.html">credentials(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="ioprio_set.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

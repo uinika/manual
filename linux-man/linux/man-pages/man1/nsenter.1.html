@@ -1,0 +1,365 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>nsenter(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">NSENTER(1)                      User Commands                     NSENTER(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       nsenter - run program with namespaces of other processes
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>nsenter </b>[options] [<i>program</i> [<i>arguments</i>]]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Enters the namespaces of one or more other processes and then
+       executes the specified <i>program</i>. If <i>program</i> is not given, then
+       ``${SHELL}'' is run (default: /bin/sh).
+
+       Enterable namespaces are:
+
+       <b>mount namespace</b>
+              Mounting and unmounting filesystems will not affect the rest
+              of the system, except for filesystems which are explicitly
+              marked as shared (with <b>mount --make-shared</b>; see <i>/proc/self</i>
+              <i>/mountinfo</i> for the <b>shared </b>flag).  For further details, see
+              <a href="../man7/mount_namespaces.7.html">mount_namespaces(7)</a> and the discussion of the <b>CLONE_NEWNS </b>flag
+              in <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>UTS namespace</b>
+              Setting hostname or domainname will not affect the rest of the
+              system.  For further details, see <a href="../man7/namespaces.7.html">namespaces(7)</a> and the
+              discussion of the <b>CLONE_NEWUTS </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>IPC namespace</b>
+              The process will have an independent namespace for POSIX
+              message queues as well as System V message queues, semaphore
+              sets and shared memory segments.  For further details, see
+              <a href="../man7/namespaces.7.html">namespaces(7)</a> and the discussion of the <b>CLONE_NEWIPC </b>flag in
+              <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>network namespace</b>
+              The process will have independent IPv4 and IPv6 stacks, IP
+              routing tables, firewall rules, the <i>/proc/net</i> and <i>/sys/class</i>
+              <i>/net</i> directory trees, sockets, etc.  For further details, see
+              <a href="../man7/namespaces.7.html">namespaces(7)</a> and the discussion of the <b>CLONE_NEWNET </b>flag in
+              <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>PID namespace</b>
+              Children will have a set of PID to process mappings separate
+              from the <b>nsenter </b>process For further details, see
+              <a href="../man7/pid_namespaces.7.html">pid_namespaces(7)</a> and the discussion of the <b>CLONE_NEWPID </b>flag
+              in <b>nsenter </b>will fork by default if changing the PID namespace,
+              so that the new program and its children share the same PID
+              namespace and are visible to each other.  If <b>--no-fork </b>is
+              used, the new program will be exec'ed without forking.
+
+       <b>user namespace</b>
+              The process will have a distinct set of UIDs, GIDs and
+              capabilities.  For further details, see <a href="../man7/user_namespaces.7.html">user_namespaces(7)</a> and
+              the discussion of the <b>CLONE_NEWUSER </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+
+       <b>cgroup namespace</b>
+              The process will have a virtualized view of <i>/proc/self/cgroup</i>,
+              and new cgroup mounts will be rooted at the namespace cgroup
+              root.  For further details, see <a href="../man7/cgroup_namespaces.7.html">cgroup_namespaces(7)</a> and the
+              discussion of the <b>CLONE_NEWCGROUP </b>flag in <a href="../man2/clone.2.html">clone(2)</a>.
+
+       See <a href="../man2/clone.2.html">clone(2)</a> for the exact semantics of the flags.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Various of the options below that relate to namespaces take an
+       optional <i>file</i> argument.  This should be one of the <i>/proc/[pid]/ns/*</i>
+       files described in <a href="../man7/namespaces.7.html">namespaces(7)</a>.
+
+       <b>-a</b>, <b>--all</b>
+              Enter all namespaces of the target process by the default
+              <i>/proc/[pid]/ns/*</i> namespace paths. The default paths to the
+              target process namespaces may be overwritten by namespace
+              specific options (e.g. --all --mount=[path]).
+
+              The user namespace will be ignored if the same as the caller's
+              current user namespace. It prevents a caller that has dropped
+              capabilities from regaining those capabilities via a call to
+              setns().  See <a href="../man2/setns.2.html">setns(2)</a> for more details.
+
+       <b>-t</b>, <b>--target </b><i>pid</i>
+              Specify a target process to get contexts from.  The paths to
+              the contexts specified by <i>pid</i> are:
+
+              /proc/<i>pid</i>/ns/mnt    the mount namespace
+              /proc/<i>pid</i>/ns/uts    the UTS namespace
+              /proc/<i>pid</i>/ns/ipc    the IPC namespace
+              /proc/<i>pid</i>/ns/net    the network namespace
+              /proc/<i>pid</i>/ns/pid    the PID namespace
+              /proc/<i>pid</i>/ns/user   the user namespace
+              /proc/<i>pid</i>/ns/cgroup the cgroup namespace
+              /proc/<i>pid</i>/root      the root directory
+              /proc/<i>pid</i>/cwd       the working directory respectively
+
+       <b>-m</b>, <b>--mount</b>[=<i>file</i>]
+              Enter the mount namespace.  If no file is specified, enter the
+              mount namespace of the target process.  If <i>file</i> is specified,
+              enter the mount namespace specified by <i>file</i>.
+
+       <b>-u</b>, <b>--uts</b>[=<i>file</i>]
+              Enter the UTS namespace.  If no file is specified, enter the
+              UTS namespace of the target process.  If <i>file</i> is specified,
+              enter the UTS namespace specified by <i>file</i>.
+
+       <b>-i</b>, <b>--ipc</b>[=<i>file</i>]
+              Enter the IPC namespace.  If no file is specified, enter the
+              IPC namespace of the target process.  If <i>file</i> is specified,
+              enter the IPC namespace specified by <i>file</i>.
+
+       <b>-n</b>, <b>--net</b>[=<i>file</i>]
+              Enter the network namespace.  If no file is specified, enter
+              the network namespace of the target process.  If <i>file</i> is
+              specified, enter the network namespace specified by <i>file</i>.
+
+       <b>-p</b>, <b>--pid</b>[=<i>file</i>]
+              Enter the PID namespace.  If no file is specified, enter the
+              PID namespace of the target process.  If <i>file</i> is specified,
+              enter the PID namespace specified by <i>file</i>.
+
+       <b>-U</b>, <b>--user</b>[=<i>file</i>]
+              Enter the user namespace.  If no file is specified, enter the
+              user namespace of the target process.  If <i>file</i> is specified,
+              enter the user namespace specified by <i>file</i>.  See also the
+              <b>--setuid </b>and <b>--setgid </b>options.
+
+       <b>-C</b>, <b>--cgroup</b>[=<i>file</i>]
+              Enter the cgroup namespace.  If no file is specified, enter
+              the cgroup namespace of the target process.  If <i>file</i> is
+              specified, enter the cgroup namespace specified by <i>file</i>.
+
+       <b>-G</b>, <b>--setgid </b><i>gid</i>
+              Set the group ID which will be used in the entered namespace
+              and drop supplementary groups.  <a href="nsenter.1.html">nsenter(1)</a> always sets GID for
+              user namespaces, the default is 0.
+
+       <b>-S</b>, <b>--setuid </b><i>uid</i>
+              Set the user ID which will be used in the entered namespace.
+              <a href="nsenter.1.html">nsenter(1)</a> always sets UID for user namespaces, the default is
+              0.
+
+       <b>--preserve-credentials</b>
+              Don't modify UID and GID when enter user namespace. The
+              default is to drops supplementary groups and sets GID and UID
+              to 0.
+
+       <b>-r</b>, <b>--root</b>[=<i>directory</i>]
+              Set the root directory.  If no directory is specified, set the
+              root directory to the root directory of the target process.
+              If directory is specified, set the root directory to the
+              specified directory.
+
+       <b>-w</b>, <b>--wd</b>[=<i>directory</i>]
+              Set the working directory.  If no directory is specified, set
+              the working directory to the working directory of the target
+              process.  If directory is specified, set the working directory
+              to the specified directory.
+
+       <b>-F</b>, <b>--no-fork</b>
+              Do not fork before exec'ing the specified program.  By
+              default, when entering a PID namespace, <b>nsenter </b>calls <b>fork</b>
+              before calling <b>exec </b>so that any children will also be in the
+              newly entered PID namespace.
+
+       <b>-Z</b>, <b>--follow-context</b>
+              Set the SELinux security context used for executing a new
+              process according to already running process specified by
+              <b>--target </b>PID. (The util-linux has to be compiled with SELinux
+              support otherwise the option is unavailable.)
+
+       <b>-V</b>, <b>--version</b>
+              Display version information and exit.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/clone.2.html">clone(2)</a>, <a href="../man2/setns.2.html">setns(2)</a>, <a href="../man7/namespaces.7.html">namespaces(7)</a>
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Eric Biederman ⟨biederm@xmission.com⟩
+       Karel Zak ⟨kzak@redhat.com⟩
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The nsenter command is part of the util-linux package and is
+       available from Linux Kernel Archive 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                        June 2013                       NSENTER(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="nsenter.1.html">nsenter(1)</a>,&nbsp; 
+    <a href="unshare.1.html">unshare(1)</a>,&nbsp; 
+    <a href="../man7/namespaces.7.html">namespaces(7)</a>,&nbsp; 
+    <a href="../man8/lsns.8.html">lsns(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

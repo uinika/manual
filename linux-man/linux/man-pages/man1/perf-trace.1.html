@@ -1,0 +1,376 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>perf-trace(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#PAGEFAULTS">PAGEFAULTS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PERF-TRACE(1)                    perf Manual                   PERF-TRACE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       perf-trace - strace inspired tool
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>perf trace</i>
+       <i>perf trace record</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This command will show the events associated with the target,
+       initially syscalls, but other system events like pagefaults, task
+       lifetime events, scheduling events, etc.
+
+       This is a live mode tool in addition to working with perf.data files
+       like the other perf tools. Files can be generated using the <i>perf</i>
+       <i>record</i> command but the session needs to include the raw_syscalls
+       events (-e <i>raw_syscalls:*</i>). Alternatively, <i>perf trace record</i> can be
+       used as a shortcut to automatically include the raw_syscalls events
+       when writing events to a file.
+
+       The following options apply to perf trace; options to perf trace
+       record are found in the perf record man page.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -a, --all-cpus
+           System-wide collection from all CPUs.
+
+       -e, --expr, --event
+           List of syscalls and other perf events (tracepoints, HW cache
+           events, etc) to show. See <i>perf list</i> for a complete list of
+           events. Prefixing with ! shows all syscalls but the ones
+           specified. You may need to escape it.
+
+       -D msecs, --delay msecs
+           After starting the program, wait msecs before measuring. This is
+           useful to filter out the startup phase of the program, which is
+           often very different.
+
+       -o, --output=
+           Output file name.
+
+       -p, --pid=
+           Record events on existing process ID (comma separated list).
+
+       -t, --tid=
+           Record events on existing thread ID (comma separated list).
+
+       -u, --uid=
+           Record events in threads owned by uid. Name or number.
+
+       --filter-pids=
+           Filter out events for these pids and for <i>trace</i> itself (comma
+           separated list).
+
+       -v, --verbose=
+           Verbosity level.
+
+       --no-inherit
+           Child tasks do not inherit counters.
+
+       -m, --mmap-pages=
+           Number of mmap data pages (must be a power of two) or size
+           specification with appended unit character - B/K/M/G. The size is
+           rounded up to have nearest pages power of two value.
+
+       -C, --cpu
+           Collect samples only on the list of CPUs provided. Multiple CPUs
+           can be provided as a comma-separated list with no space: 0,1.
+           Ranges of CPUs are specified with -: 0-2. In per-thread mode with
+           inheritance mode on (default), Events are captured only when the
+           thread executes on the designated CPUs. Default is to monitor all
+           CPUs.
+
+       --duration: Show only events that had a duration greater than N.M ms.
+
+       --sched: Accrue thread runtime and provide a summary at the end of
+       the session.
+
+       -i --input Process events from a given perf data file.
+
+       -T --time Print full timestamp rather time relative to first sample.
+
+       --comm
+           Show process COMM right beside its ID, on by default, disable
+           with --no-comm.
+
+       -s, --summary
+           Show only a summary of syscalls by thread with min, max, and
+           average times (in msec) and relative stddev.
+
+       -S, --with-summary
+           Show all syscalls followed by a summary by thread with min, max,
+           and average times (in msec) and relative stddev.
+
+       --tool_stats
+           Show tool stats such as number of times fd→pathname was
+           discovered thru hooking the open syscall return + vfs_getname or
+           via reading /proc/pid/fd, etc.
+
+       -F=[all|min|maj], --pf=[all|min|maj]
+           Trace pagefaults. Optionally, you can specify whether you want
+           minor, major or all pagefaults. Default value is maj.
+
+       --syscalls
+           Trace system calls. This options is enabled by default, disable
+           with --no-syscalls.
+
+       --call-graph [mode,type,min[,limit],order[,key][,branch]]
+           Setup and enable call-graph (stack chain/backtrace) recording.
+           See --call-graph section in perf-record and perf-report man pages
+           for details. The ones that are most useful in <i>perf trace</i> are
+           <i>dwarf</i> and <i>lbr</i>, where available, try: <i>perf trace --call-graph</i>
+           <i>dwarf</i>.
+
+               Using this will, for the root user, bump the value of --mmap-pages to 4
+               times the maximum for non-root users, based on the kernel.perf_event_mlock_kb
+               sysctl. This is done only if the user doesn't specify a --mmap-pages value.
+
+       --kernel-syscall-graph
+           Show the kernel callchains on the syscall exit path.
+
+       --max-stack
+           Set the stack depth limit when parsing the callchain, anything
+           beyond the specified depth will be ignored. Note that at this
+           point this is just about the presentation part, i.e. the kernel
+           is still not limiting, the overhead of callchains needs to be set
+           via the knobs in --call-graph dwarf.
+
+               Implies '--call-graph dwarf' when --call-graph not present on the
+               command line, on systems where DWARF unwinding was built in.
+
+               Default: /proc/sys/kernel/perf_event_max_stack when present for
+                        live sessions (without --input/-i), 127 otherwise.
+
+       --min-stack
+           Set the stack depth limit when parsing the callchain, anything
+           below the specified depth will be ignored. Disabled by default.
+
+               Implies '--call-graph dwarf' when --call-graph not present on the
+               command line, on systems where DWARF unwinding was built in.
+
+       --proc-map-timeout
+           When processing pre-existing threads /proc/XXX/mmap, it may take
+           a long time, because the file may be huge. A time out is needed
+           in such cases. This option sets the time out limit. The default
+           value is 500 ms.
+</pre>
+<h2><a id="PAGEFAULTS" href="#PAGEFAULTS"></a>PAGEFAULTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When tracing pagefaults, the format of the trace is as follows:
+
+       &lt;min|maj&gt;fault [&lt;ip.symbol&gt;+&lt;ip.offset&gt;] ⇒ &lt;<b>addr.dso@addr.offset</b><b></b>[1]&gt;
+       (&lt;map type&gt;&lt;addr level&gt;).
+
+       ·   min/maj indicates whether fault event is minor or major;
+
+       ·   ip.symbol shows symbol for instruction pointer (the code that
+           generated the fault); if no debug symbols available, perf trace
+           will print raw IP;
+
+       ·   addr.dso shows DSO for the faulted address;
+
+       ·   map type is either <i>d</i> for non-executable maps or <i>x</i> for executable
+           maps;
+
+       ·   addr level is either <i>k</i> for kernel dso or <i>.</i>  for user dso.
+
+       For symbols resolution you may need to install debugging symbols.
+
+       Please be aware that duration is currently always 0 and doesn’t
+       reflect actual time it took for fault to be handled!
+
+       When --verbose specified, perf trace tries to print all available
+       information for both IP and fault address in the form of
+       <b>dso@symbol</b><b></b>[2]+offset.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Trace only major pagefaults:
+
+           $ perf trace --no-syscalls -F
+
+       Trace syscalls, major and minor pagefaults:
+
+           $ perf trace -F all
+
+           1416.547 ( 0.000 ms): python/20235 majfault [CRYPTO_push_info_+0x0] =&gt; /lib/x86_64-linux-gnu/libcrypto.so.1.0.0@0x61be0 (x.)
+
+           As you can see, there was major pagefault in python process, from
+           CRYPTO_push_info_ routine which faulted somewhere in libcrypto.so.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="perf-record.1.html">perf-record(1)</a>, <a href="perf-script.1.html">perf-script(1)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. addr.dso@addr.offset
+           mailto:addr.dso@addr.offset
+
+        2. dso@symbol
+           mailto:dso@symbol
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>perf</i> (Performance analysis tools for Linux
+       (in Linux source tree)) project.  Information about the project can
+       be found at ⟨<a href="https://perf.wiki.kernel.org/index.php/Main_Page">https://perf.wiki.kernel.org/index.php/Main_Page</a>⟩.  If
+       you have a bug report for this manual page, send it to
+       linux-kernel@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨<a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git">http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">perf                             05/03/2017                    PERF-TRACE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="perf-ftrace.1.html">perf-ftrace(1)</a>,&nbsp; 
+    <a href="perf-probe.1.html">perf-probe(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

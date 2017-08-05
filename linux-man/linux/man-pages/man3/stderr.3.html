@@ -1,0 +1,246 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>stdin(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">STDIN(3)                  Linux Programmer's Manual                 STDIN(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       stdin, stdout, stderr - standard I/O streams
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdio.h&gt;</b>
+
+       <b>extern FILE *</b><i>stdin</i><b>;</b>
+       <b>extern FILE *</b><i>stdout</i><b>;</b>
+       <b>extern FILE *</b><i>stderr</i><b>;</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Under normal circumstances every UNIX program has three streams
+       opened for it when it starts up, one for input, one for output, and
+       one for printing diagnostic or error messages.  These are typically
+       attached to the user's terminal (see <a href="../man4/tty.4.html">tty(4)</a> but might instead refer
+       to files or other devices, depending on what the parent process chose
+       to set up.  (See also the "Redirection" section of <b>sh</b>(1).)
+
+       The input stream is referred to as "standard input"; the output
+       stream is referred to as "standard output"; and the error stream is
+       referred to as "standard error".  These terms are abbreviated to form
+       the symbols used to refer to these files, namely <i>stdin</i>, <i>stdout</i>, and
+       <i>stderr</i>.
+
+       Each of these symbols is a <a href="stdio.3.html">stdio(3)</a> macro of type pointer to <i>FILE</i>,
+       and can be used with functions like <a href="fprintf.3.html">fprintf(3)</a> or <a href="fread.3.html">fread(3)</a>.
+
+       Since <i>FILE</i>s are a buffering wrapper around UNIX file descriptors, the
+       same underlying files may also be accessed using the raw UNIX file
+       interface, that is, the functions like <a href="../man2/read.2.html">read(2)</a> and <a href="../man2/lseek.2.html">lseek(2)</a>.
+
+       On program startup, the integer file descriptors associated with the
+       streams <i>stdin</i>, <i>stdout</i>, and <i>stderr</i> are 0, 1, and 2, respectively.  The
+       preprocessor symbols <b>STDIN_FILENO</b>, <b>STDOUT_FILENO</b>, and <b>STDERR_FILENO</b>
+       are defined with these values in <i>&lt;unistd.h&gt;</i>.  (Applying <a href="freopen.3.html">freopen(3)</a> to
+       one of these streams can change the file descriptor number associated
+       with the stream.)
+
+       Note that mixing use of <i>FILE</i>s and raw file descriptors can produce
+       unexpected results and should generally be avoided.  (For the
+       masochistic among you: POSIX.1, section 8.2.3, describes in detail
+       how this interaction is supposed to work.)  A general rule is that
+       file descriptors are handled in the kernel, while stdio is just a
+       library.  This means for example, that after an <a href="exec.3.html">exec(3)</a>, the child
+       inherits all open file descriptors, but all old streams have become
+       inaccessible.
+
+       Since the symbols <i>stdin</i>, <i>stdout</i>, and <i>stderr</i> are specified to be
+       macros, assigning to them is nonportable.  The standard streams can
+       be made to refer to different files with help of the library function
+       <a href="freopen.3.html">freopen(3)</a>, specially introduced to make it possible to reassign
+       <i>stdin</i>, <i>stdout</i>, and <i>stderr</i>.  The standard streams are closed by a call
+       to <a href="exit.3.html">exit(3)</a> and by normal program termination.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>stdin</i>, <i>stdout</i>, and <i>stderr</i> macros conform to C89 and this standard
+       also stipulates that these three streams shall be open at program
+       startup.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The stream <i>stderr</i> is unbuffered.  The stream <i>stdout</i> is line-buffered
+       when it points to a terminal.  Partial lines will not appear until
+       <a href="fflush.3.html">fflush(3)</a> or <a href="exit.3.html">exit(3)</a> is called, or a newline is printed.  This can
+       produce unexpected results, especially with debugging output.  The
+       buffering mode of the standard streams (or any other stream) can be
+       changed using the <a href="setbuf.3.html">setbuf(3)</a> or <a href="setvbuf.3.html">setvbuf(3)</a> call.  Note that in case
+       <i>stdin</i> is associated with a terminal, there may also be input
+       buffering in the terminal driver, entirely unrelated to stdio
+       buffering.  (Indeed, normally terminal input is line buffered in the
+       kernel.)  This kernel input handling can be modified using calls like
+       <a href="tcsetattr.3.html">tcsetattr(3)</a>; see also <a href="../man1/stty.1.html">stty(1)</a>, and <a href="termios.3.html">termios(3)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>csh</b>(1), <b>sh</b>(1), <a href="../man2/open.2.html">open(2)</a>, <a href="fopen.3.html">fopen(3)</a>, <a href="stdio.3.html">stdio(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2008-07-14                         STDIN(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/intro.1.html">intro(1)</a>,&nbsp; 
+    <a href="stdio.3.html">stdio(3)</a>,&nbsp; 
+    <a href="../man8/pam_exec.8.html">pam_exec(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="stdin.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

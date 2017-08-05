@@ -1,0 +1,283 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>execveat(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">EXECVEAT(2)               Linux Programmer's Manual              EXECVEAT(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       execveat - execute program relative to a directory file descriptor
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>int execveat(int </b><i>dirfd</i><b>, const char *</b><i>pathname</i><b>,</b>
+                    <b>char *const </b><i>argv</i><b>[], char *const </b><i>envp</i><b>[],</b>
+                    <b>int </b><i>flags</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>execveat</b>() system call executes the program referred to by the
+       combination of <i>dirfd</i> and <i>pathname</i>.  It operates in exactly the same
+       way as <a href="execve.2.html">execve(2)</a>, except for the differences described in this manual
+       page.
+
+       If the pathname given in <i>pathname</i> is relative, then it is interpreted
+       relative to the directory referred to by the file descriptor <i>dirfd</i>
+       (rather than relative to the current working directory of the calling
+       process, as is done by <a href="execve.2.html">execve(2)</a> for a relative pathname).
+
+       If <i>pathname</i> is relative and <i>dirfd</i> is the special value <b>AT_FDCWD</b>, then
+       <i>pathname</i> is interpreted relative to the current working directory of
+       the calling process (like <a href="execve.2.html">execve(2)</a>).
+
+       If <i>pathname</i> is absolute, then <i>dirfd</i> is ignored.
+
+       If <i>pathname</i> is an empty string and the <b>AT_EMPTY_PATH </b>flag is
+       specified, then the file descriptor <i>dirfd</i> specifies the file to be
+       executed (i.e., <i>dirfd</i> refers to an executable file, rather than a
+       directory).
+
+       The <i>flags</i> argument is a bit mask that can include zero or more of the
+       following flags:
+
+       <b>AT_EMPTY_PATH</b>
+              If <i>pathname</i> is an empty string, operate on the file referred
+              to by <i>dirfd</i> (which may have been obtained using the <a href="open.2.html">open(2)</a>
+              <b>O_PATH </b>flag).
+
+       <b>AT_SYMLINK_NOFOLLOW</b>
+              If the file identified by <i>dirfd</i> and a non-NULL <i>pathname</i> is a
+              symbolic link, then the call fails with the error <b>ELOOP</b>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>execveat</b>() does not return.  On error, -1 is returned,
+       and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The same errors that occur for <a href="execve.2.html">execve(2)</a> can also occur for
+       <b>execveat</b>().  The following additional errors can occur for
+       <b>execveat</b>():
+
+       <b>EBADF  </b><i>dirfd</i> is not a valid file descriptor.
+
+       <b>EINVAL </b>Invalid flag specified in <i>flags</i>.
+
+       <b>ELOOP  </b><i>flags</i> includes <b>AT_SYMLINK_NOFOLLOW </b>and the file identified by
+              <i>dirfd</i> and a non-NULL <i>pathname</i> is a symbolic link.
+
+       <b>ENOENT </b>The program identified by <i>dirfd</i> and <i>pathname</i> requires the use
+              of an interpreter program (such as a script starting with
+              "#!"), but the file descriptor <i>dirfd</i> was opened with the
+              <b>O_CLOEXEC </b>flag, with the result that the program file is
+              inaccessible to the launched interpreter.  See BUGS.
+
+       <b>ENOTDIR</b>
+              <i>pathname</i> is relative and <i>dirfd</i> is a file descriptor referring
+              to a file other than a directory.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>execveat</b>() was added to Linux in kernel 3.19.  GNU C library support
+       is pending.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>execveat</b>() system call is Linux-specific.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In addition to the reasons explained in <a href="openat.2.html">openat(2)</a>, the <b>execveat</b>()
+       system call is also needed to allow <a href="../man3/fexecve.3.html">fexecve(3)</a> to be implemented on
+       systems that do not have the <i>/proc</i> filesystem mounted.
+
+       When asked to execute a script file, the <i>argv[0]</i> that is passed to
+       the script interpreter is a string of the form <i>/dev/fd/N</i> or
+       <i>/dev/fd/N/P</i>, where <i>N</i> is the number of the file descriptor passed via
+       the <i>dirfd</i> argument.  A string of the first form occurs when
+       <b>AT_EMPTY_PATH </b>is employed.  A string of the second form occurs when
+       the script is specified via both <i>dirfd</i> and <i>pathname</i>; in this case, <i>P</i>
+       is the value given in <i>pathname</i>.
+
+       For the same reasons described in <a href="../man3/fexecve.3.html">fexecve(3)</a>, the natural idiom when
+       using <b>execveat</b>() is to set the close-on-exec flag on <i>dirfd</i>.  (But see
+       BUGS.)
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>ENOENT </b>error described above means that it is not possible to set
+       the close-on-exec flag on the file descriptor given to a call of the
+       form:
+
+           execveat(fd, "", argv, envp, AT_EMPTY_PATH);
+
+       However, the inability to set the close-on-exec flag means that a
+       file descriptor referring to the script leaks through to the script
+       itself.  As well as wasting a file descriptor, this leakage can lead
+       to file-descriptor exhaustion in scenarios where scripts recursively
+       employ <b>execveat</b>().
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="execve.2.html">execve(2)</a>, <a href="openat.2.html">openat(2)</a>, <a href="../man3/fexecve.3.html">fexecve(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                      EXECVEAT(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="execve.2.html">execve(2)</a>,&nbsp; 
+    <a href="open.2.html">open(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/exec.3.html">exec(3)</a>,&nbsp; 
+    <a href="../man3/fexecve.3.html">fexecve(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="execveat.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

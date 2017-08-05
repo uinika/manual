@@ -1,0 +1,296 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>avc_add_callback(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SECURITY_EVENTS">SECURITY&nbsp;EVENTS</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#NOTES">NOTES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">avc_add_callback(3)       SELinux API documentation      avc_add_callback(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       avc_add_callback   -   additional   event  notification  for  SELinux
+       userspace object managers
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;selinux/selinux.h&gt;</b>
+       <b>#include &lt;selinux/avc.h&gt;</b>
+
+       <b>int avc_add_callback(int (*</b><i>callback</i><b>)(uint32_t </b><i>event</i><b>,</b>
+                                            <b>security_id_t </b><i>ssid</i><b>,</b>
+                                            <b>security_id_t </b><i>tsid</i><b>,</b>
+                                            <b>security_class_t </b><i>tclass</i><b>,</b>
+                                            <b>access_vector_t </b><i>perms</i><b>,</b>
+                                            <b>access_vector_t *</b><i>out_retained</i><b>),</b>
+                            <b>uint32_t </b><i>events</i><b>, security_id_t </b><i>ssid</i><b>,</b>
+                            <b>security_id_t </b><i>tsid</i><b>, security_class_t </b><i>tclass</i><b>,</b>
+                            <b>access_vector_t </b><i>perms</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>avc_add_callback</b>() is used to register callback functions on security
+       events.  The purpose of this functionality is to allow userspace
+       object managers to take additional action when a policy change,
+       usually a policy reload, causes permissions to be granted or revoked.
+
+       <i>events</i> is the bitwise-<i>or</i> of security events on which to register the
+       callback; see <b>SECURITY EVENTS </b>below.
+
+       <i>ssid</i>, <i>tsid</i>, <i>tclass</i>, and <i>perms</i> specify the source and target SID's,
+       target class, and specific permissions that the callback wishes to
+       monitor.  The special symbol <b>SECSID_WILD </b>may be passed as the <i>source</i>
+       or <i>target</i> and will cause any SID to match.
+
+       <i>callback</i> is the callback function provided by the userspace object
+       manager.  The <i>event</i> argument indicates the security event which
+       occurred; the remaining arguments are interpreted according to the
+       event as described below.  The return value of the callback should be
+       zero on success, -1 on error with <i><a href="errno.3.html">errno</a></i> set appropriately (but see
+       <b>RETURN VALUE </b>below).
+</pre>
+<h2><a id="SECURITY_EVENTS" href="#SECURITY_EVENTS"></a>SECURITY EVENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In all cases below, <i>ssid</i> and/or <i>tsid</i> may be set to <b>SECSID_WILD</b>,
+       indicating that the change applies to all source and/or target SID's.
+       Unless otherwise indicated, the <i>out_retained</i> parameter is unused.
+
+       <b>AVC_CALLBACK_GRANT</b>
+              Previously denied permissions are now granted for <i>ssid</i>, <i>tsid</i>
+              with respect to <i>tclass</i>.  <i>perms</i> indicates the permissions to
+              grant.
+
+       <b>AVC_CALLBACK_TRY_REVOKE</b>
+              Previously granted permissions are now conditionally revoked
+              for <i>ssid</i>, <i>tsid</i> with respect to <i>tclass</i>.  <i>perms</i> indicates the
+              permissions to revoke.  The callback should set <i>out_retained</i>
+              to the subset of <i>perms</i> which are retained as migrated
+              permissions.  Note that <i>out_retained</i> is ignored if the
+              callback returns -1.
+
+       <b>AVC_CALLBACK_REVOKE</b>
+              Previously granted permissions are now unconditionally revoked
+              for <i>ssid</i>, <i>tsid</i> with respect to <i>tclass</i>.  <i>perms</i> indicates the
+              permissions to revoke.
+
+       <b>AVC_CALLBACK_RESET</b>
+              Indicates that the cache was flushed.  The SID, class, and
+              permission arguments are unused and are set to NULL.
+
+       <b>AVC_CALLBACK_AUDITALLOW_ENABLE</b>
+              The permissions given by <i>perms</i> should now be audited when
+              granted for <i>ssid</i>, <i>tsid</i> with respect to <i>tclass</i>.
+
+       <b>AVC_CALLBACK_AUDITALLOW_DISABLE</b>
+              The permissions given by <i>perms</i> should no longer be audited
+              when granted for <i>ssid</i>, <i>tsid</i> with respect to <i>tclass</i>.
+
+       <b>AVC_CALLBACK_AUDITDENY_ENABLE</b>
+              The permissions given by <i>perms</i> should now be audited when
+              denied for <i>ssid</i>, <i>tsid</i> with respect to <i>tclass</i>.
+
+       <b>AVC_CALLBACK_AUDITDENY_DISABLE</b>
+              The permissions given by <i>perms</i> should no longer be audited
+              when denied for <i>ssid</i>, <i>tsid</i> with respect to <i>tclass</i>.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>avc_add_callback</b>() returns zero.  On error, -1 is
+       returned and <i><a href="errno.3.html">errno</a></i> is set appropriately.
+
+       A return value of -1 from a callback is interpreted as a failed
+       policy operation.  If such a return value is encountered, all
+       remaining callbacks registered on the event are called.  In threaded
+       mode, the netlink handler thread may then terminate and cause the
+       userspace AVC to return <b>EINVAL </b>on all further permission checks until
+       <a href="avc_destroy.3.html">avc_destroy(3)</a> is called.  In non-threaded mode, the permission check
+       on which the error occurred will return -1 and the value of <i><a href="errno.3.html">errno</a></i>
+       encountered to the caller.  In both cases, a log message is produced
+       and the kernel may be notified of the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ENOMEM </b>An attempt to allocate memory failed.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If the userspace AVC is running in threaded mode, callbacks
+       registered via <b>avc_add_callback</b>() may be executed in the context of
+       the netlink handler thread.  This will likely introduce
+       synchronization issues requiring the use of locks.  See <a href="avc_init.3.html">avc_init(3)</a>.
+
+       Support for dynamic revocation and retained permissions is mostly
+       unimplemented in the SELinux kernel module.  The only security event
+       that currently gets exercised is <b>AVC_CALLBACK_RESET</b>.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Eamon Walsh &lt;ewalsh@tycho.nsa.gov&gt;
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="avc_init.3.html">avc_init(3)</a>, <a href="avc_has_perm.3.html">avc_has_perm(3)</a>, <a href="avc_context_to_sid.3.html">avc_context_to_sid(3)</a>,
+       <a href="avc_cache_stats.3.html">avc_cache_stats(3)</a>, <a href="security_compute_av.3.html">security_compute_av(3)</a> <a href="../man8/selinux.8-2.html">selinux(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                 9 June 2004             avc_add_callback(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="avc_cache_stats.3.html">avc_cache_stats(3)</a>,&nbsp; 
+    <a href="avc_context_to_sid.3.html">avc_context_to_sid(3)</a>,&nbsp; 
+    <a href="avc_has_perm.3.html">avc_has_perm(3)</a>,&nbsp; 
+    <a href="avc_open.3.html">avc_open(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

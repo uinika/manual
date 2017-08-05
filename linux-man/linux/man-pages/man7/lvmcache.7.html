@@ -1,0 +1,551 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>lvmcache(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#Cache_Terms">Cache&nbsp;Terms</a> | <a href="#Cache_Usage">Cache&nbsp;Usage</a> | <a href="#Cache_Removal">Cache&nbsp;Removal</a> | <a href="#Cache_Topics">Cache&nbsp;Topics</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LVMCACHE(7)                                                      LVMCACHE(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       lvmcache — LVM caching
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       An <a href="../man8/lvm.8.html">lvm(8)</a> <b>cache </b>Logical Volume (LV) uses a small and fast LV to
+       improve the performance of a large and slow LV.  It does this by
+       storing the frequently used blocks on the faster LV.  LVM refers to
+       the small fast LV as a <b>cache pool LV</b>.  The large slow LV is called
+       the <b>origin LV</b>.  Due to requirements from dm-cache (the kernel
+       driver), LVM further splits the cache pool LV into two devices - the
+       <b>cache data LV </b>and <b>cache metadata LV</b>.  The cache data LV is where
+       copies of data blocks are kept from the origin LV to increase speed.
+       The cache metadata LV holds the accounting information that specifies
+       where data blocks are stored (e.g.  on the origin LV or on the cache
+       data LV).  Users should be familiar with these LVs if they wish to
+       create the best and most robust cached LVs.  All of these associated
+       LVs must be in the same Volume Group (VG).
+</pre>
+<h2><a id="Cache_Terms" href="#Cache_Terms"></a>Cache Terms  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       origin LV           OriginLV      large slow LV
+       cache data LV       CacheDataLV   small fast LV for cache pool data
+       cache metadata LV   CacheMetaLV   small fast LV for cache pool metadata
+       cache pool LV       CachePoolLV   CacheDataLV + CacheMetaLV
+       cache LV            CacheLV       OriginLV + CachePoolLV
+</pre>
+<h2><a id="Cache_Usage" href="#Cache_Usage"></a>Cache Usage  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The primary method for using a cache type LV:
+
+   <b>0. create OriginLV</b>
+       Create an LV or identify an existing LV to be the origin LV.
+
+       <b>lvcreate -n OriginLV -L LargeSize VG SlowPVs</b>
+
+       <i>Example</i>
+       # lvcreate -n lvol0 -L 100G vg
+
+   <b>1. create CacheDataLV</b>
+       Create the cache data LV.  This LV will hold data blocks from the
+       OriginLV.  The size of this LV is the size of the cache and will be
+       reported as the size of the cache pool LV.
+
+       <b>lvcreate -n CacheDataLV -L CacheSize VG FastPVs</b>
+
+       <i>Example</i>
+       # lvcreate -n cache0 -L 10G vg /dev/fast
+
+   <b>2. create CacheMetaLV</b>
+       Create the cache metadata LV.  This LV will hold cache pool metadata.
+       The size of this LV should be 1000 times smaller than the cache data
+       LV, with a minimum size of 8MiB.
+
+       <b>lvcreate -n CacheMetaLV -L MetaSize VG FastPVs</b>
+
+       <i>Example</i>
+       # lvcreate -n cache0meta -L 12M vg /dev/fast
+
+       # lvs -a vg
+         LV         VG   Attr       LSize   Pool Origin
+         cache0     vg   -wi-a-----  10.00g
+         cache0meta vg   -wi-a-----  12.00m
+         lvol0      vg   -wi-a----- 100.00g
+
+   <b>3. create CachePoolLV</b>
+       Combine the data and metadata LVs into a cache pool LV.  The behavior
+       of the cache pool LV can be set in this step.
+       CachePoolLV takes the name of CacheDataLV.
+       CacheDataLV is renamed CachePoolLV_cdata and becomes hidden.
+       CacheMetaLV is renamed CachePoolLV_cmeta and becomes hidden.
+
+       <b>lvconvert --type cache-pool --poolmetadata VG/CacheMetaLV</b>
+              <b>VG/CacheDataLV</b>
+
+       <i>Example</i>
+       # lvconvert --type cache-pool --poolmetadata vg/cache0meta vg/cache0
+
+       # lvs -a vg
+         LV              VG   Attr       LSize   Pool Origin
+         cache0          vg   Cwi---C---  10.00g
+         [cache0_cdata]  vg   Cwi-------  10.00g
+         [cache0_cmeta]  vg   ewi-------  12.00m
+         lvol0           vg   -wi-a----- 100.00g
+
+   <b>4. create CacheLV</b>
+       Create a cache LV by linking the cache pool LV to the origin LV.  The
+       user accessible cache LV takes the name of the origin LV, while the
+       origin LV becomes a hidden LV with the name OriginLV_corig.  This can
+       be done while the origin LV is in use.
+       CacheLV takes the name of OriginLV.
+       OriginLV is renamed OriginLV_corig and becomes hidden.
+
+       <b>lvconvert --type cache --cachepool VG/CachePoolLV VG/OriginLV</b>
+
+       <i>Example</i>
+       # lvconvert --type cache --cachepool vg/cache0 vg/lvol0
+
+       # lvs -a vg
+         LV              VG   Attr       LSize   Pool   Origin
+         cache0          vg   Cwi---C---  10.00g
+         [cache0_cdata]  vg   Cwi-ao----  10.00g
+         [cache0_cmeta]  vg   ewi-ao----  12.00m
+         lvol0           vg   Cwi-a-C--- 100.00g cache0 [lvol0_corig]
+         [lvol0_corig]   vg   -wi-ao---- 100.00g
+</pre>
+<h2><a id="Cache_Removal" href="#Cache_Removal"></a>Cache Removal  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Split a cache pool LV off of a cache LV</b>
+
+       A cache pool LV can be disconnected from a cache LV, leaving an
+       unused cache pool LV, and an uncached origin LV.  This command writes
+       back data from the cache pool to the origin LV when necessary.
+
+       <b>lvconvert --splitcache VG/CacheLV</b>
+
+   <b>Removing a cache pool LV without removing its linked origin LV</b>
+
+       This writes back data from the cache pool to the origin LV when
+       necessary, then removes the cache pool LV, leaving the uncached
+       origin LV.
+
+       <b>lvremove VG/CachePoolLV</b>
+
+       An alternative command that also disconnects the cache pool from the
+       cache LV, and deletes the cache pool:
+
+       <b>lvconvert --uncache VG/CacheLV</b>
+
+       <i>Example</i>
+       # lvs vg
+         LV     VG   Attr       LSize   Pool   Origin
+         cache0 vg   Cwi---C---  10.00g
+         lvol0  vg   Cwi-a-C--- 100.00g cache0 [lvol0_corig]
+
+       # lvremove vg/cache0
+
+       # lvs vg
+         LV    VG   Attr       LSize   Pool Origin
+         lvol0 vg   -wi-a----- 100.00g
+
+   <b>Removing a cache LV: both origin LV and the cache pool LV</b>
+
+       Removing a cache LV removes both the origin LV and the linked cache
+       pool LV.
+
+       <b>lvremove VG/CacheLV</b>
+</pre>
+<h2><a id="Cache_Topics" href="#Cache_Topics"></a>Cache Topics  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Tolerate device failures in a cache pool LV</b>
+
+       Users who are concerned about the possibility of failures in their
+       fast devices that could lead to data loss might consider making their
+       cache pool sub-LVs redundant.
+
+       <i>Example</i>
+       0. Create an origin LV we wish to cache
+       # lvcreate -L 10G -n lv1 vg /dev/slow_devs
+
+       1. Create a 2-way RAID1 cache data LV
+       # lvcreate --type raid1 -m 1 -L 1G -n cache1 vg \
+            /dev/fast1 /dev/fast2
+
+       2. Create a 2-way RAID1 cache metadata LV
+       # lvcreate --type raid1 -m 1 -L 8M -n cache1meta vg \
+            /dev/fast1 /dev/fast2
+
+       3. Create a cache pool LV combining cache data LV and cache metadata LV
+       # lvconvert --type cache-pool --poolmetadata vg/cache1meta vg/cache1
+
+       4. Create a cached LV by combining the cache pool LV and origin LV
+       # lvconvert --type cache --cachepool vg/cache1 vg/lv1
+
+   <b>Cache mode</b>
+
+       The default cache mode is "writethrough".  Writethrough ensures that
+       any data written will be stored both in the cache pool LV and on the
+       origin LV.  The loss of a device associated with the cache pool LV in
+       this case would not mean the loss of any data.
+
+       A second cache mode is "writeback".  Writeback delays writing data
+       blocks from the cache pool back to the origin LV.  This mode will
+       increase performance, but the loss of a device associated with the
+       cache pool LV can result in lost data.
+
+       With the --cachemode option, the cache mode can be set when creating
+       a cache LV, or changed on an existing cache LV.  The current cache
+       mode of a cache LV can be displayed with the cache_mode reporting
+       option:
+
+       <b>lvs -o+cache_mode VG/CacheLV</b>
+
+       <a href="../man5/lvm.conf.5.html">lvm.conf(5)</a> <b>allocation/cache_mode</b>
+       defines the default cache mode.
+
+       <i>Example</i>
+       0. Create an origin LV we wish to cache (yours may already exist)
+       # lvcreate -L 10G -n lv1 vg /dev/slow
+
+       1. Create a cache data LV
+       # lvcreate -L 1G -n cache1 vg /dev/fast
+
+       2. Create a cache metadata LV
+       # lvcreate -L 8M -n cache1meta vg /dev/fast
+
+       3. Create a cache pool LV
+       # lvconvert --type cache-pool --poolmetadata vg/cache1meta vg/cache1
+
+       4. Create a cache LV by combining the cache pool LV and origin LV,
+          and use the writethrough cache mode.
+       # lvconvert --type cache --cachepool vg/cache1 \
+            --cachemode writethrough vg/lv1
+
+   <b>Cache policy</b>
+
+       The cache subsystem has additional per-LV parameters: the cache
+       policy to use, and possibly tunable parameters for the cache policy.
+       Three policies are currently available: "smq" is the default policy,
+       "mq" is an older implementation, and "cleaner" is used to force the
+       cache to write back (flush) all cached writes to the origin LV.
+
+       The "mq" policy has a number of tunable parameters. The defaults are
+       chosen to be suitable for the majority of systems, but in special
+       circumstances, changing the settings can improve performance.
+
+       With the --cachepolicy and --cachesettings options, the cache policy
+       and settings can be set when creating a cache LV, or changed on an
+       existing cache LV (both options can be used together).  The current
+       cache policy and settings of a cache LV can be displayed with the
+       cache_policy and cache_settings reporting options:
+
+       <b>lvs -o+cache_policy,cache_settings VG/CacheLV</b>
+
+       <i>Example</i>
+       Change the cache policy and settings of an existing cache LV.
+       # lvchange --cachepolicy mq --cachesettings \
+            'migration_threshold=2048 random_threshold=4' vg/lv1
+
+       <a href="../man5/lvm.conf.5.html">lvm.conf(5)</a> <b>allocation/cache_policy</b>
+       defines the default cache policy.
+
+       <a href="../man5/lvm.conf.5.html">lvm.conf(5)</a> <b>allocation/cache_settings</b>
+       defines the default cache settings.
+
+   <b>Chunk size</b>
+
+       The size of data blocks managed by a cache pool can be specified with
+       the --chunksize option when the cache LV is created.  The default
+       unit is KiB. The value must be a multiple of 32KiB between 32KiB and
+       1GiB.
+
+       Using a chunk size that is too large can result in wasteful use of
+       the cache, where small reads and writes can cause large sections of
+       an LV to be mapped into the cache.  However, choosing a chunk size
+       that is too small can result in more overhead trying to manage the
+       numerous chunks that become mapped into the cache.  Overhead can
+       include both excessive CPU time searching for chunks, and excessive
+       memory tracking chunks.
+
+       Command to display the cache pool LV chunk size:
+       <b>lvs -o+chunksize VG/CacheLV</b>
+
+       <a href="../man5/lvm.conf.5.html">lvm.conf(5)</a> <b>cache_pool_chunk_size</b>
+       controls the default chunk size used when creating a cache LV.
+
+       The default value is shown by:
+       <b>lvmconfig --type default allocation/cache_pool_chunk_size</b>
+
+   <b>Spare metadata LV</b>
+
+       See <a href="lvmthin.7.html">lvmthin(7)</a> for a description of the "pool metadata spare" LV.
+       The same concept is used for cache pools.
+
+   <b>Automatic pool metadata LV</b>
+
+       A cache data LV can be converted to cache pool LV without specifying
+       a cache pool metadata LV.  LVM will automatically create a metadata
+       LV from the same VG.
+
+       <b>lvcreate -n CacheDataLV -L CacheSize VG</b>
+       <b>lvconvert --type cache-pool VG/CacheDataLV</b>
+
+   <b>Create a new cache LV without an existing origin LV</b>
+
+       A cache LV can be created using an existing cache pool without an
+       existing origin LV.  A new origin LV is created and linked to the
+       cache pool in a single step.
+
+       <b>lvcreate --type cache -L LargeSize -n CacheLV</b>
+              <b>--cachepool VG/CachePoolLV VG SlowPVs</b>
+
+   <b>Single step cache pool LV creation</b>
+
+       A cache pool LV can be created with a single lvcreate command, rather
+       than using lvconvert on existing LVs.  This one command creates a
+       cache data LV, a cache metadata LV, and combines the two into a cache
+       pool LV.
+
+       <b>lvcreate --type cache-pool -L CacheSize -n CachePoolLV VG FastPVs</b>
+
+   <b>Convert existing LVs to cache types</b>
+
+       When an existing origin LV is converted to a cache LV, the specified
+       cache pool may be a normal LV, rather than a cache pool LV.  In this
+       case, lvm will first convert the normal LV to a cache pool LV.  A
+       pool metadata LV may optionally be specified.
+
+       <b>lvcreate -n OriginLV -L LargeSize VG</b>
+       <b>lvcreate -n CacheDataLV -L CacheSize VG</b>
+       <b>lvconvert --type cache --cachepool VG/CataDataLV VG/OriginLV</b>
+
+       This is equivalent to:
+
+       <b>lvcreate -n OriginLV -L LargeSize VG</b>
+       <b>lvcreate -n CacheDataLV -L CacheSize VG</b>
+       <b>lvconvert --type cache-pool VG/CacheDataLV</b>
+       <b>lvconvert --type cache --cachepool VG/CachePoolLV VG/OriginLV</b>
+
+   <b>Cache metadata formats</b>
+
+       There are two disk formats for cache metadata.  The metadata format
+       can be specified when a cache pool is created, and cannot be changed.
+       Format <b>2 </b>has better performance; it is more compact, and stores dirty
+       bits in a separate btree, which improves the speed of shutting down
+       the cache.  With <b>auto</b>, lvm selects the best option provided by the
+       current dm-cache kernel target.
+
+       <b>lvconvert --type cache-pool --cachemetadataformat auto|1|2</b>
+              <b>VG/CacheDataLV</b>
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man5/lvm.conf.5.html">lvm.conf(5)</a>, <a href="../man8/lvchange.8.html">lvchange(8)</a>, <a href="../man8/lvcreate.8.html">lvcreate(8)</a>, <a href="../man8/lvdisplay.8.html">lvdisplay(8)</a>, <a href="../man8/lvextend.8.html">lvextend(8)</a>,
+       <a href="../man8/lvremove.8.html">lvremove(8)</a>, <a href="../man8/lvrename.8.html">lvrename(8)</a>, <a href="../man8/lvresize.8.html">lvresize(8)</a>, <a href="../man8/lvs.8.html">lvs(8)</a>, <a href="../man8/vgchange.8.html">vgchange(8)</a>,
+       <a href="../man8/vgmerge.8.html">vgmerge(8)</a>, <a href="../man8/vgreduce.8.html">vgreduce(8)</a>, <a href="../man8/vgsplit.8.html">vgsplit(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>lvm2</i> (Logical Volume Manager 2) project.
+       Information about the project can be found at 
+       ⟨<a href="http://www.sourceware.org/lvm2/">http://www.sourceware.org/lvm2/</a>⟩.  If you have a bug report for this
+       manual page, send it to linux-lvm@redhat.com.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://sourceware.org/git/lvm2.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Red Hat, Inc       LVM TOOLS 2.02.173(2)-git (2017-06-28)        LVMCACHE(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pcp-dmcache.1.html">pcp-dmcache(1)</a>,&nbsp; 
+    <a href="../man8/lvchange.8.html">lvchange(8)</a>,&nbsp; 
+    <a href="../man8/lvconvert.8.html">lvconvert(8)</a>,&nbsp; 
+    <a href="../man8/lvcreate.8.html">lvcreate(8)</a>,&nbsp; 
+    <a href="../man8/lvdisplay.8.html">lvdisplay(8)</a>,&nbsp; 
+    <a href="../man8/lvextend.8.html">lvextend(8)</a>,&nbsp; 
+    <a href="../man8/lvm.8.html">lvm(8)</a>,&nbsp; 
+    <a href="../man8/lvmconfig.8.html">lvmconfig(8)</a>,&nbsp; 
+    <a href="../man8/lvmdiskscan.8.html">lvmdiskscan(8)</a>,&nbsp; 
+    <a href="../man8/lvm-fullreport.8.html">lvm-fullreport(8)</a>,&nbsp; 
+    <a href="../man8/lvm-lvpoll.8.html">lvm-lvpoll(8)</a>,&nbsp; 
+    <a href="../man8/lvreduce.8.html">lvreduce(8)</a>,&nbsp; 
+    <a href="../man8/lvremove.8.html">lvremove(8)</a>,&nbsp; 
+    <a href="../man8/lvrename.8.html">lvrename(8)</a>,&nbsp; 
+    <a href="../man8/lvresize.8.html">lvresize(8)</a>,&nbsp; 
+    <a href="../man8/lvs.8.html">lvs(8)</a>,&nbsp; 
+    <a href="../man8/lvscan.8.html">lvscan(8)</a>,&nbsp; 
+    <a href="../man8/pvchange.8.html">pvchange(8)</a>,&nbsp; 
+    <a href="../man8/pvck.8.html">pvck(8)</a>,&nbsp; 
+    <a href="../man8/pvcreate.8.html">pvcreate(8)</a>,&nbsp; 
+    <a href="../man8/pvdisplay.8.html">pvdisplay(8)</a>,&nbsp; 
+    <a href="../man8/pvmove.8.html">pvmove(8)</a>,&nbsp; 
+    <a href="../man8/pvremove.8.html">pvremove(8)</a>,&nbsp; 
+    <a href="../man8/pvresize.8.html">pvresize(8)</a>,&nbsp; 
+    <a href="../man8/pvs.8.html">pvs(8)</a>,&nbsp; 
+    <a href="../man8/pvscan.8.html">pvscan(8)</a>,&nbsp; 
+    <a href="../man8/vgcfgbackup.8.html">vgcfgbackup(8)</a>,&nbsp; 
+    <a href="../man8/vgcfgrestore.8.html">vgcfgrestore(8)</a>,&nbsp; 
+    <a href="../man8/vgchange.8.html">vgchange(8)</a>,&nbsp; 
+    <a href="../man8/vgck.8.html">vgck(8)</a>,&nbsp; 
+    <a href="../man8/vgconvert.8.html">vgconvert(8)</a>,&nbsp; 
+    <a href="../man8/vgcreate.8.html">vgcreate(8)</a>,&nbsp; 
+    <a href="../man8/vgdisplay.8.html">vgdisplay(8)</a>,&nbsp; 
+    <a href="../man8/vgexport.8.html">vgexport(8)</a>,&nbsp; 
+    <a href="../man8/vgextend.8.html">vgextend(8)</a>,&nbsp; 
+    <a href="../man8/vgimport.8.html">vgimport(8)</a>,&nbsp; 
+    <a href="../man8/vgimportclone.8.html">vgimportclone(8)</a>,&nbsp; 
+    <a href="../man8/vgmerge.8.html">vgmerge(8)</a>,&nbsp; 
+    <a href="../man8/vgmknodes.8.html">vgmknodes(8)</a>,&nbsp; 
+    <a href="../man8/vgreduce.8.html">vgreduce(8)</a>,&nbsp; 
+    <a href="../man8/vgremove.8.html">vgremove(8)</a>,&nbsp; 
+    <a href="../man8/vgrename.8.html">vgrename(8)</a>,&nbsp; 
+    <a href="../man8/vgs.8.html">vgs(8)</a>,&nbsp; 
+    <a href="../man8/vgscan.8.html">vgscan(8)</a>,&nbsp; 
+    <a href="../man8/vgsplit.8.html">vgsplit(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

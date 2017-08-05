@@ -1,0 +1,313 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sd_journal_open(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SD_JOURNAL_OPEN(3)             sd_journal_open            SD_JOURNAL_OPEN(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sd_journal_open, sd_journal_open_directory,
+       sd_journal_open_directory_fd, sd_journal_open_files,
+       sd_journal_open_files_fd, sd_journal_close, sd_journal,
+       SD_JOURNAL_LOCAL_ONLY, SD_JOURNAL_RUNTIME_ONLY, SD_JOURNAL_SYSTEM,
+       SD_JOURNAL_CURRENT_USER, SD_JOURNAL_OS_ROOT - Open the system journal
+       for reading
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;systemd/sd-journal.h&gt;</b>
+
+       <b>int sd_journal_open(sd_journal **</b><i>ret</i><b>, int </b><i>flags</i><b>);</b>
+
+       <b>int sd_journal_open_directory(sd_journal **</b><i>ret</i><b>, const char *</b><i>path</i><b>,</b>
+                                     <b>int </b><i>flags</i><b>);</b>
+
+       <b>int sd_journal_open_directory_fd(sd_journal **</b><i>ret</i><b>, int </b><i>fd</i><b>,</b>
+                                        <b>int </b><i>flags</i><b>);</b>
+
+       <b>int sd_journal_open_files(sd_journal **</b><i>ret</i><b>, const char **</b><i>paths</i><b>,</b>
+                                 <b>int </b><i>flags</i><b>);</b>
+
+       <b>int sd_journal_open_files_fd(sd_journal **</b><i>ret</i><b>, int </b><i>fds[]</i><b>,</b>
+                                    <b>unsigned </b><i>n_fds</i><b>, int </b><i>flags</i><b>);</b>
+
+       <b>void sd_journal_close(sd_journal *</b><i>j</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sd_journal_open() </b>opens the log journal for reading. It will find all
+       journal files automatically and interleave them automatically when
+       reading. As first argument it takes a pointer to a <i>sd_journal</i>
+       pointer, which, on success, will contain a journal context object.
+       The second argument is a flags field, which may consist of the
+       following flags ORed together: <b>SD_JOURNAL_LOCAL_ONLY </b>makes sure only
+       journal files generated on the local machine will be opened.
+       <b>SD_JOURNAL_RUNTIME_ONLY </b>makes sure only volatile journal files will
+       be opened, excluding those which are stored on persistent storage.
+       <b>SD_JOURNAL_SYSTEM </b>will cause journal files of system services and the
+       kernel (in opposition to user session processes) to be opened.
+       <b>SD_JOURNAL_CURRENT_USER </b>will cause journal files of the current user
+       to be opened. If neither <b>SD_JOURNAL_SYSTEM </b>nor
+       <b>SD_JOURNAL_CURRENT_USER </b>are specified, all journal file types will be
+       opened.
+
+       <b>sd_journal_open_directory() </b>is similar to <b>sd_journal_open() </b>but takes
+       an absolute directory path as argument. All journal files in this
+       directory will be opened and interleaved automatically. This call
+       also takes a flags argument. The flags parameters accepted by this
+       call are <b>SD_JOURNAL_OS_ROOT</b>, <b>SD_JOURNAL_SYSTEM</b>, and
+       <b>SD_JOURNAL_CURRENT_USER</b>. If <b>SD_JOURNAL_OS_ROOT </b>is specified, journal
+       files are searched for below the usual /var/log/journal and
+       /run/log/journal relative to the specified path, instead of directly
+       beneath it. The other two flags limit which files are opened, the
+       same as for <b>sd_journal_open()</b>.
+
+       <b>sd_journal_open_directory_fd() </b>is similar to
+       <b>sd_journal_open_directory()</b>, but takes a file descriptor referencing
+       a directory in the file system instead of an absolute file system
+       path.
+
+       <b>sd_journal_open_files() </b>is similar to <b>sd_journal_open() </b>but takes a
+       <b>NULL</b>-terminated list of file paths to open. All files will be opened
+       and interleaved automatically. This call also takes a flags argument,
+       but it must be passed as 0 as no flags are currently understood for
+       this call. Please note that in the case of a live journal, this
+       function is only useful for debugging, because individual journal
+       files can be rotated at any moment, and the opening of specific files
+       is inherently racy.
+
+       <b>sd_journal_open_files_fd() </b>is similar to <b>sd_journal_open_files() </b>but
+       takes an array of open file descriptors that must reference journal
+       files, instead of an array of file system paths. Pass the array of
+       file descriptors as second argument, and the number of array entries
+       in the third. The flags parameter must be passed as 0.
+
+       <i>sd_journal</i> objects cannot be used in the child after a fork.
+       Functions which take a journal object as an argument
+       (<b>sd_journal_next() </b>and others) will return <b>-ECHILD </b>after a fork.
+
+       <b>sd_journal_close() </b>will close the journal context allocated with
+       <b>sd_journal_open() </b>or <b>sd_journal_open_directory() </b>and free its
+       resources.
+
+       When opening the journal only journal files accessible to the calling
+       user will be opened. If journal files are not accessible to the
+       caller, this will be silently ignored.
+
+       See <a href="sd_journal_next.3.html">sd_journal_next(3)</a> for an example of how to iterate through the
+       journal after opening it with <b>sd_journal_open()</b>.
+
+       A journal context object returned by <b>sd_journal_open() </b>references a
+       specific journal entry as <i>current</i> entry, similar to a file seek index
+       in a classic file system file, but without absolute positions. It may
+       be altered with <a href="sd_journal_next.3.html">sd_journal_next(3)</a> and <a href="sd_journal_seek_head.3.html">sd_journal_seek_head(3)</a> and
+       related calls. The current entry position may be exported in <i>cursor</i>
+       strings, as accessible via <a href="sd_journal_get_cursor.3.html">sd_journal_get_cursor(3)</a>. Cursor strings
+       may be used to globally identify a specific journal entry in a stable
+       way and then later to seek to it (or if the specific entry is not
+       available locally, to its closest entry in time)
+       <a href="sd_journal_seek_cursor.3.html">sd_journal_seek_cursor(3)</a>.
+
+       Notification of journal changes is available via <b>sd_journal_get_fd()</b>
+       and related calls.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>sd_journal_open()</b>, <b>sd_journal_open_directory()</b>, and
+       <b>sd_journal_open_files() </b>calls return 0 on success or a negative
+       errno-style error code.  <b>sd_journal_close() </b>returns nothing.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All functions listed here are thread-agnostic and only a single
+       thread may operate on a given sd_journal object.
+
+       The <b>sd_journal_open()</b>, <b>sd_journal_open_directory() </b>and
+       <b>sd_journal_close() </b>interfaces are available as a shared library,
+       which can be compiled and linked to with the <b>libsystemd pkg-config</b>(1)
+       file.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="sd-journal.3.html">sd-journal(3)</a>, <a href="sd_journal_next.3.html">sd_journal_next(3)</a>,
+       <a href="sd_journal_get_data.3.html">sd_journal_get_data(3)</a>, <a href="../man8/systemd-machined.8.html">systemd-machined(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                               SD_JOURNAL_OPEN(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="sd-journal.3.html">sd-journal(3)</a>,&nbsp; 
+    <a href="sd_journal_add_match.3.html">sd_journal_add_match(3)</a>,&nbsp; 
+    <a href="sd_journal_enumerate_fields.3.html">sd_journal_enumerate_fields(3)</a>,&nbsp; 
+    <a href="sd_journal_get_catalog.3.html">sd_journal_get_catalog(3)</a>,&nbsp; 
+    <a href="sd_journal_get_cursor.3.html">sd_journal_get_cursor(3)</a>,&nbsp; 
+    <a href="sd_journal_get_cutoff_realtime_usec.3.html">sd_journal_get_cutoff_realtime_usec(3)</a>,&nbsp; 
+    <a href="sd_journal_get_data.3.html">sd_journal_get_data(3)</a>,&nbsp; 
+    <a href="sd_journal_get_fd.3.html">sd_journal_get_fd(3)</a>,&nbsp; 
+    <a href="sd_journal_get_realtime_usec.3.html">sd_journal_get_realtime_usec(3)</a>,&nbsp; 
+    <a href="sd_journal_get_usage.3.html">sd_journal_get_usage(3)</a>,&nbsp; 
+    <a href="sd_journal_next.3.html">sd_journal_next(3)</a>,&nbsp; 
+    <a href="sd_journal_query_unique.3.html">sd_journal_query_unique(3)</a>,&nbsp; 
+    <a href="sd_journal_seek_head.3.html">sd_journal_seek_head(3)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

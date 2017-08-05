@@ -1,0 +1,257 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>xfs_logprint(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">xfs_logprint(8)            System Manager's Manual           xfs_logprint(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       xfs_logprint - print the log of an XFS filesystem
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>xfs_logprint </b>[ <i>options</i> ] <i>device</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>xfs_logprint </b>prints the log of an XFS filesystem (see <a href="../man5/xfs.5.html">xfs(5)</a>).  The
+       <i>device</i> argument is the pathname of the partition or logical volume
+       containing the filesystem. The <i>device</i> can be a regular file if the <b>-f</b>
+       option is used. The contents of the filesystem remain undisturbed.
+       There are two major modes of operation in <b>xfs_logprint</b>.
+
+       One mode is better for filesystem operation debugging.  It is called
+       the transactional view and is enabled through the <b>-t </b>option. The
+       transactional view prints only the portion of the log that pertains
+       to recovery. In other words, it prints out complete transactions
+       between the tail and the head. This view tries to display each
+       transaction without regard to how they are split across log records.
+
+       The second mode starts printing out information from the beginning of
+       the log.  Some error blocks might print out in the beginning because
+       the last log record usually overlaps the oldest log record. A message
+       is printed when the physical end of the log is reached and when the
+       logical end of the log is reached. A log record view is displayed one
+       record at a time. Transactions that span log records may not be
+       decoded fully.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-b     </b>Extract and print buffer information. Only used in
+              transactional view.
+
+       <b>-c     </b>Attempt to continue when an error is detected.
+
+       <b>-C </b><i>filename</i>
+              Copy the log from the filesystem to the file <i>filename</i>.  The
+              log itself is not printed.
+
+       <b>-d     </b>Dump the log from front to end, printing where each log record
+              is located on disk.
+
+       <b>-D     </b>Do not decode anything; just print data.
+
+       <b>-e     </b>Exit when an error is found in the log. Normally, <b>xfs_logprint</b>
+              tries to continue and unwind from bad logs.  However,
+              sometimes it just dies in bad ways.  Using this option
+              prevents core dumps.
+
+       <b>-f     </b>Specifies that the filesystem image to be processed is stored
+              in a regular file at <i>device</i> (see the <a href="mkfs.xfs.8.html">mkfs.xfs(8)</a> <b>-d </b><i>file</i>
+              option).  This might happen if an image copy of a filesystem
+              has been made into an ordinary file with <a href="xfs_copy.8.html">xfs_copy(8)</a>.
+
+       <b>-l </b><i>logdev</i>
+              External log device. Only for those filesystems which use an
+              external log.
+
+       <b>-i     </b>Extract and print inode information. Only used in
+              transactional view.
+
+       <b>-q     </b>Extract and print quota information. Only used in
+              transactional view.
+
+       <b>-n     </b>Do not try and interpret log data; just interpret log header
+              information.
+
+       <b>-o     </b>Also print buffer data in hex.  Normally, buffer data is just
+              decoded, so better information can be printed.
+
+       <b>-s </b><i>start-block</i>
+              Override any notion of where to start printing.
+
+       <b>-t     </b>Print out the transactional view.
+
+       <b>-v     </b>Print "overwrite" data.
+
+       <b>-V     </b>Prints the version number and exits.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="mkfs.xfs.8.html">mkfs.xfs(8)</a>, <a href="mount.8.html">mount(8)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>xfsprogs</i> (utilities for XFS filesystems)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://xfs.org/">http://xfs.org/</a>⟩.  If you have a bug report for this manual page, see
+       ⟨<a href="http://oss.sgi.com/bugzilla/buglist.cgi?product=XFS">http://oss.sgi.com/bugzilla/buglist.cgi?product=XFS</a>⟩.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨git://oss.sgi.com/xfs/cmds/xfsprogs⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                                             xfs_logprint(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="xfs_db.8.html">xfs_db(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

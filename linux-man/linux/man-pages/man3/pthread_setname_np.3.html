@@ -1,0 +1,322 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pthread_setname_np(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PTHREAD_SETNAME_NP(3)     Linux Programmer's Manual    PTHREAD_SETNAME_NP(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pthread_setname_np, pthread_getname_np - set/get the name of a thread
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#define _GNU_SOURCE             </b>/* See feature_test_macros(7) */
+       <b>#include &lt;pthread.h&gt;</b>
+       <b>int pthread_setname_np(pthread_t </b><i>thread</i><b>, const char *</b><i>name</i><b>);</b>
+       <b>int pthread_getname_np(pthread_t </b><i>thread</i><b>,</b>
+                              <b>char *</b><i>name</i><b>, size_t </b><i>len</i><b>);</b>
+
+       Compile and link with <i>-pthread</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       By default, all the threads created using <b>pthread_create</b>() inherit
+       the program name.  The <b>pthread_setname_np</b>() function can be used to
+       set a unique name for a thread, which can be useful for debugging
+       multithreaded applications.  The thread name is a meaningful C
+       language string, whose length is restricted to 16 characters,
+       including the terminating null byte ('\0').  The <i>thread</i> argument
+       specifies the thread whose name is to be changed; <i>name</i> specifies the
+       new name.
+
+       The <b>pthread_getname_np</b>() function can be used to retrieve the name of
+       the thread.  The <i>thread</i> argument specifies the thread whose name is
+       to be retrieved.  The buffer <i>name</i> is used to return the thread name;
+       <i>len</i> specifies the number of bytes available in <i>name</i>.  The buffer
+       specified by <i>name</i> should be at least 16 characters in length.  The
+       returned thread name in the output buffer will be null terminated.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, these functions return 0; on error, they return a nonzero
+       error number.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>pthread_setname_np</b>() function can fail with the following error:
+
+       <b>ERANGE </b>The length of the string specified pointed to by <i>name</i> exceeds
+              the allowed limit.
+
+       The <b>pthread_getname_np</b>() function can fail with the following error:
+
+       <b>ERANGE </b>The buffer specified by <i>name</i> and <i>len</i> is too small to hold the
+              thread name.
+
+       If either of these functions fails to open
+       <i>/proc/self/task/[tid]/comm</i>, then the call may fail with one of the
+       errors described in <a href="../man2/open.2.html">open(2)</a>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions first appeared in glibc in version 2.12.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────────────┬───────────────┬─────────┐
+       │<b>Interface             </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├──────────────────────┼───────────────┼─────────┤
+       │<b>pthread_setname_np</b>(), │ Thread safety │ MT-Safe │
+       │<b>pthread_getname_np</b>()  │               │         │
+       └──────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are nonstandard GNU extensions.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pthread_setname_np</b>() internally writes to the thread-specific <i>comm</i>
+       file under the <i>/proc</i> filesystem: <i>/proc/self/task/[tid]/comm</i>.
+       <b>pthread_getname_np</b>() retrieves it from the same location.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below demonstrates the use of <b>pthread_setname_np</b>() and
+       <b>pthread_getname_np</b>().
+
+       The following shell session shows a sample run of the program:
+
+           $ <b>./a.out</b>
+           Created a thread. Default name is: a.out
+           The thread name after setting it is THREADFOO.
+           <b>^Z                           </b># Suspend the program
+           [1]+  Stopped           ./a.out
+           $ <b>ps H -C a.out -o 'pid tid cmd comm'</b>
+             PID   TID CMD                         COMMAND
+            5990  5990 ./a.out                     a.out
+            5990  5991 ./a.out                     THREADFOO
+           $ <b>cat /proc/5990/task/5990/comm</b>
+           a.out
+           $ <b>cat /proc/5990/task/5991/comm</b>
+           THREADFOO
+
+   <b>Program source</b>
+
+       #define _GNU_SOURCE
+       #include &lt;pthread.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;string.h&gt;
+       #include &lt;unistd.h&gt;
+       #include &lt;errno.h&gt;
+       #include &lt;stdlib.h&gt;
+
+       #define NAMELEN 16
+
+       #define errExitEN(en, msg) \
+                   do { errno = en; perror(msg); exit(EXIT_FAILURE); \
+               } while (0)
+
+       static void *
+       threadfunc(void *parm)
+       {
+           sleep(5);          // allow main program to set the thread name
+           return NULL;
+       }
+
+       int
+       main(int argc, char **argv)
+       {
+           pthread_t thread;
+           int rc;
+           char thread_name[NAMELEN];
+
+           rc = pthread_create(&amp;thread, NULL, threadfunc, NULL);
+           if (rc != 0)
+               errExitEN(rc, "pthread_create");
+
+           rc = pthread_getname_np(thread, thread_name, NAMELEN);
+           if (rc != 0)
+               errExitEN(rc, "pthread_getname_np");
+
+           printf("Created a thread. Default name is: %s\n", thread_name);
+           rc = pthread_setname_np(thread, (argc &gt; 1) ? argv[1] : "THREADFOO");
+           if (rc != 0)
+               errExitEN(rc, "pthread_setname_np");
+
+           sleep(2);
+
+           rc = pthread_getname_np(thread, thread_name,
+                                   (argc &gt; 2) ? atoi(argv[1]) : NAMELEN);
+           if (rc != 0)
+               errExitEN(rc, "pthread_getname_np");
+           printf("The thread name after setting it is %s.\n", thread_name);
+
+           rc = pthread_join(thread, NULL);
+           if (rc != 0)
+               errExitEN(rc, "pthread_join");
+
+           printf("Done\n");
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/prctl.2.html">prctl(2)</a>, <a href="pthread_create.3.html">pthread_create(3)</a>, <a href="../man7/pthreads.7.html">pthreads(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-07-23            PTHREAD_SETNAME_NP(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/prctl.2.html">prctl(2)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="pthread_setname_np.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

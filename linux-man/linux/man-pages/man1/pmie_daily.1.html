@@ -1,0 +1,364 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmie_check(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#PCP_ENVIRONMENT">PCP&nbsp;ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMIE_CHECK(1)              General Commands Manual             PMIE_CHECK(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmie_check</b>,  <b>pmie_daily  </b>- administration of the Performance Co-Pilot
+       inference engine
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>$PCP_BINADM_DIR/pmie_check </b>[<b>-CNsV</b>] [<b>-c </b><i>control</i>] [<b>-l </b><i>logfile</i>]
+       <b>$PCP_BINADM_DIR/pmie_daily </b>[<b>-NV</b>] [<b>-c </b><i>control</i>] [<b>-k </b><i>discard</i>] [<b>-l</b>
+       <i>logfile</i>] [<b>-m </b><i>addresses</i>] [<b>-x </b><i>compress</i>] [<b>-X </b><i>program</i>] [<b>-Y </b><i>regex</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This series of shell scripts and associated control files may be used
+       to create a customized regime of administration and management for
+       the Performance Co-Pilot (see <a href="pcpintro.1-2.html">PCPintro(1)</a>) inference engine, <a href="pmie.1.html">pmie(1)</a>.
+
+       <b>pmie_daily </b>is intended to be run once per day, preferably in the
+       early morning, as soon after midnight as practicable.  Its task is to
+       rotate the log files for the running <b>pmie </b>processes - these files may
+       grow without bound if the ``print'' action is used, or any other <b>pmie</b>
+       action writes to its stdout/stderr streams.  After some period, old
+       <b>pmie </b>log files are discarded.  This period is 14 days by default, but
+       may be changed using the <b>-k </b>option. Two special values are recognized
+       for the period (<i>discard</i>), namely <b>0 </b>to keep no log files beyond the
+       current one, and <b>forever </b>to prevent any log files being discarded.
+
+       Log files can optionally be compressed after some period (<i>compress</i>),
+       to conserve disk space.  This is particularly useful for large
+       numbers of <b>pmie </b>processes under the control of <b>pmie_check</b>.  The <b>-x</b>
+       option specifies the number of days after which to compress archive
+       data files, and the <b>-X </b>option specifies the program to use for
+       compression - by default this is <b>xz</b>(1).  Use of the <b>-Y </b>option allows
+       a regular expression to be specified causing files in the set of
+       files matched for compression to be omitted - this allows only the
+       data file to be compressed, and also prevents the program from
+       attempting to compress it more than once.  The default <i>regex</i> is
+       ".(meta|index|Z|gz|bz2|zip|xz|lzma|lzo|lz4)$" - such files are
+       filtered using the <b>-v </b>option to <a href="egrep.1.html">egrep(1)</a>.
+
+       Use of the <b>-m </b>option causes <b>pmie_daily </b>to construct a summary of the
+       log files generated for all monitored hosts in the last 24 hours
+       (lines matching `` OK '' are culled), and e-mail that summary to the
+       set of space-separated <i>addresses</i>.
+
+       <b>pmie_check </b>may be run at any time, and is intended to check that the
+       desired set of <a href="pmie.1.html">pmie(1)</a> processes are running, and if not to re-launch
+       any failed inference engines.  Use of the <b>-s </b>option provides the
+       reverse functionality, allowing the set of <b>pmie </b>processes to be
+       cleanly shutdown.  Use of the <b>-C </b>option queries the system service
+       runlevel information for <b>pmie</b>, and uses that to determine whether to
+       start processes.
+
+       Both <b>pmie_check </b>and <b>pmie_daily </b>are controlled by PCP inference engine
+       control file(s) that specify the <b>pmie </b>instances to be managed.  The
+       default control file is <b>$PCP_PMIECONTROL_PATH </b>but an alternate may be
+       specified using the <b>-c </b>option.  If the directory
+       <b>$PCP_PMLOGGERCONTROL_PATH</b>.d (or <i>control</i>.d from the <b>-c </b>option) exists,
+       then the contents of any additional control files therein will be
+       appended to the main control file (which must exist).
+
+       <b>Warning</b>: The <b>$PCP_PMIECONTROL_PATH </b>and <b>$PCP_PMIECONTROL_PATH</b>.d files
+       must not be writable by any user other than root.
+
+       The control file(s) should be customized according to the following
+       rules that define for the current version (1.1) of the control file
+       format.
+
+       1.  Lines beginning with a ``#'' are comments.
+       2.  Lines beginning with a ``$'' are assumed to be assignments to
+           environment variables in the style of <b>sh</b>(1), and all text
+           following the ``$'' will be <b>eval</b>'ed by the script reading the
+           control file, and the corresponding variable exported into the
+           environment.  This is particularly useful to set and export
+           variables into the environment of the administrative script, e.g.
+               $ PMCD_CONNECT_TIMEOUT=20
+       3.  There <b>must </b>be a version line in the initial control file of the
+           form:
+               $ version=1.1
+       4.  There should be one line in the control file(s) for each <b>pmie</b>
+           instance of the form:
+
+               <i>host</i> <b>y</b>|<b>n y</b>|<b>n </b><i>logfile args</i>
+
+       5.  Fields within a line of the control file(s) are separated by one
+           or more spaces or tabs.
+       6.  The <i>first</i> field is the name of the host that is the default
+           source of the performance metrics for this <b>pmie </b>instance.
+       7.  The <i>second</i> field indicates if this is a <i>primary</i> <b>pmie </b>instance (<b>y</b>)
+           or not (<b>n</b>).  Since the primary inference engine must run on the
+           local host, and there may be at most one primary for a particular
+           host, this field can be <b>y </b>for at most one <b>pmie </b>instance, in which
+           case the host name must be the name of the local host.  When
+           generating <b>pmie </b>configuration files, the primary clause indicates
+           that <a href="pmieconf.1.html">pmieconf(1)</a> should enable all rules in the primary group, in
+           addition to all other default rules.
+       8.  The <i>third</i> field indicates whether this <b>pmie </b>instance needs to be
+           started under the control of <a href="pmsocks.1.html">pmsocks(1)</a> to connect to a <b>pmcd</b>
+           through a firewall (<b>y </b>or <b>n</b>).
+       9.  The <i>fourth</i> field is the name of the <b>pmie </b>activity log file.  A
+           useful convention is that <b>pmie </b>instances monitoring the local
+           host with hostname <i>myhost</i> are maintained in the directory
+           <b>$PCP_LOG_DIR/pmie/</b><i>myhost</i>, while activity logs for the remote host
+           <i>mumble</i> are maintained in <b>$PCP_LOG_DIR/pmie/</b><i>mumble</i>.  This is
+           consistent with the way <a href="pmlogger.1.html">pmlogger(1)</a> maintains its activity logs
+           and archive files.
+       10. All other fields are interpreted as arguments to be passed to
+           <a href="pmie.1.html">pmie(1)</a>.  Most typically this would be the <b>-c </b>option.
+
+       The following sample control lines specify one <b>pmie </b>instance
+       monitoring the local host (<i>wobbly</i>), and another monitoring
+       performance metrics from the host <i>splat</i>.
+
+       wobbly  n  PCP_LOG_DIR/pmie/wobbly  -c config.default
+       splat   n  PCP_LOG_DIR/pmie/splat   -c splat/cpu.conf
+
+       Typical <a href="../man5/crontab.5.html">crontab(5)</a> entries for periodic execution of <b>pmie_daily </b>and
+       <b>pmie_check </b>are given in <b>$PCP_SYSCONF_DIR/pmie/crontab </b>(unless
+       installed by default in <i>/etc/cron.d</i> already) and shown below.
+
+       # daily processing of pmie logs
+       08      0       *       *       *       $PCP_BINADM_DIR/pmie_daily
+       # every 30 minutes, check pmie instances are running
+       28,58   *       *       *       *       $PCP_BINADM_DIR/pmie_check
+
+       In order to ensure that mail is not unintentionally sent when these
+       scripts are run from <a href="../man8/cron.8.html">cron(8)</a> diagnostics are always sent to log
+       files.  By default, these files are <b>$PCP_LOG_DIR/pmie/pmie_daily.log</b>
+       and <b>$PCP_LOG_DIR/pmie/pmie_check.log </b>but this can be changed using
+       the <b>-l </b>option.  If this log file already exists when the script
+       starts, it will be renamed with a <i>.prev</i> suffix (overwriting any log
+       file saved earlier) before diagnostics are generated to the new log
+       file.
+
+       The output from the <b>cron </b>execution of the scripts may be extended
+       using the <b>-V </b>option to the scripts which will enable verbose tracing
+       of their activity.  By default the scripts generate no output unless
+       some error or warning condition is encountered.
+
+       The <b>-N </b>option enables a ``show me'' mode, where the actions are
+       echoed, but not executed, in the style of ``make -n''.  Using <b>-N </b>in
+       conjunction with <b>-V </b>maximizes the diagnostic capabilities for
+       debugging.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>$PCP_PMIECONTROL_PATH</b>
+                 the default PCP inference engine control file
+                 <b>Warning</b>: this file must not be writable by any user other
+                 than root.
+
+       <b>$PCP_PMIECONTROL_PATH</b>.d
+                 optional directory containing additional PCP inference
+                 engine control files, typically one per host
+                 <b>Warning</b>: this files herein must not be writable by any user
+                 other than root.
+
+       <b>$PCP_SYSCONF_DIR/pmie/crontab</b>
+                 sample crontab for automated script execution by $PCP_USER
+                 (or root) - exists only if the platform does not support
+                 the <i>/etc/cron.d</i> mechanism.
+
+       <b>$PCP_VAR_DIR/config/pmie/config.default</b>
+                 default <b>pmlogger </b>configuration file location for a
+                 localhost inference engine, typically generated
+                 automatically by <a href="pmieconf.1.html">pmieconf(1)</a>.
+
+       <b>$PCP_LOG_DIR/pmie/</b><i>hostname</i>
+                 default location for the pmie log file for the host
+                 <i>hostname</i>
+
+       <b>$PCP_LOG_DIR/pmie/</b><i>hostname</i><b>/lock</b>
+                 transient lock file to guarantee mutual exclusion during
+                 <b>pmie </b>administration for the host <i>hostname</i> - if present, can
+                 be safely removed if neither <b>pmie_daily </b>nor <b>pmie_check </b>are
+                 running
+
+       <b>$PCP_LOG_DIR/NOTICES</b>
+                 PCP ``notices'' file used by <a href="pmie.1.html">pmie(1)</a> and friends
+</pre>
+<h2><a id="PCP_ENVIRONMENT" href="#PCP_ENVIRONMENT"></a>PCP ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Environment variables with the prefix <b>PCP_ </b>are used to parameterize
+       the file and directory names used by PCP.  On each installation, the
+       file <b>/etc/pcp.conf </b>contains the local values for these variables.
+       The <b>$PCP_CONF </b>variable may be used to specify an alternative
+       configuration file, as described in <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="egrep.1.html">egrep(1)</a>, <a href="pcpintro.1-2.html">PCPintro(1)</a>, <a href="pmie.1.html">pmie(1)</a>, <a href="pmieconf.1.html">pmieconf(1)</a>, <b>xz</b>(1) and <a href="../man8/cron.8.html">cron(8)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                       PMIE_CHECK(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pcpintro.1-2.html">pcpintro(1)</a>,&nbsp; 
+    <a href="pmie.1.html">pmie(1)</a>,&nbsp; 
+    <a href="pmieconf.1.html">pmieconf(1)</a>,&nbsp; 
+    <a href="pmiestatus.1.html">pmiestatus(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

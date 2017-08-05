@@ -1,0 +1,275 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>machine-id(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RELATION_TO_OSF_UUIDS">RELATION&nbsp;TO&nbsp;OSF&nbsp;UUIDS</a> | <a href="#HISTORY">HISTORY</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MACHINE-ID(5)                    machine-id                    MACHINE-ID(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       machine-id - Local machine ID configuration file
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /etc/machine-id
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The /etc/machine-id file contains the unique machine ID of the local
+       system that is set during installation. The machine ID is a single
+       newline-terminated, hexadecimal, 32-character, lowercase ID. When
+       decoded from hexadecimal, this corresponds to a 16-byte/128-bit
+       value.
+
+       The machine ID is usually generated from a random source during
+       system installation and stays constant for all subsequent boots.
+       Optionally, for stateless systems, it is generated during runtime at
+       early boot if it is found to be empty.
+
+       The machine ID does not change based on local or network
+       configuration or when hardware is replaced. Due to this and its
+       greater length, it is a more useful replacement for the <a href="../man3/gethostid.3.html">gethostid(3)</a>
+       call that POSIX specifies.
+
+       This machine ID adheres to the same format and logic as the D-Bus
+       machine ID.
+
+       This ID uniquely identifies the host. It should be considered
+       "confidential", and must not be exposed in untrusted environments, in
+       particular on the network. If a stable unique identifier that is tied
+       to the machine is needed for some application, the machine ID or any
+       part of it must not be used directly. Instead the machine ID should
+       be hashed with a cryptographic, keyed hash function, using a fixed,
+       application-specific key. That way the ID will be properly unique,
+       and derived in a constant way from the machine ID but there will be
+       no way to retrieve the original machine ID from the
+       application-specific one. The <a href="../man3/sd_id128_get_machine_app_specific.3.html">sd_id128_get_machine_app_specific(3)</a>
+       API provides an implementation of such an algorithm.
+
+       The <a href="../man1/systemd-machine-id-setup.1.html">systemd-machine-id-setup(1)</a> tool may be used by installer tools
+       to initialize the machine ID at install time. Use
+       <a href="../man1/systemd-firstboot.1.html">systemd-firstboot(1)</a> to initialize it on mounted (but not booted)
+       system images.
+
+       The machine-id may also be set, for example when network booting, by
+       setting the <i>systemd.machine_id=</i> kernel command line parameter or
+       passing the option <b>--machine-id= </b>to systemd. A machine-id may not be
+       set to all zeros.
+</pre>
+<h2><a id="RELATION_TO_OSF_UUIDS" href="#RELATION_TO_OSF_UUIDS"></a>RELATION TO OSF UUIDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Note that the machine ID historically is not an OSF UUID as defined
+       by <b>RFC 4122</b><b></b>[1], nor a Microsoft GUID; however, starting with systemd
+       v30, newly generated machine IDs do qualify as v4 UUIDs.
+
+       In order to maintain compatibility with existing installations, an
+       application requiring a UUID should decode the machine ID, and then
+       apply the following operations to turn it into a valid OSF v4 UUID.
+       With "id" being an unsigned character array:
+
+           /* Set UUID version to 4 --- truly random generation */
+           id[6] = (id[6] &amp; 0x0F) | 0x40;
+           /* Set the UUID variant to DCE */
+           id[8] = (id[8] &amp; 0x3F) | 0x80;
+
+       (This code is inspired by "generate_random_uuid()" of
+       drivers/char/random.c from the Linux kernel sources.)
+</pre>
+<h2><a id="HISTORY" href="#HISTORY"></a>HISTORY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The simple configuration file format of /etc/machine-id originates in
+       the /var/lib/dbus/machine-id file introduced by D-Bus. In fact, this
+       latter file might be a symlink to /etc/machine-id.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man1/systemd-machine-id-setup.1.html">systemd-machine-id-setup(1)</a>, <a href="../man3/gethostid.3.html">gethostid(3)</a>, <a href="hostname.5.html">hostname(5)</a>,
+       <a href="machine-info.5.html">machine-info(5)</a>, <a href="os-release.5.html">os-release(5)</a>, <a href="../man3/sd-id128.3.html">sd-id128(3)</a>, <a href="../man3/sd_id128_get_machine.3.html">sd_id128_get_machine(3)</a>,
+       <a href="../man1/systemd-firstboot.1.html">systemd-firstboot(1)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. RFC 4122
+           <a href="https://tools.ietf.org/html/rfc4122">https://tools.ietf.org/html/rfc4122</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                    MACHINE-ID(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemd-firstboot.1.html">systemd-firstboot(1)</a>,&nbsp; 
+    <a href="../man1/systemd-machine-id-setup.1.html">systemd-machine-id-setup(1)</a>,&nbsp; 
+    <a href="../man3/sd-id128.3.html">sd-id128(3)</a>,&nbsp; 
+    <a href="../man3/sd_id128_get_machine.3.html">sd_id128_get_machine(3)</a>,&nbsp; 
+    <a href="../man3/sd_id128_randomize.3.html">sd_id128_randomize(3)</a>,&nbsp; 
+    <a href="hostname.5.html">hostname(5)</a>,&nbsp; 
+    <a href="machine-info.5.html">machine-info(5)</a>,&nbsp; 
+    <a href="networkd.conf.5.html">networkd.conf(5)</a>,&nbsp; 
+    <a href="os-release.5.html">os-release(5)</a>,&nbsp; 
+    <a href="systemd.netdev.5.html">systemd.netdev(5)</a>,&nbsp; 
+    <a href="systemd.network.5.html">systemd.network(5)</a>,&nbsp; 
+    <a href="systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="tmpfiles.d.5.html">tmpfiles.d(5)</a>,&nbsp; 
+    <a href="../man7/lvmsystemid.7.html">lvmsystemid(7)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man7/systemd.journal-fields.7.html">systemd.journal-fields(7)</a>,&nbsp; 
+    <a href="../man8/kernel-install.8.html">kernel-install(8)</a>,&nbsp; 
+    <a href="../man8/systemd-machine-id-commit.service.8.html">systemd-machine-id-commit.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

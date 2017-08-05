@@ -1,0 +1,278 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>setrans.conf(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#FILES">FILES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">setrans.conf(8)          setrans.conf documentation          setrans.conf(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       setrans.conf  -  translation  configuration  file for MCS/MLS SELinux
+       systems
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>/etc/selinux/{SELINUXTYPE}/setrans.conf</i> configuration file
+       specifies the way that SELinux MCS/MLS labels are translated into
+       human readable form by the mcstransd daemon.  The default policies
+       support 16 sensitivity levels (s0 through s15) and 1024 categories
+       (c0 through c1023). Multiple categories can be separated with commas
+       (c0,c1,c3,c5) and a range of categories can be shortened using dot
+       notation (c0.c3,c5).
+
+   <b>Keywords</b>
+       Base   once a base is declared, subsequent sensitivity label
+              definitions will have all modifiers applied to them during
+              translation.  Sensitivity labels defined before the base
+              declaration are immediately cached and no modifiers will be
+              applied these are used as direct translations.
+
+       Default
+              defines the category bit range that will be used for inverse
+              bits.
+
+       Domain creates a new domain with the supplied name.
+
+       Include
+              read and process the contents of the specified configuration
+              file.
+
+       Join   defines a character used to separate members of a modifier
+              group when more than one is specified (ex. USA/AUS).
+
+       ModifierGroup
+              a means of grouping category bit definitions by how they
+              modify the sensitivity label.
+
+       Prefix word(s) that may proceed member(s) of a modifier group (ex.
+              REL USA).
+
+       Suffix word(s) that may follow member(s) of a modifier group (ex. USA
+              EYES ONLY).
+
+       Whitespace
+              defines the set of acceptable white space characters that may
+              be used in label being translated.
+
+   <b>Sensitivity Level Definition Examples</b>
+       s0=SystemLow
+              defines a translation of s0 (the lowest sensitivity level)
+              with no categories to SystemLow.
+
+       s15:c0.c1023=SystemHigh
+              defines a translation of s15:c0.c1023 to SystemHigh. c0.c1023
+              is shorthand for all categories. A colon separates the
+              sensitivity level and categories.
+
+       s0-s15:c0.c1023=SystemLow-SystemHigh
+              defines a range translation of of s0-s15:c0.c1023 to
+              SystemLow-SystemHigh. The two range components are separated
+              by a dash.
+
+       s0:c0=PatientRecord
+              defines a translation of sensitivity s0 with category c0 to
+              PatientRecord.
+
+       s0:c1=Accounting
+              defines a translation of sensitivity s0 with category c1 to
+              Accounting.
+
+       s2:c1,c2,c3=Confidential3Categories
+
+       s2:c1.c3=Confidential3Categories
+              both define a translation of sensitivity s2 with categories
+              c1, c2 and c3 to Confidential3Categories.
+
+       s5=TopSecret
+              defines a translation of sensitivity s5 with no categories to
+              TopSecret.
+
+   <b>Constraint Examples</b>
+       c0!c1  if category bits 0 and 1 are both set, the constraint will
+              fail and the original context will be returned.
+
+       c5.c9&gt;c1
+              if category bits 5 through 9 are set, bit 1 must also be set
+              or the constraint will fail and the original context will be
+              returned.
+
+       s1!c5,c9
+              if category bits 5 and 9 are set and the sensitivity level is
+              s1, the constraint will fail and the original context will be
+              returned.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+           Written by Joe Nall &lt;joe@nall.com&gt;.
+           Updated by Ted X. Toth &lt;txtoth@gmail.com&gt;.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       selinux(8), mcs(8), mls(8), chcon(1)
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /etc/selinux/{SELINUXTYPE}/setrans.conf
+       /usr/share/mcstrans/examples
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">txtoth@gmail.com                13 July 2010                 setrans.conf(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

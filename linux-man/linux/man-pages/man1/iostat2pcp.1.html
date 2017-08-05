@@ -1,0 +1,279 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>iostat2pcp(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CAVEAT">CAVEAT</a> | <a href="#PCP_ENVIRONMENT">PCP&nbsp;ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">IOSTAT2PCP(1)              General Commands Manual             IOSTAT2PCP(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>iostat2pcp </b>- import iostat data and create a PCP archive
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>iostat2pcp </b>[<b>-v</b>] [<b>-S </b><i>start</i>] [<b>-t </b><i>interval</i>] [<b>-Z </b><i>timezone</i>] <i>infile outfile</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>iostat2pcp </b>reads a text file created with <a href="iostat.1.html">iostat(1)</a> (<i>infile</i>) and
+       translates this into a Performance Co-Pilot (PCP) archive with the
+       basename <i>outfile</i>.  If <i>infile</i> is - then <i>iostat2pcp</i> reads from standard
+       input, allowing easy preprocessing of the <a href="iostat.1.html">iostat(1)</a> output with
+       <a href="sed.1.html">sed(1)</a> or similar.
+
+       The resultant PCP archive may be used with all the PCP client tools
+       to graph subsets of the data using <a href="pmchart.1.html">pmchart(1)</a>, perform data reduction
+       and reporting, filter with the PCP inference engine <a href="pmie.1.html">pmie(1)</a>, etc.
+
+       A series of physical files will be created with the prefix <i>outfile</i>.
+       These are <i>outfile</i><b>.0 </b>(the performance data), <i>outfile</i><b>.meta </b>(the
+       metadata that describes the performance data) and <i>outfile</i><b>.index </b>(a
+       temporal index to improve efficiency of replay operations for the
+       archive).  If any of these files exists already, then <b>iostat2pcp </b>will
+       <b>not </b>overwrite them and will exit with an error message.
+
+       The first output sample from <a href="iostat.1.html">iostat(1)</a> contains a statistical summary
+       since boot time and is ignored by <i>iostat2pcp</i>, so the first real data
+       set is the second one in the <a href="iostat.1.html">iostat(1)</a> output.
+
+       The best results are obtained when <a href="iostat.1.html">iostat(1)</a> was run with its own <b>-t</b>
+       flag, so each output sample is prefixed with a timestamp.  Even
+       better is <b>-t </b>with $<b>S_TIME_FORMAT=ISO </b>set in environment when
+       <a href="iostat.1.html">iostat(1)</a> is run, in which case the timestamp includes the timezone.
+
+       Note that if $<b>S_TIME_FORMAT=ISO </b>is <b>not </b>used with the <b>-t </b>option then
+       <a href="iostat.1.html">iostat(1)</a> may produce a timestamp controlled by <b>LC_TIME </b>from the
+       locale that is in a format <i>iostat2pcp</i> cannot parse.  The formats for
+       the timestamp that <i>iostat2pcp</i> accepts are illustrated by these
+       examples:
+
+       <b>2013-07-06T21:34:39+1000</b>
+           (for the $<b>S_TIME_FORMAT=ISO</b>).
+
+       <b>2013-07-06 21:34:39</b>
+           (for some of the European formats, e.g. de_AT, de_BE, de_LU and
+           en_DK.utf8).
+
+       <b>06/07/13 21:34:39</b>
+           (for all of the $<b>LC_TIME </b>settings for English locales outside
+           North America, e.g. en_AU, en_GB, en_IE, en_NZ, en_SG and en_ZA,
+           and all the Spanish locales, e.g.  es_ES, es_MX and es_AR).
+
+       In particular, note that some common North American $<b>LC_TIME </b>settings
+       will <b>not </b>work with <i>iostat2pcp</i> (namely, en_US, POSIX and C) because
+       they use the MM/DD format which may be incorrectly converted with the
+       assumed DD/MM format.  This is another reason to recommend setting
+       $<b>S_TIME_FORMAT=ISO</b>.
+
+       If there are no timestamps in the input stream, <i>iostat2pcp</i> will try
+       and deduce the sample interval if basic Disk data (<b>-d </b>option for
+       <a href="iostat.1.html">iostat(1)</a>) is found.  If this fails, then the <b>-t </b>option may be used
+       to specify the sample <i>interval</i> in seconds.  This option is ignored if
+       timestamps are found in the input stream.
+
+       The <b>-S </b>option may be used to specify as start time for the first real
+       sample in <i>infile</i>, where <i>start</i> must have the format HH:MM:SS.  This
+       option is ignored if timestamps are found in the input stream.
+
+       The <b>-Z </b>option may be used to specify a timezone.  It must have the
+       format +HHMM (for hours and minutes East of UTC) or -HHMM (for hours
+       and minutes West of UTC).  Note in particular that <b>neither </b>the
+       <b>zoneinfo </b>(aka Olson) format, e.g. Europe/Paris, nor the Posix <b>TZ</b>
+       format, e.g.  EST+5 is allowed for the <b>-Z </b>option.  This option is
+       ignored if ISO timestamps are found in the input stream.  If the
+       timezone is not specified and cannot be deduced, it defaults to UTC.
+
+       Some additional diagnostic output is generated with the <b>-v </b>option.
+
+       <b>iostat2pcp </b>is a Perl script that uses the PCP::LogImport Perl wrapper
+       around the PCP <i>libpcp_import</i> library, and as such could be used as an
+       example to develop new tools to import other types of performance
+       data and create PCP archives.
+</pre>
+<h2><a id="CAVEAT" href="#CAVEAT"></a>CAVEAT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>iostat2pcp </b>requires <i>infile</i> to have been created by the version of
+       <a href="iostat.1.html">iostat(1)</a> from &lt;<a href="http://freshmeat.net/projects/sysstat">http://freshmeat.net/projects/sysstat</a>&gt;.
+
+       <b>iostat2pcp </b>handles the <b>-c </b>(CPU), <b>-d </b>(Disk), <b>-x </b>(eXtended Disk) and <b>-p</b>
+       (Partition) report formats (including their <b>-k</b>, <b>-m</b>, <b>-z </b>and <b>ALL</b>
+       variants), but does not accommodate the <b>-n </b>(Network Filesystem)
+       report format from <a href="iostat.1.html">iostat(1)</a>; this is a demand-driven limitation
+       rather than a technical limitation.
+</pre>
+<h2><a id="PCP_ENVIRONMENT" href="#PCP_ENVIRONMENT"></a>PCP ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Environment variables with the prefix <b>PCP_ </b>are used to parameterize
+       the file and directory names used by PCP.  On each installation, the
+       file <i>/etc/pcp.conf</i> contains the local values for these variables.
+       The <b>$PCP_CONF </b>variable may be used to specify an alternative
+       configuration file, as described in <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="iostat.1.html">iostat(1)</a>, <a href="pmchart.1.html">pmchart(1)</a>, <a href="pmie.1.html">pmie(1)</a>, <a href="pmlogger.1.html">pmlogger(1)</a>, <a href="sed.1.html">sed(1)</a>,
+       <b>Date</b>::Format(3pm), <b>Date</b>::Parse(3pm), <b>PCP</b>::LogImport(3pm) and
+       <a href="../man3/LOGIMPORT.3.html">LOGIMPORT(3)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                       IOSTAT2PCP(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pcp-iostat.1.html">pcp-iostat(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

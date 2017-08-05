@@ -1,0 +1,390 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>readv(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">READV(2)                  Linux Programmer's Manual                 READV(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       readv,  writev,  preadv,  pwritev,  preadv2, pwritev2 - read or write
+       data into multiple buffers
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/uio.h&gt;</b>
+
+       <b>ssize_t readv(int </b><i>fd</i><b>, const struct iovec *</b><i>iov</i><b>, int </b><i>iovcnt</i><b>);</b>
+
+       <b>ssize_t writev(int </b><i>fd</i><b>, const struct iovec *</b><i>iov</i><b>, int </b><i>iovcnt</i><b>);</b>
+
+       <b>ssize_t preadv(int </b><i>fd</i><b>, const struct iovec *</b><i>iov</i><b>, int </b><i>iovcnt</i><b>,</b>
+                      <b>off_t </b><i>offset</i><b>);</b>
+
+       <b>ssize_t pwritev(int </b><i>fd</i><b>, const struct iovec *</b><i>iov</i><b>, int </b><i>iovcnt</i><b>,</b>
+                       <b>off_t </b><i>offset</i><b>);</b>
+
+       <b>ssize_t preadv2(int </b><i>fd</i><b>, const struct iovec *</b><i>iov</i><b>, int </b><i>iovcnt</i><b>,</b>
+                       <b>off_t </b><i>offset</i><b>, int </b><i>flags</i><b>);</b>
+
+       <b>ssize_t pwritev2(int </b><i>fd</i><b>, const struct iovec *</b><i>iov</i><b>, int </b><i>iovcnt</i><b>,</b>
+                        <b>off_t </b><i>offset</i><b>, int </b><i>flags</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>preadv</b>(), <b>pwritev</b>():
+           Since glibc 2.19:
+               _DEFAULT_SOURCE
+           Glibc 2.19 and earlier:
+               _BSD_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>readv</b>() system call reads <i>iovcnt</i> buffers from the file associated
+       with the file descriptor <i>fd</i> into the buffers described by <i>iov</i>
+       ("scatter input").
+
+       The <b>writev</b>() system call writes <i>iovcnt</i> buffers of data described by
+       <i>iov</i> to the file associated with the file descriptor <i>fd</i> ("gather
+       output").
+
+       The pointer <i>iov</i> points to an array of <i>iovec</i> structures, defined in
+       <i>&lt;sys/uio.h&gt;</i> as:
+
+           struct iovec {
+               void  *iov_base;    /* Starting address */
+               size_t iov_len;     /* Number of bytes to transfer */
+           };
+
+       The <b>readv</b>() system call works just like <a href="read.2.html">read(2)</a> except that multiple
+       buffers are filled.
+
+       The <b>writev</b>() system call works just like <a href="write.2.html">write(2)</a> except that
+       multiple buffers are written out.
+
+       Buffers are processed in array order.  This means that <b>readv</b>()
+       completely fills <i>iov</i>[0] before proceeding to <i>iov</i>[1], and so on.  (If
+       there is insufficient data, then not all buffers pointed to by <i>iov</i>
+       may be filled.)  Similarly, <b>writev</b>() writes out the entire contents
+       of <i>iov</i>[0] before proceeding to <i>iov</i>[1], and so on.
+
+       The data transfers performed by <b>readv</b>() and <b>writev</b>() are atomic: the
+       data written by <b>writev</b>() is written as a single block that is not
+       intermingled with output from writes in other processes (but see
+       <a href="../man7/pipe.7.html">pipe(7)</a> for an exception); analogously, <b>readv</b>() is guaranteed to read
+       a contiguous block of data from the file, regardless of read
+       operations performed in other threads or processes that have file
+       descriptors referring to the same open file description (see
+       <a href="open.2.html">open(2)</a>).
+
+   <b>preadv() and pwritev()</b>
+       The <b>preadv</b>() system call combines the functionality of <b>readv</b>() and
+       <a href="pread.2.html">pread(2)</a>.  It performs the same task as <b>readv</b>(), but adds a fourth
+       argument, <i>offset</i>, which specifies the file offset at which the input
+       operation is to be performed.
+
+       The <b>pwritev</b>() system call combines the functionality of <b>writev</b>() and
+       <a href="pwrite.2.html">pwrite(2)</a>.  It performs the same task as <b>writev</b>(), but adds a fourth
+       argument, <i>offset</i>, which specifies the file offset at which the output
+       operation is to be performed.
+
+       The file offset is not changed by these system calls.  The file
+       referred to by <i>fd</i> must be capable of seeking.
+
+   <b>preadv2() and pwritev2()</b>
+       These system calls are similar to <b>preadv</b>() and <b>pwritev</b>() calls, but
+       add a fifth argument, <i>flags</i>, which modifies the behavior on a per-
+       call basis.
+
+       Unlike <b>preadv</b>() and <b>pwritev</b>(), if the <i>offset</i> argument is -1, then the
+       current file offset is used and updated.
+
+       The <i>flags</i> argument contains a bitwise OR of zero or more of the
+       following flags:
+
+       <b>RWF_DSYNC </b>(since Linux 4.7)
+              Provide a per-write equivalent of the <b>O_DSYNC open</b>(2) flag.
+              This flag is meaningful only for <b>pwritev2</b>(), and its effect
+              applies only to the data range written by the system call.
+
+       <b>RWF_HIPRI </b>(since Linux 4.6)
+              High priority read/write.  Allows block-based filesystems to
+              use polling of the device, which provides lower latency, but
+              may use additional resources.  (Currently, this feature is
+              usable only on a file descriptor opened using the <b>O_DIRECT</b>
+              flag.)
+
+       <b>RWF_SYNC </b>(since Linux 4.7)
+              Provide a per-write equivalent of the <b>O_SYNC open</b>(2) flag.
+              This flag is meaningful only for <b>pwritev2</b>(), and its effect
+              applies only to the data range written by the system call.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>readv</b>(), <b>preadv</b>() and <b>preadv2</b>() return the number of
+       bytes read; <b>writev</b>(), <b>pwritev</b>() and <b>pwritev2</b>() return the number of
+       bytes written.
+
+       Note that it is not an error for a successful call to transfer fewer
+       bytes than requested (see <a href="read.2.html">read(2)</a> and <a href="write.2.html">write(2)</a>).
+
+       On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The errors are as given for <a href="read.2.html">read(2)</a> and <a href="write.2.html">write(2)</a>.  Furthermore,
+       <b>preadv</b>(), <b>preadv2</b>(), <b>pwritev</b>(), and <b>pwritev2</b>() can also fail for the
+       same reasons as <a href="lseek.2.html">lseek(2)</a>.  Additionally, the following errors are
+       defined:
+
+       <b>EINVAL </b>The sum of the <i>iov_len</i> values overflows an <i>ssize_t</i> value.
+
+       <b>EINVAL </b>The vector count, <i>iovcnt</i>, is less than zero or greater than
+              the permitted maximum.
+
+       <b>EINVAL </b>An unknown flag is specified in <i>flags</i>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>preadv</b>() and <b>pwritev</b>() first appeared in Linux 2.6.30; library
+       support was added in glibc 2.10.
+
+       <b>preadv2</b>() and <b>pwritev2</b>() first appeared in Linux 4.6.  Library
+       support was added in glibc 2.26.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>readv</b>(), <b>writev</b>(): POSIX.1-2001, POSIX.1-2008, 4.4BSD (these system
+       calls first appeared in 4.2BSD).
+
+       <b>preadv</b>(), <b>pwritev</b>(): nonstandard, but present also on the modern
+       BSDs.
+
+       <b>preadv2</b>(), <b>pwritev2</b>(): nonstandard Linux extension.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1 allows an implementation to place a limit on the number of
+       items that can be passed in <i>iov</i>.  An implementation can advertise its
+       limit by defining <b>IOV_MAX </b>in <i>&lt;limits.h&gt;</i> or at run time via the return
+       value from <i>sysconf(_SC_IOV_MAX)</i>.  On modern Linux systems, the limit
+       is 1024.  Back in Linux 2.0 days, this limit was 16.
+
+   <b>C library/kernel differences</b>
+       The raw <b>preadv</b>() and <b>pwritev</b>() system calls have call signatures that
+       differ slightly from that of the corresponding GNU C library wrapper
+       functions shown in the SYNOPSIS.  The final argument, <i>offset</i>, is
+       unpacked by the wrapper functions into two arguments in the system
+       calls:
+
+           <b>unsigned long </b><i>pos_l</i><b>, unsigned long </b><i>pos</i>
+
+       These arguments contain, respectively, the low order and high order
+       32 bits of <i>offset</i>.
+
+   <b>Historical C library/kernel differences</b>
+       To deal with the fact that <b>IOV_MAX </b>was so low on early versions of
+       Linux, the glibc wrapper functions for <b>readv</b>() and <b>writev</b>() did some
+       extra work if they detected that the underlying kernel system call
+       failed because this limit was exceeded.  In the case of <b>readv</b>(), the
+       wrapper function allocated a temporary buffer large enough for all of
+       the items specified by <i>iov</i>, passed that buffer in a call to <a href="read.2.html">read(2)</a>,
+       copied data from the buffer to the locations specified by the
+       <i>iov_base</i> fields of the elements of <i>iov</i>, and then freed the buffer.
+       The wrapper function for <b>writev</b>() performed the analogous task using
+       a temporary buffer and a call to <a href="write.2.html">write(2)</a>.
+
+       The need for this extra effort in the glibc wrapper functions went
+       away with Linux 2.2 and later.  However, glibc continued to provide
+       this behavior until version 2.10.  Starting with glibc version 2.9,
+       the wrapper functions provide this behavior only if the library
+       detects that the system is running a Linux kernel older than version
+       2.6.18 (an arbitrarily selected kernel version).  And since glibc
+       2.20 (which requires a minimum Linux kernel version of 2.6.32), the
+       glibc wrapper functions always just directly invoke the system calls.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following code sample demonstrates the use of <b>writev</b>():
+
+           char *str0 = "hello ";
+           char *str1 = "world\n";
+           struct iovec iov[2];
+           ssize_t nwritten;
+
+           iov[0].iov_base = str0;
+           iov[0].iov_len = strlen(str0);
+           iov[1].iov_base = str1;
+           iov[1].iov_len = strlen(str1);
+
+           nwritten = writev(STDOUT_FILENO, iov, 2);
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="pread.2.html">pread(2)</a>, <a href="read.2.html">read(2)</a>, <a href="write.2.html">write(2)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-07-13                         READV(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="fcntl.2.html">fcntl(2)</a>,&nbsp; 
+    <a href="fsync.2.html">fsync(2)</a>,&nbsp; 
+    <a href="pread.2.html">pread(2)</a>,&nbsp; 
+    <a href="process_vm_readv.2.html">process_vm_readv(2)</a>,&nbsp; 
+    <a href="read.2.html">read(2)</a>,&nbsp; 
+    <a href="recv.2.html">recv(2)</a>,&nbsp; 
+    <a href="send.2.html">send(2)</a>,&nbsp; 
+    <a href="syscall.2.html">syscall(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="write.2.html">write(2)</a>,&nbsp; 
+    <a href="../man7/signal.7.html">signal(7)</a>,&nbsp; 
+    <a href="../man7/socket.7.html">socket(7)</a>,&nbsp; 
+    <a href="../man7/spufs.7.html">spufs(7)</a>,&nbsp; 
+    <a href="../man8/xfs_io.8.html">xfs_io(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="readv.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

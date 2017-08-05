@@ -1,0 +1,229 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pts(4) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PTS(4)                    Linux Programmer's Manual                   PTS(4)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ptmx, pts - pseudoterminal master and slave
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The file <i>/dev/ptmx</i> is a character file with major number 5 and minor
+       number 2, usually of mode 0666 and owner.group of root.root.  It is
+       used to create a pseudoterminal master and slave pair.
+
+       When a process opens <i>/dev/ptmx</i>, it gets a file descriptor for a
+       pseudoterminal master (PTM), and a pseudoterminal slave (PTS) device
+       is created in the <i>/dev/pts</i> directory.  Each file descriptor obtained
+       by opening <i>/dev/ptmx</i> is an independent PTM with its own associated
+       PTS, whose path can be found by passing the file descriptor to
+       <a href="../man3/ptsname.3.html">ptsname(3)</a>.
+
+       Before opening the pseudoterminal slave, you must pass the master's
+       file descriptor to <a href="../man3/grantpt.3.html">grantpt(3)</a> and <a href="../man3/unlockpt.3.html">unlockpt(3)</a>.
+
+       Once both the pseudoterminal master and slave are open, the slave
+       provides processes with an interface that is identical to that of a
+       real terminal.
+
+       Data written to the slave is presented on the master file descriptor
+       as input.  Data written to the master is presented to the slave as
+       input.
+
+       In practice, pseudoterminals are used for implementing terminal
+       emulators such as <b>xterm</b>(1), in which data read from the
+       pseudoterminal master is interpreted by the application in the same
+       way a real terminal would interpret the data, and for implementing
+       remote-login programs such as <a href="../man8/sshd.8.html">sshd(8)</a>, in which data read from the
+       pseudoterminal master is sent across the network to a client program
+       that is connected to a terminal or terminal emulator.
+
+       Pseudoterminals can also be used to send input to programs that
+       normally refuse to read input from pipes (such as <a href="../man1/su.1.html">su(1)</a>, and
+       <a href="../man1/passwd.1.html">passwd(1)</a>).
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/dev/ptmx</i>, <i>/dev/pts/*</i>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The Linux support for the above (known as UNIX 98 pseudoterminal
+       naming) is done using the <i>devpts</i> filesystem, that should be mounted
+       on <i>/dev/pts</i>.
+
+       Before this UNIX 98 scheme, master pseudoterminals were called
+       <i>/dev/ptyp0</i>, ...  and slave pseudoterminals <i>/dev/ttyp0</i>, ...  and one
+       needed lots of preallocated device nodes.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man3/getpt.3.html">getpt(3)</a>, <a href="../man3/grantpt.3.html">grantpt(3)</a>, <a href="../man3/ptsname.3.html">ptsname(3)</a>, <a href="../man3/unlockpt.3.html">unlockpt(3)</a>, <a href="../man7/pty.7.html">pty(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-03-15                           PTS(4)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man3/getpt.3.html">getpt(3)</a>,&nbsp; 
+    <a href="../man3/grantpt.3.html">grantpt(3)</a>,&nbsp; 
+    <a href="../man3/posix_openpt.3.html">posix_openpt(3)</a>,&nbsp; 
+    <a href="../man3/ptsname.3.html">ptsname(3)</a>,&nbsp; 
+    <a href="../man3/ttyname.3.html">ttyname(3)</a>,&nbsp; 
+    <a href="../man3/unlockpt.3.html">unlockpt(3)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man7/pty.7.html">pty(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="pts.4.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

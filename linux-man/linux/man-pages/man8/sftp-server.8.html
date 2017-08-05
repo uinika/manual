@@ -1,0 +1,268 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sftp-server(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#HISTORY">HISTORY</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SFTP-SERVER(8)           BSD System Manager's Manual          SFTP-SERVER(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>sftp-server </b>— SFTP server subsystem
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>sftp-server </b>[<b>-ehR</b>] [<b>-d </b><i>start_directory</i>] [<b>-f </b><i>log_facility</i>]
+                 [<b>-l </b><i>log_level</i>] [<b>-P </b><i>blacklisted_requests</i>]
+                 [<b>-p </b><i>whitelisted_requests</i>] [<b>-u </b><i>umask</i>]
+     <b>sftp-server -Q </b><i>protocol_feature</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>sftp-server </b>is a program that speaks the server side of SFTP protocol
+     to stdout and expects client requests from stdin.  <b>sftp-server </b>is not
+     intended to be called directly, but from sshd(8) using the <b>Subsystem</b>
+     option.
+
+     Command-line flags to <b>sftp-server </b>should be specified in the <b>Subsystem</b>
+     declaration.  See sshd_config(5) for more information.
+
+     Valid options are:
+
+     <b>-d </b><i>start_directory</i>
+             specifies an alternate starting directory for users.  The path‐
+             name may contain the following tokens that are expanded at run‐
+             time: %% is replaced by a literal '%', %d is replaced by the
+             home directory of the user being authenticated, and %u is
+             replaced by the username of that user.  The default is to use
+             the user's home directory.  This option is useful in conjunc‐
+             tion with the sshd_config(5) <b>ChrootDirectory </b>option.
+
+     <b>-e      </b>Causes <b>sftp-server </b>to print logging information to stderr
+             instead of syslog for debugging.
+
+     <b>-f </b><i>log_facility</i>
+             Specifies the facility code that is used when logging messages
+             from <b>sftp-server</b>.  The possible values are: DAEMON, USER, AUTH,
+             LOCAL0, LOCAL1, LOCAL2, LOCAL3, LOCAL4, LOCAL5, LOCAL6, LOCAL7.
+             The default is AUTH.
+
+     <b>-h      </b>Displays <b>sftp-server </b>usage information.
+
+     <b>-l </b><i>log_level</i>
+             Specifies which messages will be logged by <b>sftp-server</b>.  The
+             possible values are: QUIET, FATAL, ERROR, INFO, VERBOSE, DEBUG,
+             DEBUG1, DEBUG2, and DEBUG3.  INFO and VERBOSE log transactions
+             that <b>sftp-server </b>performs on behalf of the client.  DEBUG and
+             DEBUG1 are equivalent.  DEBUG2 and DEBUG3 each specify higher
+             levels of debugging output.  The default is ERROR.
+
+     <b>-P </b><i>blacklisted_requests</i>
+             Specify a comma-separated list of SFTP protocol requests that
+             are banned by the server.  <b>sftp-server </b>will reply to any black‐
+             listed request with a failure.  The <b>-Q </b>flag can be used to
+             determine the supported request types.  If both a blacklist and
+             a whitelist are specified, then the blacklist is applied before
+             the whitelist.
+
+     <b>-p </b><i>whitelisted_requests</i>
+             Specify a comma-separated list of SFTP protocol requests that
+             are permitted by the server.  All request types that are not on
+             the whitelist will be logged and replied to with a failure mes‐
+             sage.
+
+             Care must be taken when using this feature to ensure that
+             requests made implicitly by SFTP clients are permitted.
+
+     <b>-Q </b><i>protocol_feature</i>
+             Query protocol features supported by <b>sftp-server</b>.  At present
+             the only feature that may be queried is “requests”, which may
+             be used for black or whitelisting (flags <b>-P </b>and <b>-p </b>respec‐
+             tively).
+
+     <b>-R      </b>Places this instance of <b>sftp-server </b>into a read-only mode.
+             Attempts to open files for writing, as well as other operations
+             that change the state of the filesystem, will be denied.
+
+     <b>-u </b><i>umask</i>
+             Sets an explicit umask(2) to be applied to newly-created files
+             and directories, instead of the user's default mask.
+
+     On some systems, <b>sftp-server </b>must be able to access <i>/dev/log</i> for log‐
+     ging to work, and use of <b>sftp-server </b>in a chroot configuration there‐
+     fore requires that syslogd(8) establish a logging socket inside the
+     chroot directory.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     sftp(1), ssh(1), sshd_config(5), sshd(8)
+
+     T. Ylonen and S. Lehtinen, <i>SSH File Transfer Protocol</i>, draft-ietf-
+     secsh-filexfer-02.txt, October 2001, work in progress material.
+</pre>
+<h2><a id="HISTORY" href="#HISTORY"></a>HISTORY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>sftp-server </b>first appeared in OpenBSD 2.8.
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     Markus Friedl &lt;<i>markus@openbsd.org</i>&gt;
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     This page is part of the <i>openssh</i> (Portable OpenSSH) project.  Informa‐
+     tion about the project can be found at
+     <a href="http://www.openssh.com/portable.html">http://www.openssh.com/portable.html</a>.  If you have a bug report for
+     this manual page, see <a href="http://www.openssh.com/report.html">http://www.openssh.com/report.html</a>.  This page
+     was obtained from the tarball openssh-7.5p1.tar.gz fetched from
+     <a href="http://ftp.eu.openbsd.org/pub/OpenBSD/OpenSSH/portable/">http://ftp.eu.openbsd.org/pub/OpenBSD/OpenSSH/portable/</a> on 2017-07-05.
+     If you discover any rendering problems in this HTML version of the
+     page, or you believe there is a better or more up-to-date source for
+     the page, or you have corrections or improvements to the information in
+     this COLOPHON (which is <i>not</i> part of the original manual page), send a
+     mail to man-pages@man7.org
+
+<span class="footline">BSD                           December 11, 2014                          BSD</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

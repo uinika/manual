@@ -1,0 +1,956 @@
+﻿<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	<meta name="Author" content="VBird, 鸟哥">
+	<meta name="Description" content="Dynamic Host Configuration Protocol 主机的设定问题(类似 IP 分享器的后端功能)">
+	<title>鸟哥的 Linux 私房菜 -- DHCP 服务器</title>
+    <script src="../../index-2.html" type="text/javascript"></script>
+	<script src="../../index-2.html" type="text/javascript"></script>
+	<link href="../../index-2.html" rel="stylesheet" type="text/css" />
+    <link href="../../index-2.html" rel="stylesheet" type="text/css" />
+    </head><body style="margin: 0pt; padding: 0pt;" class="table"onload="MM_preloadImages('../../index-2.html','../../index-2.html','../../index-2.html','../../index-2.html','../../index-2.html','../../index-2.html','../../index-2.html','../../index-2.html')">
+
+<center>
+<div id="apDiv5">
+<div> <LINK REL="SHORTCUT ICON" HREF="../../index-2.html">
+<!-- ImageReady Slices (title3.ai) -->
+<table id="___01" width="898" height="81" border="0" align="center" cellpadding="0" cellspacing="0";>
+	<tr>
+		<td colspan="15">
+			<img src="image/title/title_01.png" width="900" height="1" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="4" bgcolor="#182448"><p><img src="http://linux.vbird.org/cgi-bin/Count.cgi?dd=C&amp;ft=5&amp;sh=T&amp;md=8&amp;pad=Y&amp;df=vbird.dic.ksu.edu.tw.dat" width="93" align="left" title="計數器" /></p>
+	    <p><font color="#FFFFFF" size="-1">since2012/04/23</font></p></td>
+		<td rowspan="4" align="left" valign="top"><a href="../../index.html"><img src="image/title/title_03.png" alt="" width="263" height="79" border="0"></a></td>
+		<td colspan="13">
+			<img src="image/title/title_04.png" alt="" width="535" height="9" border="0"></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img src="image/title/title_05.png" alt="" width="53" height="70" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../../linux_basic/0110whatislinux.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image51','','image/title/title_06.png',1)"><img src="image/title/title3_06.png" name="Image51" width="106" height="25" border="0" id="Image51" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_07.png" alt="" width="27" height="37" border="0"></td>
+		<td colspan="3" align="left" valign="top"><a href="../0110network_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image52','','image/title/title_08.png',1)"><img src="image/title/title3_08.png" name="Image52" width="107" height="25" border="0" id="Image52" alt=""/></a></td>
+		<td rowspan="2">
+			<img src="image/title/title_09.png" alt="" width="37" height="37" border="0"></td>
+		<td colspan="2" align="left" valign="top"><a href="../../about.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image53','','image/title/title_10.png',1)"><img src="image/title/title3_10.png" name="Image53" width="75" height="25" border="0" id="Image53" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_11.png" alt="" width="35" height="70" border="0"></td>
+		<td align="left" valign="top"><a href="mailto:vbird@mail.vbird.idv.tw" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image54','','image/title/title_12.png',1)"><img src="image/title/title3_12.png" name="Image54" width="74" height="25" border="0" id="Image54" alt=""/></a></td>
+		<td rowspan="3">
+			<img src="image/title/title_13.png" alt="" width="21" height="70" border="0"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<img src="image/title/title_14.png" alt="" width="106" height="12" border="0"></td>
+		<td colspan="3">
+			<img src="image/title/title_15.png" alt="" width="107" height="12" border="0"></td>
+		<td colspan="2">
+			<img src="image/title/title_16.png" width="75" height="12" alt=""></td>
+		<td rowspan="2">
+			<img src="image/title/title_17.png" alt="" width="74" height="45" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/title_18.png" alt="" width="15" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar1" class="MenuBarHorizontal">
+	  <li><a href="../../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image44','','image/title/title_19.png',1)"><img src="image/title/title3_19.png" name="Image44" width="123" height="33" border="0" id="Image44" /></a>
+			    <ul>
+			      <li><a href="../../linux_basic/Mandrake9.0/mandrake9.0.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image46','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image46" width="120" height="26" border="0" id="Image46" alt="" /></a></li>
+                  <li><a href="../../linux_basic/fedora_4/fc4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image47','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image47" width="120" height="26" border="0" id="Image47" alt="" /></a></li>
+                  <li><a href="../../linux_basic/linux_basic.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image48','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image48" width="120" height="26" border="0" id="Image48" alt="" /></a></li>
+                </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_20.png" alt="" width="42" height="33" border="0"></td>
+		<td colspan="3" align="left" valign="top"><ul id="MenuBar2" class="MenuBarHorizontal">
+	  <li><a href="../index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image45','','image/title/title_21.png',1)"><img src="image/title/title3_21.png" name="Image45" width="125" height="33" border="0" id="Image45" /></a>
+			    <ul>
+			      <li><a href="../linux_redhat9/redhat9.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image43','','image/title/title_26.png',1)"><img src="image/title/title_23.png" name="Image43" width="120" height="26" border="0" id="Image43" alt=""/></a></li>
+			      <li><a href="../centos4.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image49','','image/title/title_27.png',1)"><img src="image/title/title_24.png" name="Image49" width="120" height="26" border="0" id="Image49" alt="" /></a></li>
+			      <li><a href="../index.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image50','','image/title/title_28.png',1)"><img src="image/title/title_25.png" name="Image50" width="120" height="26" border="0" id="Image50" alt="" /></a></li>
+		        </ul>
+		      </li>
+		</ul></td>
+		<td>
+			<img src="image/title/title_22.png" alt="" width="47" height="33" border="0"></td>
+	</tr>
+	<tr>
+		<td>
+			<img src="image/title/Spacer.gif" width="101" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="263" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="53" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="15" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="91" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="27" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="5" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="42" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="60" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="37" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="28" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="47" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="35" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="74" height="1" alt=""></td>
+		<td>
+			<img src="image/title/Spacer.gif" width="22" height="1" alt=""></td>
+	</tr>
+</table>
+<!-- End ImageReady Slices -->
+<script type="text/javascript">
+<!--
+var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+var MenuBar2 = new Spry.Widget.MenuBar("MenuBar2", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+//-->
+</script>
+</div>
+<table summary="本文内容的排版" style="width: 898px;" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+<tr><td style="width: 16px; font-size: 6px;">　</td>
+    <td width="866">
+
+<!-- 本文的档头部分 -->
+<div style="text-align:center">
+    <a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0340dhcp-centos4.php">
+    <span class="text_head0"><span class="text_head_en">DHCP </span>服务器</span></a><br>
+</div>
+    <div style="text-align:right">
+        <span class="text_history">最近更新日期：2006/12/06</span>
+    </div>
+
+<center>本文已不再维护，更新文章请参考<a href="http://linux.vbird.org/linux_server/0340dhcp.php">这里</a><br><br></center>
+
+<!-- 本文的档头部分 -->
+<center><table class="head1" summary="排版：文章档头的说明"><tbody><tr><td class="head1">
+	如果您在工作单位使用的是笔记本电脑，而且常常要带着您的笔记本电脑到处跑，那么由前几章的『
+	<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0130internet_connect-centos4.php">连上 Internet </a> 』设定当中，会发现，哇！
+	我的网络卡参数要常常修改啊！而且，每到一个新的地方，就得问清楚该地的
+	Server 提供的网络参数才行！真是麻烦～～这个时候，动态主机设定协议 (DHCP)
+	可就大大的派上用场啦！DHCP 这个服务器可以自动的分配 IP 与相关的网络参数给
+	Client 端，来提供 Client 端自动以主机提供的参数来设定他们的网络，如此一来，用户只要将自己的
+	Notebook 设定好经由 DHCP 协议来取得网络参数后，一插上网络线，呵呵！马上就可以享受
+	Internet 的服务啦！很方便吧！所以得来瞧一瞧这个好用的协定喔！
+</td></tr></tbody></table></center><br>
+
+
+<!-- 本文的连结区部分 -->
+<div class="block1">
+<span class="text_h1">
+1. <a href="#before">本章的行前准备工作</a><br>
+2. <a href="#theory">DHCP 运作的原理</a><br>
+	<span class="text_h2">
+	　　2.1 <a href="#theory_whatisdhcp">什么是 DHCP 协议</a><br>
+	　　2.2 <a href="#theory_dhcpwork">DHCP 的运作方式</a><br>
+	　　2.3 <a href="#theory_need">何时需要架设 DHCP 服务器</a><br>
+	</span>
+3. <a href="#server">DHCP 服务器端的设定</a><br>
+	<span class="text_h2">
+	　　3.1 <a href="#server_pkg">所需套件与套件结构</a><br>
+	　　3.2 <a href="#server_dhcpd.conf">主要配置文件 /etc/dhcpd.conf 的语法</a><br>
+	　　3.3 <a href="#server_case">一个局域网络的 DHCP 服务器设定案例</a><br>
+	　　3.4 <a href="#server_start">DHCP 服务器的启动与观察</a><br>
+	　　3.5 <a href="#server_host">内部主机的 IP 对应</a><br>
+	</span>
+4. <a href="#client">DHCP 客户端的设定</a><br>
+	<span class="text_h2">
+	　　4.1 <a href="#client_linux">Linux 客户端</a><br>
+	　　4.2 <a href="#client_win">Windows 客户端</a><br>
+	</span>
+5. <a href="#other">服务器端数据查阅</a><br>
+	<span class="text_h2">
+	　　5.1 <a href="#other_lease">检查租约档案</a><br>
+	　　5.2 <a href="#other_remote">使用 ether-wake 实行远程自动开机 (remote boot)</a><br>
+	</span>
+6. <a href="#review">重点回顾</a><br>
+7. <a href="#ex">课后练习</a><br>
+8. <a href="#reference">参考数据</a><br>
+<span class="text_h2">
+9. <a href="http://phorum.vbird.org/viewtopic.php?p=117845" target="_blank">针对本文的建议：http://phorum.vbird.org/viewtopic.php?p=117845</a><br>
+</span>
+</span>
+</div>
+
+
+<!-- 本文的正式部分 -->
+<hr><a name="before"></a><img src="image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">本章的行前准备工作</span><br>
+<div class="block1">
+	由于 DHCP 必需要设定整个局域网络的网段规定，还有得要了解路由设定，以及一堆与网络有关的信息等等，
+	所以你一定要熟悉网络基础。此外，由于 DHCP server 套件预设应该是不会安装啦，所以你也必需要了解如何使用 rpm
+	或者是 yum 等工具才行。<br>
+	<ul>
+	<li>务必了解<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0110network_basic-centos4.php">网络基础</a>相关的数据；
+	</li><li>也得了解一下 <a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0350dns-centos4.php">DNS</a> 相关的议题；
+	</li><li>还有<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0250simple_firewall-centos4.php">防火墙</a>最好也能了解一番。
+	</li></ul>
+</div>
+
+<hr><a name="theory"></a><img src="image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">DHCP 运作的原理</span><br>
+<div class="block1">
+	老规矩，在正式的进入 <span class="text_import2">DHCP (Dynamic Host Configuration Protocol) </span>
+	主机设定之前，我们先来认识一下 DHCP 这个协议吧！还有，需要了解的是，我们是否有需要『一定』得设定 DHCP 
+	这个服务器呢？这里都需要厘清一下概念喔！ <br><br>
+
+	<hr><a name="theory_whatisdhcp"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">什么是 DHCP 协议</span><br>
+	<div class="block2">
+		在开始 DHCP 的说明之前，我们先来复习一下之前在<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0110network_basic-centos4.php">网络基础</a>里面提到的几个网络参数吧！
+		要设定好一个网络的环境，使计算机可以顺利的连上 Internet ，那么您的计算机里面一定要有底下几个网络的参数才行，分别是：
+		<ul><span class="text_import2">IP, netmask, network, broadcast, gateway, DNS IP</span></ul>
+		其中，那个 IP, netmask, network, broadcast 与 gateway 都可以在 
+		/etc/sysconfig/network-scripts/ifcfg-eth[0-n] 这些档案里面设定，DNS 的地址则是在 
+		/etc/resolv.conf 里头设定。呵呵！只要这几个项目设定正确，那么计算机应该就没问题的可以上网了！
+		所以说，您家里面的 3, 4 部计算机，您都可以手动的来设定好您所需要的网络参数，
+		然后利用 <a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0250simple_firewall-centos4.php#nat">NAT 主机</a>的功能，就可以大摇大摆的<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0130internet_connect-centos4.php">连上 Internet</a> 了！真是不错 ^_^，不是吗？<br><br>
+
+		好了，现在让我们换一个大一些些的场景吧！假设您是学校宿舍的网络管理员，所管理的学生计算机大概有 100 
+		部好了，那么您怎么设定好这 100 部的计算机呢？<br>
+		<ol><span class="text_import2">
+		<li>直接每一部计算机都让您登门拜访手动的去设定好？
+		</li><li>将所有的学生都集合起来，然后精神训话.....喔不！是直接教导一下怎么设定？还是
+		</li><li>藉由一部主机来自动的分配所有的网络参数给宿舍内的任何一部计算机？
+		</li></span></ol>
+
+		这三种解决方案所需要的时间都不相同，如果您选择的是(1)，那么鸟哥个人认为，您不是工作狂就是疯掉了，
+		因为所要花费的时间与您所得的薪水与付出的心力是完全不成比例的。如果选择是(2)那么很可能您会被挂上独裁者、
+		没良心的管理员的称号！如果是选择(3)呢？恭喜您！这个方案的管理时间花费最短，也是最不麻烦的作法啦！<br><br>
+
+		呵呵！知道我要说些什么了吗？是的！这个 <span class="text_import2">DHCP (Dynamic Host Configuration Protocol)</span> 
+		主机最主要的工作，就是在进行前面提到的第三个方案，也就是自动的将网络参数正确的分配给网域中的每部计算机，
+		让客户端的计算机可以在开机的时候就立即自动的设定好网络的参数值，这些参数值可以包括了 IP、netmask、network、gateway
+		与 DNS 的地址等等。如此一来，呵呵！身为管理员的您，只要注意到这一部提供网络参数的主机有没有挂掉就好了，
+		其他同学们的个人计算机，哈！您想都不必想要怎么去帮忙！因为 DHCP 主机已经完全都帮您搞定啦！ 
+		^_^！ 阿！当管理员最大的幸福就是可以喝喝茶、聊聊天就能控管好一切的网络问题呢！<br><br>
+	</div>
+
+	<hr><a name="theory_dhcpwork"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">DHCP 的运作方式</span><br>
+	<div class="block2">
+		你必需要知道的是，DHCP 通常是用局域网络内的一个通讯协议，他主要藉由客户端传送广播封包给整个物理网段内的所有主机，
+		若局域网络内有 DHCP 主机时，才会响应客户端的 IP 参数要求。所以啰，DHCP 服务器与客户端是应该要在同一个物理网段内的。
+		而客户端取得 IP 参数的程序可以简化如下：<br>
+		<ol>
+		<li><span class="text_import1">客户端利用广播封包发送 DHCP 需求：</span><br>
+		若客户端设定使用 DHCP 取得 IP (在 Windows 内为『自动取得 IP』)，则当客户端开机或者是重新启动网络卡时，
+		客户端主机会发送出 DHCP 要求给所有物理网段内的计算机。此封包的目标 IP 会是 255.255.255.255，
+		所以一般主机接收到这个封包后会直接予以丢弃，但若局域网络内有 DHCP 服务器时会如何回应？</li><br>
+
+		<li><span class="text_import1">DHCP 主机响应消息：</span><br>
+		DHCP 主机在接收到这个客户端的需求后，针对这个客户端的<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0110network_basic-centos4.php#fig_mac">硬件地址 (MAC)</a> 与本身的设定数据来进行下列工作：<br><br>
+		<ul><span class="text_import2">
+		<li>到服务器的登录文件中寻找该用户之前是否曾经用过某个 IP ，若有且该 IP 目前无人使用，则提供此 IP 给客户端；
+		</li><li>若配置文件针对该 MAC 提供额外的固定 IP (static IP) 时，则给予该 IP 的设定；
+		</li><li>若不符合上述两个条件，则随机取用目前没有被使用的 IP 给用户，并记录下来。
+		</li></span></ul><br>
+		此外，DHCP 服务器还会提供一个租约时间给客户端，并等待客户端的响应。</li><br>
+
+		<li><span class="text_import1">客户端接受 DHCP 服务器提供的参数并设定本身的网络环境：</span><br>
+		若一切安好，则客户端会接受该次取得的 IP 并开始处理本身的网络环境，包括改写 /etc/resolv.conf 等等；
+		并且会向 DHCP 服务器发送一个确认封包，确认该参数已被接受。</li><br>
+
+		<li><span class="text_import1">DHCP 服务器记录该次租约行为：</span><br>
+		客户端回传讯息以建立租约行为后，该次租约会被记录到主机的登录文件上头，
+		并且开始租约计时喔！那么该次租约何时会到期而被解约 (真可怕的字眼！) ？你可以这样想：<br><br>
+		<ul>
+		<li><span class="text_import2">客户端脱机</span>：不论是关闭网络接口 (ifdown)、重新启动 (reboot)、关机 (shutdown) 
+		等行为，皆算是脱机状态，这个时候 Server 端就会将该 IP 回收，并放到 Server 自己的备用区中，等待未来的使用；</li><br>
+		<li><span class="text_import2">客户端租约到期：</span>前面提到 DHCP server 端发放的 IP 有使用的期限，客户端使用这个 IP 
+		到达期限规定的时间，而且没有重新提出 DHCP 的申请时，就需要将 IP 缴回去！这个时候就会造成断线，而用户也可以再向 
+		DHCP 主机要求再次分配 IP 啰
+		</li></ul>
+		</li></ol>
+
+		以上就是 DHCP 这个协议在 Server 端与 Client 端的运作状态，由上面这个运作状态来看，我们可以晓得，只要 
+		Server 端设定没有问题，加上 Server 与 Client 在硬件联机上面确定是 OK 的，那么 Client 就可以直接藉由 Server 
+		来取得上网的网络参数，当然啦，只要我们这些管理员能够好好的、正确的管理好我们的 DHCP 
+		，嘿嘿！那么上网的设定自然就变成一件很简单的事情啦！ <br><br>
+
+		<hr><li><span class="text_import1">DHCP 服务器给予客户端的 IP 类型：</span></li>
+		<div class="block2">
+		在上面的步骤里面，注意到第二步骤了吗？就是服务器会去比较客户端的 MAC 硬件地址，并判断该 MAC 
+		是否需要给予一个固定的 IP 呢！所以啦，我们可以设定 DHCP 服务器给予客户端的 IP 类型主要有两种：<br>
+		<ul>
+		<li><span class="text_import2">固定 (Static) IP：</span><br>
+		只要那个客户端计算机的网络卡不换掉，那么 MAC 肯定就不会改变，由于 DHCP 可以根据 MAC 来给予固定的 
+		IP ，所以该计算机每次都能以一个固定的 IP 连上 Internet ！呵呵！
+		这种情况比较适合当这部计算机需要用来做为提供区域内的一些网络服务的主机之用。那么如何在 Linux 
+		上面知道您的 MAC 呢？很简单啦！有很多的方式，最简单的方式就是使用 ifconfig 及 arp 来进行：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre><span class="term_hd">1. 观察自己的 MAC 可用 ifconfig：</span>
+[root@linux ~]# <span class="term_command">ifconfig eth0</span>
+eth0      Link encap:Ethernet  HWaddr <span class="term_write">00:08:03:A3:E0:34</span>
+          inet addr:192.168.1.254  Bcast:192.168.1.255  Mask:255.255.255.0
+          <span class="term_say">....底下省略....</span>
+
+<span class="term_hd">2. 观察别人的 MAC 可用 ping 配合 arp</span>
+[root@linux ~]# <span class="term_command">ping -c 1 192.168.1.101</span>
+[root@linux ~]# <span class="term_command">arp -n</span>
+Address        HWtype  HWaddress          Flags Mask   Iface
+192.168.1.101  ether   <span class="term_write">00:08:75:A0:B2:78</span>  C            eth0
+</pre></td></tr></tbody></table><br>
+
+		</li><li><span class="text_import2">动态 (dynamic) IP：</span><br>
+		Client 端每次连上 DHCP 所取得的 IP 都不是固定的！都直接经由 DHCP 所随机由尚未被使用的 IP 中提供！
+		</li></ul>
+
+		除非您的局域网络内的计算机有可能用来做为主机之用，所以必需要设定成为固定 IP ，否则使用动态 IP 
+		的设定比较简单，而且使用上面具有较佳的弹性。怎么说呢？假如您是一个 ISP 好了，而您只申请到 
+		150 个 IP 来做为您的客户联机之用。那么您是否真的只能邀集到 150 的使用者？呵呵！当然不啰！我可以邀集 
+		200 个使用者以上呢！<br><br>
+
+		为什么？这样想好了，我今天开了一家餐馆，里面只有 20 个座位，那么是否我一餐只能卖给 20 
+		个人呢？当然不是啦！因为客人是人来人往的，有人先吃有人后吃，所以同样是 20 个座位，但是可以有 
+		40 个人来吃我的简餐，因为来的时间不一样嘛！了解了吗？呵呵！对啦！您这个 ISP 虽然只有 150 个 IP 
+		可以发放，但是因为您的使用者并非 24 小时都挂在在线的，所以您可以将这 150 个 IP 做良好的分配，让 
+		200 个人来『轮流使用』这 150 个 IP 哩！ <br>
+
+		<div style="padding: 10pt 0pt 10pt 0pt ;" align="right"><table width="90%"><tbody><tr><td><b>Tips:</b><br><span style="color : #009000"><font size="-1">		其实 IP 只有 Public IP 与 Private IP 两种，中文翻译成『公共 IP』与『私有 IP』这两个，
+		至于其他所谓的『静态 IP』、『实体 IP』、『虚拟 IP』、『浮动式 IP』等等，都是藉由一些 IP 取得的方式来分类的，
+		关于 IP 的种类我们在<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0110network_basic-centos4.php#ipandmac_type">网络基础</a>中谈过了，记得再好好的厘清一下观念喔！
+		</font></span></td><td><img src="0340dhcp-centos4.php_files/vbird_face.gif" alt="鸟哥的图示" title="鸟哥的图示"></td></tr></tbody></table></div>
+		事实上现在主流的 ADSL 宽带拨接上网也有使用到『<span class="text_import2">静态 
+		IP</span> 』与『<span class="text_import2">固定 IP</span> 』之类的概念喔！
+		举例来说好了，hinet/seed net 等主要 ISP 都有提供所谓的：『一个固定 IP 搭配 7~8 个浮动 IP 』的
+		ADSL 拨接功能，也就是说同样透过一条电话线拨接到 ISP ，但是其中一个拨接是可以取得固定的 IP 呢！
+		而其他的则是非固定的 IP ，DHCP 的 static/dynamic 跟这个玩意儿有点类似啦！ ^_^<br><br>
+		</div>
+
+		<hr><li><span class="text_import1">关于租约所造成的问题：</span></li>
+		<div class="block2">
+		怪了！如果我们观察上面 DHCP 运作模式的第二个步骤，您会发现最后面 DHCP 服务器还有给予还有一个租约期限！
+		干嘛还要这样的一个期限呢？其实设定期限还是有个优点啦！最大的优点就是可以避免 IP 
+		被某些使用者一直占用着，但该使用者却是 Idle (发呆) 的状态！<br><br>
+
+		举个例子来说，我们刚刚不是说到，我有 150 个 IP ，但是偏偏我有 200 个用户吗？我们以 
+		2006 年的世界杯足球赛来说明好了。假设每个使用者都急着上网知道世足赛的消息，
+		那么某些热门对战时段网络将可能达到使用尖峰！也就是说，这 200 个人同时要来使用这 150 个 
+		IP ，有可能吗？当然不可能！肯定会有 50 个人无法联机，因为『很抱歉！目前系统正在忙线中，请您稍后再拨！』<br><br>
+
+		那怎么办？这个时候租约到期的方式就很有用处啦！那几个已经联机进来很久的人，
+		就会因为租约到期而被迫脱机，这个时候该 IP 就会被释放出来，哈哈！大家赶快抢呀！先抢到先赢喔！
+		所以，那 50 个人 (包括被迫脱机的那个朋友) 只好继续的、努力的、加油的来进行 DHCP 的要求啰！ ^_^""<br><br>
+
+		虽然说是优点，但是其实如果站在使用者的角度来看，还是可能会造成公愤的！凭什么大家一起交钱，
+		我先联机进来就需要先被踢出去？～呵呵！所以啰，如果要当 ISP ，还是得要先规划好服务的方针才行呦！
+		这样您可以了解租约到期的行为了吗？！ ^_^ <br><br>
+
+		既然有租约时间，那么<span class="text_import2">是否代表我用 DHCP 取得的 IP 
+		就得要『手动』的在某个时间点去重新取得新的 IP 呢？</span>不需要的啦！因为目前的 DHCP 
+		客户端程序大多会主动的依据租约时间去重新申请 IP (renew) 的！也就是说在租约到期前你的 DHCP 
+		客户端程序就已经又重新申请更新租约时间了。所以除非 DHCP 主机挂点，
+		否则您所取得的 IP 应该是可以一直使用下去的！<br><br>
+		</div>
+
+		<hr><li><span class="text_import1">多部 DHCP 主机在同一物理网段的情况</span></li>
+		<div class="block2">
+		或许您曾经发现过一件事情，那就是当我的网域里面有两部以上的 DHCP 主机时，
+		到底哪一部主机会设定我的这部计算机所发出的 DHCP 要求？呵呵！很抱歉，俺也不晓得！
+		因为在网络上面，很多时候都是『先抢先赢』的， DHCP 的回应也是如此！当 Server1 先响应时，您使用的就是 
+		Server1 所提供的网络参数内容，如果是 Server2 先响应，您就是使用 Server2 的参数来设定您的 
+		PC ！不过，前提之下当然是这些计算机的『物理联机』都是在一起的啊！<br><br>
+		</div>
+	</div>
+
+	<hr><a name="theory_need"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">何时需要架设 DHCP 服务器</span><br>
+	<div class="block2">
+		既然 DHCP 的好处是『免客户端设定』，而且对于行动装置的上网方面非常的方便！那么是否代表你就得要架设一部 
+		DHCP 呢？那可不一定！接下来要告知大家的是几个概念性的问题，
+		您倒不一定『必需』遵守底下的一些概念呢！反正，自己的网域自己『爽』就好啦！<br><br>
+
+		<li><span class="text_import1">使用 DHCP 的几个时机</span></li>
+		<div class="block2">
+		在某些情况之下，倒是强烈的建议架设 DHCP 主机的！什么情况呢？例如：<br>
+
+		<ul>
+		<li><span class="text_import2">具有相当多行动装置的场合：</span><br>
+		例如您的公司内部很多笔记本电脑 (笔电) 使用的场合！因为这种笔电本身就是移动性的装置，
+		如果每到一个地方都要去问人家『喂！您这边的网络参数是什么？』还得要担心是否会跟人家的 
+		IP 相冲突等等的问题！这个时候，DHCP 可就是您的救星啰！</li><br>
+
+		<li><span class="text_import2">区域内计算机数量相当的多时：</span><br>
+		另外一个情况就是您所负责的网域内计算机数量相当庞大时，
+		大到您没有办法一个一个的进行说明来设定他们自己的网络参数，这个时候为了省麻烦，还是架设 
+		DHCP 来的方便吶！况且，维护一部您熟悉的 DHCP 主机，要比造访几十个不懂计算机的人要简单的多哩！^_^
+		</li></ul>
+		</div>
+
+		<li><span class="text_import1">不建议使用 DHCP 主机的时机</span></li>
+		<div class="block2">
+		虽然 DHCP 有很多好处，但是您有没有发现一个步骤怪怪的呀！回头看一下那个步骤一，
+		客户端在开机的时候会主动的发送讯息给网域上的所有机器，这个时候，如果网域上就是没有 DHCP 
+		主机呢？很抱歉，那么您的这部客户端计算机，『仍然会持续的发送讯息！』
+		真正的时间与次数我不晓得会有多久，不过，肯定会超过 30 秒以上，
+		甚至可以达到一分钟以上！哇！那么这段时间您能干嘛？呵呵！除了等、还是等！
+		所以啰，如果计算机数不多，还是使用手动的方式来设定一下就好了！方便嘛！<br>
+		<ul><span class="text_import2">
+		<li>在您网域内的计算机，有很多机器其实是做为主机的用途，很少 Client 需求，那么似乎就没有必要架设 DHCP ；
+		</li><li>更极端的情况是，像一般家里，只有 3 ~ 4 部计算机，这个时候，架设 DHCP 只能拿来练练功力，事实上，并没有多大的效益；
+		</li><li>当您管理的网域当中，大多网络卡都属于老旧的型号，并不支持 DHCP 的协议时；
+		</li><li>很多用户的信息知识都很高，那么也没有需要架设 DHCP 啦。
+		</li></span></ul>
+		</div>
+
+		如前所述，上面的都是概念性的说法，事实上，一件事情的解决之道是有很多的方案的，
+		没有所谓的『完全正确』的方案，只有『相对可行、并且符合经济效益与功能』的方案！
+		所以啰，架设任何网站之前，请先多评估评估吶！<br><br>
+	</div>
+</div>
+
+
+<hr><a name="server"></a><img src="image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">DHCP 服务器端的设定</span><br>
+<div class="block1">
+	事实上，目前市面上的 IP 分享器已经便宜到爆了！而 IP 分享器本身就含有 DHCP 的功能，
+	所以如果你只是想要单纯的使用 DHCP 在你的局域网络当中而已，那么建议你直接购买一部 IP 分享器来使用即可，
+	因为至少他很省电。如果你还有其他考虑的话，才来架设 DHCP 吧！底下我们以一个简单的范例来架设 DHCP 先。<br><br>
+
+	<hr><a name="server_pkg"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">所需套件与套件结构</span><br>
+	<div class="block2">
+		DHCP 的套件需求很简单，就是只要服务器端软件即可。所需套件为：<br>
+
+		<ul><li><span class="text_import1">dhcp</span><br>
+		提供整个 DHCP 服务器的主要配置文件与启动的 script 及执行文件等等重要数据。
+		</li></ul>
+
+		真的只要一个套件就好了，而且没有什么很重大的相依性问题呢！请拿出你的原版光盘用 rpm 来安装，
+		或者直接用 yum 在线安装也可以！档案很小啦！至于整个套件的结构是这样的：<br>
+
+		<ul>
+		<li><span class="text_import1">/etc/dhcpd.conf</span><br>
+		这个就是 dhcp 服务器的主要配置文件咯！在某些 Linux 版本上头这个档案可能不存在，所以如果你确定有安装 dhcp 
+		套件却找不到这个档案时，请手动自行建立他即可。这个档案的设定很简单啦，我们底下主要就是在谈这个档案的设定而已哩。
+		不过配置文件的实际位置还是得要参考 /etc/init.d/dhcpd 的规范才是。<br>
+		<div style="padding: 10pt 0pt 10pt 0pt ;" align="right"><table width="90%"><tbody><tr><td><b>Tips:</b><br><span style="color : #009000"><font size="-1">		其实 dhcp 套件在释出的时候都会附上一个范例档案，你可以使用『 rpm -ql dhcp 』来查询到 
+		dhcpd.conf.sample 这个范例档案，然后将该档案复制成为 /etc/dhcpd.conf 后，再手动去修改 
+		/etc/dhcpd.conf 即可，这样设定比较容易咯！
+		</font></span></td><td><img src="0340dhcp-centos4.php_files/vbird_face.gif" alt="鸟哥的图示" title="鸟哥的图示"></td></tr></tbody></table></div>
+		</li><li><span class="text_import1">/usr/sbin/dhcpd</span><br>
+		启动整个 dhcp daemon 的执行档啊！其实最详细的执行方式应该要使用『 man dhcpd 』来查阅一番的呢！^_^</li><br>
+
+		<li><span class="text_import1">/var/lib/dhcp/dhcpd.leases</span><br>
+		这档案颇有趣的！我们前面原理部分不是有提到『租约』吗？DHCP 
+		服务器端与客户端租约建立的启始与到期日就是记录在这个档案当中的咯！</li>
+		</ul>
+
+		就跟你说很简单吧！整个套件数据也不过才如此而已呢！<br><br>
+	</div>
+
+	<hr><a name="server_dhcpd.conf"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">主要配置文件 /etc/dhcpd.conf 
+	的语法</span><br>
+	<div class="block2">
+		其实 DHCP 的设定很简单啊，只要将 dhcpd.conf 设定好就可以启动了。不过编辑这个档案时你必须要留意的是：<br>
+		<ul><span class="text_import2">
+		<li>『 # 』为批注符号；
+		</li><li>除了括号那一行之外，其他的每一行后面都要以『 ; 』做为结尾！这是最容易出错的地方。
+		</li><li>通常设定的项目都有独特的名称，以：『 &lt;参数代号&gt;  &lt;设定内容&gt; 』来处理，例如：<br>
+		default-lease-time 259200;
+		</li><li>某些设定项目必须以 option 来设定，基本方式为『 option &lt;参数代码&gt; &lt;设定内容&gt; 』例如：<br>
+		option domain-name "your.domain.name";
+		</li></span></ul>
+
+		基本上，我们刚刚前面提过说， 
+		DHCP 的 IP 分配可分为给予动态 IP 与静态 IP ，其中又需要了解的是，如果需要设定静态 IP 
+		的话，那么就必须要知道要设定成静态 IP 的那部计算机的硬件地址 (MAC) 才行，请使用 arp 及 
+		ifconfig 来查知您的界面的 MAC 吧！此外，我们需要设定的项目大概有几项：<br>
+		<ul>
+		<li><span class="text_import2">整体设定 (Global)</span><br>
+		包括有租约期限、DNS 的 IP 地址、路由器的 IP 地址还有动态 DNS (DDNS) 更新的类型等等。
+		当静态 IP 及动态 IP 内没有规范到某些设定时，则以整体设定值为准。常使用参数有：<br>
+		<ul>
+		<li style="padding: 10px 0 0 0"><span class="text_import2">default-lease-time 时间</span>：<br>
+		预设的租约时间，后面的时间参数默认单位为秒；
+		</li><li style="padding: 10px 0 0 0"><span class="text_import2">max-lease-time 时间</span>：<br>
+		最大租约时间，当客户端超过租约时间却尚未更新 IP 时，最长可以使用该 IP 的时间；
+		</li><li style="padding: 10px 0 0 0"><span class="text_import2">option domain-name "领域名"</span>：<br>
+		如果你在 /etc/resolv.conf 里面设定了一个『 search google.com 』的话，这表示当你要搜寻主机名时，
+		DNS 系统会主动帮你加上这个领域名的意思。所以这个设定参数也会修改 /etc/resolv.conf 喔！
+		</li><li style="padding: 10px 0 0 0"><span class="text_import2">option domain-name-servers IP1, 
+		IP2</span>：<br>这个设定参数可以修改客户端的
+		/etc/resolv.conf 档案！就是 nameserver 所接的那个 DNS IP 啰！特别注意设定参数最末尾为『servers』 (有 s 喔)；
+		</li><li style="padding: 10px 0 0 0"><span class="text_import2">ddns-update-style 类型</span>：<br>因为 DHCP 
+		客户端所取得的 IP 通常是一直变动的，
+		所以某部主机的主机名与 IP 的对应就很难处理。此时 DHCP 可以透过 ddns (请参考
+		<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0270dynamic_dns-centos4.php">合法主机名</a> 与 <a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0350dns-centos4.php">DNS 章节</a>的说明) 
+		来更新主机名与 IP 的对应。不过我们这里不谈这么复杂的东西，所以你可以将他设定为 none 喔。
+		</li><li style="padding: 10px 0 0 0"><span class="text_import2">option routers 路由器的地址</span>：<br>
+		设定路由器的 IP 所在，记得那个『 routers 』要加 s 才对！</li>
+
+		<li style="padding: 10px 0 0 0"><span class="text_import2">option broadcasst-address 广播地址</span>：<br>
+		设定广播地址而已。如果没有设定的话，系统应该会自动依据 class A, B, C 的原则来计算出广播地址吧！</li>
+
+		</ul><br>
+
+		</li><li><span class="text_import2">动态 IP 分配设定：</span><br>
+		用来设定随机给予 IP 的方式，只要给予网域 (network 以及 netmask) 配合 range 这个参数就能够给予限制的 IP 范围了。
+		设定方式并不怎么难啊。</li><br>
+
+		<li><span class="text_import2">静态 IP 的设定方式：</span><br>
+		透过硬件地址 (MAC) 来处理 IP 的取得。使用的是 host 这个设定参数，
+		配合底下两个常见的参数值来处理：<br>
+
+		<ul>
+		<li style="padding: 10px 0 0 0"><span class="text_import2">hardware ethernet 硬件地址</span>：<br>
+		利用网络卡上面的固定硬件地址来设定，亦即该设定仅针对这个硬件地址有效的意思；</li>
+
+		<li style="padding: 10px 0 0 0"><span class="text_import2">fixed-address IP地址</span>：<br>
+		给予一个固定的 IP 地址的意思。
+		</li></ul>
+		</li></ul>
+		说再多也没有什么用啦！让我们实际来玩一个案例吧！你就知道该如何处理了。<br><br>
+	</div>
+
+	<hr><a name="server_case"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">一个局域网络的 DHCP 服务器设定案例</span><br>
+	<div class="block2">
+		假设我的环境当中，Linux 服务器除了 NAT 主机之外还得要负责其他服务器，例如邮件服务器的支持。
+		而在后端局域网络中则想要提供 DHCP 的服务。整个硬件配置的情况如同下图所示：<br><br>
+
+		<a name="fig_01"></a><center><img src="0340dhcp-centos4.php_files/lan.png" title="局域网络的实体连接情况" alt="局域网络的实体连接情况"><br>
+		图一、局域网络的实体连接情况</center><br>
+
+		如上图所示，假设我的 Linux 有两块接口，其中 eth0 对内而 eth1 对外，至于其他的网络参数设计为：<br>
+		<ul>
+		<li>内部网段设定为 192.168.1.0/24 这一段，且 router 为 192.168.1.254 ，此外， DNS 主机的 IP 
+		为中华电信的 168.95.1.1 及 Seednet 的 139.175.10.20 这两个；
+		</li><li>我想要让每个使用者预设租约为 3 天，最长为 6 天；
+		</li><li>只想要分配的 IP 只有 192.168.1.21 到 192.168.1.100 这几个，其他的 IP 则保留下来；
+		</li><li>我还有一部主机，他的 MAC 是『 00:40:95:30:43:B4 』，我要给他的主机名为 vbird-inside ，且 IP 为 192.168.1.5 这个。
+		</li></ul>
+		则我的配置文件就会像底下这个样子了：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@linux ~]# <span class="term_command">vi /etc/dhcpd.conf</span>
+<span class="term_write"><span class="term_say"># 1. 整体的环境设定
+#    当底下的 subnet 与 host 没有设定时，以这里的设定值为准喔！</span>
+ddns-update-style               none;          <span class="term_say">&lt;==不要更新 DDNS 的设定</span>
+default-lease-time              259200;        <span class="term_say">&lt;==预设租约为 3 天</span>
+max-lease-time                  518400;        <span class="term_say">&lt;==最大租约为 6 天</span>
+option routers                  192.168.1.254; <span class="term_say">&lt;==这就是预设路由</span>
+option broadcast-address        192.168.1.255; <span class="term_say">&lt;==这是广播地址啊</span>
+option domain-name-servers      168.95.1.1, 139.175.10.20;
+<span class="term_say"># 上面是 DNS 的 IP 设定，这个设定值会修改客户端的 /etc/resolv.conf 档案内容！
+# 此外，你可以设定多部 DNS 主机，不过必须要以逗号『 , 』分隔开才行。</span>
+
+<span class="term_say"># 2. 关于动态分配的 IP</span>
+<span class="term_say">#     Network_IP↓        Netmask_IP↓</span>
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    range 192.168.1.21 192.168.1.100;      <span class="term_say">&lt;==分配的 IP 范围</span>
+    option subnet-mask   255.255.255.0; <span class="term_say">&lt;==可重复设定 netmask 地址</span>
+    option nis-domain    "vbird.tsai";  <span class="term_say">&lt;==额外给的 NIS 相关参数</span>
+    option domain-name   "vbird.tsai";  <span class="term_say">&lt;==在 /etc/resolv.conf 给一个搜寻领域</span>
+
+    <span class="term_say"># 3. 关于静态的 IP 啊！</span>
+    <span class="term_say">#    主机名↓</span>
+    host vbird-inside {
+        hardware ethernet    00:40:95:30:43:B4; <span class="term_say">&lt;==客户端网卡 MAC</span>
+        fixed-address        192.168.1.5;       <span class="term_say">&lt;==给予固定的 IP</span>
+    }
+}</span>
+<span class="term_say"># 相关的设定参数意义，请查询前一小节的介绍，或者 man dhcpd.conf</span>
+</pre></td></tr></tbody></table>
+
+		够简单吧！这样就设定好了！你可以复制上头的数据然后修改一下，让里头的 IP 参数符合你的环境，
+		就能够设定好你的 DHCP 服务器了。接下来理论上你就能够启动 dhcp 了。不过，在某些早期的 Linux distribution 上面，
+		当你的 Linux 主机具有多个接口时，你的一个设定可能会让多个接口同时来监听，那就可能会发生错误了。<br><br>
+
+		举例来说，我们现在的设定是 192.168.1.0/24 这个在 eth0 上头的网域，假设你还有一个界面 eth1 在 192.168.2.0/24 好了，
+		那万一你的 DHCP 同时监听两块接口的话，想一想，如果 192.168.2.0/24 网域的客户端发送出 dhcp 封包的要求时，
+		他会取得什么 IP ？所以啰，我们就得要针对 dhcpd 这个执行文件设定他监听的接口，
+		而不是针对所有的接口都监听啊！您说是吧！^_^！那如何处理呢？在 CentOS (Red Hat 系统) 可以这样做：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@linux ~]# <span class="term_command">vi /etc/sysconfig/dhcpd</span>
+DHCPDARGS=<span class="term_write">"eth0"</span>
+</pre></td></tr></tbody></table>
+
+		这样做就好了，这是因为启动 dhcpd 的 script 会主动的呼叫这个参数档案。如果是在其他版本的 Linux 当中，
+		你可以直接修改 /etc/init.d/dhcpd 这个 script 档案内容，找到『 daemon /usr/sbin/dhcpd ... 』那一行，
+		并新增网络卡代号即可，例如：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@linux ~]# <span class="term_command">vi /etc/init.d/dhcpd</span>
+<span class="term_say"># 约在第 58 行左右会找到：</span>
+        daemon /usr/sbin/dhcpd <span class="term_write">${DHCPDARGS}</span> 2&gt;/dev/null 
+</pre></td></tr></tbody></table>
+
+		在上述的特殊字体部分，你可以持续加入想要增加的监听接口啦！更多的功能可以参考『 man dhcpd 』的解释。
+		不过这个动作在较新的版本上面已经不需要了，因为新版本的 dhcp 会主动的分析服务器的网段与实际的 dhcpd.conf 设定，
+		如果两者无法吻合，就会有错误提示，人性化多了。 ^_^！
+		接下来我们可以开始启动 dhcp 试看看啰！<br><br>
+	</div>
+
+	<hr><a name="server_start"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">DHCP 服务器的启动与观察</span><br>
+	<div class="block2">
+		开始来启动 dhcp 吧！另外你要注意的是：dhcpd 使用的埠口是 port 67 ，并且启动的结果会记录在 /var/log/messages
+		档案内，你最好能去观察一下 /var/log/messages 所显示的 dhcpd 相关信息才好。<br>
+
+<table class="term"><tbody><tr><td class="term"><pre><span class="term_hd">1. 就启动吧！</span>
+[root@linux ~]# <span class="term_command">/etc/init.d/dhcpd start</span>
+
+<span class="term_hd">2. 看看埠口启动的情况</span>
+[root@linux ~]# <span class="term_command">netstat -tlunp</span>
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address Foreign Address PID/Program name
+udp        0      <span class="term_write">0 0.0.0.0:67</span>    0.0.0.0:*       7294/dhcpd
+
+<span class="term_hd">3. 看看登录文件的输出信息</span>
+[root@linux ~]# <span class="term_command">tail -n 30 /var/log/messages</span>
+Dec 5 10:58 linux dhcpd: Internet Systems Consortium DHCP Server V3.0.1
+Dec 5 10:58 linux dhcpd: Copyright 2004 Internet Systems Consortium.
+Dec 5 10:58 linux dhcpd: All rights reserved.
+Dec 5 10:58 linux dhcpd: For info, please visit http://www.isc.org/sw/dhcp/
+Dec 5 10:58 linux dhcpd: <span class="term_write">Wrote 0 deleted host decls to leases file.</span>
+Dec 5 10:58 linux dhcpd: <span class="term_write">Wrote 0 new dynamic host decls to leases file.</span>
+Dec 5 10:58 linux dhcpd: <span class="term_write">Wrote 0 leases to leases file.</span>
+Dec 5 10:58 linux dhcpd: <span class="term_write">Listening on LPF/eth0/00:40:fa:25:2a:db/192.168.1/24</span>
+Dec 5 10:58 linux dhcpd: dhcpd startup succeeded
+</pre></td></tr></tbody></table>
+
+		看到这些就是成功的象征啦！恭喜你啊！真是『福气啦！』不过，万一你看到的登录档是类似底下的模样呢？<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>Dec 5 11:11 linux dhcpd: <span class="term_write">/etc/dhcpd.conf line 10</span>: semicolon expected.
+Dec 5 11:11 linux dhcpd: <span class="term_write">subnet</span>
+Dec 5 11:11 linux dhcpd: <span class="term_write">^</span>
+Dec 5 11:11 linux dhcpd: Configuration file errors encountered -- exiting
+</pre></td></tr></tbody></table>
+
+		这表示应该是第 10 行左右有点问题，问题点应该是没有分号 (semicolon) 而已。而分号应该是在指数符号 (^) 指的地方，
+		也就是 subnet 附近而已，很容易分辨吧！那如果是出现如下的模样呢？<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>** You must add a <span class="term_write">ddns-update-style statement to /etc/dhcpd.conf</span>.
+   To get the same behaviour as in 3.0b2pl11 and previous
+   versions, add a line that says "ddns-update-style ad-hoc;"
+   Please read the dhcpd.conf manual page for more information. **
+</pre></td></tr></tbody></table>
+
+		这表示你忘记在 /etc/dhcpd.conf 里面加入 ddns-update-style 的参数宣告啦！
+		瞧一瞧这个输出信息，就能够晓得你的设定错误所在，根据错误来处理你的 dhcp 配置文件吧！<br><br>
+	</div>
+
+	<hr><a name="server_host"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">内部主机的 IP 对应</span><br>
+	<div class="block2">
+		如果您有仔细的瞧过前几章的<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0110network_basic-centos4.php">网络基础</a>的话，那么应该还会记得那个 
+		<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0130internet_connect-centos4.php#problem_hosts">/etc/hosts</a> 
+		会影响内部计算机的连接速度很大吧！那么我现在使用 DHCP 之后，糟糕！我怎么知道哪一部 PC 
+		连上我的主机，那要怎么填写 /etc/hosts 的内容呢？这真是太简单了！就将所有可能的计算机 IP 
+		都加进去该档案呀！ ^_^ ！以鸟哥为例，在这个例子中，鸟哥的分配的 IP 至少有 192.168.1.5, 192.168.1.21 ~ 
+		192.168.1.100 ，所以 /etc/hosts 可以写成：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@linux ~]# <span class="term_command">vi /etc/hosts</span>
+127.0.0.1　　 localhost.localdomain localhost
+<span class="term_write">192.168.1.254  vbird-server
+192.168.1.5　  static-ip
+192.168.1.21 　dynamic-021
+192.168.1.22 　dynamic-022
+.....
+192.168.1.100  dynamic-100</span>
+</pre></td></tr></tbody></table>
+
+		这样一来，所有可能连进来的 IP 都已经有纪录了，哈哈！当然没有什么大问题啰！ ^_^
+	</div>
+</div>
+
+
+<hr><a name="client"></a><img src="image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">DHCP 客户端的设定</span><br>
+<div class="block1">
+	DHCP 的 Client 端，可以是 Windows 也可以是 Linux 呢！由于鸟哥的领域内刚好有两部 Client 
+	端的计算机，一部为 Linux (CentOS 4.4) 另一部为 Windows xp ，这里就提一下，分别是怎样设定的呢？<br><br>
+
+	<hr><a name="client_linux"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">Linux 客户端</span><br>
+	<div class="block2">
+		Linux 的网络参数设定还记得吧？不记得的话就得要打屁股了！在<a href="http://vbird.dic.ksu.edu.tw/linux_server/0340dhcp/0130internet_connect-centos4.php#connect_auto" target="_blank">连上 Internet 章节</a>内我们谈过自动取得 IP 的方式，设定真的很简单：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@client ~]# <span class="term_command">vi /etc/sysconfig/network-scripts/ifcfg-eth0</span>
+DEVICE=eth0
+<span class="term_write">BOOTPROTO=dhcp</span>  <span class="term_say">&lt;==就是他！指定这一个就对了！</span>
+ONBOOT=yes
+
+[root@client ~]# <span class="term_command">/etc/init.d/network restart</span>
+</pre></td></tr></tbody></table>
+
+		改完之后，就将我们的整个网络重新启动即可 (不要使用 ifdown 与 ifup ，因为还有预设路由要设定！)
+		。请注意，如果您是在远程进行这个动作，您的联机『肯定会挂掉！』，因为网络卡被您关了嘛！
+		呵呵！所以请在本机前面才进行喔！如果执行的结果有找到正确的 DHCP 主机，那么几个档案可能会被更动喔：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre><span class="term_hd">1. DNS 的 IP 会被更动呢！查阅一下 resolv.conf 先：</span>
+[root@linux ~]# <span class="term_command">cat /etc/resolv.conf</span>
+; generated by /sbin/dhclient-script
+search vbird.tsai          <span class="term_say">&lt;==是否记得设定过 domain-name 呢？</span>
+nameserver 168.95.1.1      <span class="term_say">&lt;==这就是我们原本的设定值。</span>
+nameserver 139.175.10.20
+
+<span class="term_hd">2. 观察一下路由啦！</span>
+[root@linux ~]# <span class="term_command">route -n</span>
+Kernel IP routing table
+Destination     Gateway        Genmask        Flags  Iface
+192.168.1.0     0.0.0.0        255.255.255.0  U      eth0
+169.254.0.0     0.0.0.0        255.255.0.0    U      eth0
+0.0.0.0         <span class="term_write">192.168.1.254</span>  0.0.0.0        UG     eth0
+<span class="term_say"># 嗯！没错！路由也被正确的捉到了！OK的啦！</span>
+
+<span class="term_hd">3. 察看一下客户端的指令吧！</span>
+[root@linux ~]# <span class="term_command">netstat -tlunp</span>
+Proto Recv-Q Send-Q Local Address  Foreign Address State  PID/Program name
+udp        0      <span class="term_write">0 0.0.0.0:68</span>     0.0.0.0:*              3996/dhclient
+<span class="term_say"># 你没看错！确实是有个小程序在监测 DHCP 的联机状态吶！</span>
+
+<span class="term_hd">4. 看一看客户端租约所记载的信息吧！</span>
+[root@linux ~]# <span class="term_command">cat /var/lib/dhcp/dhclient-eth0.leases</span>
+lease {
+  interface "eth0";
+  <span class="term_write">fixed-address 192.168.1.100;</span>  <span class="term_say">&lt;==这就是为啥我每次取得的 IP 是固定的。</span>
+  option subnet-mask 255.255.255.0;
+  option routers 192.168.1.254;
+  option dhcp-lease-time 259200;
+  option dhcp-message-type 5;
+  option domain-name-servers 168.95.1.1,139.175.10.20;
+  option dhcp-server-identifier 192.168.1.254;
+  option nis-domain "vbird.tsai";
+  option broadcast-address 192.168.1.255;
+  option domain-name "vbird.tsai";
+  renew 3 2006/12/6 18:15:41;   <span class="term_say">&lt;==下一次预计更新 (renew) 的时间点</span>
+  rebind 5 2006/12/8 05:26:26;
+  expire 5 2006/12/8 14:26:26;
+}
+<span class="term_say"># 这个档案会记录该适配卡所曾经要求过的 DHCP 信息喔！重要！
+# 有没有看出来，他几乎就与你设定的 /etc/dhcpd.conf 类似？ ^_^</span>
+
+<span class="term_hd">5. 额外看一下 NIS 的领域名有没有设定妥当啊？</span>
+[root@linux ~]# <span class="term_command">nisdomainname</span>
+vbird.tsai   <span class="term_say">&lt;==因为我们有设定 nis-domain 的项目啊！</span>
+</pre></td></tr></tbody></table>
+
+		有没有发现其实你的客户端取得的数据都被记载在 /var/lib/dhcp/dhclient-eth0.leases 里头啊？
+		如果你有多张网卡，那么每张网卡自己的 DHCP 要求就会被写入到不同档名的档案当中去！
+		观察该档案就知道你的数据是如何啰！这可也是挺重要的呦！<br><br>
+	</div>
+
+	<hr><a name="client_win"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">Windows 客户端</span><br>
+	<div class="block2">
+		在 Windows 底下设定 DHCP 协议以取得 IP 实在是很简单喔！我们以目前最常用的 Windows XP 来说明的话，
+		你可以依据『开始』--&gt;『设定』--&gt;『控制台』--&gt;『网络和因特网联机』--&gt;『网络联机』--&gt;『区域联机』
+		来开始一步一步的进行下面的动作喔：<br>
+		<ol>
+		<li>在点选了上面的局域网络后，你的桌面上应该会出现如下的图示：<br><br>
+
+		<a name="fig_02"></a><center><img src="0340dhcp-centos4.php_files/winxp_01.png" title="局域网络的 DHCP 取得方式之设定" alt="局域网络的 DHCP 取得方式之设定"><br>
+		图二、局域网络的 DHCP 取得方式之设定</center><br>
+
+		</li><li>在上图二的地方按下箭头所指的『内容』处，就会出现如下画面啰：<br><br>
+
+		<a name="fig_03"></a><center><img src="0340dhcp-centos4.php_files/winxp_02.png" title="局域网络的 DHCP 取得方式之设定" alt="局域网络的 DHCP 取得方式之设定"><br>
+		图三、局域网络的 DHCP 取得方式之设定</center><br>
+
+		在上面的画面当中，建议你可以在箭头所指的 1 处勾选那两个项目，如此一来在桌面最底下的右侧就会出现一个网络符号，
+		以后你就可以点选该图示来进入这个画面了！比较方便啦。然后在箭头 2 的地方勾选 Internet Protocol (TCP/IP) 的项目，
+		并点选『内容』后，就可能进入到设定的画面。<br><br>
+
+		</li><li>接下来如下图所示，你只要勾选『自动取得 IP 地址』那个项目，然后按下『确定』并离开设定画面，
+		如此一来 Windows 就会开始自动取得 IP 的工作了。<br><br>
+		<a name="fig_04"></a><center><img src="0340dhcp-centos4.php_files/winxp_03.png" title="局域网络的 DHCP 取得方式之设定" alt="局域网络的 DHCP 取得方式之设定"><br>
+		图四、局域网络的 DHCP 取得方式之设定</center><br>
+
+		</li><li>那你如何确认你的 IP 已经被顺利的取得呢？如果是在早期的 Windows 95 ，你可以使用一个名为『 winipcfg 』
+		来观察你的 IP 设定。不过在 windows 2000 以后，你可能需要使用命令提示字符来观察才行。你可以使用：
+		『开始』--&gt;『程序集』--&gt;『附属应用程序』--&gt;『命令提示字符』来取出终端机，然后这样处理看看：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>C:\Documents and Settings\dmtsai&gt; <span class="term_command">ipconfig /all</span>
+<span class="term_say">....前面省略....</span>
+Ethernet adapter 区域联机:
+
+        Connection-specific DNS Suffix  . : vbird.tsai
+        Physical Address. . . . . . . . . : 00-D0-18-AF-6E-81
+        Dhcp Enabled. . . . . . . . . . . : Yes
+        Autoconfiguration Enabled . . . . : Yes
+        IP Address. . . . . . . . . . . . : 192.168.1.99
+        Subnet Mask . . . . . . . . . . . : 255.255.255.0
+        Default Gateway . . . . . . . . . : 192.168.1.254
+        DHCP Server . . . . . . . . . . . : 192.168.1.254  <span class="term_say">&lt;==这一部 DHCP 主机</span>
+        DNS Servers . . . . . . . . . . . : 168.95.1.1
+                                            139.175.10.20
+        Lease Obtained. . . . . . . . . . : 2006年12月5日 下午 10:22:37
+        Lease Expires . . . . . . . . . . : 2006年12月8日 下午 10:22:37
+
+C:\Documents and Settings\dmtsai&gt; <span class="term_command">ipconfig /renew</span>
+<span class="term_say"># 这样可以立即要求更新 IP 信息喔！</span>
+</pre></td></tr></tbody></table>
+
+		这样就 OK 的啦！简单吧！
+		</li></ol>
+	</div>
+</div>
+
+
+<hr><a name="other"></a><img src="image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">服务器端数据查阅</span><br>
+<div class="block1">
+
+
+	<hr><a name="other_lease"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">检查租约档案</span><br>
+	<div class="block2">
+		客户端会主动的纪录租约信息，那主机端更不能忘记记录啰！主机端是记录在这个地方：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@linux ~]# <span class="term_command">cat /var/lib/dhcp/dhcpd.leases</span>
+lease 192.168.1.99 {  <span class="term_say">&lt;==就是那部 Windows 的纪录</span>
+  starts 2 2006/12/05 14:23:37;
+  ends 5 2006/12/08 14:23:37;
+  binding state active;
+  next binding state free;
+  hardware ethernet 00-d0-18-af-6e-81;
+  uid "\001\000\340\030\257n\003";
+  client-hostname "vbird_work";
+}
+lease 192.168.1.100 { <span class="term_say">&lt;==就是那部 Linux 的纪录</span>
+  starts 2 2006/12/05 15:37:33;
+  ends 5 2006/12/08 15:37:33;
+  binding state active;
+  next binding state free;
+  hardware ethernet 00:30:20:1d:c3:6e;
+}
+</pre></td></tr></tbody></table>
+
+		从这个档案里面我们就知道有多少客户端已经向我们申请了 DHCP 的 IP 使用了呢！
+		很容易了解吧！<br><br>
+	</div>
+
+	<hr><a name="other_remote"></a><img src="image/logo.png" alt="小标题的图示" width="24" align="middle" height="23"><span class="text_h2">使用 ether-wake 实行远程自动开机 
+	(remote boot)</span><br>
+	<div class="block2">
+		既然已经知道客户端的 MAC 地址了，如果<span class="text_import2">客户端的主机符合一些电源标准，
+		并且该客户端主机所使用之网络卡暨主板支持网络唤醒的功能时，我们就可以透过网络来让客户端计算机开机</span>了。
+		如果你有一部主机想要让他可以透过网络来启动时，你必须要在这部客户端计算机上进行：<br>
+
+		<ol><span class="text_import2">
+		<li>首先你得要在 BIOS 里面设定『网络唤醒』的功能，否则是没有用的喔！
+		</li><li>再来你必须要让这部主机接上网络线，并且电源也是接通的。
+		</li><li>将这部主机的 MAC 抄下来，然后关机等待网络唤醒。
+		</li></span></ol>
+
+		接下来请到永远开着的主机 DHCP 主机上面 (其实只要任何一部 Linux 主机均可！) ，
+		下载 ether-wake.c 这个档案：<br>
+		<ul><a href="ftp://ftp.scyld.com/pub/diag/" target="_blank">ftp://ftp.scyld.com/pub/diag/</a></ul>
+		然后开始编译他：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@linux ~]# <span class="term_command">gcc -O -Wall -o ether-wake ether-wake.c</span>
+</pre></td></tr></tbody></table>
+
+		此时你的家目录下应该会有一个名为 ehter-wake 的档案，假设客户端主机的 MAC 为 11:22:33:44:55:66 好了，
+		那么你想要让这部主机被唤醒，就这样做吧：<br>
+
+<table class="term"><tbody><tr><td class="term"><pre>[root@linux ~]# <span class="term_command">./ether-wake 11:22:33:44:55:66</span>
+
+<span class="term_say"># 更多功能可以这样查阅喔：</span>
+[root@linux ~]# <span class="term_command">./ether-wake -u</span>
+</pre></td></tr></tbody></table>
+
+		然后你就会发现，哈哈！那部客户端主机被启动了！以后如果你要连到局域网络内的话，
+		只要能够连上你的防火墙主机，然后透过这个 ether-wake 软件，就能够让你局域网络内的主机启动了，
+		控管上面就更加方便的啦！您说是吧！ ^_^
+	</div>
+</div>
+
+
+<hr><a name="review"></a><img src="image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">重点回顾</span><br>
+<div class="block1">
+<ul><span class="text_import2">
+	<li>DHCP (Dynamic Host Configuration Protocol) 可以提供网络参数给客户端计算机，使其自动设定网络的功能；
+	</li><li>透过 DHCP 的统一管理，在同一网域当中就比较不容易出现 IP 冲突的情况发生；
+	</li><li>DHCP 可以透过 MAC 的比对来提供 Static IP (或称为静态 IP)，否则通常提供客户端 dynamic IP (或称为动态 IP)；
+	</li><li>DHCP 除了 Static IP 与 Dynamic IP 之外，还可以提供租约行为之设定；
+	</li><li>在租约期限到期之前，客户端 dhcp 软件即会主动的要求更新 (约 0.5, 0.85 倍租约时间左右)；
+	</li><li>客户端脱机、不明原因的当机、超过租约期限等机会下，DHCP Server 与客户端的租约行为会终止！
+	</li><li>DHCP 可以提供的 MAC 比对、Dynamic IP 的 IP 范围以及租约期限等等，都在 dhcpd.conf 这个档案当中设定的；
+	</li><li>一般的情况之下，使用者需要自行设定 dhcpd.leases 这个档案，不过，真正的租约档案记录是在 /var/lib/dhcp/dhcpd.leases 里面；
+	</li><li>新版的 DHCP 配置文件 dhcpd.conf 中，需含有『 ddns-update-style 』的参数设定；
+	</li><li>如果只是要单纯的 DHCP 服务，建议可以购买类似 IP 分享器的设备即可提供稳定且低耗电的网络服务。
+</li></span></ul>
+</div>
+
+
+<hr><a name="ex"></a><img src="image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">课后练习</span><br>
+<div class="block1">
+<ul>
+	<li>DHCP 的主要用途为何？</li>
+	<div class="block2"><font color="white" size="-1">
+	DHCP 主机的主要用途就是在于自动分配网络参数给 Client 端的计算机，以降低网域当中可能发生的 IP 
+	冲突问题，以及减少网管人员到处检查错误的伤脑筋！ 
+	</font></div>
+
+	<li>DHCP 主要的两种 IP 分配模式为何？</li>
+	<div class="block2"><font color="white" size="-1">
+	主要的两种分配模式分别为 Dynamic IP 与 Static IP ， Static IP 透过 MAC 的比对，至于 Dynamic IP 
+	则是直接取用网域中尚未被使用到的 IP 来进行 Client 端的分配。
+	</font></div>
+
+	<li>在有 DHCP 主机存在的网域当中，且 client 端亦使用 DHCP 来规划客户端的网络参数，那么请问，在该网域当中，Client
+	端是如何取得 IP 的呢？</li>
+	<div class="block2"><font color="white" size="-1">
+	<ol><li>首先， Client 端会发出一个 DHCP 要求封包；
+	</li><li>server 端接收到要求后，会主动的响应信息给 Client ；
+	</li><li>Client 若接受该 DHCP 主机所提供的参数，则主机会记录下租约信息，至于 client 端则开始以主机提供的参数设定其网络
+	</li></ol>
+	</font></div>
+
+	<li>DHCP 是如何发送 Static IP 的？可以使用何种指令取得该信息？</li>
+	<div class="block2"><font color="white" size="-1">
+	DHCP 主要利用网络卡的硬件地址，亦即俗称的『网络卡卡号』，也就是 MAC 来进行 Client 端的比对的，至于主动取得 
+	Client 端的方式，可以透过 ping 以及 arp 来获得。 
+	</font></div>
+
+	<li>在 DHCP 的租约档，亦即 /var/lib/dhcp/dhcpd.leases 当中，记录了什么信息？</li>
+	<div class="block2"><font color="white" size="-1">
+	这个档案主要记录了 Client 端连上 Server 端的纪录数据，他会被 DHCP 主机用来判定与 Client 端的租约行为喔！
+	</font></div>
+
+	<li>DHCP 的登录档放置于何处？</li>
+	<div class="block2"><font color="white" size="-1">
+	就是最重要的 /var/log/messages 这个档案啦(预设状况下！)
+	</font></div>
+</ul>
+</div>
+
+
+<hr><a name="reference"></a><img src="image/logo.png" alt="大标题的图示" width="35" align="middle" height="34"><span class="text_h1">参考数据</span><br>
+<div class="block1">
+<ul>
+	<li>Linux Magazine：<a href="http://www.linux-mag.com/2000-04/networknirvana_01.html" target="_blank">http://www.linux-mag.com/2000-04/networknirvana_01.html</a></li>
+	<li>DHCP mini HOWTO：<br>英文版：<a href="http://tldp.org/HOWTO/DHCP/index.html" target="_blank">http://tldp.org/HOWTO/DHCP/index.html</a><br>
+		中文版：<a href="http://www.linux.org.tw/CLDP/MiniHOWTO/network/DHCP/" target="_blank">http://www.linux.org.tw/CLDP/MiniHOWTO/network/DHCP/</a></li>
+	<li>Internet Software consortium：<a href="http://www.isc.org/products/DHCP/" target="_blank">http://www.isc.org/products/DHCP/</a></li>
+	<li>Study Area：<a href="http://www.study-area.org/linux/servers/linux_dhcp.htm" target="_blank">http://www.study-area.org/linux/servers/linux_dhcp.htm</a></li>
+	<li>Study Area 网络开机(我本善良兄撰写)：<a href="http://www.study-area.org/tips/wol.htm" target="_blank">http://www.study-area.org/tips/wol.htm</a>
+</li></ul>
+</div>
+
+
+<hr><span class="text_history">
+2002/11/23：第一次完成<br>
+2003/03/15：加入相关重点回顾、与练习题<br>
+2003/09/10：修改版面去！<br>
+2006/12/05：将旧的文章移动到<a href="http://linux.vbird.org/linux_server/0340dhcp/0340dhcp.php">此处</a><br>
+2006/12/06：好累！怎么老是在说累～总之，完成啰～新增加 <a href="#other_remote">ether-wake 的网络唤醒</a>功能。<hr>
+</span>
+    </td>
+    <td style="width: 16px; font-size: 6px;">　</td></tr>
+<tr><td style="width: 16px; height: 16px;">　</td>
+    <td style="width: 866px; height: 16px;">　</td>
+    <td style="width: 16px; height: 16px;">　</td></tr>
+</tbody></table>
+
+<div style="padding-top: 0px; text-align: center;">
+<span style="font-size: 80%;">
+	<a href="http://vbird.dic.ksu.edu.tw/" target="_top" title="前往鸟哥的首页">http://linux.vbird.org</a>
+	is designed by <a href="mailto:vbird@mail.vbird.idv.tw" title="联络鸟哥(我不要广告信！)">VBird</a>
+		during 2001-2011. <a href="http://www.ksu.edu.tw/" target="_blank">ksu.edu</a></span>
+         ﻿<div id="apDiv4">
+      <p>本网页主要以Firefox配合解析度 1024x768 作为设计依据&nbsp;&nbsp;&nbsp;&nbsp; 鸟哥自由软件整合应用研究室</p></div></div>
+</div>
+</center>
+</body></html>

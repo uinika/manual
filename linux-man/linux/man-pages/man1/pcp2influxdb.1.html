@@ -1,0 +1,266 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pcp2influxdb(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PCP2INFLUXDB(1)            General Commands Manual           PCP2INFLUXDB(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pcp2influxdb </b>- pcp-to-influxdb metrics exporter
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pcp2influxdb </b>[<b>-h </b><i>hostspec</i>] [<b>-a </b><i>archive</i>] [<b>-L</b>] [<b>-O </b><i>origin</i>] [<b>-T </b><i>finish</i>]
+       [<b>-s </b><i>samples</i>] [<b>-t </b><i>delta</i>] [<b>-i </b><i>influxdbaddress</i>] [<b>-u </b><i>units</i>] [<b>-d </b><i>database</i>]
+       [<b>-U </b><i>username</i>] [<b>-P </b><i>password</i>] [<b>-I </b><i>tagstring</i>] <i>metricname</i> ...
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pcp2influxdb </b>is a PCP metric exporter.  It relays metrics of the
+       <a href="../man5/pmns.5.html">pmns(5)</a> to a designated InfluxDB database by periodically polling,
+       then copying/converting relevant numerical metrics across the
+       InfluxDB HTTP(S) protocols.  Metric values are optionally scaled to a
+       given unit/scale, but are not rate-converted.  Metric names are
+       somewhat canonicalized (mangled) to fit the InfluxDB namespace rules.
+
+       The data transfer will continue on a best-effort basis until the
+       program is interrupted.  Temporary errors are ignored, but reported.
+       Multiple copies of this program may be run in parallel, to populate
+       different InfluxDB databases or subtrees, with different scaling or
+       sampling intervals.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-h </b><i>hostspec</i>
+              Extract metrics from the specified <a href="pmcd.1.html">pmcd(1)</a> daemon, using a
+              host specification as described on <a href="PCPIntro.1.html">PCPIntro(1)</a>.  The default
+              is <b>local:</b>.
+
+       <b>-a </b><i>archive</i>
+              Extract metrics from the given set of archives, which is a
+              comma-separated list of names, each of which may be the base
+              name of an archive or the name of a directory containing one
+              or more archives.
+
+       <b>-L     </b>Extract metrics from the local context PCP PMDAs.
+
+       <b>-t </b><i>delta</i>
+              Specify the polling interval in seconds.  If live, polling is
+              aligned to natural multiples of this interval.  The default is
+              <b>60 </b>seconds.
+
+       <b>-O </b><i>origin</i>
+              Set the time origin for archive scanning.  The default is the
+              start of the set of archives.
+
+       <b>-T </b><i>finish</i>
+              Set the time finish for archive scanning.  The default is the
+              end of the set of archives.
+
+       <b>-s </b><i>samples</i>
+              Set the maximum number of samples to relay.  The default is
+              unlimited.
+
+       <b>-i </b><i>influxdbaddress</i>
+              Specify the influxdb HTTP(S) address where the relayed data is
+              to be relayed.  The default is <b><a href="http://localhost:8086/">http://localhost:8086</a> </b>.
+
+       <b>-u </b><i>units</i>
+              Rescale the metrics to the given UNITS string, as parsed by
+              the <a href="../man3/pmParseUnitsStr.3.html">pmParseUnitsStr(3)</a> function.  This must be dimensionally
+              consistent with the underlying PCP metric.  The default is to
+              perform no scaling.
+
+       <b>-d </b><i>database</i>
+              The name of the database to write to. Must exist already; will
+              not be created.  Defaults to "pcp".
+
+       <b>-U </b><i>username</i>
+              The username to use to authenticate to InfluxDB. Must have
+              write access on the database that metrics are written to.
+
+       <b>-P </b><i>password</i>
+              The password to use to authenticate to InfluxDB that goes with
+              the given username.
+
+       <b>-I </b><i>tagstring</i>
+              A string of tags, in InfluxDB's format (i.e.
+              host=www.example.com,gpu=tesla).  Not required, but
+              recommended to be enable richer querying and dashboard
+              creation.
+
+       <i>metricname</i>
+              Relay all numeric metrics nested at or below the given name in
+              the PMNS.  This option may be repeated.  This is a compulsory
+              option, having no default.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PCPIntro.1.html">PCPIntro(1)</a>, <a href="pmcd.1.html">pmcd(1)</a>, <a href="../man3/pmParseUnitsStr.3.html">pmParseUnitsStr(3)</a>,
+       <b>https://influxdata.com/time-series-platform/influxdb/, pmmgr</b>(1),
+       <a href="pmval.1.html">pmval(1)</a>, <a href="../man3/PMAPI.3.html">PMAPI(3)</a>, <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a> and <a href="../man5/pmns.5.html">pmns(5)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                     PCP2INFLUXDB(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pmmgr.1.html">pmmgr(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

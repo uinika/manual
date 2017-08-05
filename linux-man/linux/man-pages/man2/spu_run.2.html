@@ -1,0 +1,340 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>spu_run(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SPU_RUN(2)                Linux Programmer's Manual               SPU_RUN(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       spu_run - execute an SPU context
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/spu.h&gt;</b>
+
+       <b>int spu_run(int </b><i>fd</i><b>, unsigned int *</b><i>npc</i><b>, unsigned int *</b><i>event</i><b>);</b>
+
+       <i>Note</i>: There is no glibc wrapper for this system call; see NOTES.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>spu_run</b>() system call is used on PowerPC machines that implement
+       the Cell Broadband Engine Architecture in order to access Synergistic
+       Processor Units (SPUs).  The <i>fd</i> argument is a file descriptor
+       returned by <a href="spu_create.2.html">spu_create(2)</a> that refers to a specific SPU context.
+       When the context gets scheduled to a physical SPU, it starts
+       execution at the instruction pointer passed in <i>npc</i>.
+
+       Execution of SPU code happens synchronously, meaning that <b>spu_run</b>()
+       blocks while the SPU is still running.  If there is a need to execute
+       SPU code in parallel with other code on either the main CPU or other
+       SPUs, a new thread of execution must be created first (e.g., using
+       <a href="../man3/pthread_create.3.html">pthread_create(3)</a>).
+
+       When <b>spu_run</b>() returns, the current value of the SPU program counter
+       is written to <i>npc</i>, so successive calls to <b>spu_run</b>() can use the same
+       <i>npc</i> pointer.
+
+       The <i>event</i> argument provides a buffer for an extended status code.  If
+       the SPU context was created with the <b>SPU_CREATE_EVENTS_ENABLED </b>flag,
+       then this buffer is populated by the Linux kernel before <b>spu_run</b>()
+       returns.
+
+       The status code may be one (or more) of the following constants:
+
+       <b>SPE_EVENT_DMA_ALIGNMENT</b>
+              A DMA alignment error occurred.
+
+       <b>SPE_EVENT_INVALID_DMA</b>
+              An invalid MFC DMA command was attempted.
+
+       <b>SPE_EVENT_SPE_DATA_STORAGE</b>
+              A DMA storage error occurred.
+
+       <b>SPE_EVENT_SPE_ERROR</b>
+              An illegal instruction was executed.
+
+       NULL is a valid value for the <i>event</i> argument.  In this case, the
+       events will not be reported to the calling process.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>spu_run</b>() returns the value of the <i>spu_status</i> register.
+       On error, it returns -1 and sets <i><a href="../man3/errno.3.html">errno</a></i> to one of the error codes
+       listed below.
+
+       The <i>spu_status</i> register value is a bit mask of status codes and
+       optionally a 14-bit code returned from the <b>stop-and-signal</b>
+       instruction on the SPU.  The bit masks for the status codes are:
+
+       <b>0x02   </b>SPU was stopped by a <b>stop-and-signal </b>instruction.
+
+       <b>0x04   </b>SPU was stopped by a <b>halt </b>instruction.
+
+       <b>0x08   </b>SPU is waiting for a channel.
+
+       <b>0x10   </b>SPU is in single-step mode.
+
+       <b>0x20   </b>SPU has tried to execute an invalid instruction.
+
+       <b>0x40   </b>SPU has tried to access an invalid channel.
+
+       <b>0x3fff0000</b>
+              The bits masked with this value contain the code returned from
+              a <b>stop-and-signal </b>instruction.  These bits are valid only if
+              the 0x02 bit is set.
+
+       If <b>spu_run</b>() has not returned an error, one or more bits among the
+       lower eight ones are always set.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EBADF  </b><i>fd</i> is not a valid file descriptor.
+
+       <b>EFAULT </b><i>npc</i> is not a valid pointer, or <i>event</i> is non-NULL and an
+              invalid pointer.
+
+       <b>EINTR  </b>A signal occurred while <b>spu_run</b>() was in progress; see
+              <a href="../man7/signal.7.html">signal(7)</a>.  The <i>npc</i> value has been updated to the new program
+              counter value if necessary.
+
+       <b>EINVAL </b><i>fd</i> is not a valid file descriptor returned from <a href="spu_create.2.html">spu_create(2)</a>.
+
+       <b>ENOMEM </b>There was not enough memory available to handle a page fault
+              resulting from a Memory Flow Controller (MFC) direct memory
+              access.
+
+       <b>ENOSYS </b>The functionality is not provided by the current system,
+              because either the hardware does not provide SPUs or the spufs
+              module is not loaded.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>spu_run</b>() system call was added to Linux in kernel 2.6.16.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This call is Linux-specific and implemented only by the PowerPC
+       architecture.  Programs using this system call are not portable.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Glibc does not provide a wrapper for this system call; call it using
+       <a href="syscall.2.html">syscall(2)</a>.  Note however, that <b>spu_run</b>() is meant to be used from
+       libraries that implement a more abstract interface to SPUs, not to be
+       used from regular applications.  See 
+       ⟨<a href="http://www.bsc.es/projects/deepcomputing/linuxoncell/">http://www.bsc.es/projects/deepcomputing/linuxoncell/</a>⟩ for the recom‐
+       mended libraries.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following is an example of running a simple, one-instruction SPU
+       program with the <b>spu_run</b>() system call.
+
+       #include &lt;stdlib.h&gt;
+       #include &lt;stdint.h&gt;
+       #include &lt;unistd.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;sys/types.h&gt;
+       #include &lt;fcntl.h&gt;
+
+       #define handle_error(msg) \
+           do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
+       int main(void)
+       {
+           int context, fd, spu_status;
+           uint32_t instruction, npc;
+
+           context = spu_create("/spu/example-context", 0, 0755);
+           if (context == -1)
+               handle_error("spu_create");
+
+           /* write a 'stop 0x1234' instruction to the SPU's
+            * local store memory
+            */
+           instruction = 0x00001234;
+
+           fd = open("/spu/example-context/mem", O_RDWR);
+           if (fd == -1)
+               handle_error("open");
+           write(fd, &amp;instruction, sizeof(instruction));
+
+           /* set npc to the starting instruction address of the
+            * SPU program. Since we wrote the instruction at the
+            * start of the mem file, the entry point will be 0x0
+            */
+           npc = 0;
+
+           spu_status = spu_run(context, &amp;npc, NULL);
+           if (spu_status == -1)
+               handle_error("open");
+
+           /* we should see a status code of 0x1234002:
+            *   0x00000002 (spu was stopped due to stop-and-signal)
+            * | 0x12340000 (the stop-and-signal code)
+            */
+           printf("SPU Status: 0x%08x\n", spu_status);
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="close.2.html">close(2)</a>, <a href="spu_create.2.html">spu_create(2)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>, <a href="../man7/spufs.7.html">spufs(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2012-08-05                       SPU_RUN(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="spu_create.2.html">spu_create(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man7/spufs.7.html">spufs(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="spu_run.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

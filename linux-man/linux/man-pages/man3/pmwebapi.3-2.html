@@ -1,0 +1,445 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmwebapi(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#OVERVIEW">OVERVIEW</a> | <a href="#CONTEXT_CREATION:_pmNewContext">CONTEXT&nbsp;CREATION:&nbsp;pmNewContext</a> | <a href="#PMAPI_OPERATIONS">PMAPI&nbsp;OPERATIONS</a> | <a href="#GRAPHITE">GRAPHITE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMWEBAPI(3)               Library Functions Manual               PMWEBAPI(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>PMWEBAPI  </b>-  introduction  to the Performance Metrics Web Application
+       Programming Interface
+</pre>
+<h2><a id="OVERVIEW" href="#OVERVIEW"></a>OVERVIEW  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The PMWEBAPI interface is a binding of a subset of the PMAPI to the
+       web.  It uses HTTP as transport, REST as organizational style for
+       request/parameter encoding (the GET and POST methods are
+       interchangeable), and JSON as response encoding.  A context
+       identifier is used as a persistent way to refer to PMAPI contexts
+       across related web requests.  These context identifiers expire after
+       a configurable period of disuse.
+
+       Errors generally result in HTTP-level error responses.  An <i>Access-</i>
+       <i>Control-Allow-Origin: *</i> header is added to all JSON responses.
+</pre>
+<h2><a id="CONTEXT_CREATION:_pmNewContext" href="#CONTEXT_CREATION:_pmNewContext"></a>CONTEXT CREATION: pmNewContext  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       To create a new web context identifier, a web client invokes:
+
+       <b>/pmapi/context?hostname=STRING</b>
+
+       <b>/pmapi/context?hostspec=STRING</b>
+              Creates a PM_CONTEXT_HOST PMAPI context with the given host
+              name and/or extended specification.  If the host specification
+              contains a userid/password combination, then the corresponding
+              PMAPI context operations will require HTTP Basic
+              authentication credentials with matching userid/password.
+
+       <b>/pmapi/context?archivefile=ARCHIVE</b>
+              Creates a PM_CONTEXT_ARCHIVE PMAPI context with the given file
+              name.  Only metrics from the given archive are available.
+
+       In addition, the web client may add the parameter <b>&amp;polltimeout=MMMM</b>
+       for a maximum interval (in seconds) between expected accesses to the
+       given context.  This value is limited by pmwebd configuration, and is
+       a courtesy to allow pmwebd to free up memory earlier in case of
+       sudden web application shutdown.
+
+       If successful, the response from these requests is a JSON document of
+       the form:
+
+              { "context" : NNNNN }
+
+       The number (a 32-bit unsigned decimal) is then used in all later op‐
+       erations.
+</pre>
+<h2><a id="PMAPI_OPERATIONS" href="#PMAPI_OPERATIONS"></a>PMAPI OPERATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The general form of the requests is as follows:
+       <b>/pmapi/NNNNN/OPERATION </b>where
+
+       <b>/pmapi </b>is the fixed prefix for all PMWEBAPI operations,
+
+       <b>NNNNN  </b>is a PMWEBAPI context number returned from a context-creation
+              call, or assigned permanently at pmwebd startup, and
+
+       <b>OPERATION?PARAM1=VALUE2&amp;PARAM2=VALUE2</b>
+              identifies the operation and its URL-encoded parameters.  Some
+              parameters may be optional.
+
+   <b>METRIC METADATA: pmLookupName, pmLookupDesc, pmLookupText,</b>
+       <b>pmTraversePMNS_r</b>
+       The general form of the requests is as follows:
+
+       <b>/pmapi/NNNNN/_metric</b>
+              Traverse the entire Performance Metrics Name Space (PMNS).
+
+       <b>/pmapi/NNNNN/_metric?prefix=NAME</b>
+              Traverse the subtree of PMNS with the prefix NAME.
+
+       The response is a JSON document that provides the metric metadata as
+       an array.  For example:
+
+              { "metrics": [
+                  { "name":"foo.bar", "pmID":PPPP, "indom":DDDD,
+                    "type":"32", "sem":"instant", "units":"MHz",
+                    "text-oneline":"foo bar", "text-help":"blah blah blah" },
+                  { "name":"foo.bar2", ... }
+                  ...
+                ] }
+
+       Most of the fields are self-explanatory.
+
+       name   A name for the metric as defined in the PMNS.  If the PMNS
+              contains multiple names associated with the metric's Perfor‐
+              mance Metric Identifier (PMID), one of these will be returned
+              via name, but there is no way to determine which of the dupli‐
+              cate names this will be.
+
+       PPPP   the PMID
+
+       DDDD   the instance domain
+
+       type   from pmTypeStr
+
+       units  from pmUnitsStr
+
+       sem    an abbreviation of the metric semantic:
+
+              PM_SEM_COUNTER  "counter"
+              PM_SEM_INSTANT  "instant"
+              PM_SEM_DISCRETE "discrete"
+
+   <b>METRIC VALUE: pmFetch</b>
+       The general form of the requests is as follows:
+
+       <b>/pmapi/NNNNN/_fetch?names=NAME1,NAME2</b>
+              Fetch current values for given named metrics.
+
+       <b>/pmapi/NNNNN/_fetch?pmids=PPPP1,PPPP2</b>
+              Fetch current values for given PMIDs.
+
+       If any of the names/pmids are valid, the response is a JSON document
+       that provides the values for all requested metrics, for all their in‐
+       stances.
+
+              { "timestamp": { "s":SEC, "us":USEC },
+                "values": [
+                      { "pmid":PPPP1, "name":"NAME1",
+                        "instances:" [
+                             { "instance":IIII1, "value":VALUE1 }
+                             { "instance":IIII2, "value":VALUE2 }
+                             ...
+                        ] },
+                      { "pmid":PPPP2, "name":"NAME2", ... }
+                      ...
+                ] }
+
+       Most of the fields are self-explanatory.  Numeric metric types are
+       represented as JSON integer or floating-point values.  Strings are
+       passed verbatim, except that non-ASCII values are replaced with a
+       Unicode 0xFFFD REPLACEMENT CHARACTER code.  Event type metrics are
+       not currently supported.
+
+   <b>INSTANCE DOMAINS METADATA: pmGetInDom, pmNameInDom, pmLookupInDom</b>
+       The general form of the requests is as follows:
+
+       <b>/pmapi/NNNN/_indom?indom=DDDD</b>
+              List instances of the given instance domain.
+
+       <b>/pmapi/NNNN/_indom?name=NAME</b>
+              List instances of the instance domain belonging to the named
+              metric.
+
+       In addition, either query may be suffixed with:
+
+       <b>&amp;instance=IIII,JJJJ</b>
+              Restrict listings to given instance code numbers.
+
+       <b>&amp;iname=INAME1,INAME2</b>
+              Restrict listings to given instance names.
+
+       The response is a JSON document that provides the metric metadata as
+       an array.  For example:
+
+              { "indom":DDDD,
+                 "instances": [
+                    { "instance":IIII, "name":"INAME" }
+                    ...
+                 ] }
+
+   <b>INSTANCE PROFILE: pmAddProfile, pmDelProfile</b>
+       The general form of these requests is as follows:
+
+       <b>/pmapi/NNNN/_profile_reset?indom=DDDD</b>
+              These are not currently supported.
+
+       <b>/pmapi/NNNN/_profile_add?indom=DDDD&amp;instance=IIII,JJJJ</b>
+              These are not currently supported.
+
+       <b>/pmapi/NNNN/_profile_add?indom=DDDD&amp;iname=IIII,JJJJ</b>
+              These are not currently supported.
+
+       <b>/pmapi/NNNN/_profile_del?indom=DDDD&amp;instance=JJJJ</b>
+              These are not currently supported.
+
+       <b>/pmapi/NNNN/_profile_del?indom=DDDD&amp;iname=INAME1,INAME2</b>
+              These are not currently supported.
+
+   <b>METRIC STORE: pmStore</b>
+       The general form of these requests is as follows:
+
+       <b>/pmapi/NNNN/_store?name=NAME&amp;value=VALUE</b>
+              Store a new value for given named metrics.
+
+       <b>/pmapi/NNNNN/_store?pmid=PPPP&amp;value=VALUE</b>
+              Store a new value for given performance metric identifier
+              (PMID).
+
+       In addition, either query may be suffixed with:
+
+       <b>&amp;instance=IIII,JJJJ</b>
+              Restrict store to given instance code numbers.
+
+       <b>&amp;iname=INAME1,INAME2</b>
+              Restrict store to given instance names.
+
+       If successful, the response from these requests is a JSON document of
+       the form:
+
+              { "success" : true }
+
+   <b>DERIVED METRICS: pmRegisterDerived</b>
+       <b>/pmapi/NNNNN/_derive?name=NAME&amp;expr=EXPRESSION</b>
+              These are not currently supported.
+
+   <b>CONTEXT COPY: pmDupContext</b>
+       <b>/pmapi/NNNNN/copy</b>
+              These are not currently supported.
+
+   <b>CONTEXT CLOSE: pmDestroyContext</b>
+       <b>/pmapi/NNNNN/destroy</b>
+              This is not likely to be supported, as it is destructive and
+              would offer a tempting target to brute-force attackers.  In‐
+              stead, the pmwebd timeout is used to automatically free unused
+              contexts.
+</pre>
+<h2><a id="GRAPHITE" href="#GRAPHITE"></a>GRAPHITE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When enabled, pmwebd can emulate a subset of the graphite web-api to
+       allow web applications like graphite and grafana to extract data from
+       all archives under the configured -A directory.  The graphite
+       namespace is constructed from the PCP archives using a simple mapping
+       that encodes the Cartesian product of archives, metrics, and
+       instance-domain instances into dot-separated strings.  Some
+       metacharacter-quoting is employed to encode general strings into
+       components.  Only numeric PCP metrics are exposed; COUNTER semantic
+       values are rate-converted.
+
+           ┌─────────┬────────┬─────────────────────────────────────────┐
+           │position │ number │                 purpose                 │
+           ├─────────┼────────┼─────────────────────────────────────────┤
+           │   1     │   1    │ the pathname of the archive .meta file  │
+           │   2     │   N    │ the N components of the pcp metric name │
+           │  N+2    │   1    │ instance name of the metric (if any)    │
+           └─────────┴────────┴─────────────────────────────────────────┘
+       Since glob wildcarding is supported within metric name components,
+       using them in the first component (an encoding of the archive name)
+       is a good way to identify machines, or to match multiple archives
+       spanning times of interest.
+
+       We list here only the broadest outline of the supported calls.
+       pmwebd does not support every graphite web-api option, so many
+       querystring parameters may be ignored.  Arithmetic/statistical
+       functions on metrics are not supported.
+
+       <b>/graphite/render?format=json&amp;target=FOO&amp;from=TIME&amp;until=TIME</b>
+              Return a series of values of the given metrics, between the
+              two times, sampled every 60 seconds.
+
+       <b>/graphite/rawdata?target=FOO.BAR&amp;from=TIME&amp;until=TIME</b>
+              Same, with a slightly different result encoding.
+
+       <b>/graphite/render?format=png&amp;target=FOO&amp;from=TIME&amp;until=TIME&amp;....</b>
+              Same, but render the curves into a PNG image file.  Several
+              color- and rendering-control-related parameters are supported.
+
+       <b>/graphite/metrics/find?query=FOO.BAR.*</b>
+              Provide incremental metric-tree traversal using wildcards.
+
+       <b>/graphite/graphlot/findmetric?query=FOO+BAR</b>
+              Search through metrics with space-separated regular
+              expressions.
+
+       <b>/graphite/browser/search?q=FOO+BAR</b>
+              Same, with a slightly different result encoding.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/PCPIntro.1.html">PCPIntro(1)</a>, <a href="PCPIntro.3.html">PCPIntro(3)</a>, <a href="../man1/pmwebd.1.html">pmwebd(1)</a>, <b><a href="http://graphite.readthedocs.org/">http://graphite.readthedocs.org/</a> </b>
+       and <a href="PMAPI.3.html">PMAPI(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                         PMWEBAPI(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pmwebd.1.html">pmwebd(1)</a>,&nbsp; 
+    <a href="pmhttpnewclient.3-2.html">pmhttpnewclient(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

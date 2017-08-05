@@ -1,0 +1,273 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>aio_write(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">AIO_WRITE(3)              Linux Programmer's Manual             AIO_WRITE(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       aio_write - asynchronous write
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;aio.h&gt;</b>
+
+       <b>int aio_write(struct aiocb *</b><i>aiocbp</i><b>);</b>
+
+       Link with <i>-lrt</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>aio_write</b>() function queues the I/O request described by the
+       buffer pointed to by <i>aiocbp</i>.  This function is the asynchronous
+       analog of <a href="../man2/write.2.html">write(2)</a>.  The arguments of the call
+
+           write(fd, buf, count)
+
+       correspond (in order) to the fields <i>aio_fildes</i>, <i>aio_buf</i>, and
+       <i>aio_nbytes</i> of the structure pointed to by <i>aiocbp</i>.  (See <a href="../man7/aio.7.html">aio(7)</a> for a
+       description of the <i>aiocb</i> structure.)
+
+       If <b>O_APPEND </b>is not set, the data is written starting at the absolute
+       position <i>aiocbp-&gt;aio_offset</i>, regardless of the file offset.  If
+       <b>O_APPEND </b>is set, data is written at the end of the file in the same
+       order as <b>aio_write</b>() calls are made.  After the call, the value of
+       the file offset is unspecified.
+
+       The "asynchronous" means that this call returns as soon as the
+       request has been enqueued; the write may or may not have completed
+       when the call returns.  One tests for completion using <a href="aio_error.3.html">aio_error(3)</a>.
+       The return status of a completed I/O operation can be obtained
+       <a href="aio_return.3.html">aio_return(3)</a>.  Asynchronous notification of I/O completion can be
+       obtained by setting <i>aiocbp-&gt;aio_sigevent</i> appropriately; see
+       <a href="../man7/sigevent.7.html">sigevent(7)</a> for details.
+
+       If <b>_POSIX_PRIORITIZED_IO </b>is defined, and this file supports it, then
+       the asynchronous operation is submitted at a priority equal to that
+       of the calling process minus <i>aiocbp-&gt;aio_reqprio</i>.
+
+       The field <i>aiocbp-&gt;aio_lio_opcode</i> is ignored.
+
+       No data is written to a regular file beyond its maximum offset.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, 0 is returned.  On error, the request is not enqueued, -1
+       is returned, and <i><a href="errno.3.html">errno</a></i> is set appropriately.  If an error is detected
+       only later, it will be reported via <a href="aio_return.3.html">aio_return(3)</a> (returns status -1)
+       and <a href="aio_error.3.html">aio_error(3)</a> (error status—whatever one would have gotten in
+       <i><a href="errno.3.html">errno</a></i>, such as <b>EBADF</b>).
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EAGAIN </b>Out of resources.
+
+       <b>EBADF  </b><i>aio_fildes</i> is not a valid file descriptor open for writing.
+
+       <b>EFBIG  </b>The file is a regular file, we want to write at least one
+              byte, but the starting position is at or beyond the maximum
+              offset for this file.
+
+       <b>EINVAL </b>One or more of <i>aio_offset</i>, <i>aio_reqprio</i>, <i>aio_nbytes</i> are
+              invalid.
+
+       <b>ENOSYS aio_write</b>() is not implemented.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>aio_write</b>() function is available since glibc 2.1.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────┬───────────────┬─────────┐
+       │<b>Interface   </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────┼───────────────┼─────────┤
+       │<b>aio_write</b>() │ Thread safety │ MT-Safe │
+       └────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       It is a good idea to zero out the control block before use.  The
+       control block must not be changed while the write operation is in
+       progress.  The buffer area being written out must not be accessed
+       during the operation or undefined results may occur.  The memory
+       areas involved must remain valid.
+
+       Simultaneous I/O operations specifying the same <i>aiocb</i> structure
+       produce undefined results.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="aio_cancel.3.html">aio_cancel(3)</a>, <a href="aio_error.3.html">aio_error(3)</a>, <a href="aio_fsync.3.html">aio_fsync(3)</a>, <a href="aio_read.3.html">aio_read(3)</a>,
+       <a href="aio_return.3.html">aio_return(3)</a>, <a href="aio_suspend.3.html">aio_suspend(3)</a>, <a href="lio_listio.3.html">lio_listio(3)</a>, <a href="../man7/aio.7.html">aio(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2016-03-15                     AIO_WRITE(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/execve.2.html">execve(2)</a>,&nbsp; 
+    <a href="../man2/fork.2.html">fork(2)</a>,&nbsp; 
+    <a href="aio_cancel.3.html">aio_cancel(3)</a>,&nbsp; 
+    <a href="aio_error.3.html">aio_error(3)</a>,&nbsp; 
+    <a href="aio_fsync.3.html">aio_fsync(3)</a>,&nbsp; 
+    <a href="aio_read.3.html">aio_read(3)</a>,&nbsp; 
+    <a href="aio_return.3.html">aio_return(3)</a>,&nbsp; 
+    <a href="aio_suspend.3.html">aio_suspend(3)</a>,&nbsp; 
+    <a href="lio_listio.3.html">lio_listio(3)</a>,&nbsp; 
+    <a href="../man7/aio.7.html">aio(7)</a>,&nbsp; 
+    <a href="../man7/sigevent.7.html">sigevent(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="aio_write.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

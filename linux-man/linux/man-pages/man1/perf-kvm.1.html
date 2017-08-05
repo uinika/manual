@@ -1,0 +1,325 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>perf-kvm(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#STAT_REPORT_OPTIONS">STAT&nbsp;REPORT&nbsp;OPTIONS</a> | <a href="#STAT_LIVE_OPTIONS">STAT&nbsp;LIVE&nbsp;OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PERF-KVM(1)                      perf Manual                     PERF-KVM(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       perf-kvm - Tool to trace/measure kvm guest os
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>perf kvm</i> [--host] [--guest] [--guestmount=&lt;path&gt;
+               [--guestkallsyms=&lt;path&gt; --guestmodules=&lt;path&gt; | --guestvmlinux=&lt;path&gt;]]
+               {top|record|report|diff|buildid-list} [&lt;options&gt;]
+       <i>perf kvm</i> [--host] [--guest] [--guestkallsyms=&lt;path&gt; --guestmodules=&lt;path&gt;
+               | --guestvmlinux=&lt;path&gt;] {top|record|report|diff|buildid-list|stat} [&lt;options&gt;]
+       'perf kvm stat [record|report|live] [&lt;options&gt;]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       There are a couple of variants of perf kvm:
+
+           'perf kvm [options] top &lt;command&gt;' to generates and displays
+           a performance counter profile of guest os in realtime
+           of an arbitrary workload.
+
+           'perf kvm record &lt;command&gt;' to record the performance counter profile
+           of an arbitrary workload and save it into a perf data file. We set the
+           default behavior of perf kvm as --guest, so if neither --host nor --guest
+           is input, the perf data file name is perf.data.guest. If --host is input,
+           the perf data file name is perf.data.kvm. If you want to record data into
+           perf.data.host, please input --host --no-guest. The behaviors are shown as
+           following:
+             Default('')         -&gt;  perf.data.guest
+             --host              -&gt;  perf.data.kvm
+             --guest             -&gt;  perf.data.guest
+             --host --guest      -&gt;  perf.data.kvm
+             --host --no-guest   -&gt;  perf.data.host
+
+           'perf kvm report' to display the performance counter profile information
+           recorded via perf kvm record.
+
+           'perf kvm diff' to displays the performance difference amongst two perf.data
+           files captured via perf record.
+
+           'perf kvm buildid-list' to  display the buildids found in a perf data file,
+           so that other tools can be used to fetch packages with matching symbol tables
+           for use by perf report. As buildid is read from /sys/kernel/notes in os, then
+           if you want to list the buildid for guest, please make sure your perf data file
+           was captured with --guestmount in perf kvm record.
+
+           'perf kvm stat &lt;command&gt;' to run a command and gather performance counter
+           statistics.
+           Especially, perf 'kvm stat record/report' generates a statistical analysis
+           of KVM events. Currently, vmexit, mmio (x86 only) and ioport (x86 only)
+           events are supported. 'perf kvm stat record &lt;command&gt;' records kvm events
+           and the events between start and end &lt;command&gt;.
+           And this command produces a file which contains tracing results of kvm
+           events.
+
+           'perf kvm stat report' reports statistical data which includes events
+           handled time, samples, and so on.
+
+           'perf kvm stat live' reports statistical data in a live mode (similar to
+           record + report but with statistical data updated live at a given display
+           rate).
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -i, --input=&lt;path&gt;
+           Input file name.
+
+       -o, --output=&lt;path&gt;
+           Output file name.
+
+       --host
+           Collect host side performance profile.
+
+       --guest
+           Collect guest side performance profile.
+
+       --guestmount=&lt;path&gt;
+           Guest os root file system mount directory. Users mounts guest os
+           root directories under &lt;path&gt; by a specific filesystem access
+           method, typically, sshfs. For example, start 2 guest os. The
+           one’s pid is 8888 and the other’s is 9999. #mkdir /guestmount;
+           cd/guestmount #sshfs -o allow_other,direct_io -p 5551 localhost:/
+           8888/ #sshfs -o allow_other,direct_io -p 5552 localhost:/ 9999/
+           #perf kvm --host --guest --guestmount=~/guestmount top
+
+       --guestkallsyms=&lt;path&gt;
+           Guest os /proc/kallsyms file copy.  <i>perf</i> kvm' reads it to get
+           guest kernel symbols. Users copy it out from guest os.
+
+       --guestmodules=&lt;path&gt;
+           Guest os /proc/modules file copy.  <i>perf</i> kvm' reads it to get
+           guest kernel module information. Users copy it out from guest os.
+
+       --guestvmlinux=&lt;path&gt;
+           Guest os kernel vmlinux.
+
+       -v, --verbose
+           Be more verbose (show counter open errors, etc).
+</pre>
+<h2><a id="STAT_REPORT_OPTIONS" href="#STAT_REPORT_OPTIONS"></a>STAT REPORT OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       --vcpu=&lt;value&gt;
+           analyze events which occur on this vcpu. (default: all vcpus)
+
+       --event=&lt;value&gt;
+           event to be analyzed. Possible values: vmexit, mmio (x86 only),
+           ioport (x86 only). (default: vmexit)
+
+       -k, --key=&lt;value&gt;
+           Sorting key. Possible values: sample (default, sort by samples
+           number), time (sort by average time).
+
+       -p, --pid=
+           Analyze events only for given process ID(s) (comma separated
+           list).
+</pre>
+<h2><a id="STAT_LIVE_OPTIONS" href="#STAT_LIVE_OPTIONS"></a>STAT LIVE OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -d, --display
+           Time in seconds between display updates
+
+       -m, --mmap-pages=
+           Number of mmap data pages (must be a power of two) or size
+           specification with appended unit character - B/K/M/G. The size is
+           rounded up to have nearest pages power of two value.
+
+       -a, --all-cpus
+           System-wide collection from all CPUs.
+
+       -p, --pid=
+           Analyze events only for given process ID(s) (comma separated
+           list).
+
+       --vcpu=&lt;value&gt;
+           analyze events which occur on this vcpu. (default: all vcpus)
+
+       --event=&lt;value&gt;
+           event to be analyzed. Possible values: vmexit, mmio (x86 only),
+           ioport (x86 only). (default: vmexit)
+
+       -k, --key=&lt;value&gt;
+           Sorting key. Possible values: sample (default, sort by samples
+           number), time (sort by average time).
+
+       --duration=&lt;value&gt;
+           Show events other than HLT (x86 only) or Wait state (s390 only)
+           that take longer than duration usecs.
+
+       --proc-map-timeout
+           When processing pre-existing threads /proc/XXX/mmap, it may take
+           a long time, because the file may be huge. A time out is needed
+           in such cases. This option sets the time out limit. The default
+           value is 500 ms.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="perf-top.1.html">perf-top(1)</a>, <a href="perf-record.1.html">perf-record(1)</a>, <a href="perf-report.1.html">perf-report(1)</a>, <a href="perf-diff.1.html">perf-diff(1)</a>,
+       <a href="perf-buildid-list.1.html">perf-buildid-list(1)</a>, <a href="perf-stat.1.html">perf-stat(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>perf</i> (Performance analysis tools for Linux
+       (in Linux source tree)) project.  Information about the project can
+       be found at ⟨<a href="https://perf.wiki.kernel.org/index.php/Main_Page">https://perf.wiki.kernel.org/index.php/Main_Page</a>⟩.  If
+       you have a bug report for this manual page, send it to
+       linux-kernel@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨<a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git">http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">perf                             02/18/2017                      PERF-KVM(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

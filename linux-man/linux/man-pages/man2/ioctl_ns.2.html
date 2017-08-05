@@ -1,0 +1,417 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ioctl_ns(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#ERRORS">ERRORS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">IOCTL_NS(2)               Linux Programmer's Manual              IOCTL_NS(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ioctl_ns - ioctl() operations for Linux namespaces
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Discovering namespace relationships</b>
+       The following <a href="ioctl.2.html">ioctl(2)</a> operations are provided to allow discovery of
+       namespace relationships (see <a href="../man7/user_namespaces.7.html">user_namespaces(7)</a> and
+       <a href="../man7/pid_namespaces.7.html">pid_namespaces(7)</a>).  The form of the calls is:
+
+           new_fd = ioctl(fd, request);
+
+       In each case, <i>fd</i> refers to a <i>/proc/[pid]/ns/*</i> file.  Both operations
+       return a new file descriptor on success.
+
+       <b>NS_GET_USERNS </b>(since Linux 4.9)
+              Returns a file descriptor that refers to the owning user
+              namespace for the namespace referred to by <i>fd</i>.
+
+       <b>NS_GET_PARENT </b>(since Linux 4.9)
+              Returns a file descriptor that refers to the parent namespace
+              of the namespace referred to by <i>fd</i>.  This operation is valid
+              only for hierarchical namespaces (i.e., PID and user
+              namespaces).  For user namespaces, <b>NS_GET_PARENT </b>is synonymous
+              with <b>NS_GET_USERNS</b>.
+
+       The new file descriptor returned by these operations is opened with
+       the <b>O_RDONLY </b>and <b>O_CLOEXEC </b>(close-on-exec; see <a href="fcntl.2.html">fcntl(2)</a>) flags.
+
+       By applying <a href="fstat.2.html">fstat(2)</a> to the returned file descriptor, one obtains a
+       <i>stat</i> structure whose <i>st_dev</i> (resident device) and <i>st_ino</i> (inode
+       number) fields together identify the owning/parent namespace.  This
+       inode number can be matched with the inode number of another
+       <i>/proc/[pid]/ns/{pid,user}</i> file to determine whether that is the
+       owning/parent namespace.
+
+       Either of these <a href="ioctl.2.html">ioctl(2)</a> operations can fail with the following
+       errors:
+
+       <b>EPERM  </b>The requested namespace is outside of the caller's namespace
+              scope.  This error can occur if, for example, the owning user
+              namespace is an ancestor of the caller's current user
+              namespace.  It can also occur on attempts to obtain the parent
+              of the initial user or PID namespace.
+
+       <b>ENOTTY </b>The operation is not supported by this kernel version.
+
+       Additionally, the <b>NS_GET_PARENT </b>operation can fail with the following
+       error:
+
+       <b>EINVAL </b><i>fd</i> refers to a nonhierarchical namespace.
+
+       See the EXAMPLE section for an example of the use of these
+       operations.
+
+   <b>Discovering the namespace type</b>
+       The <b>NS_GET_NSTYPE </b>operation (available since Linux 4.11) can be used
+       to discover the type of namespace referred to by the file descriptor
+       <i>fd</i>:
+
+           nstype = ioctl(fd, NS_GET_NSTYPE);
+
+       <i>fd</i> refers to a <i>/proc/[pid]/ns/*</i> file.
+
+       The return value is one of the <b>CLONE_NEW* </b>values that can be
+       specified to <a href="clone.2.html">clone(2)</a> or <a href="unshare.2.html">unshare(2)</a> in order to create a namespace.
+
+   <b>Discovering the owner of a user namespace</b>
+       The <b>NS_GET_OWNER_UID </b>operation (available since Linux 4.11) can be
+       used to discover the owner user ID of a user namespace (i.e., the
+       effective user ID of the process that created the user namespace).
+       The form of the call is:
+
+           uid_t uid;
+           ioctl(fd, NS_GET_OWNER_UID, &amp;uid);
+
+       <i>fd</i> refers to a <i>/proc/[pid]/ns/user</i> file.
+
+       The owner user ID is returned in the <i>uid_t</i> pointed to by the third
+       argument.
+
+       This operation can fail with the following error:
+
+       <b>EINVAL </b><i>fd</i> does not refer to a user namespace.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Namespaces and the operations described on this page are a Linux-
+       specific.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Any of the above <b>ioctl</b>() operations can return the following errors:
+
+       <b>ENOTTY </b><i>fd</i> does not refer to a <i>/proc/[pid]/ns/*</i> file.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The example shown below uses the <a href="ioctl.2.html">ioctl(2)</a> operations described above
+       to perform simple discovery of namespace relationships.  The
+       following shell sessions show various examples of the use of this
+       program.
+
+       Trying to get the parent of the initial user namespace fails, since
+       it has no parent:
+
+           $ <b>./ns_show /proc/self/ns/user p</b>
+           The parent namespace is outside your namespace scope
+
+       Create a process running <a href="../man1/sleep.1.html">sleep(1)</a> that resides in new user and UTS
+       namespaces, and show that the new UTS namespace is associated with
+       the new user namespace:
+
+           $ <b>unshare -Uu sleep 1000 &amp;</b>
+           [1] 23235
+           $ <b>./ns_show /proc/23235/ns/uts u</b>
+           Device/Inode of owning user namespace is: [0,3] / 4026532448
+           $ <b>readlink /proc/23235/ns/user</b>
+           user:[4026532448]
+
+       Then show that the parent of the new user namespace in the preceding
+       example is the initial user namespace:
+
+           $ <b>readlink /proc/self/ns/user</b>
+           user:[4026531837]
+           $ <b>./ns_show /proc/23235/ns/user p</b>
+           Device/Inode of parent namespace is: [0,3] / 4026531837
+
+       Start a shell in a new user namespace, and show that from within this
+       shell, the parent user namespace can't be discovered.  Similarly, the
+       UTS namespace (which is associated with the initial user namespace)
+       can't be discovered.
+
+           $ <b>PS1="sh2$ " unshare -U bash</b>
+           sh2$ <b>./ns_show /proc/self/ns/user p</b>
+           The parent namespace is outside your namespace scope
+           sh2$ <b>./ns_show /proc/self/ns/uts u</b>
+           The owning user namespace is outside your namespace scope
+
+   <b>Program source</b>
+
+       /* ns_show.c
+
+          Licensed under the GNU General Public License v2 or later.
+       */
+       #include &lt;stdlib.h&gt;
+       #include &lt;unistd.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;fcntl.h&gt;
+       #include &lt;string.h&gt;
+       #include &lt;sys/stat.h&gt;
+       #include &lt;sys/ioctl.h&gt;
+       #include &lt;errno.h&gt;
+       #include &lt;sys/sysmacros.h&gt;
+
+       #ifndef NS_GET_USERNS
+       #define NSIO    0xb7
+       #define NS_GET_USERNS   _IO(NSIO, 0x1)
+       #define NS_GET_PARENT   _IO(NSIO, 0x2)
+       #endif
+
+       int
+       main(int argc, char *argv[])
+       {
+           int fd, userns_fd, parent_fd;
+           struct stat sb;
+
+           if (argc &lt; 2) {
+               fprintf(stderr, "Usage: %s /proc/[pid]/ns/[file] [p|u]\n",
+                       argv[0]);
+               fprintf(stderr, "\nDisplay the result of one or both "
+                       "of NS_GET_USERNS (u) or NS_GET_PARENT (p)\n"
+                       "for the specified /proc/[pid]/ns/[file]. If neither "
+                       "'p' nor 'u' is specified,\n"
+                       "NS_GET_USERNS is the default.\n");
+               exit(EXIT_FAILURE);
+           }
+
+           /* Obtain a file descriptor for the 'ns' file specified
+              in argv[1] */
+
+           fd = open(argv[1], O_RDONLY);
+           if (fd == -1) {
+               perror("open");
+               exit(EXIT_FAILURE);
+           }
+
+           /* Obtain a file descriptor for the owning user namespace and
+              then obtain and display the inode number of that namespace */
+
+           if (argc &lt; 3 || strchr(argv[2], 'u')) {
+               userns_fd = ioctl(fd, NS_GET_USERNS);
+
+               if (userns_fd == -1) {
+                   if (errno == EPERM)
+                       printf("The owning user namespace is outside "
+                               "your namespace scope\n");
+                   else
+                      perror("ioctl-NS_GET_USERNS");
+                   exit(EXIT_FAILURE);
+                }
+
+               if (fstat(userns_fd, &amp;sb) == -1) {
+                   perror("fstat-userns");
+                   exit(EXIT_FAILURE);
+               }
+               printf("Device/Inode of owning user namespace is: "
+                       "[%lx,%lx] / %ld\n",
+                       (long) major(sb.st_dev), (long) minor(sb.st_dev),
+                       (long) sb.st_ino);
+
+               close(userns_fd);
+           }
+
+           /* Obtain a file descriptor for the parent namespace and
+              then obtain and display the inode number of that namespace */
+
+           if (argc &gt; 2 &amp;&amp; strchr(argv[2], 'p')) {
+               parent_fd = ioctl(fd, NS_GET_PARENT);
+
+               if (parent_fd == -1) {
+                   if (errno == EINVAL)
+                       printf("Can' get parent namespace of a "
+                               "nonhierarchical namespace\n");
+                   else if (errno == EPERM)
+                       printf("The parent namespace is outside "
+                               "your namespace scope\n");
+                   else
+                       perror("ioctl-NS_GET_PARENT");
+                   exit(EXIT_FAILURE);
+               }
+
+               if (fstat(parent_fd, &amp;sb) == -1) {
+                   perror("fstat-parentns");
+                   exit(EXIT_FAILURE);
+               }
+               printf("Device/Inode of parent namespace is: [%lx,%lx] / %ld\n",
+                       (long) major(sb.st_dev), (long) minor(sb.st_dev),
+                       (long) sb.st_ino);
+
+               close(parent_fd);
+           }
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="fstat.2.html">fstat(2)</a>, <a href="ioctl.2.html">ioctl(2)</a>, <a href="../man5/proc.5.html">proc(5)</a>, <a href="../man7/namespaces.7.html">namespaces(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                      IOCTL_NS(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="ioctl.2.html">ioctl(2)</a>,&nbsp; 
+    <a href="../man7/namespaces.7.html">namespaces(7)</a>,&nbsp; 
+    <a href="../man7/pid_namespaces.7.html">pid_namespaces(7)</a>,&nbsp; 
+    <a href="../man7/user_namespaces.7.html">user_namespaces(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="ioctl_ns.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

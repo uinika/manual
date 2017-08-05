@@ -1,0 +1,325 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>truncate(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">TRUNCATE(2)               Linux Programmer's Manual              TRUNCATE(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       truncate, ftruncate - truncate a file to a specified length
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;unistd.h&gt;</b>
+       <b>#include &lt;sys/types.h&gt;</b>
+
+       <b>int truncate(const char *</b><i>path</i><b>, off_t </b><i>length</i><b>);</b>
+       <b>int ftruncate(int </b><i>fd</i><b>, off_t </b><i>length</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>truncate</b>():
+           _XOPEN_SOURCE &gt;= 500
+               || /* Since glibc 2.12: */ _POSIX_C_SOURCE &gt;= 200809L
+               || /* Glibc versions &lt;= 2.19: */ _BSD_SOURCE
+
+       <b>ftruncate</b>():
+           _XOPEN_SOURCE &gt;= 500
+               || /* Since glibc 2.3.5: */ _POSIX_C_SOURCE &gt;= 200112L
+               || /* Glibc versions &lt;= 2.19: */ _BSD_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>truncate</b>() and <b>ftruncate</b>() functions cause the regular file named
+       by <i>path</i> or referenced by <i>fd</i> to be truncated to a size of precisely
+       <i>length</i> bytes.
+
+       If the file previously was larger than this size, the extra data is
+       lost.  If the file previously was shorter, it is extended, and the
+       extended part reads as null bytes ('\0').
+
+       The file offset is not changed.
+
+       If the size changed, then the st_ctime and st_mtime fields
+       (respectively, time of last status change and time of last
+       modification; see <a href="../man7/inode.7.html">inode(7)</a>) for the file are updated, and the set-
+       user-ID and set-group-ID mode bits may be cleared.
+
+       With <b>ftruncate</b>(), the file must be open for writing; with <b>truncate</b>(),
+       the file must be writable.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For <b>truncate</b>():
+
+       <b>EACCES </b>Search permission is denied for a component of the path
+              prefix, or the named file is not writable by the user.  (See
+              also <a href="../man7/path_resolution.7.html">path_resolution(7)</a>.)
+
+       <b>EFAULT </b>The argument <i>path</i> points outside the process's allocated
+              address space.
+
+       <b>EFBIG  </b>The argument <i>length</i> is larger than the maximum file size.
+              (XSI)
+
+       <b>EINTR  </b>While blocked waiting to complete, the call was interrupted by
+              a signal handler; see <a href="fcntl.2.html">fcntl(2)</a> and <a href="../man7/signal.7.html">signal(7)</a>.
+
+       <b>EINVAL </b>The argument <i>length</i> is negative or larger than the maximum
+              file size.
+
+       <b>EIO    </b>An I/O error occurred updating the inode.
+
+       <b>EISDIR </b>The named file is a directory.
+
+       <b>ELOOP  </b>Too many symbolic links were encountered in translating the
+              pathname.
+
+       <b>ENAMETOOLONG</b>
+              A component of a pathname exceeded 255 characters, or an
+              entire pathname exceeded 1023 characters.
+
+       <b>ENOENT </b>The named file does not exist.
+
+       <b>ENOTDIR</b>
+              A component of the path prefix is not a directory.
+
+       <b>EPERM  </b>The underlying filesystem does not support extending a file
+              beyond its current size.
+
+       <b>EPERM  </b>The operation was prevented by a file seal; see <a href="fcntl.2.html">fcntl(2)</a>.
+
+       <b>EROFS  </b>The named file resides on a read-only filesystem.
+
+       <b>ETXTBSY</b>
+              The file is an executable file that is being executed.
+
+       For <b>ftruncate</b>() the same errors apply, but instead of things that can
+       be wrong with <i>path</i>, we now have things that can be wrong with the
+       file descriptor, <i>fd</i>:
+
+       <b>EBADF  </b><i>fd</i> is not a valid file descriptor.
+
+       <b>EBADF </b>or <b>EINVAL</b>
+              <i>fd</i> is not open for writing.
+
+       <b>EINVAL </b><i>fd</i> does not reference a regular file or a POSIX shared memory
+              object.
+
+       <b>EINVAL </b>or <b>EBADF</b>
+              The file descriptor <i>fd</i> is not open for writing.  POSIX
+              permits, and portable applications should handle, either error
+              for this case.  (Linux produces <b>EINVAL</b>.)
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, 4.4BSD, SVr4 (these calls first appeared
+       in 4.2BSD).
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ftruncate</b>() can also be used to set the size of a POSIX shared memory
+       object; see <b>shm_open</b>(7).
+
+       The details in DESCRIPTION are for XSI-compliant systems.  For non-
+       XSI-compliant systems, the POSIX standard allows two behaviors for
+       <b>ftruncate</b>() when <i>length</i> exceeds the file length (note that <b>truncate</b>()
+       is not specified at all in such an environment): either returning an
+       error, or extending the file.  Like most UNIX implementations, Linux
+       follows the XSI requirement when dealing with native filesystems.
+       However, some nonnative filesystems do not permit <b>truncate</b>() and
+       <b>ftruncate</b>() to be used to extend a file beyond its current length: a
+       notable example on Linux is VFAT.
+
+       The original Linux <b>truncate</b>() and <b>ftruncate</b>() system calls were not
+       designed to handle large file offsets.  Consequently, Linux 2.4 added
+       <b>truncate64</b>() and <b>ftruncate64</b>() system calls that handle large files.
+       However, these details can be ignored by applications using glibc,
+       whose wrapper functions transparently employ the more recent system
+       calls where they are available.
+
+       On some 32-bit architectures, the calling signature for these system
+       calls differ, for the reasons described in <a href="syscall.2.html">syscall(2)</a>.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A header file bug in glibc 2.12 meant that the minimum value of
+       <b>_POSIX_C_SOURCE </b>required to expose the declaration of <b>ftruncate</b>() was
+       200809L instead of 200112L.  This has been fixed in later glibc
+       versions.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/truncate.1.html">truncate(1)</a>, <a href="open.2.html">open(2)</a>, <a href="stat.2.html">stat(2)</a>, <a href="../man7/path_resolution.7.html">path_resolution(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                      TRUNCATE(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="fallocate.2.html">fallocate(2)</a>,&nbsp; 
+    <a href="fcntl.2.html">fcntl(2)</a>,&nbsp; 
+    <a href="fsync.2.html">fsync(2)</a>,&nbsp; 
+    <a href="getrlimit.2.html">getrlimit(2)</a>,&nbsp; 
+    <a href="memfd_create.2.html">memfd_create(2)</a>,&nbsp; 
+    <a href="syscall.2.html">syscall(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/shm_open.3.html">shm_open(3)</a>,&nbsp; 
+    <a href="../man7/inode.7.html">inode(7)</a>,&nbsp; 
+    <a href="../man7/inotify.7.html">inotify(7)</a>,&nbsp; 
+    <a href="../man7/shm_overview.7.html">shm_overview(7)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>,&nbsp; 
+    <a href="../man8/xfs_io.8.html">xfs_io(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="truncate.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>nptl(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">NPTL(7)                   Linux Programmer's Manual                  NPTL(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       nptl - Native POSIX Threads Library
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       NPTL (Native POSIX Threads Library) is the GNU C library POSIX
+       threads implementation that is used on modern Linux systems.
+
+   <b>NPTL and signals</b>
+       NPTL makes internal use of the first two real-time signals (signal
+       numbers 32 and 33).  One of these signals is used to support thread
+       cancellation and POSIX timers (see <a href="../man2/timer_create.2.html">timer_create(2)</a>); the other is
+       used as part of a mechanism that ensures all threads in a process
+       always have the same UIDs and GIDs, as required by POSIX.  These
+       signals cannot be used in applications.
+
+       To prevent accidental use of these signals in applications, which
+       might interfere with the operation of the NPTL implementation,
+       various glibc library functions and system call wrapper functions
+       attempt to hide these signals from applications, as follows:
+
+       *  <b>SIGRTMIN </b>is defined with the value 34 (rather than 32).
+
+       *  The <a href="../man2/sigwaitinfo.2.html">sigwaitinfo(2)</a>, <a href="../man2/sigtimedwait.2.html">sigtimedwait(2)</a>, and <a href="../man3/sigwait.3.html">sigwait(3)</a> interfaces
+          silently ignore requests to wait for these two signals if they are
+          specified in the signal set argument of these calls.
+
+       *  The <a href="../man2/sigprocmask.2.html">sigprocmask(2)</a> and <a href="../man3/pthread_sigmask.3.html">pthread_sigmask(3)</a> interfaces silently
+          ignore attempts to block these two signals.
+
+       *  The <a href="../man2/sigaction.2.html">sigaction(2)</a>, <a href="../man3/pthread_kill.3.html">pthread_kill(3)</a>, and <a href="../man3/pthread_sigqueue.3.html">pthread_sigqueue(3)</a>
+          interfaces fail with the error <b>EINVAL </b>(indicating an invalid
+          signal number) if these signals are specified.
+
+       *  <a href="../man3/sigfillset.3.html">sigfillset(3)</a> does not include these two signals when it creates a
+          full signal set.
+
+   <b>NPTL and process credential changes</b>
+       At the Linux kernel level, credentials (user and group IDs) are a
+       per-thread attribute.  However, POSIX requires that all of the POSIX
+       threads in a process have the same credentials.  To accommodate this
+       requirement, the NPTL implementation wraps all of the system calls
+       that change process credentials with functions that, in addition to
+       invoking the underlying system call, arrange for all other threads in
+       the process to also change their credentials.
+
+       The implementation of each of these system calls involves the use of
+       a real-time signal that is sent (using <a href="../man2/tgkill.2.html">tgkill(2)</a>) to each of the
+       other threads that must change its credentials.  Before sending these
+       signals, the thread that is changing credentials saves the new
+       credential(s) and records the system call being employed in a global
+       buffer.  A signal handler in the receiving thread(s) fetches this
+       information and then uses the same system call to change its
+       credentials.
+
+       Wrapper functions employing this technique are provided for
+       <a href="../man2/setgid.2.html">setgid(2)</a>, <a href="../man2/setuid.2.html">setuid(2)</a>, <a href="../man2/setegid.2.html">setegid(2)</a>, <a href="../man2/seteuid.2.html">seteuid(2)</a>, <a href="../man2/setregid.2.html">setregid(2)</a>,
+       <a href="../man2/setreuid.2.html">setreuid(2)</a>, <a href="../man2/setresgid.2.html">setresgid(2)</a>, <a href="../man2/setresuid.2.html">setresuid(2)</a>, and <a href="../man2/setgroups.2.html">setgroups(2)</a>.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For details of the conformance of NPTL to the POSIX standard, see
+       <a href="pthreads.7.html">pthreads(7)</a>.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX says that any thread in any process with access to the memory
+       containing a process-shared (<b>PTHREAD_PROCESS_SHARED</b>) mutex can
+       operate on that mutex.  However, on 64-bit x86 systems, the mutex
+       definition for x86-64 is incompatible with the mutex definition for
+       i386, meaning that 32-bit and 64-bit binaries can't share mutexes on
+       x86-64 systems.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="credentials.7.html">credentials(7)</a>, <a href="pthreads.7.html">pthreads(7)</a>, <a href="signal.7.html">signal(7)</a>, <a href="standards.7.html">standards(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-08-08                          NPTL(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/getgroups.2.html">getgroups(2)</a>,&nbsp; 
+    <a href="../man2/setgid.2.html">setgid(2)</a>,&nbsp; 
+    <a href="../man2/setresuid.2.html">setresuid(2)</a>,&nbsp; 
+    <a href="../man2/setreuid.2.html">setreuid(2)</a>,&nbsp; 
+    <a href="../man2/setuid.2.html">setuid(2)</a>,&nbsp; 
+    <a href="../man2/sigaction.2.html">sigaction(2)</a>,&nbsp; 
+    <a href="../man2/sigprocmask.2.html">sigprocmask(2)</a>,&nbsp; 
+    <a href="../man2/sigwaitinfo.2.html">sigwaitinfo(2)</a>,&nbsp; 
+    <a href="../man2/timer_create.2.html">timer_create(2)</a>,&nbsp; 
+    <a href="../man3/pthread_kill.3.html">pthread_kill(3)</a>,&nbsp; 
+    <a href="../man3/pthread_sigmask.3.html">pthread_sigmask(3)</a>,&nbsp; 
+    <a href="../man3/pthread_sigqueue.3.html">pthread_sigqueue(3)</a>,&nbsp; 
+    <a href="../man3/sigsetops.3.html">sigsetops(3)</a>,&nbsp; 
+    <a href="../man3/sigwait.3.html">sigwait(3)</a>,&nbsp; 
+    <a href="credentials.7.html">credentials(7)</a>,&nbsp; 
+    <a href="pthreads.7.html">pthreads(7)</a>,&nbsp; 
+    <a href="signal.7.html">signal(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="nptl.7.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,256 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>rexec(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">REXEC(3)                  Linux Programmer's Manual                 REXEC(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       rexec, rexec_af - return stream to a remote command
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;netdb.h&gt;</b>
+
+       <b>int rexec(char **</b><i>ahost</i><b>, int </b><i>inport</i><b>, const char *</b><i>user</i><b>,</b>
+                 <b>const char *</b><i>passwd</i><b>, const char *</b><i>cmd</i><b>, int *</b><i>fd2p</i><b>);</b>
+
+       <b>int rexec_af(char **</b><i>ahost</i><b>, int </b><i>inport</i><b>, const char *</b><i>user</i><b>,</b>
+                    <b>const char *</b><i>passwd</i><b>, const char *</b><i>cmd</i><b>, int *</b><i>fd2p</i><b>,</b>
+                    <b>sa_family_t </b><i>af</i><b>);</b>
+
+       <b>rexec</b>(), <b>rexec_af</b>():
+           Since glibc 2.19:
+               _DEFAULT_SOURCE
+           In glibc up to and including 2.19:
+               _BSD_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This interface is obsoleted by <a href="rcmd.3.html">rcmd(3)</a>.
+
+       The <b>rexec</b>() function looks up the host <i>*ahost</i> using <a href="gethostbyname.3.html">gethostbyname(3)</a>,
+       returning -1 if the host does not exist.  Otherwise, <i>*ahost</i> is set to
+       the standard name of the host.  If a username and password are both
+       specified, then these are used to authenticate to the foreign host;
+       otherwise the environment and then the <i>.netrc</i> file in user's home
+       directory are searched for appropriate information.  If all this
+       fails, the user is prompted for the information.
+
+       The port <i>inport</i> specifies which well-known DARPA Internet port to use
+       for the connection; the call <i>getservbyname("exec", "tcp")</i> (see
+       <a href="getservent.3.html">getservent(3)</a>) will return a pointer to a structure that contains the
+       necessary port.  The protocol for connection is described in detail
+       in <b>rexecd</b>(8).
+
+       If the connection succeeds, a socket in the Internet domain of type
+       <b>SOCK_STREAM </b>is returned to the caller, and given to the remote
+       command as <i>stdin</i> and <i>stdout</i>.  If <i>fd2p</i> is nonzero, then an auxiliary
+       channel to a control process will be setup, and a file descriptor for
+       it will be placed in <i>*fd2p</i>.  The control process will return
+       diagnostic output from the command (unit 2) on this channel, and will
+       also accept bytes on this channel as being UNIX signal numbers, to be
+       forwarded to the process group of the command.  The diagnostic
+       information returned does not include remote authorization failure,
+       as the secondary connection is set up after authorization has been
+       verified.  If <i>fd2p</i> is 0, then the <i>stderr</i> (unit 2 of the remote
+       command) will be made the same as the <i>stdout</i> and no provision is made
+       for sending arbitrary signals to the remote process, although you may
+       be able to get its attention by using out-of-band data.
+
+   <b>rexec_af()</b>
+       The <b>rexec</b>() function works over IPv4 (<b>AF_INET</b>).  By contrast, the
+       <b>rexec_af</b>() function provides an extra argument, <i>af</i>, that allows the
+       caller to select the protocol.  This argument can be specified as
+       <b>AF_INET</b>, <b>AF_INET6</b>, or <b>AF_UNSPEC </b>(to allow the implementation to
+       select the protocol).
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>rexec_af</b>() function was added to glibc in version 2.2.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────────────┬───────────────┬───────────┐
+       │<b>Interface           </b>│ <b>Attribute     </b>│ <b>Value     </b>│
+       ├────────────────────┼───────────────┼───────────┤
+       │<b>rexec</b>(), <b>rexec_af</b>() │ Thread safety │ MT-Unsafe │
+       └────────────────────┴───────────────┴───────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are not in POSIX.1.  The <b>rexec</b>() function first
+       appeared in 4.2BSD, and is present on the BSDs, Solaris, and many
+       other systems.  The <b>rexec_af</b>() function is more recent, and less
+       widespread.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>rexec</b>() function sends the unencrypted password across the
+       network.
+
+       The underlying service is considered a big security hole and
+       therefore not enabled on many sites; see <b>rexecd</b>(8) for explanations.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="rcmd.3.html">rcmd(3)</a>, <b>rexecd</b>(8)
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-03-15                         REXEC(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="rcmd.3.html">rcmd(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="rexec.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

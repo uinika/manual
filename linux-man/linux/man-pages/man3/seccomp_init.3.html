@@ -1,0 +1,292 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>seccomp_init(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#NOTES">NOTES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">seccomp_init(3)           libseccomp Documentation           seccomp_init(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       seccomp_init, seccomp_reset - Initialize the seccomp filter state
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;seccomp.h&gt;</b>
+
+       <b>typedef void * scmp_filter_ctx;</b>
+
+       <b>scmp_filter_ctx seccomp_init(uint32_t </b><i>def_action</i><b>);</b>
+       <b>int seccomp_reset(scmp_filter_ctx </b><i>ctx</i><b>, uint32_t </b><i>def_action</i><b>);</b>
+
+       Link with <i>-lseccomp</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>seccomp_init</b>() and <b>seccomp_reset</b>() functions (re)initialize the
+       internal seccomp filter state, prepares it for use, and sets the
+       default action based on the <i>def_action</i> parameter.  The <b>seccomp_init</b>()
+       function must be called before any other libseccomp functions as the
+       rest of the library API will fail if the filter context is not
+       initialized properly.  The <b>seccomp_reset</b>() function releases the
+       existing filter context state before reinitializing it and can only
+       be called after a call to <b>seccomp_init</b>() has succeeded.
+
+       When the caller is finished configuring the seccomp filter and has
+       loaded it into the kernel, the caller should call <a href="seccomp_release.3.html">seccomp_release(3)</a>
+       to release all of the filter context state.
+
+       Valid <i>def_action</i> values are as follows:
+
+       <b>SCMP_ACT_KILL</b>
+              The thread will be terminated by the kernel with SIGSYS when
+              it calls a syscall that does not match any of the configured
+              seccomp filter rules.  The thread will not be able to catch
+              the signal.
+
+       <b>SCMP_ACT_TRAP</b>
+              The thread will be sent a SIGSYS signal when it calls a
+              syscall that does not match any of the configured seccomp
+              filter rules.  It may catch this and change its behavior
+              accordingly.  When using SA_SIGINFO with <a href="../man2/sigaction.2.html">sigaction(2)</a>, si_code
+              will be set to SYS_SECCOMP, si_syscall will be set to the
+              syscall that failed the rules, and si_arch will be set to the
+              AUDIT_ARCH for the active ABI.
+
+       <b>SCMP_ACT_ERRNO(uint16_t errno)</b>
+              The thread will receive a return value of <i><a href="errno.3.html">errno</a></i> when it calls
+              a syscall that does not match any of the configured seccomp
+              filter rules.
+
+       <b>SCMP_ACT_TRACE(uint16_t msg_num)</b>
+              If the thread is being traced and the tracing process
+              specified the <b>PTRACE_O_TRACESECCOMP </b>option in the call to
+              <a href="../man2/ptrace.2.html">ptrace(2)</a>, the tracing process will be notified, via
+              <b>PTRACE_EVENT_SECCOMP</b>, and the value provided in <i>msg_num</i> can be
+              retrieved using the <b>PTRACE_GETEVENTMSG </b>option.
+
+       <b>SCMP_ACT_ALLOW</b>
+              The seccomp filter will have no effect on the thread calling
+              the syscall if it does not match any of the configured seccomp
+              filter rules.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>seccomp_init</b>() function returns a filter context on success, NULL
+       on failure.  The <b>seccomp_reset</b>() function returns zero on success,
+       negative errno values on failure.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;seccomp.h&gt;
+
+       int main(int argc, char *argv[])
+       {
+            int rc = -1;
+            scmp_filter_ctx ctx;
+
+            ctx = seccomp_init(SCMP_ACT_KILL);
+            if (ctx == NULL)
+                 goto out;
+
+            /* ... */
+
+            rc = seccomp_reset(ctx, SCMP_ACT_KILL);
+            if (rc &lt; 0)
+                 goto out;
+
+            /* ... */
+
+       out:
+            seccomp_release(ctx);
+            return -rc;
+       }
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       While the seccomp filter can be generated independent of the kernel,
+       kernel support is required to load and enforce the seccomp filter
+       generated by libseccomp.
+
+       The libseccomp project site, with more information and the source
+       code repository, can be found at
+       <a href="https://github.com/seccomp/libseccomp">https://github.com/seccomp/libseccomp</a>.  This tool, as well as the
+       libseccomp library, is currently under development, please report any
+       bugs at the project site or directly to the author.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Paul Moore &lt;paul@paul-moore.com&gt;
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="seccomp_release.3.html">seccomp_release(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>libseccomp</i> (high-level API to the Linux
+       Kernel's seccomp filter) project.  Information about the project can
+       be found at ⟨<a href="https://github.com/seccomp/libseccomp">https://github.com/seccomp/libseccomp</a>⟩.  If you have a
+       bug report for this manual page, see 
+       ⟨<a href="https://groups.google.com/d/forum/libseccomp">https://groups.google.com/d/forum/libseccomp</a>⟩.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/seccomp/libseccomp">https://github.com/seccomp/libseccomp</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">paul@paul-moore.com             25 July 2012                 seccomp_init(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/seccomp.2.html">seccomp(2)</a>,&nbsp; 
+    <a href="seccomp_arch_add.3.html">seccomp_arch_add(3)</a>,&nbsp; 
+    <a href="seccomp_attr_set.3.html">seccomp_attr_set(3)</a>,&nbsp; 
+    <a href="seccomp_export_bpf.3.html">seccomp_export_bpf(3)</a>,&nbsp; 
+    <a href="seccomp_load.3.html">seccomp_load(3)</a>,&nbsp; 
+    <a href="seccomp_merge.3.html">seccomp_merge(3)</a>,&nbsp; 
+    <a href="seccomp_release.3.html">seccomp_release(3)</a>,&nbsp; 
+    <a href="seccomp_rule_add.3.html">seccomp_rule_add(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

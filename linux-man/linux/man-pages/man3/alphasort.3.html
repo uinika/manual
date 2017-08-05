@@ -1,0 +1,336 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>scandir(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SCANDIR(3)                Linux Programmer's Manual               SCANDIR(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       scandir,  scandirat,  alphasort,  versionsort  - scan a directory for
+       matching entries
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;dirent.h&gt;</b>
+
+       <b>int scandir(const char *</b><i>dirp</i><b>, struct dirent ***</b><i>namelist</i><b>,</b>
+              <b>int (*</b><i>filter</i><b>)(const struct dirent *),</b>
+              <b>int (*</b><i>compar</i><b>)(const struct dirent **, const struct dirent **));</b>
+
+       <b>int alphasort(const struct dirent **</b><i>a</i><b>, const struct dirent **</b><i>b</i><b>);</b>
+
+       <b>int versionsort(const struct dirent **</b><i>a</i><b>, const struct dirent **</b><i>b</i><b>);</b>
+
+       <b>#include &lt;fcntl.h&gt;          </b>/* Definition of AT_* constants */
+       <b>#include &lt;dirent.h&gt;</b>
+
+       <b>int scandirat(int </b><i>dirfd</i><b>, const char *</b><i>dirp</i><b>, struct dirent ***</b><i>namelist</i><b>,</b>
+              <b>int (*</b><i>filter</i><b>)(const struct dirent *),</b>
+              <b>int (*</b><i>compar</i><b>)(const struct dirent **, const struct dirent **));</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>scandir</b>(), <b>alphasort</b>():
+           /* Since glibc 2.10: */ _POSIX_C_SOURCE &gt;= 200809L
+               || /* Glibc versions &lt;= 2.19: */ _BSD_SOURCE || _SVID_SOURCE
+
+       <b>versionsort</b>(): _GNU_SOURCE
+
+       <b>scandirat</b>(): _GNU_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>scandir</b>() function scans the directory <i>dirp</i>, calling <i>filter</i>() on
+       each directory entry.  Entries for which <i>filter</i>() returns nonzero are
+       stored in strings allocated via <a href="malloc.3.html">malloc(3)</a>, sorted using <a href="qsort.3.html">qsort(3)</a> with
+       the comparison function <i>compar</i>(), and collected in array <i>namelist</i>
+       which is allocated via <a href="malloc.3.html">malloc(3)</a>.  If <i>filter</i> is NULL, all entries are
+       selected.
+
+       The <b>alphasort</b>() and <b>versionsort</b>() functions can be used as the
+       comparison function <i>compar</i>().  The former sorts directory entries
+       using <a href="strcoll.3.html">strcoll(3)</a>, the latter using <a href="strverscmp.3.html">strverscmp(3)</a> on the strings
+       <i>(*a)-&gt;d_name</i> and <i>(*b)-&gt;d_name</i>.
+
+   <b>scandirat()</b>
+       The <b>scandirat</b>() function operates in exactly the same way as
+       <b>scandir</b>(), except for the differences described here.
+
+       If the pathname given in <i>dirp</i> is relative, then it is interpreted
+       relative to the directory referred to by the file descriptor <i>dirfd</i>
+       (rather than relative to the current working directory of the calling
+       process, as is done by <b>scandir</b>() for a relative pathname).
+
+       If <i>dirp</i> is relative and <i>dirfd</i> is the special value <b>AT_FDCWD</b>, then
+       <i>dirp</i> is interpreted relative to the current working directory of the
+       calling process (like <b>scandir</b>()).
+
+       If <i>dirp</i> is absolute, then <i>dirfd</i> is ignored.
+
+       See <a href="../man2/openat.2.html">openat(2)</a> for an explanation of the need for <b>scandirat</b>().
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>scandir</b>() function returns the number of directory entries
+       selected.  On error, -1 is returned, with <i><a href="errno.3.html">errno</a></i> set to indicate the
+       cause of the error.
+
+       The <b>alphasort</b>() and <b>versionsort</b>() functions return an integer less
+       than, equal to, or greater than zero if the first argument is
+       considered to be respectively less than, equal to, or greater than
+       the second.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ENOENT </b>The path in <i>dirp</i> does not exist.
+
+       <b>ENOMEM </b>Insufficient memory to complete the operation.
+
+       <b>ENOTDIR</b>
+              The path in <i>dirp</i> is not a directory.
+
+       The following additional errors can occur for <b>scandirat</b>():
+
+       <b>EBADF  </b><i>dirfd</i> is not a valid file descriptor.
+
+       <b>ENOTDIR</b>
+              <i>dirp</i> is a relative path and <i>dirfd</i> is a file descriptor
+              referring to a file other than a directory.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>versionsort</b>() was added to glibc in version 2.1.
+
+       <b>scandirat</b>() was added to glibc in version 2.15.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌───────────────────────────┬───────────────┬────────────────┐
+       │<b>Interface                  </b>│ <b>Attribute     </b>│ <b>Value          </b>│
+       ├───────────────────────────┼───────────────┼────────────────┤
+       │<b>scandir</b>(), <b>scandirat</b>()     │ Thread safety │ MT-Safe        │
+       ├───────────────────────────┼───────────────┼────────────────┤
+       │<b>alphasort</b>(), <b>versionsort</b>() │ Thread safety │ MT-Safe locale │
+       └───────────────────────────┴───────────────┴────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>alphasort</b>(), <b>scandir</b>(): 4.3BSD, POSIX.1-2008.
+
+       <b>versionsort</b>() and <b>scandirat</b>() are GNU extensions.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Since glibc 2.1, <b>alphasort</b>() calls <a href="strcoll.3.html">strcoll(3)</a>; earlier it used
+       <a href="strcmp.3.html">strcmp(3)</a>.
+
+       Before glibc 2.10, the two arguments of <b>alphasort</b>() and <b>versionsort</b>()
+       were typed as <i>const void *</i>.  When <b>alphasort</b>() was standardized in
+       POSIX.1-2008, the argument type was specified as the type-safe <i>const</i>
+       <i>struct dirent **</i>, and glibc 2.10 changed the definition of
+       <b>alphasort</b>() (and the nonstandard <b>versionsort</b>()) to match the
+       standard.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below prints a list of the files in the current directory
+       in reverse order.
+
+   <b>Program source</b>
+
+       #define _DEFAULT_SOURCE
+       #include &lt;dirent.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+
+       int
+       main(void)
+       {
+           struct dirent **namelist;
+           int n;
+
+           n = scandir(".", &amp;namelist, NULL, alphasort);
+           if (n == -1) {
+               perror("scandir");
+               exit(EXIT_FAILURE);
+           }
+
+           while (n--) {
+               printf("%s\n", namelist[n]-&gt;d_name);
+               free(namelist[n]);
+           }
+           free(namelist);
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="closedir.3.html">closedir(3)</a>, <a href="fnmatch.3.html">fnmatch(3)</a>, <a href="opendir.3.html">opendir(3)</a>, <a href="readdir.3.html">readdir(3)</a>, <a href="rewinddir.3.html">rewinddir(3)</a>,
+       <a href="seekdir.3.html">seekdir(3)</a>, <a href="strcmp.3.html">strcmp(3)</a>, <a href="strcoll.3.html">strcoll(3)</a>, <a href="strverscmp.3.html">strverscmp(3)</a>, <a href="telldir.3.html">telldir(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2017-03-13                       SCANDIR(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/open.2.html">open(2)</a>,&nbsp; 
+    <a href="closedir.3.html">closedir(3)</a>,&nbsp; 
+    <a href="dirfd.3.html">dirfd(3)</a>,&nbsp; 
+    <a href="fnmatch.3.html">fnmatch(3)</a>,&nbsp; 
+    <a href="opendir.3.html">opendir(3)</a>,&nbsp; 
+    <a href="qsort.3.html">qsort(3)</a>,&nbsp; 
+    <a href="readdir.3.html">readdir(3)</a>,&nbsp; 
+    <a href="rewinddir.3.html">rewinddir(3)</a>,&nbsp; 
+    <a href="seekdir.3.html">seekdir(3)</a>,&nbsp; 
+    <a href="strverscmp.3.html">strverscmp(3)</a>,&nbsp; 
+    <a href="telldir.3.html">telldir(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="scandir.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

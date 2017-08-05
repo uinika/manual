@@ -1,0 +1,318 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>deb-substvars(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">deb-substvars(5)                 dpkg suite                 deb-substvars(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       deb-substvars - Debian source substitution variables
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       substvars
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Before <b>dpkg-source</b>, <b>dpkg-gencontrol </b>and <b>dpkg-genchanges </b>write their
+       control information (to the source control file <b>.dsc </b>for <b>dpkg-source</b>
+       and to standard output for <b>dpkg-gencontrol </b>and <b>dpkg-genchanges</b>) they
+       perform some variable substitutions on the output file.
+
+       A variable substitution has the form <b>${</b><i>variable-name</i><b>}</b>.  Variable
+       names consist of alphanumerics, hyphens and colons and start with an
+       alphanumeric. Variable substitutions are performed repeatedly until
+       none are left; the full text of the field after the substitution is
+       rescanned to look for more substitutions.
+
+       After all the substitutions have been done each occurrence of the
+       string <b>${} </b>(which is not a legal substitution) is replaced with a <b>$</b>
+       sign.
+
+       While variable substitution is done on all control fields, some of
+       those fields are used and needed during the build when the
+       substitution did not yet occur. That's why you can't use variables in
+       the <b>Package</b>, <b>Source </b>and <b>Architecture </b>fields.
+
+       Variable substitution happens on the content of the fields after they
+       have been parsed, thus if you want a variable to expand over multiple
+       lines you do not have to include a space after the newline. This is
+       done implicitly when the field is output. For example, if the
+       variable <b>${Description} </b>is set to "foo is bar.${Newline}foo is
+       great." and if you have the following field:
+
+        Description: foo application
+         ${Description}
+         .
+         More text.
+
+       It will result in:
+
+        Description: foo application
+         foo is bar.
+         foo is great.
+         .
+         More text.
+
+       Variables can be set using the <b>-V </b>common option. They can be also
+       specified in the file <b>debian/substvars </b>(or whatever other file is
+       specified using the <b>-T </b>option). This file consists of lines of the
+       form <i>name</i><b>=</b><i>value</i>.  Trailing whitespace on each line, blank lines, and
+       lines starting with a <b># </b>symbol (comments) are ignored.
+
+       Additionally, the following standard variables are available:
+
+       <b>Arch   </b>The current host architecture (i.e. the architecture the
+              package is being built for, the equivalent of <b>DEB_HOST_ARCH</b>).
+
+       <b>source:Version</b>
+              The source package version (since dpkg 1.13.19).
+
+       <b>source:Upstream-Version</b>
+              The upstream source package version, including the Debian
+              version epoch if any (since dpkg 1.13.19).
+
+       <b>binary:Version</b>
+              The binary package version (which may differ from
+              source:Version in a binNMU for example; since dpkg 1.13.19).
+
+       <b>Source-Version</b>
+              The source package version (from the changelog file). This
+              variable is now <b>obsolete </b>and emits an error when used as its
+              meaning is different from its function, please use the
+              <b>source:Version </b>or <b>binary:Version </b>as appropriate.
+
+       <b>Installed-Size</b>
+              The approximate total size of the package's installed files.
+              This value is copied into the corresponding control file
+              field; setting it will modify the value of that field. If this
+              variable is not set <b>dpkg-gencontrol </b>will compute the default
+              value by accumulating the size of each regular file and
+              symlink rounded to 1 KiB used units, and a baseline of 1 KiB
+              for any other filesystem object type.
+
+              <b>Note: </b>Take into account that this can only ever be an
+              approximation, as the actual size used on the installed system
+              will depend greatly on the filesystem used and its parameters,
+              which might end up using either more or less space than the
+              specified in this field.
+
+       <b>Extra-Size</b>
+              Additional disk space used when the package is installed. If
+              this variable is set its value is added to that of the
+              <b>Installed-Size </b>variable (whether set explicitly or using the
+              default value) before it is copied into the <b>Installed-Size</b>
+              control file field.
+
+       <b>S:</b><i>fieldname</i>
+              The value of the source stanza field <i>fieldname</i> (which must be
+              given in the canonical capitalisation; since dpkg 1.18.11).
+              Setting these variables has no effect other than on places
+              where they are expanded explicitly.  These variables are only
+              available when generating binary control files.
+
+       <b>F:</b><i>fieldname</i>
+              The value of the output field <i>fieldname</i> (which must be given
+              in the canonical capitalisation). Setting these variables has
+              no effect other than on places where they are expanded
+              explicitly.
+
+       <b>Format </b>The <b>.changes </b>file format version generated by this version of
+              the source packaging scripts. If you set this variable the
+              contents of the <b>Format </b>field in the <b>.changes </b>file will change
+              too.
+
+       <b>Newline</b>, <b>Space</b>, <b>Tab</b>
+              These variables each hold the corresponding character.
+
+       <b>shlibs:</b><i>dependencyfield</i>
+              Variable settings with names of this form are generated by
+              <b>dpkg-shlibdeps</b>.
+
+       <b>dpkg:Upstream-Version</b>
+              The upstream version of dpkg (since dpkg 1.13.19).
+
+       <b>dpkg:Version</b>
+              The full version of dpkg (since dpkg 1.13.19).
+
+       If a variable is referred to but not defined it generates a warning
+       and an empty value is assumed.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>debian/substvars</b>
+              List of substitution variables and values.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/dpkg.1.html">dpkg(1)</a>, <a href="../man1/dpkg-genchanges.1.html">dpkg-genchanges(1)</a>, <a href="../man1/dpkg-gencontrol.1.html">dpkg-gencontrol(1)</a>, <a href="../man1/dpkg-shlibdeps.1.html">dpkg-shlibdeps(1)</a>,
+       <a href="../man1/dpkg-source.1.html">dpkg-source(1)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>dpkg</i> (Debian Package Manager) project.
+       Information about the project can be found at 
+       ⟨<a href="https://wiki.debian.org/Teams/Dpkg/">https://wiki.debian.org/Teams/Dpkg/</a>⟩.  If you have a bug report for
+       this manual page, see 
+       ⟨<a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg">http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=dpkg</a>⟩.  This page
+       was obtained from the project's upstream Git repository 
+       ⟨git://git.debian.org/git/dpkg/dpkg.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">1.18.15-3-ga2ef                  1970-01-01                 deb-substvars(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/dpkg-genchanges.1.html">dpkg-genchanges(1)</a>,&nbsp; 
+    <a href="../man1/dpkg-gencontrol.1.html">dpkg-gencontrol(1)</a>,&nbsp; 
+    <a href="../man1/dpkg-source.1.html">dpkg-source(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

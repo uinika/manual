@@ -1,0 +1,236 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmunitsstr(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMUNITSSTR(3)             Library Functions Manual             PMUNITSSTR(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmUnitsStr</b>,  <b>pmUnitsStr_r - convert a performance metric's units into</b>
+       <b>a string</b>
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pcp/pmapi.h&gt;</b>
+
+       <b>const char *pmUnitsStr(const pmUnits *</b><i>pu</i><b>);</b>
+       <b>char *pmUnitsStr_r(const pmUnits *</b><i>pu</i><b>, char *</b><i>buf</i><b>, int </b><i>buflen</i><b>);</b>
+
+       <b>cc ... -lpcp</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The encoding of a performance metric's dimensionality and scale uses
+       a <i>pmUnits</i> structure; see <a href="pmLookupDesc.3.html">pmLookupDesc(3)</a>.
+
+       As an aid to labeling graphs and tables, or for error messages,
+       <b>pmUnitsStr </b>will take a dimension and scale specification as per <i>pu</i>,
+       and return the corresponding text string.  The <b>pmUnitsStr_r </b>function
+       does the same, but stores the result in a user-supplied buffer <i>buf</i> of
+       length <i>buflen</i>, which should have room for at least 60 bytes.  If
+       <i>buflen</i> is less than 60 then <b>pmUnitsStr_r </b>returns <b>NULL </b>and <i>buf</i> is not
+       changed.
+
+       For example <i>{1, -2, 0, PM_SPACE_MBYTE, PM_TIME_SEC, 0}</i>, as the value
+       of <i>*pu</i> gives the result string <i>Mbyte / sec^2</i>.
+
+       The string value result from <b>pmUnitsStr </b>is held in a single static
+       buffer, so the returned value is only valid until the next call to
+       <b>pmUnitsStr</b>.
+
+       If the ``count'' dimension is non-zero, and the ``count'' scale is
+       not zero, then the text string will include a decimal scaling factor,
+       eg.  <i>count x 10^6</i>.
+
+       As a special case, if all components of the dimension are zero, then
+       the ``count'' scale is used to produce the text.  If this scale is
+       zero the result is an empty string, otherwise the result is of the
+       form <i>x1 0^2</i>.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmUnitsStr </b>returns a pointer to a static buffer and hence is not
+       thread-safe.  Multi-threaded applications should use <b>pmUnitsStr_r</b>
+       instead.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PMAPI.3.html">PMAPI(3)</a>, <a href="pmAtomStr.3.html">pmAtomStr(3)</a>, <a href="pmConvScale.3.html">pmConvScale(3)</a>, <a href="pmExtractValue.3.html">pmExtractValue(3)</a>,
+       <a href="pmLookupDesc.3.html">pmLookupDesc(3)</a>, <a href="pmPrintValue.3.html">pmPrintValue(3)</a>, <a href="pmIDStr.3.html">pmIDStr(3)</a>, <a href="pmInDomStr.3.html">pmInDomStr(3)</a>,
+       <a href="pmTypeStr.3.html">pmTypeStr(3)</a>, <a href="pmSemStr.3.html">pmSemStr(3)</a> and <a href="pmUnitsStr.3.html">pmUnitsStr(3)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                       PMUNITSSTR(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/pmlogsummary.1.html">pmlogsummary(1)</a>,&nbsp; 
+    <a href="pmatomstr.3-2.html">pmatomstr(3)</a>,&nbsp; 
+    <a href="pmconvscale.3-2.html">pmconvscale(3)</a>,&nbsp; 
+    <a href="pmextractvalue.3-2.html">pmextractvalue(3)</a>,&nbsp; 
+    <a href="pmidstr.3-2.html">pmidstr(3)</a>,&nbsp; 
+    <a href="pmindomstr.3-2.html">pmindomstr(3)</a>,&nbsp; 
+    <a href="pmlookupdesc.3-2.html">pmlookupdesc(3)</a>,&nbsp; 
+    <a href="pmparseunitsstr.3-2.html">pmparseunitsstr(3)</a>,&nbsp; 
+    <a href="pmprintvalue.3-2.html">pmprintvalue(3)</a>,&nbsp; 
+    <a href="pmsemstr.3-2.html">pmsemstr(3)</a>,&nbsp; 
+    <a href="pmtypestr.3-2.html">pmtypestr(3)</a>,&nbsp; 
+    <a href="pmunitsstr.3-2.html">pmunitsstr(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

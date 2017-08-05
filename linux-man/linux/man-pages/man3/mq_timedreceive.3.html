@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>mq_receive(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MQ_RECEIVE(3)             Linux Programmer's Manual            MQ_RECEIVE(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       mq_receive, mq_timedreceive - receive a message from a message queue
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;mqueue.h&gt;</b>
+
+       <b>ssize_t mq_receive(mqd_t </b><i>mqdes</i><b>, char *</b><i>msg_ptr</i><b>,</b>
+                          <b>size_t </b><i>msg_len</i><b>, unsigned int *</b><i>msg_prio</i><b>);</b>
+
+       <b>#include &lt;time.h&gt;</b>
+       <b>#include &lt;mqueue.h&gt;</b>
+
+       <b>ssize_t mq_timedreceive(mqd_t </b><i>mqdes</i><b>, char *</b><i>msg_ptr</i><b>,</b>
+                          <b>size_t </b><i>msg_len</i><b>, unsigned int *</b><i>msg_prio</i><b>,</b>
+                          <b>const struct timespec *</b><i>abs_timeout</i><b>);</b>
+
+       Link with <i>-lrt</i>.
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>mq_timedreceive</b>():
+           _POSIX_C_SOURCE &gt;= 200112L
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mq_receive</b>() removes the oldest message with the highest priority
+       from the message queue referred to by the message queue descriptor
+       <i>mqdes</i>, and places it in the buffer pointed to by <i>msg_ptr</i>.  The
+       <i>msg_len</i> argument specifies the size of the buffer pointed to by
+       <i>msg_ptr</i>; this must be greater than or equal to the <i>mq_msgsize</i>
+       attribute of the queue (see <a href="mq_getattr.3.html">mq_getattr(3)</a>).  If <i>msg_prio</i> is not NULL,
+       then the buffer to which it points is used to return the priority
+       associated with the received message.
+
+       If the queue is empty, then, by default, <b>mq_receive</b>() blocks until a
+       message becomes available, or the call is interrupted by a signal
+       handler.  If the <b>O_NONBLOCK </b>flag is enabled for the message queue
+       description, then the call instead fails immediately with the error
+       <b>EAGAIN</b>.
+
+       <b>mq_timedreceive</b>() behaves just like <b>mq_receive</b>(), except that if the
+       queue is empty and the <b>O_NONBLOCK </b>flag is not enabled for the message
+       queue description, then <i>abs_timeout</i> points to a structure which
+       specifies how long the call will block.  This value is an absolute
+       timeout in seconds and nanoseconds since the Epoch, 1970-01-01
+       00:00:00 +0000 (UTC), specified in the following structure:
+
+           struct timespec {
+               time_t tv_sec;        /* seconds */
+               long   tv_nsec;       /* nanoseconds */
+           };
+
+       If no message is available, and the timeout has already expired by
+       the time of the call, <b>mq_timedreceive</b>() returns immediately.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>mq_receive</b>() and <b>mq_timedreceive</b>() return the number of
+       bytes in the received message; on error, -1 is returned, with <i><a href="errno.3.html">errno</a></i>
+       set to indicate the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EAGAIN </b>The queue was empty, and the <b>O_NONBLOCK </b>flag was set for the
+              message queue description referred to by <i>mqdes</i>.
+
+       <b>EBADF  </b>The descriptor specified in <i>mqdes</i> was invalid or not opened
+              for reading.
+
+       <b>EINTR  </b>The call was interrupted by a signal handler; see <a href="../man7/signal.7.html">signal(7)</a>.
+
+       <b>EINVAL </b>The call would have blocked, and <i>abs_timeout</i> was invalid,
+              either because <i>tv_sec</i> was less than zero, or because <i>tv_nsec</i>
+              was less than zero or greater than 1000 million.
+
+       <b>EMSGSIZE</b>
+              <i>msg_len</i> was less than the <i>mq_msgsize</i> attribute of the message
+              queue.
+
+       <b>ETIMEDOUT</b>
+              The call timed out before a message could be transferred.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────────────────────────┬───────────────┬─────────┐
+       │<b>Interface                       </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────────────────────────┼───────────────┼─────────┤
+       │<b>mq_receive</b>(), <b>mq_timedreceive</b>() │ Thread safety │ MT-Safe │
+       └────────────────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On Linux, <b>mq_timedreceive</b>() is a system call, and <b>mq_receive</b>() is a
+       library function layered on top of that system call.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="mq_close.3.html">mq_close(3)</a>, <a href="mq_getattr.3.html">mq_getattr(3)</a>, <a href="mq_notify.3.html">mq_notify(3)</a>, <a href="mq_open.3.html">mq_open(3)</a>, <a href="mq_send.3.html">mq_send(3)</a>,
+       <a href="mq_unlink.3.html">mq_unlink(3)</a>, <a href="../man7/mq_overview.7.html">mq_overview(7)</a>, <a href="../man7/time.7.html">time(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-12-12                    MQ_RECEIVE(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="mq_close.3.html">mq_close(3)</a>,&nbsp; 
+    <a href="mq_getattr.3.html">mq_getattr(3)</a>,&nbsp; 
+    <a href="mq_notify.3.html">mq_notify(3)</a>,&nbsp; 
+    <a href="mq_open.3.html">mq_open(3)</a>,&nbsp; 
+    <a href="mq_send.3.html">mq_send(3)</a>,&nbsp; 
+    <a href="mq_unlink.3.html">mq_unlink(3)</a>,&nbsp; 
+    <a href="../man7/mq_overview.7.html">mq_overview(7)</a>,&nbsp; 
+    <a href="../man7/signal.7.html">signal(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="mq_receive.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

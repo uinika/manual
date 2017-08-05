@@ -1,0 +1,389 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>clock_getres(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">CLOCK_GETRES(2)           Linux Programmer's Manual          CLOCK_GETRES(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       clock_getres, clock_gettime, clock_settime - clock and time functions
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;time.h&gt;</b>
+
+       <b>int clock_getres(clockid_t </b><i>clk_id</i><b>, struct timespec *</b><i>res</i><b>);</b>
+
+       <b>int clock_gettime(clockid_t </b><i>clk_id</i><b>, struct timespec *</b><i>tp</i><b>);</b>
+
+       <b>int clock_settime(clockid_t </b><i>clk_id</i><b>, const struct timespec *</b><i>tp</i><b>);</b>
+
+       Link with <i>-lrt</i> (only for glibc versions before 2.17).
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>clock_getres</b>(), <b>clock_gettime</b>(), <b>clock_settime</b>():
+              _POSIX_C_SOURCE &gt;= 199309L
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The function <b>clock_getres</b>() finds the resolution (precision) of the
+       specified clock <i>clk_id</i>, and, if <i>res</i> is non-NULL, stores it in the
+       <i>struct timespec</i> pointed to by <i>res</i>.  The resolution of clocks depends
+       on the implementation and cannot be configured by a particular
+       process.  If the time value pointed to by the argument <i>tp</i> of
+       <b>clock_settime</b>() is not a multiple of <i>res</i>, then it is truncated to a
+       multiple of <i>res</i>.
+
+       The functions <b>clock_gettime</b>() and <b>clock_settime</b>() retrieve and set
+       the time of the specified clock <i>clk_id</i>.
+
+       The <i>res</i> and <i>tp</i> arguments are <i>timespec</i> structures, as specified in
+       <i>&lt;time.h&gt;</i>:
+
+           struct timespec {
+               time_t   tv_sec;        /* seconds */
+               long     tv_nsec;       /* nanoseconds */
+           };
+
+       The <i>clk_id</i> argument is the identifier of the particular clock on
+       which to act.  A clock may be system-wide and hence visible for all
+       processes, or per-process if it measures time only within a single
+       process.
+
+       All implementations support the system-wide real-time clock, which is
+       identified by <b>CLOCK_REALTIME</b>.  Its time represents seconds and
+       nanoseconds since the Epoch.  When its time is changed, timers for a
+       relative interval are unaffected, but timers for an absolute point in
+       time are affected.
+
+       More clocks may be implemented.  The interpretation of the
+       corresponding time values and the effect on timers is unspecified.
+
+       Sufficiently recent versions of glibc and the Linux kernel support
+       the following clocks:
+
+       <b>CLOCK_REALTIME</b>
+              System-wide clock that measures real (i.e., wall-clock) time.
+              Setting this clock requires appropriate privileges.  This
+              clock is affected by discontinuous jumps in the system time
+              (e.g., if the system administrator manually changes the
+              clock), and by the incremental adjustments performed by
+              <a href="adjtime.3.html">adjtime(3)</a> and NTP.
+
+       <b>CLOCK_REALTIME_COARSE </b>(since Linux 2.6.32; Linux-specific)
+              A faster but less precise version of <b>CLOCK_REALTIME</b>.  Use when
+              you need very fast, but not fine-grained timestamps.  Requires
+              per-architecture support, and probably also architecture
+              support for this flag in the <a href="../man7/vdso.7.html">vdso(7)</a>.
+
+       <b>CLOCK_MONOTONIC</b>
+              Clock that cannot be set and represents monotonic time since
+              some unspecified starting point.  This clock is not affected
+              by discontinuous jumps in the system time (e.g., if the system
+              administrator manually changes the clock), but is affected by
+              the incremental adjustments performed by <a href="adjtime.3.html">adjtime(3)</a> and NTP.
+
+       <b>CLOCK_MONOTONIC_COARSE </b>(since Linux 2.6.32; Linux-specific)
+              A faster but less precise version of <b>CLOCK_MONOTONIC</b>.  Use
+              when you need very fast, but not fine-grained timestamps.
+              Requires per-architecture support, and probably also
+              architecture support for this flag in the <a href="../man7/vdso.7.html">vdso(7)</a>.
+
+       <b>CLOCK_MONOTONIC_RAW </b>(since Linux 2.6.28; Linux-specific)
+              Similar to <b>CLOCK_MONOTONIC</b>, but provides access to a raw
+              hardware-based time that is not subject to NTP adjustments or
+              the incremental adjustments performed by <a href="adjtime.3.html">adjtime(3)</a>.
+
+       <b>CLOCK_BOOTTIME </b>(since Linux 2.6.39; Linux-specific)
+              Identical to <b>CLOCK_MONOTONIC</b>, except it also includes any time
+              that the system is suspended.  This allows applications to get
+              a suspend-aware monotonic clock without having to deal with
+              the complications of <b>CLOCK_REALTIME</b>, which may have
+              discontinuities if the time is changed using <a href="../man2/settimeofday.2.html">settimeofday(2)</a>
+              or similar.
+
+       <b>CLOCK_PROCESS_CPUTIME_ID </b>(since Linux 2.6.12)
+              Per-process CPU-time clock (measures CPU time consumed by all
+              threads in the process).
+
+       <b>CLOCK_THREAD_CPUTIME_ID </b>(since Linux 2.6.12)
+              Thread-specific CPU-time clock.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>clock_gettime</b>(), <b>clock_settime</b>(), and <b>clock_getres</b>() return 0 for
+       success, or -1 for failure (in which case <i><a href="errno.3.html">errno</a></i> is set
+       appropriately).
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b><i>tp</i> points outside the accessible address space.
+
+       <b>EINVAL </b>The <i>clk_id</i> specified is not supported on this system.
+
+       <b>EPERM  clock_settime</b>() does not have permission to set the clock
+              indicated.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls first appeared in Linux 2.6.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌─────────────────────────────────┬───────────────┬─────────┐
+       │<b>Interface                        </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├─────────────────────────────────┼───────────────┼─────────┤
+       │<b>clock_getres</b>(), <b>clock_gettime</b>(), │ Thread safety │ MT-Safe │
+       │<b>clock_settime</b>()                  │               │         │
+       └─────────────────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SUSv2.
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On POSIX systems on which these functions are available, the symbol
+       <b>_POSIX_TIMERS </b>is defined in <i>&lt;unistd.h&gt;</i> to a value greater than 0.
+       The symbols <b>_POSIX_MONOTONIC_CLOCK</b>, <b>_POSIX_CPUTIME</b>,
+       <b>_POSIX_THREAD_CPUTIME </b>indicate that <b>CLOCK_MONOTONIC</b>,
+       <b>CLOCK_PROCESS_CPUTIME_ID</b>, <b>CLOCK_THREAD_CPUTIME_ID </b>are available.
+       (See also <a href="sysconf.3.html">sysconf(3)</a>.)
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1 specifies the following:
+
+              Setting the value of the <b>CLOCK_REALTIME </b>clock via
+              <b>clock_settime</b>() shall have no effect on threads that are
+              blocked waiting for a relative time service based upon this
+              clock, including the <b>nanosleep</b>() function; nor on the
+              expiration of relative timers based upon this clock.
+              Consequently, these time services shall expire when the
+              requested relative interval elapses, independently of the new
+              or old value of the clock.
+
+   <b>Historical note for SMP systems</b>
+       Before Linux added kernel support for <b>CLOCK_PROCESS_CPUTIME_ID </b>and
+       <b>CLOCK_THREAD_CPUTIME_ID</b>, glibc implemented these clocks on many
+       platforms using timer registers from the CPUs (TSC on i386, AR.ITC on
+       Itanium).  These registers may differ between CPUs and as a
+       consequence these clocks may return <b>bogus results </b>if a process is
+       migrated to another CPU.
+
+       If the CPUs in an SMP system have different clock sources, then there
+       is no way to maintain a correlation between the timer registers since
+       each CPU will run at a slightly different frequency.  If that is the
+       case, then <b>clock_getcpuclockid</b>(0) will return <b>ENOENT </b>to signify this
+       condition.  The two clocks will then be useful only if it can be
+       ensured that a process stays on a certain CPU.
+
+       The processors in an SMP system do not start all at exactly the same
+       time and therefore the timer registers are typically running at an
+       offset.  Some architectures include code that attempts to limit these
+       offsets on bootup.  However, the code cannot guarantee to accurately
+       tune the offsets.  Glibc contains no provisions to deal with these
+       offsets (unlike the Linux Kernel).  Typically these offsets are small
+       and therefore the effects may be negligible in most cases.
+
+       Since glibc 2.4, the wrapper functions for the system calls described
+       in this page avoid the abovementioned problems by employing the
+       kernel implementation of <b>CLOCK_PROCESS_CPUTIME_ID </b>and
+       <b>CLOCK_THREAD_CPUTIME_ID</b>, on systems that provide such an
+       implementation (i.e., Linux 2.6.12 and later).
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       According to POSIX.1-2001, a process with "appropriate privileges"
+       may set the <b>CLOCK_PROCESS_CPUTIME_ID </b>and <b>CLOCK_THREAD_CPUTIME_ID</b>
+       clocks using <b>clock_settime</b>().  On Linux, these clocks are not
+       settable (i.e., no process has "appropriate privileges").
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/date.1.html">date(1)</a>, <a href="../man2/gettimeofday.2.html">gettimeofday(2)</a>, <a href="../man2/settimeofday.2.html">settimeofday(2)</a>, <a href="../man2/time.2.html">time(2)</a>, <a href="adjtime.3.html">adjtime(3)</a>,
+       <a href="clock_getcpuclockid.3.html">clock_getcpuclockid(3)</a>, <a href="ctime.3.html">ctime(3)</a>, <a href="ftime.3.html">ftime(3)</a>, <a href="pthread_getcpuclockid.3.html">pthread_getcpuclockid(3)</a>,
+       <a href="sysconf.3.html">sysconf(3)</a>, <a href="../man7/time.7.html">time(7)</a>, <a href="../man7/vdso.7.html">vdso(7)</a>, <a href="../man8/hwclock.8.html">hwclock(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2016-12-12                  CLOCK_GETRES(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/clock_nanosleep.2.html">clock_nanosleep(2)</a>,&nbsp; 
+    <a href="../man2/getrusage.2.html">getrusage(2)</a>,&nbsp; 
+    <a href="../man2/gettimeofday.2.html">gettimeofday(2)</a>,&nbsp; 
+    <a href="../man2/nanosleep.2.html">nanosleep(2)</a>,&nbsp; 
+    <a href="../man2/recvmmsg.2.html">recvmmsg(2)</a>,&nbsp; 
+    <a href="../man2/syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man2/timer_create.2.html">timer_create(2)</a>,&nbsp; 
+    <a href="../man2/timer_delete.2.html">timer_delete(2)</a>,&nbsp; 
+    <a href="../man2/timerfd_create.2.html">timerfd_create(2)</a>,&nbsp; 
+    <a href="../man2/timer_getoverrun.2.html">timer_getoverrun(2)</a>,&nbsp; 
+    <a href="../man2/times.2.html">times(2)</a>,&nbsp; 
+    <a href="aio_suspend.3.html">aio_suspend(3)</a>,&nbsp; 
+    <a href="clock.3.html">clock(3)</a>,&nbsp; 
+    <a href="clock_getcpuclockid.3.html">clock_getcpuclockid(3)</a>,&nbsp; 
+    <a href="ftime.3.html">ftime(3)</a>,&nbsp; 
+    <a href="pmdaeventarray.3.html">pmdaeventarray(3)</a>,&nbsp; 
+    <a href="pthread_getcpuclockid.3.html">pthread_getcpuclockid(3)</a>,&nbsp; 
+    <a href="pthread_tryjoin_np.3.html">pthread_tryjoin_np(3)</a>,&nbsp; 
+    <a href="sd_bus_message_get_monotonic_usec.3.html">sd_bus_message_get_monotonic_usec(3)</a>,&nbsp; 
+    <a href="sd_event_add_time.3.html">sd_event_add_time(3)</a>,&nbsp; 
+    <a href="sd_event_now.3.html">sd_event_now(3)</a>,&nbsp; 
+    <a href="sd_journal_get_cutoff_realtime_usec.3.html">sd_journal_get_cutoff_realtime_usec(3)</a>,&nbsp; 
+    <a href="sd_journal_get_fd.3.html">sd_journal_get_fd(3)</a>,&nbsp; 
+    <a href="sd_journal_get_realtime_usec.3.html">sd_journal_get_realtime_usec(3)</a>,&nbsp; 
+    <a href="sd_login_monitor_new.3.html">sd_login_monitor_new(3)</a>,&nbsp; 
+    <a href="sem_wait.3.html">sem_wait(3)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>,&nbsp; 
+    <a href="../man7/time.7.html">time(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="../man2/clock_getres.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

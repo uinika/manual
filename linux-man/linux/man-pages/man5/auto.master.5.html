@@ -1,0 +1,503 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>auto.master(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FORMAT">FORMAT</a> | <a href="#BUILTIN_MAP_-hosts">BUILTIN&nbsp;MAP&nbsp;-hosts</a> | <a href="#LDAP_MAPS">LDAP&nbsp;MAPS</a> | <a href="#LDAP_AUTHENTICATION,_ENCRYPTED_AND_CERTIFIED_CONNECTIONS">LDAP&nbsp;AUTHENTICATION,&nbsp;ENCRYPTED&nbsp;AND&nbsp;CERTIFIED&nbsp;CONNECTIONS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">AUTO.MASTER(5)               File Formats Manual              AUTO.MASTER(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       auto.master - Master Map for automounter
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>auto.master </b>map is consulted to set up automount managed mount
+       points when the <a href="../man8/autofs.8.html">autofs(8)</a> script is invoked or the <a href="../man8/automount.8.html">automount(8)</a> pro‐
+       gram is run. Each line describes a mount point and refers to an aut‐
+       ofs map describing file systems to be mounted under the mount point.
+
+       The default location of the master map is <b>@mapdir@/auto.master </b>but an
+       alternate name may be given on the command line when running the au‐
+       tomounter and the default master map may changed by setting the
+       <b>MASTER_MAP_NAME </b>configuration variable in <b>@confdir@/autofs.  </b>If the
+       master map name has no path then the system Name Service Switch con‐
+       figuration will be consulted and each of the sources searched in line
+       with the rules given in the Name Service Switch configuration.
+
+       Access to mounts in maps is governed by a key.
+
+       For direct maps the mount point is always specified as:
+
+       <b>/-</b>
+
+       and the key used within the direct map is the full path to the mount
+       point. The direct map may have multiple entries in the master map.
+
+       For indirect maps access is by using the path scheme:
+
+       <b>/mount-point/key</b>
+
+       where <i>mount-point</i> is one of the entries listed in the master map. The
+       <i>key</i> is a single directory component and is matched against entries in
+       the map given in the entry (See <a href="autofs.5.html">autofs(5)</a>).
+
+       Additionally, a map may be included from its source as if it were it‐
+       self present in the master map by including a line of the form:
+
+       <b>+</b>[<b>maptype</b>[,<b>format</b>]:]<b>map </b>[<b>options</b>]
+
+       and <a href="../man8/automount.8.html">automount(8)</a> will process the map according to the specification
+       described below for map entries. Indirect map entries must be unique
+       in the master map so second and subsequent entries for an indirect
+       mount point are ignored by <a href="../man8/automount.8.html">automount(8)</a>.
+</pre>
+<h2><a id="FORMAT" href="#FORMAT"></a>FORMAT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Master map entries have three fields separated by an arbitrary number
+       of spaces or tabs. Lines beginning with # are comments. The first
+       field is the mount point described above and the second field is the
+       name of the map to be consulted for the mount point followed by the
+       third field which contains options to be applied to all entries in
+       the map.
+
+       The format of a master map entry is:
+
+       <b>mount-point </b>[<b>map-type</b>[,<b>format</b>]:]<b>map </b>[<b>options</b>]
+
+       <b>mount-point</b>
+              Base location for the <b>autofs </b>filesystem to be mounted.  For
+              indirect maps this directory will be created (as with <b>mkdir</b>
+              <b>-p</b>) and is removed when the <b>autofs </b>filesystem is umounted.
+
+       <b>map-type</b>
+              Type of map used for this mount point.  The following are
+              valid map types:
+
+              <b>file   </b>The map is a regular text file.
+
+              <b>program</b>
+                     The map is an executable program, which is passed a key
+                     on the command line and returns an entry (everything
+                     besides the key) on stdout if successful.  Optinally,
+                     the keyword exec may be used as a synonym for program
+                     to avoid confusion with amd formated maps mount type
+                     program.
+
+              <b>yp     </b>The map is a NIS (YP) database.
+
+              <b>nisplus</b>
+                     The map is a NIS+ database.
+
+              <b>hesiod </b>The map is a hesiod database whose <b>filsys </b>entries are
+                     used for maps.
+
+              <b>ldap </b>or <b>ldaps</b>
+                     The map is stored in an LDAP directory. If <b>ldaps </b>is
+                     used the appropriate certificate must be configured in
+                     the LDAP client.
+
+              <b>multi  </b>This map type allows the specification of multiple maps
+                     separated by "--". These maps are searched in order to
+                     resolve key lookups.
+
+              <b>dir    </b>This map type can be used at <b>+ </b>master map including
+                     notation. The contents of files under given directory
+                     are included to the master map. The name of file to be
+                     included must be ended with ".autofs". A file will be
+                     ignored if its name is not ended with the suffix. In
+                     addition a dot file, a file which name is started with
+                     "." is also ignored.
+
+       <b>format</b>
+              Format of the map data; currently the formats recognized are
+              <b>sun</b>, which is a subset of the Sun automounter map format,
+              <b>hesiod</b>, for hesiod filesys entries and <b>amd </b>for amd formated
+              map entries.  If the format is left unspecified, it defaults
+              to <b>sun </b>for all map types except <b>hesiod </b>unless it is a top
+              level <b>amd </b>mount that has a configuration entry for the mount
+              point path, in which case the format used is <b>amd</b>.
+
+       <b>map</b>
+              Name of the map to use.  This is an absolute UNIX pathname for
+              maps of types <b>file</b>, <b>dir</b>, or <b>program</b>, and the name of a
+              database in the case for maps of type <b>yp</b>, <b>nisplus</b>, or <b>hesiod</b>
+              or the <b>dn </b>of an LDAP entry for maps of type <b>ldap</b>.
+
+       <b>options</b>
+              Any remaining command line arguments without leading dashes
+              (-) are taken as options (<i>-o</i>) to <b>mount</b>.  Arguments with
+              leading dashes are considered options for the maps and are
+              passed to automount (8).
+
+              The <b>sun </b>format supports the following options:
+
+              <i>-Dvariable=value</i>
+                     Replace <i>variable</i> with <i>value</i> in map substitutions.
+
+              <i>-strict</i>
+                     Treat errors when mounting file systems as fatal. This
+                     is important when multiple file systems should be
+                     mounted (`multimounts'). If this option is given, no
+                     file system is mounted at all if at least one file
+                     system can't be mounted.
+
+              <i>[no]browse</i>
+                     This is an autofs specific option that is a pseudo
+                     mount option and so is given without a leading dash.
+                     Use of the browse option pre-creates mount point
+                     directories for indirect mount maps so the map keys can
+                     be seen in a directory listing without being mounted.
+                     Use of this option can cause performance problem if the
+                     indirect map is large so it should be used with
+                     caution. The internal program default is to enable
+                     browse mode for indirect mounts but the default
+                     installed configuration overrides this by setting
+                     BROWSE_MODE to "no" because of the potential
+                     performance problem.
+
+              <i>nobind</i> This is an autofs specific option that is a pseudo
+                     mount option and so is given without a leading dash. It
+                     may be used either in the master map entry (so it
+                     effects all the map entries) or with individual map
+                     entries to prevent bind mounting of local NFS
+                     filesystems. For direct mount maps the option is only
+                     effective if specified on the first direct map entry
+                     and is applied to all direct mount maps in the master
+                     map. It is ignored if given on subsequent direct map
+                     entries. It may be used on individual map entries of
+                     both types. Bind mounting of NFS file systems can also
+                     be prevented for specific map entrys by adding the
+                     "port=" mount option to the entries.
+
+              <i>symlink</i>
+                     This option makes bind mounting use a symlink instead
+                     of an actual bind mount. It is an autofs specific
+                     option that is a pseudo mount option and so is given
+                     without a leading dash. It may be used with indirect
+                     map entries only, either in the master map (so it
+                     effects all map entries) or with individual map
+                     entries. The option is ignored for direct mounts and
+                     non-root offest mount entries.
+
+              <i>-r, --random-multimount-selection</i>
+                     Enables the use of ramdom selection when choosing a
+                     host from a list of replicated servers. This option is
+                     applied to this mount only, overriding the global
+                     setting that may be specified on the command line.
+
+              <i>-w, --use-weight-only</i>
+                     Use only specified weights for server selection where
+                     more than one server is specified in the map entry. If
+                     no server weights are given then each available server
+                     will be tried in the order listed, within proximity.
+
+              <i>-t, --timeout &lt;seconds&gt;</i>
+                     Set the expire timeout for map entries. This option can
+                     be used to override the global default given either on
+                     the command line or in the configuration.
+
+              <i>-n, --negative-timeout &lt;seconds&gt;</i>
+                     Set the timeout for caching failed key lookups. This
+                     option can be used to override the global default given
+                     either on the command line or in the configuration.
+
+              <i>--mode &lt;octal_mode&gt;</i>
+                     Set the directory mode for the base location of the
+                     <b>autofs </b>mount point.  If this option is given, <b>autofs</b>
+                     will chmod that directory with this mode.
+</pre>
+<h2><a id="BUILTIN_MAP_-hosts" href="#BUILTIN_MAP_-hosts"></a>BUILTIN MAP -hosts  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If "-hosts" is given as the map then accessing a key under the mount
+       point which corresponds to a hostname will allow access to the
+       exports of that host. The hosts map cannot be dynamically updated and
+       requires a HUP signal to be sent to the daemon for it to check hosts
+       for an update. Due to possible hierarchic dependencies within a mount
+       tree, it might not be completely updated during the HUP signal
+       processing.
+
+       For example, with an entry in the master map of <b>/net -hosts </b>accessing
+       /net/myserver will mount exports from myserver on directories below
+       /net/myserver.
+
+       NOTE: mounts done from a hosts map will be mounted with the "no‐
+       suid,nodev,intr" options unless overridden by explicily specifying
+       the "suid", "dev" or "nointr" options in the master map entry.
+</pre>
+<h2><a id="LDAP_MAPS" href="#LDAP_MAPS"></a>LDAP MAPS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If the map type <b>ldap </b>is specified the mapname is of the form
+       <b>[//servername/]dn</b>, where the optional <b>servername </b>is the name of the
+       LDAP server to query, and <b>dn </b>is the Distinguished Name of a subtree
+       to search for map entries.  The old style <b>ldap:servername:mapname </b>is
+       also understood. Alternatively, the type can be obtained from the
+       Name Service Switch configuration, in which case the map name alone
+       must be given.
+
+       If no schema is set in the autofs configuration then autofs will
+       check each of the commonly used schema for a valid entry and if one
+       is found it will used for subsequent lookups.
+
+       There are three common schemas in use:
+
+       <i>nisMap</i>
+              Entries in the <b>nisMap </b>schema are <b>nisObject </b>objects in the
+              specified subtree, where the <b>cn </b>attribute is the key (the
+              wildcard key is "/"), and the <b>nisMapEntry </b>attribute contains
+              the information used by the automounter.
+
+       <i>automountMap</i>
+              The <b>automountMap </b>schema has two variations that differ in the
+              attribute used for the map key. Entries in the automountMap
+              schema are <b>automount </b>objects in the specified subtree, where
+              the <b>cn </b>or <b>automountKey </b>attribute (depending on local usage) is
+              the key (the wildcard key is "/"), and the <b>automountInforma‐</b>
+              <b>tion </b>attribute contains the information used by the auto‐
+              mounter. Note that the <b>cn </b>attribute is case insensitive.
+
+       The object classes and attributes used for accessing automount maps
+       in LDAP can be changed by setting entries in the autofs configuration
+       located in <b>@confdir@/autofs.conf</b>.
+
+       <b>NOTE:  </b>If a schema is given in the configuration then all the schema
+              configuration values must be set, any partial schema specifi‐
+              cation will be ignored.
+
+       For <b>amd </b>format maps a different schema is used:
+
+       <i>amdMap</i>
+              The <b>amdmap </b>schema contains attributes <b>amdmapName</b>, <b>amdmapKey</b>
+              and <b>amdmapValue </b>where <b>amdmapName </b>contains the name of the con‐
+              taining map, <b>amdmapKey </b>contains the map key and <b>amdmapValue</b>
+              contains the map entry.
+</pre>
+<h2><a id="LDAP_AUTHENTICATION,_ENCRYPTED_AND_CERTIFIED_CONNECTIONS" href="#LDAP_AUTHENTICATION,_ENCRYPTED_AND_CERTIFIED_CONNECTIONS"></a>LDAP AUTHENTICATION, ENCRYPTED AND CERTIFIED CONNECTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       LDAP authenticated binds, TLS encrypted connections and certification
+       may be used by setting appropriate values in the autofs
+       authentication configuration file and configuring the LDAP client
+       with appropriate settings.  The default location of this file is
+       <b>@mapdir@/autofs_ldap_auth.conf</b>.
+
+       If this file exists it will be used to establish whether TLS or au‐
+       thentication should be used.
+
+       An example of this file is:
+
+         &lt;?xml version="1.0" ?&gt;
+         &lt;autofs_ldap_sasl_conf
+                 usetls="yes"
+                 tlsrequired="no"
+                 authrequired="no"
+                 authtype="DIGEST-MD5"
+                 user="xyz"
+                 secret="abc"
+         /&gt;
+
+       If TLS encryption is to be used the location of the Certificate Au‐
+       thority certificate must be set within the LDAP client configuration
+       in order to validate the server certificate. If, in addition, a cer‐
+       tified connection is to be used then the client certificate and pri‐
+       vate key file locations must also be configured within the LDAP
+       client.
+
+       In OpenLDAP these may be configured in the <b>ldap.conf </b>file or in the
+       per-user configuration. For example it may be sensible to use the
+       system wide configuration for the location of the Certificate Author‐
+       ity certificate and set the location of the client certificate and
+       private key in the per-user configuration. The location of these
+       files and the configuration entry requirements is system dependent so
+       the documentation for your installation will need to be consulted to
+       get further information.
+
+       See <a href="autofs_ldap_auth.conf.5.html">autofs_ldap_auth.conf(5)</a> for more information.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+         /-        auto.data
+         /home     /etc/auto.home
+         /mnt      yp:mnt.map
+
+       This will generate two mountpoints for <i>/home</i> and <i>/mnt</i> and install
+       direct mount triggers for each entry in the direct mount map
+       <i>auto.data</i>.  All accesses to <i>/home</i> will lead to the consultation of
+       the map in <i>/etc/auto.home</i> and all accesses to <i>/mnt</i> will consult the
+       NIS map <i>mnt.map</i>.  All accesses to paths in the map <i>auto.data</i> will
+       trigger mounts when they are accessed and the Name Service Switch
+       configuration will be used to locate the source of the map <i>auto.data</i>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/automount.8.html">automount(8)</a>, <a href="autofs.5.html">autofs(5)</a>, <a href="../man8/autofs.8.html">autofs(8)</a>, <a href="autofs.conf.5.html">autofs.conf(5)</a>,
+       <a href="autofs_ldap_auth.conf.5.html">autofs_ldap_auth.conf(5)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page was written by Christoph Lameter &lt;chris@waterf.org&gt;,
+       for the Debian GNU/Linux system.  Edited by &lt;hpa@transmeta.com&gt; and
+       Ian Kent &lt;raven@themaw.net&gt; .
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>autofs</i> (automount) project.  Information
+       about the project can be found at ⟨<a href="http://www.autofs.org/">http://www.autofs.org/</a>⟩.  If you
+       have a bug report for this manual page, send it to
+       autofs@vger.kernel.org.  This page was obtained from the project's
+       upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/storage/autofs/autofs.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">                                 11 Apr 2006                  AUTO.MASTER(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="autofs.5.html">autofs(5)</a>,&nbsp; 
+    <a href="autofs.conf.5.html">autofs.conf(5)</a>,&nbsp; 
+    <a href="autofs_ldap_auth.conf.5.html">autofs_ldap_auth.conf(5)</a>,&nbsp; 
+    <a href="../man8/autofs.8.html">autofs(8)</a>,&nbsp; 
+    <a href="../man8/automount.8.html">automount(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

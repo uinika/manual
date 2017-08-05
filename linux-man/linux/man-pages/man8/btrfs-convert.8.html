@@ -1,0 +1,304 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>btrfs-convert(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">BTRFS-CONVERT(8)                Btrfs Manual                BTRFS-CONVERT(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       btrfs-convert - convert from ext2/3/4 filesystem to btrfs in-place
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>btrfs-convert </b>[options] <i>&lt;device&gt;</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>btrfs-convert </b>is used to convert existing ext2/3/4 filesystem image
+       to a btrfs filesystem in-place. The original filesystem image is
+       accessible subvolume named <i>ext2_saved</i> as file <i>image</i>.
+
+           <b>Warning</b>
+           If you are going to perform rollback to ext2/3/4, you should not
+           execute <b>btrfs balance </b>command on the converted filesystem. This
+           will change the extent layout and make <b>btrfs-convert </b>unable to
+           rollback.
+
+       The conversion utilizes free space of the original filesystem. The
+       exact estimate of the required space cannot be foretold. The final
+       btrfs metadata might occupy several gigabytes on a hundreds-gigabyte
+       filesystem.
+
+       If you decide not to rollback anymore, it is recommended to perform a
+       few more steps to transform the btrfs filesystem to a more compact
+       layout. The conversion inherits the original data block fragmentation
+       and the metadata blocks are bound to the original free space layout.
+
+       Due to different constraints, it’s possible to convert only
+       filesystem that have supported data block size (ie. the same that
+       would be valid for <i>mkfs.btrfs</i>). This is typically the system page
+       size (4KiB on x86_64 machines).
+
+           <b>Note</b>
+           The source filesystem should be clean, you are encouraged to run
+           the <i>fsck</i> tool if you’re not sure.
+
+       <b>REMOVE THE ORIGINAL FILESYSTEM METADATA</b>
+
+       By removing the <i>ext2_saved</i> subvolume, all metadata of the original
+       filesystem will be removed:
+
+           # btrfs subvolume delete /mnt/ext2_saved
+
+       At this point it’s not possible to do rollback. The filesystem is
+       usable but may be impacted by the fragmentation inherited from the
+       original filesystem.
+
+       <b>MAKE FILE DATA MORE CONTIGUOUS</b>
+
+       An optional but recommended step is to run defragmentation on the
+       entire filesystem. This will attempt to make file extents more
+       contiguous.
+
+           # btrfs filesystem defrag -v -r -f -t 32M /mnt/btrfs
+
+       Verbose recursive defragmentation (<i>-v</i>, <i>-r</i>), flush data per-file (<i>-f</i>)
+       with target extent size 32MiB (<i>-t</i>).
+
+       <b>ATTEMPT TO MAKE BTRFS METADATA MORE COMPACT</b>
+
+       Optional but recommended step.
+
+       The metadata block groups after conversion may be smaller than the
+       default size (256MiB or 1GiB). Running a balance will attempt to
+       merge the block groups. This depends on the free space layout (and
+       fragmentation) and may fail due to lack of enough work space. This is
+       a soft error leaving the filesystem usable but the block group layout
+       may remain unchanged.
+
+       Note that balance operation takes a lot of time, please see also
+       <a href="btrfs-balance.8.html">btrfs-balance(8)</a>.
+
+           # btrfs balance start -m /mnt/btrfs
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -d|--no-datasum
+           disable data checksum calculations and set the NODATASUM file
+           flag, this can speed up the conversion
+
+       -i|--no-xattr
+           ignore xattrs and ACLs of files
+
+       -n|--no-inline
+           disable inlining of small files to metadata blocks, this will
+           decrease the metadata consumption and may help to convert a
+           filesystem with low free space
+
+       -N|--nodesize <i>&lt;SIZE&gt;</i>
+           set filesystem nodesize, the tree block size in which btrfs
+           stores its metadata. The default value is 16KB (16384) or the
+           page size, whichever is bigger. Must be a multiple of the
+           sectorsize, but not larger than 65536. See <a href="mkfs.btrfs.8.html">mkfs.btrfs(8)</a> for more
+           details.
+
+       -r|--rollback
+           rollback to the original ext2/3/4 filesystem if possible
+
+       -l|--label <i>&lt;LABEL&gt;</i>
+           set filesystem label during conversion
+
+       -L|--copy-label
+           use label from the converted filesystem
+
+       -O|--features <i>&lt;feature1&gt;</i>[,<i>&lt;feature2&gt;</i>...]
+           A list of filesystem features turned on at conversion time. Not
+           all features are supported by old kernels. To disable a feature,
+           prefix it with <i>^</i>. Description of the features is in section
+           <i>FILESYSTEM FEATURES</i> of <a href="mkfs.btrfs.8.html">mkfs.btrfs(8)</a>.
+
+           To see all available features that btrfs-convert supports run:
+
+           <b>btrfs-convert -O list-all</b>
+
+       -p|--progress
+           show progress of conversion (a heartbeat indicator and number of
+           inodes processed), on by default
+
+       --no-progress
+           disable progress and show only the main phases of conversion
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>btrfs-convert </b>will return 0 if no error happened. If any problems
+       happened, 1 will be returned.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="mkfs.btrfs.8.html">mkfs.btrfs(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>btrfs-progs</i> (btrfs filesystem tools)
+       project.  Information about the project can be found at 
+       ⟨<a href="https://btrfs.wiki.kernel.org/index.php/Btrfs_source_repositories">https://btrfs.wiki.kernel.org/index.php/Btrfs_source_repositories</a>⟩.
+       If you have a bug report for this manual page, see 
+       ⟨<a href="https://btrfs.wiki.kernel.org/index.php/Problem_FAQ#How_do_I_report_bugs_and_issues.3F">https://btrfs.wiki.kernel.org/index.php/Problem_FAQ#How_do_I_report_bugs_and_issues.3F</a>⟩.
+       This page was obtained from the project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/kernel/git/kdave/btrfs-progs.git⟩
+       on 2017-07-05.  If you discover any rendering problems in this HTML
+       version of the page, or you believe there is a better or more up-to-
+       date source for the page, or you have corrections or improvements to
+       the information in this COLOPHON (which is <i>not</i> part of the original
+       manual page), send a mail to man-pages@man7.org
+
+<span class="footline">Btrfs v4.6.1                     12/10/2016                 BTRFS-CONVERT(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="btrfs.8.html">btrfs(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

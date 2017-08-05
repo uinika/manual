@@ -1,0 +1,576 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>event(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#EVENT_PRIORITIES">EVENT&nbsp;PRIORITIES</a> | <a href="#THREAD_SAFE_EVENTS">THREAD&nbsp;SAFE&nbsp;EVENTS</a> | <a href="#BUFFERED_EVENTS">BUFFERED&nbsp;EVENTS</a> | <a href="#NON-BLOCKING_HTTP_SUPPORT">NON-BLOCKING&nbsp;HTTP&nbsp;SUPPORT</a> | <a href="#ADDITIONAL_NOTES">ADDITIONAL&nbsp;NOTES</a> | <a href="#RETURN_VALUES">RETURN&nbsp;VALUES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#HISTORY">HISTORY</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#BUGS">BUGS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">EVENT(3)                BSD Library Functions Manual                EVENT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>event_init</b>, <b>event_dispatch</b>, <b>event_loop</b>, <b>event_loopexit</b>,
+     <b>event_loopbreak</b>, <b>event_set</b>, <b>event_base_dispatch</b>, <b>event_base_loop</b>,
+     <b>event_base_loopexit</b>, <b>event_base_loopbreak</b>, <b>event_base_set</b>,
+     <b>event_base_free</b>, <b>event_add</b>, <b>event_del</b>, <b>event_once</b>, <b>event_base_once</b>,
+     <b>event_pending</b>, <b>event_initialized</b>, <b>event_priority_init</b>,
+     <b>event_priority_set</b>, <b>evtimer_set</b>, <b>evtimer_add</b>, <b>evtimer_del</b>,
+     <b>evtimer_pending</b>, <b>evtimer_initialized</b>, <b>signal_set</b>, <b>signal_add</b>,
+     <b>signal_del</b>, <b>signal_pending</b>, <b>signal_initialized</b>, <b>bufferevent_new</b>,
+     <b>bufferevent_free</b>, <b>bufferevent_write</b>, <b>bufferevent_write_buffer</b>,
+     <b>bufferevent_read</b>, <b>bufferevent_enable</b>, <b>bufferevent_disable</b>,
+     <b>bufferevent_settimeout</b>, <b>bufferevent_base_set</b>, <b>evbuffer_new</b>,
+     <b>evbuffer_free</b>, <b>evbuffer_add</b>, <b>evbuffer_add_buffer</b>, <b>evbuffer_add_printf</b>,
+     <b>evbuffer_add_vprintf</b>, <b>evbuffer_drain</b>, <b>evbuffer_write</b>, <b>evbuffer_read</b>,
+     <b>evbuffer_find</b>, <b>evbuffer_readline</b>, <b>evhttp_new</b>, <b>evhttp_bind_socket</b>,
+     <b>evhttp_free </b>— execute a function when a specific event occurs
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>#include &lt;sys/time.h&gt;</b>
+     <b>#include &lt;event.h&gt;</b>
+
+     <i>struct event_base *</i>
+     <b>event_init</b>(<i>void</i>);
+
+     <i>int</i>
+     <b>event_dispatch</b>(<i>void</i>);
+
+     <i>int</i>
+     <b>event_loop</b>(<i>int flags</i>);
+
+     <i>int</i>
+     <b>event_loopexit</b>(<i>struct timeval *tv</i>);
+
+     <i>int</i>
+     <b>event_loopbreak</b>(<i>void</i>);
+
+     <i>void</i>
+     <b>event_set</b>(<i>struct event *ev</i>, <i>int fd</i>, <i>short event</i>,
+         <i>void (*fn)(int, short, void *)</i>, <i>void *arg</i>);
+
+     <i>int</i>
+     <b>event_base_dispatch</b>(<i>struct event_base *base</i>);
+
+     <i>int</i>
+     <b>event_base_loop</b>(<i>struct event_base *base</i>, <i>int flags</i>);
+
+     <i>int</i>
+     <b>event_base_loopexit</b>(<i>struct event_base *base</i>, <i>struct timeval *tv</i>);
+
+     <i>int</i>
+     <b>event_base_loopbreak</b>(<i>struct event_base *base</i>);
+
+     <i>int</i>
+     <b>event_base_set</b>(<i>struct event_base *base</i>, <i>struct event *</i>);
+
+     <i>void</i>
+     <b>event_base_free</b>(<i>struct event_base *base</i>);
+
+     <i>int</i>
+     <b>event_add</b>(<i>struct event *ev</i>, <i>struct timeval *tv</i>);
+
+     <i>int</i>
+     <b>event_del</b>(<i>struct event *ev</i>);
+
+     <i>int</i>
+     <b>event_once</b>(<i>int fd</i>, <i>short event</i>, <i>void (*fn)(int, short, void *)</i>,
+         <i>void *arg</i>, <i>struct timeval *tv</i>);
+
+     <i>int</i>
+     <b>event_base_once</b>(<i>struct event_base *base</i>, <i>int fd</i>, <i>short event</i>,
+         <i>void (*fn)(int, short, void *)</i>, <i>void *arg</i>, <i>struct timeval *tv</i>);
+
+     <i>int</i>
+     <b>event_pending</b>(<i>struct event *ev</i>, <i>short event</i>, <i>struct timeval *tv</i>);
+
+     <i>int</i>
+     <b>event_initialized</b>(<i>struct event *ev</i>);
+
+     <i>int</i>
+     <b>event_priority_init</b>(<i>int npriorities</i>);
+
+     <i>int</i>
+     <b>event_priority_set</b>(<i>struct event *ev</i>, <i>int priority</i>);
+
+     <i>void</i>
+     <b>evtimer_set</b>(<i>struct event *ev</i>, <i>void (*fn)(int, short, void *)</i>,
+         <i>void *arg</i>);
+
+     <i>void</i>
+     <b>evtimer_add</b>(<i>struct event *ev</i>, <i>struct timeval *</i>);
+
+     <i>void</i>
+     <b>evtimer_del</b>(<i>struct event *ev</i>);
+
+     <i>int</i>
+     <b>evtimer_pending</b>(<i>struct event *ev</i>, <i>struct timeval *tv</i>);
+
+     <i>int</i>
+     <b>evtimer_initialized</b>(<i>struct event *ev</i>);
+
+     <i>void</i>
+     <b>signal_set</b>(<i>struct event *ev</i>, <i>int signal</i>,
+         <i>void (*fn)(int, short, void *)</i>, <i>void *arg</i>);
+
+     <i>void</i>
+     <b>signal_add</b>(<i>struct event *ev</i>, <i>struct timeval *</i>);
+
+     <i>void</i>
+     <b>signal_del</b>(<i>struct event *ev</i>);
+
+     <i>int</i>
+     <b>signal_pending</b>(<i>struct event *ev</i>, <i>struct timeval *tv</i>);
+
+     <i>int</i>
+     <b>signal_initialized</b>(<i>struct event *ev</i>);
+
+     <i>struct bufferevent *</i>
+     <b>bufferevent_new</b>(<i>int fd</i>, <i>evbuffercb readcb</i>, <i>evbuffercb writecb</i>,
+         <i>everrorcb</i>, <i>void *cbarg</i>);
+
+     <i>void</i>
+     <b>bufferevent_free</b>(<i>struct bufferevent *bufev</i>);
+
+     <i>int</i>
+     <b>bufferevent_write</b>(<i>struct bufferevent *bufev</i>, <i>void *data</i>, <i>size_t size</i>);
+
+     <i>int</i>
+     <b>bufferevent_write_buffer</b>(<i>struct bufferevent *bufev</i>,
+         <i>struct evbuffer *buf</i>);
+
+     <i>size_t</i>
+     <b>bufferevent_read</b>(<i>struct bufferevent *bufev</i>, <i>void *data</i>, <i>size_t size</i>);
+
+     <i>int</i>
+     <b>bufferevent_enable</b>(<i>struct bufferevent *bufev</i>, <i>short event</i>);
+
+     <i>int</i>
+     <b>bufferevent_disable</b>(<i>struct bufferevent *bufev</i>, <i>short event</i>);
+
+     <i>void</i>
+     <b>bufferevent_settimeout</b>(<i>struct bufferevent *bufev</i>, <i>int timeout_read</i>,
+         <i>int timeout_write</i>);
+
+     <i>int</i>
+     <b>bufferevent_base_set</b>(<i>struct event_base *base</i>,
+         <i>struct bufferevent *bufev</i>);
+
+     <i>struct evbuffer *</i>
+     <b>evbuffer_new</b>(<i>void</i>);
+
+     <i>void</i>
+     <b>evbuffer_free</b>(<i>struct evbuffer *buf</i>);
+
+     <i>int</i>
+     <b>evbuffer_add</b>(<i>struct evbuffer *buf</i>, <i>const void *data</i>, <i>size_t size</i>);
+
+     <i>int</i>
+     <b>evbuffer_add_buffer</b>(<i>struct evbuffer *dst</i>, <i>struct evbuffer *src</i>);
+
+     <i>int</i>
+     <b>evbuffer_add_printf</b>(<i>struct evbuffer *buf</i>, <i>const char *fmt</i>, <i>...</i>);
+
+     <i>int</i>
+     <b>evbuffer_add_vprintf</b>(<i>struct evbuffer *buf</i>, <i>const char *fmt</i>,
+         <i>va_list ap</i>);
+
+     <i>void</i>
+     <b>evbuffer_drain</b>(<i>struct evbuffer *buf</i>, <i>size_t size</i>);
+
+     <i>int</i>
+     <b>evbuffer_write</b>(<i>struct evbuffer *buf</i>, <i>int fd</i>);
+
+     <i>int</i>
+     <b>evbuffer_read</b>(<i>struct evbuffer *buf</i>, <i>int fd</i>, <i>int size</i>);
+
+     <i>unsigned char *</i>
+     <b>evbuffer_find</b>(<i>struct evbuffer *buf</i>, <i>const unsigned char *data</i>,
+         <i>size_t size</i>);
+
+     <i>char *</i>
+     <b>evbuffer_readline</b>(<i>struct evbuffer *buf</i>);
+
+     <i>struct evhttp *</i>
+     <b>evhttp_new</b>(<i>struct event_base *base</i>);
+
+     <i>int</i>
+     <b>evhttp_bind_socket</b>(<i>struct evhttp *http</i>, <i>const char *address</i>,
+         <i>unsigned short port</i>);
+
+     <i>void</i>
+     <b>evhttp_free</b>(<i>struct evhttp *http</i>);
+
+     <i>int (*event_sigcb)(void)</i>;
+
+     <i>volatile sig_atomic_t event_gotsig</i>;
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     The <b>event </b>API provides a mechanism to execute a function when a spe‐
+     cific event on a file descriptor occurs or after a given time has
+     passed.
+
+     The <b>event </b>API needs to be initialized with <b>event_init</b>() before it can
+     be used.
+
+     In order to process events, an application needs to call
+     <b>event_dispatch</b>().  This function only returns on error, and should
+     replace the event core of the application program.
+
+     The function <b>event_set</b>() prepares the event structure <i>ev</i> to be used in
+     future calls to <b>event_add</b>() and <b>event_del</b>().  The event will be pre‐
+     pared to call the function specified by the <i>fn</i> argument with an <i>int</i>
+     argument indicating the file descriptor, a <i>short</i> argument indicating
+     the type of event, and a <i>void *</i> argument given in the <i>arg</i> argument.
+     The <i>fd</i> indicates the file descriptor that should be monitored for
+     events.  The events can be either <i>EV_READ</i>, <i>EV_WRITE</i>, or both, indicat‐
+     ing that an application can read or write from the file descriptor
+     respectively without blocking.
+
+     The function <i>fn</i> will be called with the file descriptor that triggered
+     the event and the type of event which will be either <i>EV_TIMEOUT</i>,
+     <i>EV_SIGNAL</i>, <i>EV_READ</i>, or <i>EV_WRITE</i>.  Additionally, an event which has reg‐
+     istered interest in more than one of the preceeding events, via bit‐
+     wise-OR to <b>event_set</b>(), can provide its callback function with a bit‐
+     wise-OR of more than one triggered event.  The additional flag
+     <i>EV_PERSIST</i> makes an <b>event_add</b>() persistent until <b>event_del</b>() has been
+     called.
+
+     Once initialized, the <i>ev</i> structure can be used repeatedly with
+     <b>event_add</b>() and <b>event_del</b>() and does not need to be reinitialized
+     unless the function called and/or the argument to it are to be changed.
+     However, when an <i>ev</i> structure has been added to libevent using
+     <b>event_add</b>() the structure must persist until the event occurs (assuming
+     <i>EV_PERSIST</i> is not set) or is removed using <b>event_del</b>().  You may not
+     reuse the same <i>ev</i> structure for multiple monitored descriptors; each
+     descriptor needs its own <i>ev</i>.
+
+     The function <b>event_add</b>() schedules the execution of the <i>ev</i> event when
+     the event specified in <b>event_set</b>() occurs or in at least the time spec‐
+     ified in the <i>tv</i>.  If <i>tv</i> is NULL, no timeout occurs and the function
+     will only be called if a matching event occurs on the file descriptor.
+     The event in the <i>ev</i> argument must be already initialized by <b>event_set</b>()
+     and may not be used in calls to <b>event_set</b>() until it has timed out or
+     been removed with <b>event_del</b>().  If the event in the <i>ev</i> argument already
+     has a scheduled timeout, the old timeout will be replaced by the new
+     one.
+
+     The function <b>event_del</b>() will cancel the event in the argument <i>ev</i>.  If
+     the event has already executed or has never been added the call will
+     have no effect.
+
+     The functions <b>evtimer_set</b>(), <b>evtimer_add</b>(), <b>evtimer_del</b>(),
+     <b>evtimer_initialized</b>(), and <b>evtimer_pending</b>() are abbreviations for com‐
+     mon situations where only a timeout is required.  The file descriptor
+     passed will be -1, and the event type will be <i>EV_TIMEOUT</i>.
+
+     The functions <b>signal_set</b>(), <b>signal_add</b>(), <b>signal_del</b>(),
+     <b>signal_initialized</b>(), and <b>signal_pending</b>() are abbreviations.  The
+     event type will be a persistent <i>EV_SIGNAL</i>.  That means <b>signal_set</b>()
+     adds <i>EV_PERSIST</i>.
+
+     In order to avoid races in signal handlers, the <b>event </b>API provides two
+     variables: <i>event_sigcb</i> and <i>event_gotsig</i>.  A signal handler sets
+     <i>event_gotsig</i> to indicate that a signal has been received.  The applica‐
+     tion sets <i>event_sigcb</i> to a callback function.  After the signal handler
+     sets <i>event_gotsig</i>, <b>event_dispatch </b>will execute the callback function to
+     process received signals.  The callback returns 1 when no events are
+     registered any more.  It can return -1 to indicate an error to the
+     <b>event </b>library, causing <b>event_dispatch</b>() to terminate with <i><a href="errno.3.html">errno</a></i> set to
+     EINTR.
+
+     The function <b>event_once</b>() is similar to <b>event_set</b>().  However, it
+     schedules a callback to be called exactly once and does not require the
+     caller to prepare an <i>event</i> structure.  This function supports
+     <i>EV_TIMEOUT</i>, <i>EV_READ</i>, and <i>EV_WRITE</i>.
+
+     The <b>event_pending</b>() function can be used to check if the event speci‐
+     fied by <i>event</i> is pending to run.  If <i>EV_TIMEOUT</i> was specified and <i>tv</i> is
+     not NULL, the expiration time of the event will be returned in <i>tv</i>.
+
+     The <b>event_initialized</b>() macro can be used to check if an event has been
+     initialized.
+
+     The <b>event_loop </b>function provides an interface for single pass execution
+     of pending events.  The flags <i>EVLOOP_ONCE</i> and <i>EVLOOP_NONBLOCK</i> are rec‐
+     ognized.  The <b>event_loopexit </b>function exits from the event loop. The
+     next <b>event_loop</b>() iteration after the given timer expires will complete
+     normally (handling all queued events) then exit without blocking for
+     events again. Subsequent invocations of <b>event_loop</b>() will proceed nor‐
+     mally.  The <b>event_loopbreak </b>function exits from the event loop immedi‐
+     ately.  <b>event_loop</b>() will abort after the next event is completed;
+     <b>event_loopbreak</b>() is typically invoked from this event's callback. This
+     behavior is analogous to the "break;" statement. Subsequent invocations
+     of <b>event_loop</b>() will proceed normally.
+
+     It is the responsibility of the caller to provide these functions with
+     pre-allocated event structures.
+</pre>
+<h2><a id="EVENT_PRIORITIES" href="#EVENT_PRIORITIES"></a>EVENT PRIORITIES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     By default <b>libevent </b>schedules all active events with the same priority.
+     However, sometimes it is desirable to process some events with a higher
+     priority than others.  For that reason, <b>libevent </b>supports strict prior‐
+     ity queues.  Active events with a lower priority are always processed
+     before events with a higher priority.
+
+     The number of different priorities can be set initially with the
+     <b>event_priority_init</b>() function.  This function should be called before
+     the first call to <b>event_dispatch</b>().  The <b>event_priority_set</b>() function
+     can be used to assign a priority to an event.  By default, <b>libevent</b>
+     assigns the middle priority to all events unless their priority is
+     explicitly set.
+</pre>
+<h2><a id="THREAD_SAFE_EVENTS" href="#THREAD_SAFE_EVENTS"></a>THREAD SAFE EVENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>Libevent </b>has experimental support for thread-safe events.  When ini‐
+     tializing the library via <b>event_init</b>(), an event base is returned.
+     This event base can be used in conjunction with calls to
+     <b>event_base_set</b>(), <b>event_base_dispatch</b>(), <b>event_base_loop</b>(),
+     <b>event_base_loopexit</b>(), <b>bufferevent_base_set</b>() and <b>event_base_free</b>().
+     <b>event_base_set</b>() should be called after preparing an event with
+     <b>event_set</b>(), as <b>event_set</b>() assigns the provided event to the most
+     recently created event base.  <b>bufferevent_base_set</b>() should be called
+     after preparing a bufferevent with <b>bufferevent_new</b>().
+     <b>event_base_free</b>() should be used to free memory associated with the
+     event base when it is no longer needed.
+</pre>
+<h2><a id="BUFFERED_EVENTS" href="#BUFFERED_EVENTS"></a>BUFFERED EVENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>libevent </b>provides an abstraction on top of the regular event callbacks.
+     This abstraction is called a <i>buffered event</i>.  A buffered event provides
+     input and output buffers that get filled and drained automatically.
+     The user of a buffered event no longer deals directly with the IO, but
+     instead is reading from input and writing to output buffers.
+
+     A new bufferevent is created by <b>bufferevent_new</b>().  The parameter <i>fd</i>
+     specifies the file descriptor from which data is read and written to.
+     This file descriptor is not allowed to be a pipe(2).  The next three
+     parameters are callbacks.  The read and write callback have the follow‐
+     ing form: <i>void</i> <b>(*cb)</b>(<i>struct bufferevent *bufev</i>, <i>void *arg</i>).  The error
+     callback has the following form: <i>void</i> <b>(*cb)</b>(<i>struct bufferevent *bufev</i>,
+     <i>short what</i>, <i>void *arg</i>).  The argument is specified by the fourth param‐
+     eter <i>cbarg</i>.  A <i>bufferevent struct</i> pointer is returned on success, NULL
+     on error.  Both the read and the write callback may be NULL.  The error
+     callback has to be always provided.
+
+     Once initialized, the bufferevent structure can be used repeatedly with
+     bufferevent_enable() and bufferevent_disable().  The flags parameter
+     can be a combination of <i>EV_READ</i> and <i>EV_WRITE</i>.  When read enabled the
+     bufferevent will try to read from the file descriptor and call the read
+     callback.  The write callback is executed whenever the output buffer is
+     drained below the write low watermark, which is <i>0</i> by default.
+
+     The <b>bufferevent_write</b>() function can be used to write data to the file
+     descriptor.  The data is appended to the output buffer and written to
+     the descriptor automatically as it becomes available for writing.
+     <b>bufferevent_write</b>() returns 0 on success or -1 on failure.  The
+     <b>bufferevent_read</b>() function is used to read data from the input buffer,
+     returning the amount of data read.
+
+     If multiple bases are in use, bufferevent_base_set() must be called
+     before enabling the bufferevent for the first time.
+</pre>
+<h2><a id="NON-BLOCKING_HTTP_SUPPORT" href="#NON-BLOCKING_HTTP_SUPPORT"></a>NON-BLOCKING HTTP SUPPORT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     <b>libevent </b>provides a very thin HTTP layer that can be used both to host
+     an HTTP server and also to make HTTP requests.  An HTTP server can be
+     created by calling <b>evhttp_new</b>().  It can be bound to any port and
+     address with the <b>evhttp_bind_socket</b>() function.  When the HTTP server
+     is no longer used, it can be freed via <b>evhttp_free</b>().
+
+     To be notified of HTTP requests, a user needs to register callbacks
+     with the HTTP server.  This can be done by calling <b>evhttp_set_cb</b>().
+     The second argument is the URI for which a callback is being regis‐
+     tered.  The corresponding callback will receive an <i>struct</i>
+     <i>evhttp_request</i> object that contains all information about the request.
+
+     This section does not document all the possible function calls; please
+     check <i>event.h</i> for the public interfaces.
+</pre>
+<h2><a id="ADDITIONAL_NOTES" href="#ADDITIONAL_NOTES"></a>ADDITIONAL NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     It is possible to disable support for <i>epoll</i>, <i>kqueue</i>, <i>devpoll</i>, <i>poll</i> or
+     <i>select</i> by setting the environment variable <i>EVENT_NOEPOLL</i>,
+     <i>EVENT_NOKQUEUE</i>, <i>EVENT_NODEVPOLL</i>, <i>EVENT_NOPOLL</i> or <i>EVENT_NOSELECT</i>,
+     respectively.  By setting the environment variable <i>EVENT_SHOW_METHOD</i>,
+     <b>libevent </b>displays the kernel notification method that it uses.
+</pre>
+<h2><a id="RETURN_VALUES" href="#RETURN_VALUES"></a>RETURN VALUES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     Upon successful completion <b>event_add</b>() and <b>event_del</b>() return 0.  Oth‐
+     erwise, -1 is returned and the global variable errno is set to indicate
+     the error.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     kqueue(2), poll(2), select(2), evdns(3), timeout(9)
+</pre>
+<h2><a id="HISTORY" href="#HISTORY"></a>HISTORY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     The <b>event </b>API manpage is based on the timeout(9) manpage by Artur
+     Grabowski.  The port of <b>libevent </b>to Windows is due to Michael A. Davis.
+     Support for real-time signals is due to Taral.
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     The <b>event </b>library was written by Niels Provos.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     This documentation is neither complete nor authoritative.  If you are
+     in doubt about the usage of this API then check the source code to find
+     out how it works, write up the missing piece of documentation and send
+     it to me for inclusion in this man page.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+     This page is part of the <i>libevent</i> (an event notification library)
+     project.  Information about the project can be found at
+     <a href="http://libevent.org/">http://libevent.org/</a>.  If you have a bug report for this manual page,
+     see <a href="http://sourceforge.net/p/levent/bugs/">http://sourceforge.net/p/levent/bugs/</a>.  This page was obtained from
+     the project's upstream Git repository
+     <a href="https://github.com/libevent/libevent.git">https://github.com/libevent/libevent.git</a> on 2017-07-05.  If you dis‐
+     cover any rendering problems in this HTML version of the page, or you
+     believe there is a better or more up-to-date source for the page, or
+     you have corrections or improvements to the information in this
+     COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+     to man-pages@man7.org
+
+<span class="footline">BSD                            August 8, 2000                            BSD</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

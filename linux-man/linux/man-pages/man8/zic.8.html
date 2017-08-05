@@ -1,0 +1,400 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>zic(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ZIC(8)                   Linux System Administration                  ZIC(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       zic - timezone compiler
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>zic </b>[<b>-v</b>] [<b>-d </b><i>directory</i>] [<b>-l </b><i>localtime</i>] [<b>-p </b><i>posixrules</i>]
+           [<b>-L </b><i>leapsecondfilename</i>] [<b>-s</b>] [<b>-y </b><i>command</i>] [<i>filename</i>...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>zic </b>program reads text from the file(s) named on the command line
+       and creates the time conversion information files specified in this
+       input.  If a <i>filename</i> is <b>-</b>, standard input is read.
+
+       These options are available:
+
+       <b>-d </b><i>directory</i>
+              Create time conversion information files in the named
+              directory rather than in the standard directory named below.
+
+       <b>-l </b><i>timezone</i>
+              Use the given timezone as local time.  <b>zic </b>will act as if the
+              input contained a link line of the form
+
+                   Link <i>timezone</i>       localtime
+
+       <b>-p </b><i>timezone</i>
+              Use the given timezone's rules when handling POSIX-format
+              timezone environment variables.  <b>zic </b>will act as if the input
+              contained a link line of the form
+
+                   Link <i>timezone</i>       posixrules
+
+       <b>-L </b><i>leapsecondfilename</i>
+              Read leap second information from the file with the given
+              name.  If this option is not used, no leap second information
+              appears in output files.
+
+       <b>-v     </b>Complain if a year that appears in a data file is outside the
+              range of years representable by <a href="../man2/time.2.html">time(2)</a> values.
+
+       <b>-s     </b>Limit time values stored in output files to values that are
+              the same whether they're taken to be signed or unsigned.  You
+              can use this option to generate SVVS-compatible files.
+
+       <b>-y </b><i>command</i>
+              Use the given <i>command</i> rather than <b>yearistype </b>when checking
+              year types (see below).
+
+       Input lines are made up of fields.  Fields are separated from one
+       another by any number of white space characters.  Leading and
+       trailing white space on input lines is ignored.  An unquoted sharp
+       character (#) in the input introduces a comment which extends to the
+       end of the line the sharp character appears on.  White space
+       characters and sharp characters may be enclosed in double quotes (")
+       if they're to be used as part of a field.  Any line that is blank
+       (after comment stripping) is ignored.  Nonblank lines are expected to
+       be of one of three types: rule lines, zone lines, and link lines.
+
+       A rule line has the form
+
+            Rule  NAME  FROM  TO    TYPE  IN   ON       AT    SAVE  LETTER/S
+
+       For example:
+
+            Rule  US    1967  1973  -     Apr  lastSun  2:00  1:00  D
+
+       The fields that make up a rule line are:
+
+       <b>NAME    </b>Gives the (arbitrary) name of the set of rules this rule is
+               part of.
+
+       <b>FROM    </b>Gives the first year in which the rule applies.  Any integer
+               year can be supplied; the Gregorian calendar is assumed.  The
+               word <i>minimum</i> (or an abbreviation) means the minimum year
+               representable as an integer.  The word <i>maximum</i> (or an
+               abbreviation) means the maximum year representable as an
+               integer.  Rules can describe times that are not representable
+               as time values, with the unrepresentable times ignored; this
+               allows rules to be portable among hosts with differing time
+               value types.
+
+       <b>TO      </b>Gives the final year in which the rule applies.  In addition
+               to <i>minimum</i> and <i>maximum</i> (as above), the word <i>only</i> (or an
+               abbreviation) may be used to repeat the value of the <b>FROM</b>
+               field.
+
+       <b>TYPE    </b>Gives the type of year in which the rule applies.  If <b>TYPE </b>is
+               <b>-</b>, then the rule applies in all years between <b>FROM </b>and <b>TO</b>
+               inclusive.  If <b>TYPE </b>is something else, then <i>zic</i> executes the
+               command
+                    <b>yearistype </b><i>year type</i>
+               to check the type of a year: an exit status of zero is taken
+               to mean that the year is of the given type; an exit status of
+               one is taken to mean that the year is not of the given type.
+
+       <b>IN      </b>Names the month in which the rule takes effect.  Month names
+               may be abbreviated.
+
+       <b>ON      </b>Gives the day on which the rule takes effect.  Recognized
+               forms include:
+
+                    5        the fifth of the month
+                    lastSun  the last Sunday in the month
+                    lastMon  the last Monday in the month
+                    Sun&gt;=8   first Sunday on or after the eighth
+                    Sun&lt;=25  last Sunday on or before the 25th
+
+               Names of days of the week may be abbreviated or spelled out
+               in full.  Note that there must be no spaces within the <b>ON</b>
+               field.
+
+       <b>AT      </b>Gives the time of day at which the rule takes effect.
+               Recognized forms include:
+
+                    2        time in hours
+                    2:00     time in hours and minutes
+                    15:00    24-hour format time (for times after noon)
+                    1:28:14  time in hours, minutes, and seconds
+                    -        equivalent to 0
+
+               where hour 0 is midnight at the start of the day, and hour 24
+               is midnight at the end of the day.  Any of these forms may be
+               followed by the letter <i>w</i> if the given time is local "wall
+               clock" time, <i>s</i> if the given time is local "standard" time, or
+               <i>u</i> (or <i>g</i> or <i>z</i>) if the given time is universal time; in the
+               absence of an indicator, wall clock time is assumed.
+
+       <b>SAVE    </b>Gives the amount of time to be added to local standard time
+               when the rule is in effect.  This field has the same format
+               as the <b>AT </b>field (although, of course, the <i>w</i> and <i>s</i> suffixes
+               are not used).
+
+       <b>LETTER/S</b>
+               Gives the "variable part" (for example, the "S" or "D" in
+               "EST" or "EDT") of timezone abbreviations to be used when
+               this rule is in effect.  If this field is <b>-</b>, the variable
+               part is null.
+
+       A zone line has the form
+
+            Zone  NAME                UTCOFF  RULES/SAVE  FORMAT  [UNTIL]
+
+       For example:
+
+            Zone  Australia/Adelaide  9:30    Aus         CST     1971 Oct 31 2:00
+
+       The fields that make up a zone line are:
+
+       <b>NAME  </b>The name of the timezone.  This is the name used in creating
+             the time conversion information file for the zone.
+
+       <b>UTCOFF</b>
+             The amount of time to add to UTC to get standard time in this
+             zone.  This field has the same format as the <b>AT </b>and <b>SAVE </b>fields
+             of rule lines; begin the field with a minus sign if time must
+             be subtracted from UTC.
+
+       <b>RULES/SAVE</b>
+             The name of the rule(s) that apply in the timezone or,
+             alternately, an amount of time to add to local standard time.
+             If this field is <b>-</b>, then standard time always applies in the
+             timezone.
+
+       <b>FORMAT</b>
+             The format for timezone abbreviations in this timezone.  The
+             pair of characters <b>%s </b>is used to show where the "variable part"
+             of the timezone abbreviation goes.  Alternately, a slash (/)
+             separates standard and daylight abbreviations.
+
+       <b>UNTIL </b>The time at which the UTC offset or the rule(s) change for a
+             location.  It is specified as a year, a month, a day, and a
+             time of day.  If this is specified, the timezone information is
+             generated from the given UTC offset and rule change until the
+             time specified.  The month, day, and time of day have the same
+             format as the IN, ON, and AT columns of a rule; trailing
+             columns can be omitted, and default to the earliest possible
+             value for the missing columns.
+
+             The next line must be a "continuation" line; this has the same
+             form as a zone line except that the string "Zone" and the name
+             are omitted, as the continuation line will place information
+             starting at the time specified as the <b>UNTIL </b>field in the
+             previous line in the file used by the previous line.
+             Continuation lines may contain an <b>UNTIL </b>field, just as zone
+             lines do, indicating that the next line is a further
+             continuation.
+
+       A link line has the form
+
+            Link  LINK-FROM        LINK-TO
+
+       For example:
+
+            Link  Europe/Istanbul  Asia/Istanbul
+
+       The <b>LINK-FROM </b>field should appear as the <b>NAME </b>field in some zone
+       line; the <b>LINK-TO </b>field is used as an alternate name for that zone.
+
+       Except for continuation lines, lines may appear in any order in the
+       input.
+
+       Lines in the file that describes leap seconds have the following
+       form:
+
+            Leap  YEAR  MONTH  DAY  HH:MM:SS  CORR  R/S
+
+       For example:
+
+            Leap  1974  Dec    31   23:59:60  +     S
+
+       The <b>YEAR</b>, <b>MONTH</b>, <b>DAY</b>, and <b>HH:MM:SS </b>fields tell when the leap second
+       happened.  The <b>CORR </b>field should be "+" if a second was added or "-"
+       if a second was skipped.  The <b>R/S </b>field should be (an abbreviation
+       of) "Stationary" if the leap second time given by the other fields
+       should be interpreted as UTC or (an abbreviation of) "Rolling" if the
+       leap second time given by the other fields should be interpreted as
+       local wall clock time.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/usr/local/etc/zoneinfo</i>
+              Standard directory used for created files.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For areas with more than two types of local time, you may need to use
+       local standard time in the <b>AT </b>field of the earliest transition time's
+       rule to ensure that the earliest transition time recorded in the
+       compiled file is correct.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man5/tzfile.5.html">tzfile(5)</a>, <a href="zdump.8.html">zdump(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2010-02-25                           ZIC(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="tzselect.8.html">tzselect(8)</a>,&nbsp; 
+    <a href="zdump.8.html">zdump(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="zic.8.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

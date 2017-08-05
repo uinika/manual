@@ -1,0 +1,261 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sem_open(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SEM_OPEN(3)               Linux Programmer's Manual              SEM_OPEN(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sem_open - initialize and open a named semaphore
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;fcntl.h&gt;           </b>/* For O_* constants */
+       <b>#include &lt;sys/stat.h&gt;        </b>/* For mode constants */
+       <b>#include &lt;semaphore.h&gt;</b>
+
+       <b>sem_t *sem_open(const char *</b><i>name</i><b>, int </b><i>oflag</i><b>);</b>
+       <b>sem_t *sem_open(const char *</b><i>name</i><b>, int </b><i>oflag</i><b>,</b>
+                       <b>mode_t </b><i>mode</i><b>, unsigned int </b><i>value</i><b>);</b>
+
+       Link with <i>-pthread</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sem_open</b>() creates a new POSIX semaphore or opens an existing
+       semaphore.  The semaphore is identified by <i>name</i>.  For details of the
+       construction of <i>name</i>, see <a href="../man7/sem_overview.7.html">sem_overview(7)</a>.
+
+       The <i>oflag</i> argument specifies flags that control the operation of the
+       call.  (Definitions of the flags values can be obtained by including
+       <i>&lt;fcntl.h&gt;</i>.)  If <b>O_CREAT </b>is specified in <i>oflag</i>, then the semaphore is
+       created if it does not already exist.  The owner (user ID) of the
+       semaphore is set to the effective user ID of the calling process.
+       The group ownership (group ID) is set to the effective group ID of
+       the calling process.  If both <b>O_CREAT </b>and <b>O_EXCL </b>are specified in
+       <i>oflag</i>, then an error is returned if a semaphore with the given <i>name</i>
+       already exists.
+
+       If <b>O_CREAT </b>is specified in <i>oflag</i>, then two additional arguments must
+       be supplied.  The <i>mode</i> argument specifies the permissions to be
+       placed on the new semaphore, as for <a href="../man2/open.2.html">open(2)</a>.  (Symbolic definitions
+       for the permissions bits can be obtained by including <i>&lt;sys/stat.h&gt;</i>.)
+       The permissions settings are masked against the process umask.  Both
+       read and write permission should be granted to each class of user
+       that will access the semaphore.  The <i>value</i> argument specifies the
+       initial value for the new semaphore.  If <b>O_CREAT </b>is specified, and a
+       semaphore with the given <i>name</i> already exists, then <i>mode</i> and <i>value</i> are
+       ignored.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>sem_open</b>() returns the address of the new semaphore; this
+       address is used when calling other semaphore-related functions.  On
+       error, <b>sem_open</b>() returns <b>SEM_FAILED</b>, with <i><a href="errno.3.html">errno</a></i> set to indicate the
+       error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EACCES </b>The semaphore exists, but the caller does not have permission
+              to open it.
+
+       <b>EEXIST </b>Both <b>O_CREAT </b>and <b>O_EXCL </b>were specified in <i>oflag</i>, but a
+              semaphore with this <i>name</i> already exists.
+
+       <b>EINVAL </b><i>value</i> was greater than <b>SEM_VALUE_MAX</b>.
+
+       <b>EINVAL </b><i>name</i> consists of just "/", followed by no other characters.
+
+       <b>EMFILE </b>The per-process limit on the number of open file descriptors
+              has been reached.
+
+       <b>ENAMETOOLONG</b>
+              <i>name</i> was too long.
+
+       <b>ENFILE </b>The system-wide limit on the total number of open files has
+              been reached.
+
+       <b>ENOENT </b>The <b>O_CREAT </b>flag was not specified in <i>oflag</i> and no semaphore
+              with this <i>name</i> exists; or, <b>O_CREAT </b>was specified, but <i>name</i>
+              wasn't well formed.
+
+       <b>ENOMEM </b>Insufficient memory.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌───────────┬───────────────┬─────────┐
+       │<b>Interface  </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├───────────┼───────────────┼─────────┤
+       │<b>sem_open</b>() │ Thread safety │ MT-Safe │
+       └───────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="sem_close.3.html">sem_close(3)</a>, <a href="sem_getvalue.3.html">sem_getvalue(3)</a>, <a href="sem_post.3.html">sem_post(3)</a>, <a href="sem_unlink.3.html">sem_unlink(3)</a>,
+       <a href="sem_wait.3.html">sem_wait(3)</a>, <a href="../man7/sem_overview.7.html">sem_overview(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-12-28                      SEM_OPEN(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/umask.2.html">umask(2)</a>,&nbsp; 
+    <a href="sem_close.3.html">sem_close(3)</a>,&nbsp; 
+    <a href="sem_unlink.3.html">sem_unlink(3)</a>,&nbsp; 
+    <a href="../man7/sem_overview.7.html">sem_overview(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="sem_open.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

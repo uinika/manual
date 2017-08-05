@@ -1,0 +1,303 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>slapo-chain(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SLAPO-CHAIN(5)               File Formats Manual              SLAPO-CHAIN(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       slapo-chain - chain overlay to slapd
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ETCDIR/slapd.conf
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>chain </b>overlay to <a href="../man8/slapd.8.html">slapd(8)</a> allows automatic referral chasing.  Any
+       time a referral is returned (except for bind operations), it is
+       chased by using an instance of the ldap backend.  If operations are
+       performed with an identity (i.e. after a bind), that identity can be
+       asserted while chasing the referrals by means of the <i>identity</i>
+       <i>assertion</i> feature of back-ldap (see <a href="slapd-ldap.5.html">slapd-ldap(5)</a> for details), which
+       is essentially based on the <b>proxied authorization </b>control [RFC 4370].
+       Referral chasing can be controlled by the client by issuing the
+       <b>chaining </b>control (see <i>draft-sermersheim-ldap-chaining</i> for details.)
+
+       The config directives that are specific to the <b>chain </b>overlay are
+       prefixed by <b>chain-</b>, to avoid potential conflicts with directives
+       specific to the underlying database or to other stacked overlays.
+
+       There are very few chain overlay specific directives; however,
+       directives related to the instances of the <i>ldap</i> backend that may be
+       implicitly instantiated by the overlay may assume a special meaning
+       when used in conjunction with this overlay.  They are described in
+       <a href="slapd-ldap.5.html">slapd-ldap(5)</a>, and they also need to be prefixed by <b>chain-</b>.
+
+       Note: this overlay is built into the <i>ldap</i> backend; it is not a
+       separate module.
+
+       <b>overlay chain</b>
+              This directive adds the chain overlay to the current backend.
+              The chain overlay may be used with any backend, but it is
+              mainly intended for use with local storage backends that may
+              return referrals.  It is useless in conjunction with the
+              <i>slapd-ldap</i> and <i>slapd-meta</i> backends because they already
+              exploit the libldap specific referral chase feature.  [Note:
+              this may change in the future, as the <b>ldap</b>(5) and <b>meta</b>(5)
+              backends might no longer chase referrals on their own.]
+
+       <b>chain-cache-uri {FALSE|true}</b>
+              This directive instructs the <i>chain</i> overlay to cache
+              connections to URIs parsed out of referrals that are not
+              predefined, to be reused for later chaining.  These URIs
+              inherit the properties configured for the underlying
+              <a href="slapd-ldap.5.html">slapd-ldap(5)</a> before any occurrence of the <b>chain-uri</b>
+              directive; basically, they are chained anonymously.
+
+       <b>chain-chaining [resolve=&lt;r&gt;] [continuation=&lt;c&gt;] [critical]</b>
+              This directive enables the <i>chaining</i> control (see <i>draft-</i>
+              <i>sermersheim-ldap-chaining</i> for details) with the desired
+              resolve and continuation behaviors and criticality.  The
+              <b>resolve </b>parameter refers to the behavior while discovering a
+              resource, namely when accessing the object indicated by the
+              request DN; the <b>continuation </b>parameter refers to the behavior
+              while handling intermediate responses, which is mostly
+              significant for the search operation, but may affect extended
+              operations that return intermediate responses.  The values <b>r</b>
+              and <b>c </b>can be any of <b>chainingPreferred</b>, <b>chainingRequired</b>,
+              <b>referralsPreferred</b>, <b>referralsRequired</b>.  If the <b>critical </b>flag
+              affects the control criticality if provided.  [This control is
+              experimental and its support may change in the future.]
+
+       <b>chain-max-depth &lt;n&gt;</b>
+              In case a referral is returned during referral chasing,
+              further chasing occurs at most <b>&lt;n&gt; </b>levels deep.  Set to <b>1 </b>(the
+              default) to disable further referral chasing.
+
+       <b>chain-return-error {FALSE|true}</b>
+              In case referral chasing fails, the real error is returned
+              instead of the original referral.  In case multiple referral
+              URIs are present, only the first error is returned.  This
+              behavior may not be always appropriate nor desirable, since
+              failures in referral chasing might be better resolved by the
+              client (e.g. when caused by distributed authentication
+              issues).
+
+       <b>chain-uri &lt;ldapuri&gt;</b>
+              This directive instantiates a new underlying <i>ldap</i> database and
+              instructs it about which URI to contact to chase referrals.
+              As opposed to what stated in <a href="slapd-ldap.5.html">slapd-ldap(5)</a>, only one URI can
+              appear after this directive; all subsequent <a href="slapd-ldap.5.html">slapd-ldap(5)</a>
+              directives prefixed by <b>chain- </b>refer to this specific instance
+              of a remote server.
+
+       Directives for configuring the underlying ldap database may also be
+       required, as shown in this example:
+
+              overlay                 chain
+              chain-rebind-as-user    FALSE
+
+              chain-uri               "ldap://ldap1.example.com"
+              chain-rebind-as-user    TRUE
+              chain-idassert-bind     bindmethod="simple"
+                                      binddn="cn=Auth,dc=example,dc=com"
+                                      credentials="secret"
+                                      mode="self"
+
+              chain-uri               "ldap://ldap2.example.com"
+              chain-idassert-bind     bindmethod="simple"
+                                      binddn="cn=Auth,dc=example,dc=com"
+                                      credentials="secret"
+                                      mode="none"
+
+       Any valid directives for the ldap database may be used; see
+       <a href="slapd-ldap.5.html">slapd-ldap(5)</a> for details.  Multiple occurrences of the <b>chain-uri</b>
+       directive may appear, to define multiple "trusted" URIs where
+       operations with <i>identity assertion</i> are chained.  All URIs not listed
+       in the configuration are chained anonymously.  All <a href="slapd-ldap.5.html">slapd-ldap(5)</a>
+       directives appearing before the first occurrence of <b>chain-uri </b>are
+       inherited by all URIs, unless specifically overridden inside each URI
+       configuration.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ETCDIR/slapd.conf
+              default slapd configuration file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="slapd.conf.5.html">slapd.conf(5)</a>, <a href="slapd-config.5.html">slapd-config(5)</a>, <a href="slapd-ldap.5.html">slapd-ldap(5)</a>, <a href="../man8/slapd.8.html">slapd(8)</a>.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Originally implemented by Howard Chu; extended by Pierangelo
+       Masarati.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>OpenLDAP</i> (an open source implementation of
+       the Lightweight Directory Access Protocol) project.  Information
+       about the project can be found at ⟨<a href="http://www.openldap.org/">http://www.openldap.org/</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="http://www.openldap.org/its/">http://www.openldap.org/its/</a>⟩.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.openldap.org/openldap.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">OpenLDAP LDVERSION               RELEASEDATE                  SLAPO-CHAIN(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="slapd-ldap.5.html">slapd-ldap(5)</a>,&nbsp; 
+    <a href="slapd.overlays.5.html">slapd.overlays(5)</a>,&nbsp; 
+    <a href="slapo-ppolicy.5.html">slapo-ppolicy(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

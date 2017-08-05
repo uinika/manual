@@ -1,0 +1,334 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>alphasort.3p - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#PROLOG">PROLOG</a> | <a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#APPLICATION_USAGE">APPLICATION&nbsp;USAGE</a> | <a href="#RATIONALE">RATIONALE</a> | <a href="#FUTURE_DIRECTIONS">FUTURE&nbsp;DIRECTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYRIGHT">COPYRIGHT</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ALPHASORT(3P)             POSIX Programmer's Manual            ALPHASORT(3P)</span>
+</pre>
+<h2><a id="PROLOG" href="#PROLOG"></a>PROLOG  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page is part of the POSIX Programmer's Manual.  The Linux
+       implementation of this interface may differ (consult the
+       corresponding Linux manual page for details of Linux behavior), or
+       the interface may not be implemented on Linux.
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       alphasort, scandir — scan a directory
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;dirent.h&gt;
+
+       int alphasort(const struct dirent **<i>d1</i>, const struct dirent **<i>d2</i>);
+       int scandir(const char *<i>dir</i>, struct dirent ***<i>namelist</i>,
+           int (*<i>sel</i>)(const struct dirent *),
+           int (*<i>compar</i>)(const struct dirent **, const struct dirent **));
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>alphasort</i>() function can be used as the comparison function for
+       the <i>scandir</i>() function to sort the directory entries, <i>d1</i> and <i>d2</i>, into
+       alphabetical order. Sorting happens as if by calling the <i>strcoll</i>()
+       function on the <i>d_name</i> element of the <b>dirent </b>structures passed as the
+       two parameters. If the <i>strcoll</i>() function fails, the return value of
+       <i>alphasort</i>() is unspecified.
+
+       The <i>alphasort</i>() function shall not change the setting of <i><a href="errno.3.html">errno</a></i> if
+       successful. Since no return value is reserved to indicate an error,
+       an application wishing to check for error situations should set <i><a href="errno.3.html">errno</a></i>
+       to 0, then call <i>alphasort</i>(), then check <i><a href="errno.3.html">errno</a></i>.
+
+       The <i>scandir</i>() function shall scan the directory <i>dir</i>, calling the
+       function referenced by <i>sel</i> on each directory entry. Entries for which
+       the function referenced by <i>sel</i> returns non-zero shall be stored in
+       strings allocated as if by a call to <i>malloc</i>(), and sorted as if by a
+       call to <i>qsort</i>() with the comparison function <i>compar</i>, except that
+       <i>compar</i> need not provide total ordering. The strings are collected in
+       array <i>namelist</i> which shall be allocated as if by a call to <i>malloc</i>().
+       If <i>sel</i> is a null pointer, all entries shall be selected.  If the
+       comparison function <i>compar</i> does not provide total ordering, the order
+       in which the directory entries are stored is unspecified.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Upon successful completion, the <i>alphasort</i>() function shall return an
+       integer greater than, equal to, or less than 0, according to whether
+       the name of the directory entry pointed to by <i>d1</i> is lexically greater
+       than, equal to, or less than the directory pointed to by <i>d2</i> when both
+       are interpreted as appropriate to the current locale. There is no
+       return value reserved to indicate an error.
+
+       Upon successful completion, the <i>scandir</i>() function shall return the
+       number of entries in the array and a pointer to the array through the
+       parameter <i>namelist</i>.  Otherwise, the <i>scandir</i>() function shall return
+       −1.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>scandir</i>() function shall fail if:
+
+       <b>EACCES </b>Search permission is denied for the component of the path
+              prefix of <i>dir</i> or read permission is denied for <i>dir</i>.
+
+       <b>ELOOP  </b>A loop exists in symbolic links encountered during resolution
+              of the <i>dir</i> argument.
+
+       <b>ENAMETOOLONG</b>
+              The length of a component of a pathname is longer than
+              {NAME_MAX}.
+
+       <b>ENOENT </b>A component of <i>dir</i> does not name an existing directory or <i>dir</i>
+              is an empty string.
+
+       <b>ENOMEM </b>Insufficient storage space is available.
+
+       <b>ENOTDIR</b>
+              A component of <i>dir</i> names an existing file that is neither a
+              directory nor a symbolic link to a directory.
+
+       <b>EOVERFLOW</b>
+              One of the values to be returned or passed to a callback
+              function cannot be represented correctly.
+
+       The <i>scandir</i>() function may fail if:
+
+       <b>ELOOP  </b>More than {SYMLOOP_MAX} symbolic links were encountered during
+              resolution of the <i>dir</i> argument.
+
+       <b>EMFILE </b>All file descriptors available to the process are currently
+              open.
+
+       <b>ENAMETOOLONG</b>
+              The length of a pathname exceeds {PATH_MAX}, or pathname
+              resolution of a symbolic link produced an intermediate result
+              with a length that exceeds {PATH_MAX}.
+
+       <b>ENFILE </b>Too many files are currently open in the system.
+
+       <i>The following sections are informative.</i>
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       An example to print the files in the current directory:
+
+           <b>#include &lt;dirent.h&gt;</b>
+           <b>#include &lt;stdio.h&gt;</b>
+           <b>#include &lt;stdlib.h&gt;</b>
+           <b>...</b>
+           <b>struct dirent **namelist;</b>
+           <b>int i,n;</b>
+
+               n = scandir(".", &amp;namelist, 0, alphasort);
+               if (n &lt; 0)
+                   perror("scandir");
+               else {
+                   for (i = 0; i &lt; n; i++) {
+                       printf("%s\n", namelist[i]-&gt;d_name);
+                       free(namelist[i]);
+                       }
+                   }
+               free(namelist);
+           ...
+</pre>
+<h2><a id="APPLICATION_USAGE" href="#APPLICATION_USAGE"></a>APPLICATION USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If <i>dir</i> contains filenames that do not form character strings, or
+       which contain characters outside the domain of the collating sequence
+       of the current locale, the <i>alphasort</i>() function need not provide a
+       total ordering. This condition is not possible if all filenames
+       within the directory consist only of characters from the portable
+       filename character set.
+
+       The <i>scandir</i>() function may allocate dynamic storage during its
+       operation. If <i>scandir</i>() is forcibly terminated, such as by <i>longjmp</i>()
+       or <i>siglongjmp</i>() being executed by the function pointed to by <i>sel</i> or
+       <i>compar</i>, or by an interrupt routine, <i>scandir</i>() does not have a chance
+       to free that storage, so it remains permanently allocated. A safe way
+       to handle interrupts is to store the fact that an interrupt has
+       occurred, then wait until <i>scandir</i>() returns to act on the interrupt.
+
+       For functions that allocate memory as if by <i>malloc</i>(), the application
+       should release such memory when it is no longer required by a call to
+       <i>free</i>().  For <i>scandir</i>(), this is <i>namelist</i> (including all of the
+       individual strings in <i>namelist</i>).
+</pre>
+<h2><a id="RATIONALE" href="#RATIONALE"></a>RATIONALE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="FUTURE_DIRECTIONS" href="#FUTURE_DIRECTIONS"></a>FUTURE DIRECTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="qsort.3p.html">qsort(3p)</a>, <a href="strcoll.3p.html">strcoll(3p)</a>
+
+       The Base Definitions volume of POSIX.1‐2008, <a href="../man0/dirent.h.0p.html">dirent.h(0p)</a>
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Portions of this text are reprinted and reproduced in electronic form
+       from IEEE Std 1003.1, 2013 Edition, Standard for Information
+       Technology -- Portable Operating System Interface (POSIX), The Open
+       Group Base Specifications Issue 7, Copyright (C) 2013 by the
+       Institute of Electrical and Electronics Engineers, Inc and The Open
+       Group.  (This is POSIX.1-2008 with the 2013 Technical Corrigendum 1
+       applied.) In the event of any discrepancy between this version and
+       the original IEEE and The Open Group Standard, the original IEEE and
+       The Open Group Standard is the referee document. The original
+       Standard can be obtained online at <a href="http://www.unix.org/online.html">http://www.unix.org/online.html</a> .
+
+       Any typographical or formatting errors that appear in this page are
+       most likely to have been introduced during the conversion of the
+       source files to man page format. To report such errors, see
+       <a href="https://www.kernel.org/doc/man-pages/reporting_bugs.html">https://www.kernel.org/doc/man-pages/reporting_bugs.html</a> .
+
+<span class="footline">IEEE/The Open Group                 2013                       ALPHASORT(3P)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man0/dirent.h.0p.html">dirent.h(0p)</a>,&nbsp; 
+    <a href="qsort.3p.html">qsort(3p)</a>,&nbsp; 
+    <a href="scandir.3p.html">scandir(3p)</a>,&nbsp; 
+    <a href="strcoll.3p.html">strcoll(3p)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

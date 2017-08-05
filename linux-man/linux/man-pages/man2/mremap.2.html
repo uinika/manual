@@ -1,0 +1,288 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>mremap(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MREMAP(2)                 Linux Programmer's Manual                MREMAP(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       mremap - remap a virtual memory address
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#define _GNU_SOURCE         </b>/* See feature_test_macros(7) */
+       <b>#include &lt;sys/mman.h&gt;</b>
+
+       <b>void *mremap(void *</b><i>old_address</i><b>, size_t </b><i>old_size</i><b>,</b>
+                    <b>size_t </b><i>new_size</i><b>, int </b><i>flags</i><b>, ... /* void *</b><i>new_address</i> <b>*/);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>mremap</b>() expands (or shrinks) an existing memory mapping, potentially
+       moving it at the same time (controlled by the <i>flags</i> argument and the
+       available virtual address space).
+
+       <i>old_address</i> is the old address of the virtual memory block that you
+       want to expand (or shrink).  Note that <i>old_address</i> has to be page
+       aligned.  <i>old_size</i> is the old size of the virtual memory block.
+       <i>new_size</i> is the requested size of the virtual memory block after the
+       resize.  An optional fifth argument, <i>new_address</i>, may be provided;
+       see the description of <b>MREMAP_FIXED </b>below.
+
+       In Linux the memory is divided into pages.  A user process has (one
+       or) several linear virtual memory segments.  Each virtual memory
+       segment has one or more mappings to real memory pages (in the page
+       table).  Each virtual memory segment has its own protection (access
+       rights), which may cause a segmentation violation if the memory is
+       accessed incorrectly (e.g., writing to a read-only segment).
+       Accessing virtual memory outside of the segments will also cause a
+       segmentation violation.
+
+       <b>mremap</b>() uses the Linux page table scheme.  <b>mremap</b>() changes the
+       mapping between virtual addresses and memory pages.  This can be used
+       to implement a very efficient <a href="../man3/realloc.3.html">realloc(3)</a>.
+
+       The <i>flags</i> bit-mask argument may be 0, or include the following flag:
+
+       <b>MREMAP_MAYMOVE</b>
+              By default, if there is not sufficient space to expand a
+              mapping at its current location, then <b>mremap</b>() fails.  If this
+              flag is specified, then the kernel is permitted to relocate
+              the mapping to a new virtual address, if necessary.  If the
+              mapping is relocated, then absolute pointers into the old
+              mapping location become invalid (offsets relative to the
+              starting address of the mapping should be employed).
+
+       <b>MREMAP_FIXED </b>(since Linux 2.3.31)
+              This flag serves a similar purpose to the <b>MAP_FIXED </b>flag of
+              <a href="mmap.2.html">mmap(2)</a>.  If this flag is specified, then <b>mremap</b>() accepts a
+              fifth argument, <i>void *new_address</i>, which specifies a page-
+              aligned address to which the mapping must be moved.  Any
+              previous mapping at the address range specified by <i>new_address</i>
+              and <i>new_size</i> is unmapped.  If <b>MREMAP_FIXED </b>is specified, then
+              <b>MREMAP_MAYMOVE </b>must also be specified.
+
+       If the memory segment specified by <i>old_address</i> and <i>old_size</i> is locked
+       (using <a href="mlock.2.html">mlock(2)</a> or similar), then this lock is maintained when the
+       segment is resized and/or relocated.  As a consequence, the amount of
+       memory locked by the process may change.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success <b>mremap</b>() returns a pointer to the new virtual memory area.
+       On error, the value <b>MAP_FAILED </b>(that is, <i>(void *) -1</i>) is returned,
+       and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EAGAIN </b>The caller tried to expand a memory segment that is locked,
+              but this was not possible without exceeding the <b>RLIMIT_MEMLOCK</b>
+              resource limit.
+
+       <b>EFAULT </b>"Segmentation fault." Some address in the range <i>old_address</i> to
+              <i>old_address</i>+<i>old_size</i> is an invalid virtual memory address for
+              this process.  You can also get <b>EFAULT </b>even if there exist
+              mappings that cover the whole address space requested, but
+              those mappings are of different types.
+
+       <b>EINVAL </b>An invalid argument was given.  Possible causes are:
+              <i>old_address</i> was not page aligned; a value other than
+              <b>MREMAP_MAYMOVE </b>or <b>MREMAP_FIXED </b>was specified in <i>flags</i>;
+              <i>new_size</i> was zero; <i>new_size</i> or <i>new_address</i> was invalid; or the
+              new address range specified by <i>new_address</i> and <i>new_size</i>
+              overlapped the old address range specified by <i>old_address</i> and
+              <i>old_size</i>; or <b>MREMAP_FIXED </b>was specified without also
+              specifying <b>MREMAP_MAYMOVE</b>.
+
+       <b>ENOMEM </b>The memory area cannot be expanded at the current virtual
+              address, and the <b>MREMAP_MAYMOVE </b>flag is not set in <i>flags</i>.  Or,
+              there is not enough (virtual) memory available.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This call is Linux-specific, and should not be used in programs
+       intended to be portable.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Prior to version 2.4, glibc did not expose the definition of
+       <b>MREMAP_FIXED</b>, and the prototype for <b>mremap</b>() did not allow for the
+       <i>new_address</i> argument.
+
+       If <b>mremap</b>() is used to move or expand an area locked with <a href="mlock.2.html">mlock(2)</a> or
+       equivalent, the <b>mremap</b>() call will make a best effort to populate the
+       new area but will not fail with <b>ENOMEM </b>if the area cannot be
+       populated.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="brk.2.html">brk(2)</a>, <a href="getpagesize.2.html">getpagesize(2)</a>, <a href="getrlimit.2.html">getrlimit(2)</a>, <a href="mlock.2.html">mlock(2)</a>, <a href="mmap.2.html">mmap(2)</a>, <a href="sbrk.2.html">sbrk(2)</a>,
+       <a href="../man3/malloc.3.html">malloc(3)</a>, <a href="../man3/realloc.3.html">realloc(3)</a>
+
+       Your favorite text book on operating systems for more information on
+       paged memory (e.g., <i>Modern Operating Systems</i> by Andrew S. Tanenbaum,
+       <i>Inside Linux</i> by Randolf Bentson, <i>The Design of the UNIX Operating</i>
+       <i>System</i> by Maurice J. Bach)
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-12-05                        MREMAP(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/memusage.1.html">memusage(1)</a>,&nbsp; 
+    <a href="getrlimit.2.html">getrlimit(2)</a>,&nbsp; 
+    <a href="ioctl_userfaultfd.2.html">ioctl_userfaultfd(2)</a>,&nbsp; 
+    <a href="mmap2.2.html">mmap2(2)</a>,&nbsp; 
+    <a href="mmap.2.html">mmap(2)</a>,&nbsp; 
+    <a href="remap_file_pages.2.html">remap_file_pages(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="userfaultfd.2.html">userfaultfd(2)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="mremap.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

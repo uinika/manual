@@ -1,0 +1,292 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>request-key.conf(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">REQUEST-KEY.CONF(5)    Linux Key Management Utilities    REQUEST-KEY.CONF(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       request-key.conf - Instantiation handler configuration file
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This file and its associated key-type specific variants are used by
+       the /sbin/request-key program to determine which program it should
+       run to instantiate a key.
+
+       request-key looks first in /etc/request-key.d/ for a file of the key
+       type name plus ".conf" that it can use.  If that is not found, it
+       will fall back to /etc/request-key.conf.
+
+       request-key scans through the chosen file one line at a time until it
+       finds a match, which it will then use. If it doesn't find a match,
+       it'll return an error and the kernel will automatically negate the
+       key.
+
+       Any blank line or line beginning with a hash mark '#' is considered
+       to be a comment and ignored.
+
+       All other lines are assumed to be command lines with a number of
+       white space separated fields:
+
+       &lt;op&gt; &lt;type&gt; &lt;description&gt; &lt;callout-info&gt; &lt;prog&gt; &lt;arg1&gt; &lt;arg2&gt; ...
+
+       The first four fields are used to match the parameters passed to
+       request-key by the kernel. <i>op</i> is the operation type; currently the
+       only supported operation is "create".
+
+       <i>type</i>, <i>description</i> and <i>callout-info</i> match the three parameters passed
+       to <b>keyctl request2 </b>or the <b>request_key() </b>system call. Each of these
+       may contain one or more asterisk '*' characters as wildcards anywhere
+       within the string.
+
+       Should a match be made, the program specified by &lt;prog&gt; will be
+       exec'd. This must have a fully qualified path name. argv[0] will be
+       set from the part of the program name that follows the last slash '/'
+       character.
+
+       If the program name is prefixed with a pipe bar character '|', then
+       the program will be forked and exec'd attached to three pipes. The
+       callout information will be piped to it on it's stdin and the
+       intended payload data will be retrieved from its stdout. Anything
+       sent to stderr will be posted in syslog. If the program exits 0, then
+       /sbin/request-key will attempt to instantiate the key with the data
+       read from stdout. If it fails in any other way, then request-key will
+       attempt to execute the appropriate 'negate' operation command.
+
+       The program arguments can be substituted with various macros. Only
+       complete argument substitution is supported - macro substitutions
+       can't be embedded. All macros begin with a percent character '%'. An
+       argument beginning with two percent characters will have one of them
+       discarded.
+
+       The following macros are supported:
+
+              %o    Operation type
+              %k    Key ID
+              %t    Key type
+              %d    Key description
+              %c    Callout information
+              %u    Key UID
+              %g    Key GID
+              %T    Requestor's thread keyring
+              %P    Requestor's process keyring
+              %S    Requestor's session keyring
+
+       There's another macro substitution too that permits the interpolation
+       of the contents of a key:
+
+              %{&lt;type&gt;:&lt;description&gt;}
+
+       This performs a lookup for a key of the given type and description on
+       the requestor's keyrings, and if found, substitutes the contents for
+       the macro. If not found an error will be logged and the key under
+       construction will be negated.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A basic file will be installed in the /etc. This will contain two
+       debugging lines that can be used to test the installation:
+
+              create user debug:* negate /bin/keyctl negate %k 30 %S
+              create user debug:loop:* * |/bin/cat
+              create user debug:* * /usr/share/keyutils/request-key-debug.sh
+              %k %d %c %S
+              negate * * * /bin/keyctl negate %k 30 %S
+
+       This is set up so that something like:
+
+              keyctl request2 user debug:xxxx negate
+
+       will create a negative user-defined key, something like:
+
+              keyctl request2 user debug:yyyy spoon
+
+       will create an instantiated user-defined key with "Debug spoon" as
+       the payload, and something like:
+
+              keyctl request2 user debug:loop:zzzz abcdefghijkl
+
+       will create an instantiated user-defined key with the callout
+       information as the payload.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/etc/request-key.conf</i>
+       <i>/etc/request-key.d/&lt;keytype&gt;.conf</i>
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/keyctl.1.html">keyctl(1)</a>, <a href="request-key.conf.5.html">request-key.conf(5)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>keyutils</i> (key management utilities) project.
+       Information about the project can be found at [unknown -- if you
+       know, please contact man-pages@man7.org] If you have a bug report for
+       this manual page, send it to keyrings@linux-nfs.org.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨<a href="http://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git">http://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git</a>⟩
+       on 2017-07-05.  If you discover any rendering problems in this HTML
+       version of the page, or you believe there is a better or more up-to-
+       date source for the page, or you have corrections or improvements to
+       the information in this COLOPHON (which is <i>not</i> part of the original
+       manual page), send a mail to man-pages@man7.org
+
+<span class="footline">Linux                         15 November 2011           REQUEST-KEY.CONF(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/keyctl.1.html">keyctl(1)</a>,&nbsp; 
+    <a href="../man2/request_key.2.html">request_key(2)</a>,&nbsp; 
+    <a href="request-key.conf.5.html">request-key.conf(5)</a>,&nbsp; 
+    <a href="../man7/keyrings.7.html">keyrings(7)</a>,&nbsp; 
+    <a href="../man7/keyutils.7.html">keyutils(7)</a>,&nbsp; 
+    <a href="../man8/key.dns_resolver.8.html">key.dns_resolver(8)</a>,&nbsp; 
+    <a href="../man8/request-key.8.html">request-key(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

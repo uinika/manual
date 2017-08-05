@@ -1,0 +1,282 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>hgignore(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SYNTAX">SYNTAX</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYING">COPYING</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">HGIGNORE(5)                   Mercurial Manual                   HGIGNORE(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       hgignore - syntax for Mercurial ignore files
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The Mercurial system uses a file called <b>.hgignore </b>in the root
+       directory of a repository to control its behavior when it searches
+       for files that it is not currently tracking.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The working directory of a Mercurial repository will often contain
+       files that should not be tracked by Mercurial. These include backup
+       files created by editors and build products created by compilers.
+       These files can be ignored by listing them in a <b>.hgignore </b>file in the
+       root of the working directory. The <b>.hgignore </b>file must be created
+       manually. It is typically put under version control, so that the
+       settings will propagate to other repositories with push and pull.
+
+       An untracked file is ignored if its path relative to the repository
+       root directory, or any prefix path of that path, is matched against
+       any pattern in <b>.hgignore</b>.
+
+       For example, say we have an untracked file, <b>file.c</b>, at <b>a/b/file.c</b>
+       inside our repository. Mercurial will ignore <b>file.c </b>if any pattern in
+       <b>.hgignore </b>matches <b>a/b/file.c</b>, <b>a/b </b>or <b>a</b>.
+
+       In addition, a Mercurial configuration file can reference a set of
+       per-user or global ignore files. See the <b>ignore </b>configuration key on
+       the <b>[ui] </b>section of <b>hg help config </b>for details of how to configure
+       these files.
+
+       To control Mercurial's handling of files that it manages, many
+       commands support the <b>-I </b>and <b>-X </b>options; see <b>hg help &lt;command&gt; </b>and <b>hg</b>
+       <b>help patterns </b>for details.
+
+       Files that are already tracked are not affected by .hgignore, even if
+       they appear in .hgignore. An untracked file X can be explicitly added
+       with <b>hg add X</b>, even if X would be excluded by a pattern in .hgignore.
+</pre>
+<h2><a id="SYNTAX" href="#SYNTAX"></a>SYNTAX  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       An ignore file is a plain text file consisting of a list of patterns,
+       with one pattern per line. Empty lines are skipped. The <b># </b>character
+       is treated as a comment character, and the <b>\ </b>character is treated as
+       an escape character.
+
+       Mercurial supports several pattern syntaxes. The default syntax used
+       is Python/Perl-style regular expressions.
+
+       To change the syntax used, use a line of the following form:
+
+       syntax: NAME
+
+       where <b>NAME </b>is one of the following:
+
+       <b>regexp</b>
+
+              Regular expression, Python/Perl syntax.
+
+       <b>glob</b>
+
+              Shell-style glob.
+
+       The chosen syntax stays in effect when parsing all patterns that
+       follow, until another syntax is selected.
+
+       Neither glob nor regexp patterns are rooted. A glob-syntax pattern of
+       the form <b>*.c </b>will match a file ending in <b>.c </b>in any directory, and a
+       regexp pattern of the form <b>\.c$ </b>will do the same. To root a regexp
+       pattern, start it with <b>^</b>.
+
+       Note   Patterns specified in other than <b>.hgignore </b>are always rooted.
+              Please see <b>hg help patterns </b>for details.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Here is an example ignore file.
+
+       # use glob syntax.
+       syntax: glob
+
+       *.elc
+       *.pyc
+       *~
+
+       # switch to regexp syntax.
+       syntax: regexp
+       ^\.pc/
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Vadim Gelfer &lt;vadim.gelfer@gmail.com&gt;
+
+       Mercurial was written by Matt Mackall &lt;mpm@selenic.com&gt;.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/hg.1.html">hg(1)</a>, <a href="hgrc.5.html">hgrc(5)</a>
+</pre>
+<h2><a id="COPYING" href="#COPYING"></a>COPYING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page is copyright 2006 Vadim Gelfer.  Mercurial is
+       copyright 2005-2012 Matt Mackall.  Free use of this software is
+       granted under the terms of the GNU General Public License version 2
+       or any later version.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Vadim Gelfer &lt;vadim.gelfer@gmail.com&gt;
+
+       Organization: Mercurial
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>hg</i> (Mercurial source code management system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://mercurial.selenic.com/">http://mercurial.selenic.com/</a>⟩.  If you have a bug report for this
+       manual page, see ⟨<a href="http://mercurial.selenic.com/wiki/BugTracker">http://mercurial.selenic.com/wiki/BugTracker</a>⟩.
+       This page was obtained from the project's upstream Mercurial reposi‐
+       tory ⟨<a href="http://selenic.com/hg">http://selenic.com/hg</a>⟩ on 2017-07-05.  If you discover any ren‐
+       dering problems in this HTML version of the page, or you believe
+       there is a better or more up-to-date source for the page, or you have
+       corrections or improvements to the information in this COLOPHON
+       (which is <i>not</i> part of the original manual page), send a mail to
+       man-pages@man7.org
+
+<span class="footline">                                                                 HGIGNORE(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/hg.1.html">hg(1)</a>,&nbsp; 
+    <a href="hgrc.5.html">hgrc(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

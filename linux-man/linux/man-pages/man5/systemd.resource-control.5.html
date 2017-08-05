@@ -1,0 +1,745 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.resource-control(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#AUTOMATIC_DEPENDENCIES">AUTOMATIC&nbsp;DEPENDENCIES</a> | <a href="#UNIFIED_AND_LEGACY_CONTROL_GROUP_HIERARCHIES">UNIFIED&nbsp;AND&nbsp;LEGACY&nbsp;CONTROL&nbsp;GROUP&nbsp;HIERARCHIES</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#DEPRECATED_OPTIONS">DEPRECATED&nbsp;OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.RESOURCE-CONTROL(5)ystemd.resource-controlYSTEMD.RESOURCE-CONTROL(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.resource-control - Resource control unit settings
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>slice</i>.slice, <i>scope</i>.scope, <i>service</i>.service, <i>socket</i>.socket,
+       <i>mount</i>.mount, <i>swap</i>.swap
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Unit configuration files for services, slices, scopes, sockets, mount
+       points, and swap devices share a subset of configuration options for
+       resource control of spawned processes. Internally, this relies on the
+       Linux Control Groups (cgroups) kernel concept for organizing
+       processes in a hierarchical tree of named groups for the purpose of
+       resource management.
+
+       This man page lists the configuration options shared by those six
+       unit types. See <a href="systemd.unit.5.html">systemd.unit(5)</a> for the common options of all unit
+       configuration files, and <a href="systemd.slice.5.html">systemd.slice(5)</a>, <a href="systemd.scope.5.html">systemd.scope(5)</a>,
+       <a href="systemd.service.5.html">systemd.service(5)</a>, <a href="systemd.socket.5.html">systemd.socket(5)</a>, <a href="systemd.mount.5.html">systemd.mount(5)</a>, and
+       <a href="systemd.swap.5.html">systemd.swap(5)</a> for more information on the specific unit
+       configuration files. The resource control configuration options are
+       configured in the [Slice], [Scope], [Service], [Socket], [Mount], or
+       [Swap] sections, depending on the unit type.
+
+       In addition, options which control resources available to programs
+       <i>executed</i> by systemd are listed in <a href="systemd.exec.5.html">systemd.exec(5)</a>. Those options
+       complement options listed here.
+
+       See the <b>New Control Group Interfaces</b><b></b>[1] for an introduction on how to
+       make use of resource control APIs from programs.
+</pre>
+<h2><a id="AUTOMATIC_DEPENDENCIES" href="#AUTOMATIC_DEPENDENCIES"></a>AUTOMATIC DEPENDENCIES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Units with the <i>Slice=</i> setting set automatically acquire <i>Requires=</i> and
+       <i>After=</i> dependencies on the specified slice unit.
+</pre>
+<h2><a id="UNIFIED_AND_LEGACY_CONTROL_GROUP_HIERARCHIES" href="#UNIFIED_AND_LEGACY_CONTROL_GROUP_HIERARCHIES"></a>UNIFIED AND LEGACY CONTROL GROUP HIERARCHIES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The unified control group hierarchy is the new version of kernel
+       control group interface, see <b>cgroup-v2.txt</b><b></b>[2]. Depending on the
+       resource type, there are differences in resource control
+       capabilities. Also, because of interface changes, some resource types
+       have separate set of options on the unified hierarchy.
+
+       <b>CPU</b>
+           Due to the lack of consensus in the kernel community, the CPU
+           controller support on the unified control group hierarchy
+           requires out-of-tree kernel patches. See <b>cgroup-v2-cpu.txt</b><b></b>[3].
+
+           <i>CPUWeight=</i> and <i>StartupCPUWeight=</i> replace <i>CPUShares=</i> and
+           <i>StartupCPUShares=</i>, respectively.
+
+           The "cpuacct" controller does not exist separately on the unified
+           hierarchy.
+
+       <b>Memory</b>
+           <i>MemoryMax=</i> replaces <i>MemoryLimit=</i>.  <i>MemoryLow=</i> and <i>MemoryHigh=</i> are
+           effective only on unified hierarchy.
+
+       <b>IO</b>
+           <i>IO</i> prefixed settings are superset of and replace <i>BlockIO</i> prefixed
+           ones. On unified hierarchy, IO resource control also applies to
+           buffered writes.
+
+       To ease the transition, there is best-effort translation between the
+       two versions of settings. For each controller, if any of the settings
+       for the unified hierarchy are present, all settings for the legacy
+       hierarchy are ignored. If the resulting settings are for the other
+       type of hierarchy, the configurations are translated before
+       application.
+
+       Legacy control group hierarchy (see <b>cgroups.txt</b><b></b>[4]), also called
+       cgroup-v1, doesn't allow safe delegation of controllers to
+       unprivileged processes. If the system uses the legacy control group
+       hierarchy, resource control is disabled for systemd user instance,
+       see <a href="../man1/systemd.1.html">systemd(1)</a>.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Units of the types listed above can have settings for resource
+       control configuration:
+
+       <i>CPUAccounting=</i>
+           Turn on CPU usage accounting for this unit. Takes a boolean
+           argument. Note that turning on CPU accounting for one unit will
+           also implicitly turn it on for all units contained in the same
+           slice and for all its parent slices and the units contained
+           therein. The system default for this setting may be controlled
+           with <i>DefaultCPUAccounting=</i> in <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>.
+
+       <i>CPUWeight=weight</i>, <i>StartupCPUWeight=weight</i>
+           Assign the specified CPU time weight to the processes executed,
+           if the unified control group hierarchy is used on the system.
+           These options take an integer value and control the "cpu.weight"
+           control group attribute. The allowed range is 1 to 10000.
+           Defaults to 100. For details about this control group attribute,
+           see <b>cgroup-v2.txt</b><b></b>[2] and <b>sched-design-CFS.txt</b><b></b>[5]. The available
+           CPU time is split up among all units within one slice relative to
+           their CPU time weight.
+
+           While <i>StartupCPUWeight=</i> only applies to the startup phase of the
+           system, <i>CPUWeight=</i> applies to normal runtime of the system, and
+           if the former is not set also to the startup phase. Using
+           <i>StartupCPUWeight=</i> allows prioritizing specific services at
+           boot-up differently than during normal runtime.
+
+           Implies "CPUAccounting=true".
+
+           These settings replace <i>CPUShares=</i> and <i>StartupCPUShares=</i>.
+
+       <i>CPUQuota=</i>
+           Assign the specified CPU time quota to the processes executed.
+           Takes a percentage value, suffixed with "%". The percentage
+           specifies how much CPU time the unit shall get at maximum,
+           relative to the total CPU time available on one CPU. Use values &gt;
+           100% for allotting CPU time on more than one CPU. This controls
+           the "cpu.max" attribute on the unified control group hierarchy
+           and "cpu.cfs_quota_us" on legacy. For details about these control
+           group attributes, see <b>cgroup-v2.txt</b><b></b>[2] and
+           <b>sched-design-CFS.txt</b><b></b>[5].
+
+           Example: <i>CPUQuota=20%</i> ensures that the executed processes will
+           never get more than 20% CPU time on one CPU.
+
+           Implies "CPUAccounting=true".
+
+       <i>MemoryAccounting=</i>
+           Turn on process and kernel memory accounting for this unit. Takes
+           a boolean argument. Note that turning on memory accounting for
+           one unit will also implicitly turn it on for all units contained
+           in the same slice and for all its parent slices and the units
+           contained therein. The system default for this setting may be
+           controlled with <i>DefaultMemoryAccounting=</i> in
+           <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>.
+
+       <i>MemoryLow=bytes</i>
+           Specify the best-effort memory usage protection of the executed
+           processes in this unit. If the memory usages of this unit and all
+           its ancestors are below their low boundaries, this unit's memory
+           won't be reclaimed as long as memory can be reclaimed from
+           unprotected units.
+
+           Takes a memory size in bytes. If the value is suffixed with K, M,
+           G or T, the specified memory size is parsed as Kilobytes,
+           Megabytes, Gigabytes, or Terabytes (with the base 1024),
+           respectively. Alternatively, a percentage value may be specified,
+           which is taken relative to the installed physical memory on the
+           system. This controls the "memory.low" control group attribute.
+           For details about this control group attribute, see
+           <b>cgroup-v2.txt</b><b></b>[2].
+
+           Implies "MemoryAccounting=true".
+
+           This setting is supported only if the unified control group
+           hierarchy is used and disables <i>MemoryLimit=</i>.
+
+       <i>MemoryHigh=bytes</i>
+           Specify the high limit on memory usage of the executed processes
+           in this unit. Memory usage may go above the limit if unavoidable,
+           but the processes are heavily slowed down and memory is taken
+           away aggressively in such cases. This is the main mechanism to
+           control memory usage of a unit.
+
+           Takes a memory size in bytes. If the value is suffixed with K, M,
+           G or T, the specified memory size is parsed as Kilobytes,
+           Megabytes, Gigabytes, or Terabytes (with the base 1024),
+           respectively. Alternatively, a percentage value may be specified,
+           which is taken relative to the installed physical memory on the
+           system. If assigned the special value "infinity", no memory limit
+           is applied. This controls the "memory.high" control group
+           attribute. For details about this control group attribute, see
+           <b>cgroup-v2.txt</b><b></b>[2].
+
+           Implies "MemoryAccounting=true".
+
+           This setting is supported only if the unified control group
+           hierarchy is used and disables <i>MemoryLimit=</i>.
+
+       <i>MemoryMax=bytes</i>
+           Specify the absolute limit on memory usage of the executed
+           processes in this unit. If memory usage cannot be contained under
+           the limit, out-of-memory killer is invoked inside the unit. It is
+           recommended to use <i>MemoryHigh=</i> as the main control mechanism and
+           use <i>MemoryMax=</i> as the last line of defense.
+
+           Takes a memory size in bytes. If the value is suffixed with K, M,
+           G or T, the specified memory size is parsed as Kilobytes,
+           Megabytes, Gigabytes, or Terabytes (with the base 1024),
+           respectively. Alternatively, a percentage value may be specified,
+           which is taken relative to the installed physical memory on the
+           system. If assigned the special value "infinity", no memory limit
+           is applied. This controls the "memory.max" control group
+           attribute. For details about this control group attribute, see
+           <b>cgroup-v2.txt</b><b></b>[2].
+
+           Implies "MemoryAccounting=true".
+
+           This setting replaces <i>MemoryLimit=</i>.
+
+       <i>MemorySwapMax=bytes</i>
+           Specify the absolute limit on swap usage of the executed
+           processes in this unit.
+
+           Takes a swap size in bytes. If the value is suffixed with K, M, G
+           or T, the specified swap size is parsed as Kilobytes, Megabytes,
+           Gigabytes, or Terabytes (with the base 1024), respectively. If
+           assigned the special value "infinity", no swap limit is applied.
+           This controls the "memory.swap.max" control group attribute. For
+           details about this control group attribute, see <b>cgroup-v2.txt</b><b></b>[2].
+
+           Implies "MemoryAccounting=true".
+
+           This setting is supported only if the unified control group
+           hierarchy is used and disables <i>MemoryLimit=</i>.
+
+       <i>TasksAccounting=</i>
+           Turn on task accounting for this unit. Takes a boolean argument.
+           If enabled, the system manager will keep track of the number of
+           tasks in the unit. The number of tasks accounted this way
+           includes both kernel threads and userspace processes, with each
+           thread counting individually. Note that turning on tasks
+           accounting for one unit will also implicitly turn it on for all
+           units contained in the same slice and for all its parent slices
+           and the units contained therein. The system default for this
+           setting may be controlled with <i>DefaultTasksAccounting=</i> in
+           <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>.
+
+       <i>TasksMax=N</i>
+           Specify the maximum number of tasks that may be created in the
+           unit. This ensures that the number of tasks accounted for the
+           unit (see above) stays below a specific limit. This either takes
+           an absolute number of tasks or a percentage value that is taken
+           relative to the configured maximum number of tasks on the system.
+           If assigned the special value "infinity", no tasks limit is
+           applied. This controls the "pids.max" control group attribute.
+           For details about this control group attribute, see <b>pids.txt</b><b></b>[6].
+
+           Implies "TasksAccounting=true". The system default for this
+           setting may be controlled with <i>DefaultTasksMax=</i> in
+           <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>.
+
+       <i>IOAccounting=</i>
+           Turn on Block I/O accounting for this unit, if the unified
+           control group hierarchy is used on the system. Takes a boolean
+           argument. Note that turning on block I/O accounting for one unit
+           will also implicitly turn it on for all units contained in the
+           same slice and all for its parent slices and the units contained
+           therein. The system default for this setting may be controlled
+           with <i>DefaultIOAccounting=</i> in <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>.
+
+           This setting replaces <i>BlockIOAccounting=</i> and disables settings
+           prefixed with <i>BlockIO</i> or <i>StartupBlockIO</i>.
+
+       <i>IOWeight=weight</i>, <i>StartupIOWeight=weight</i>
+           Set the default overall block I/O weight for the executed
+           processes, if the unified control group hierarchy is used on the
+           system. Takes a single weight value (between 1 and 10000) to set
+           the default block I/O weight. This controls the "io.weight"
+           control group attribute, which defaults to 100. For details about
+           this control group attribute, see <b>cgroup-v2.txt</b><b></b>[2]. The available
+           I/O bandwidth is split up among all units within one slice
+           relative to their block I/O weight.
+
+           While <i>StartupIOWeight=</i> only applies to the startup phase of the
+           system, <i>IOWeight=</i> applies to the later runtime of the system, and
+           if the former is not set also to the startup phase. This allows
+           prioritizing specific services at boot-up differently than during
+           runtime.
+
+           Implies "IOAccounting=true".
+
+           These settings replace <i>BlockIOWeight=</i> and <i>StartupBlockIOWeight=</i>
+           and disable settings prefixed with <i>BlockIO</i> or <i>StartupBlockIO</i>.
+
+       <i>IODeviceWeight=device weight</i>
+           Set the per-device overall block I/O weight for the executed
+           processes, if the unified control group hierarchy is used on the
+           system. Takes a space-separated pair of a file path and a weight
+           value to specify the device specific weight value, between 1 and
+           10000. (Example: "/dev/sda 1000"). The file path may be specified
+           as path to a block device node or as any other file, in which
+           case the backing block device of the file system of the file is
+           determined. This controls the "io.weight" control group
+           attribute, which defaults to 100. Use this option multiple times
+           to set weights for multiple devices. For details about this
+           control group attribute, see <b>cgroup-v2.txt</b><b></b>[2].
+
+           Implies "IOAccounting=true".
+
+           This setting replaces <i>BlockIODeviceWeight=</i> and disables settings
+           prefixed with <i>BlockIO</i> or <i>StartupBlockIO</i>.
+
+       <i>IOReadBandwidthMax=device bytes</i>, <i>IOWriteBandwidthMax=device bytes</i>
+           Set the per-device overall block I/O bandwidth maximum limit for
+           the executed processes, if the unified control group hierarchy is
+           used on the system. This limit is not work-conserving and the
+           executed processes are not allowed to use more even if the device
+           has idle capacity. Takes a space-separated pair of a file path
+           and a bandwidth value (in bytes per second) to specify the device
+           specific bandwidth. The file path may be a path to a block device
+           node, or as any other file in which case the backing block device
+           of the file system of the file is used. If the bandwidth is
+           suffixed with K, M, G, or T, the specified bandwidth is parsed as
+           Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to
+           the base of 1000. (Example:
+           "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This
+           controls the "io.max" control group attributes. Use this option
+           multiple times to set bandwidth limits for multiple devices. For
+           details about this control group attribute, see <b>cgroup-v2.txt</b><b></b>[2].
+
+           Implies "IOAccounting=true".
+
+           These settings replace <i>BlockIOReadBandwidth=</i> and
+           <i>BlockIOWriteBandwidth=</i> and disable settings prefixed with <i>BlockIO</i>
+           or <i>StartupBlockIO</i>.
+
+       <i>IOReadIOPSMax=device IOPS</i>, <i>IOWriteIOPSMax=device IOPS</i>
+           Set the per-device overall block I/O IOs-Per-Second maximum limit
+           for the executed processes, if the unified control group
+           hierarchy is used on the system. This limit is not
+           work-conserving and the executed processes are not allowed to use
+           more even if the device has idle capacity. Takes a
+           space-separated pair of a file path and an IOPS value to specify
+           the device specific IOPS. The file path may be a path to a block
+           device node, or as any other file in which case the backing block
+           device of the file system of the file is used. If the IOPS is
+           suffixed with K, M, G, or T, the specified IOPS is parsed as
+           KiloIOPS, MegaIOPS, GigaIOPS, or TeraIOPS, respectively, to the
+           base of 1000. (Example:
+           "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 1K"). This
+           controls the "io.max" control group attributes. Use this option
+           multiple times to set IOPS limits for multiple devices. For
+           details about this control group attribute, see <b>cgroup-v2.txt</b><b></b>[2].
+
+           Implies "IOAccounting=true".
+
+           These settings are supported only if the unified control group
+           hierarchy is used and disable settings prefixed with <i>BlockIO</i> or
+           <i>StartupBlockIO</i>.
+
+       <i>DeviceAllow=</i>
+           Control access to specific device nodes by the executed
+           processes. Takes two space-separated strings: a device node
+           specifier followed by a combination of <b>r</b>, <b>w</b>, <b>m </b>to control
+           <i>r</i>eading, <i>w</i>riting, or creation of the specific device node(s) by
+           the unit (<i>m</i>knod), respectively. This controls the "devices.allow"
+           and "devices.deny" control group attributes. For details about
+           these control group attributes, see <b>devices.txt</b><b></b>[7].
+
+           The device node specifier is either a path to a device node in
+           the file system, starting with /dev/, or a string starting with
+           either "char-" or "block-" followed by a device group name, as
+           listed in /proc/devices. The latter is useful to whitelist all
+           current and future devices belonging to a specific device group
+           at once. The device group is matched according to file name
+           globbing rules, you may hence use the "*" and "?"  wildcards.
+           Examples: /dev/sda5 is a path to a device node, referring to an
+           ATA or SCSI block device.  "char-pts" and "char-alsa" are
+           specifiers for all pseudo TTYs and all ALSA sound devices,
+           respectively.  "char-cpu/*" is a specifier matching all CPU
+           related device groups.
+
+       <i>DevicePolicy=auto|closed|strict</i>
+           Control the policy for allowing device access:
+
+           <b>strict</b>
+               means to only allow types of access that are explicitly
+               specified.
+
+           <b>closed</b>
+               in addition, allows access to standard pseudo devices
+               including /dev/null, /dev/zero, /dev/full, /dev/random, and
+               /dev/urandom.
+
+           <b>auto</b>
+               in addition, allows access to all devices if no explicit
+               <i>DeviceAllow=</i> is present. This is the default.
+
+       <i>Slice=</i>
+           The name of the slice unit to place the unit in. Defaults to
+           system.slice for all non-instantiated units of all unit types
+           (except for slice units themselves see below). Instance units are
+           by default placed in a subslice of system.slice that is named
+           after the template name.
+
+           This option may be used to arrange systemd units in a hierarchy
+           of slices each of which might have resource settings applied.
+
+           For units of type slice, the only accepted value for this setting
+           is the parent slice. Since the name of a slice unit implies the
+           parent slice, it is hence redundant to ever set this parameter
+           directly for slice units.
+
+           Special care should be taken when relying on the default slice
+           assignment in templated service units that have
+           <i>DefaultDependencies=no</i> set, see <a href="systemd.service.5.html">systemd.service(5)</a>, section
+           "Automatic Dependencies" for details.
+
+       <i>Delegate=</i>
+           Turns on delegation of further resource control partitioning to
+           processes of the unit. For unprivileged services (i.e. those
+           using the <i>User=</i> setting), this allows processes to create a
+           subhierarchy beneath its control group path. For privileged
+           services and scopes, this ensures the processes will have all
+           control group controllers enabled.
+</pre>
+<h2><a id="DEPRECATED_OPTIONS" href="#DEPRECATED_OPTIONS"></a>DEPRECATED OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following options are deprecated. Use the indicated superseding
+       options instead:
+
+       <i>CPUShares=weight</i>, <i>StartupCPUShares=weight</i>
+           Assign the specified CPU time share weight to the processes
+           executed. These options take an integer value and control the
+           "cpu.shares" control group attribute. The allowed range is 2 to
+           262144. Defaults to 1024. For details about this control group
+           attribute, see <b>sched-design-CFS.txt</b><b></b>[5]. The available CPU time is
+           split up among all units within one slice relative to their CPU
+           time share weight.
+
+           While <i>StartupCPUShares=</i> only applies to the startup phase of the
+           system, <i>CPUShares=</i> applies to normal runtime of the system, and
+           if the former is not set also to the startup phase. Using
+           <i>StartupCPUShares=</i> allows prioritizing specific services at
+           boot-up differently than during normal runtime.
+
+           Implies "CPUAccounting=true".
+
+           These settings are deprecated. Use <i>CPUWeight=</i> and
+           <i>StartupCPUWeight=</i> instead.
+
+       <i>MemoryLimit=bytes</i>
+           Specify the limit on maximum memory usage of the executed
+           processes. The limit specifies how much process and kernel memory
+           can be used by tasks in this unit. Takes a memory size in bytes.
+           If the value is suffixed with K, M, G or T, the specified memory
+           size is parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes
+           (with the base 1024), respectively. Alternatively, a percentage
+           value may be specified, which is taken relative to the installed
+           physical memory on the system. If assigned the special value
+           "infinity", no memory limit is applied. This controls the
+           "memory.limit_in_bytes" control group attribute. For details
+           about this control group attribute, see <b>memory.txt</b><b></b>[8].
+
+           Implies "MemoryAccounting=true".
+
+           This setting is deprecated. Use <i>MemoryMax=</i> instead.
+
+       <i>BlockIOAccounting=</i>
+           Turn on Block I/O accounting for this unit, if the legacy control
+           group hierarchy is used on the system. Takes a boolean argument.
+           Note that turning on block I/O accounting for one unit will also
+           implicitly turn it on for all units contained in the same slice
+           and all for its parent slices and the units contained therein.
+           The system default for this setting may be controlled with
+           <i>DefaultBlockIOAccounting=</i> in <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>.
+
+           This setting is deprecated. Use <i>IOAccounting=</i> instead.
+
+       <i>BlockIOWeight=weight</i>, <i>StartupBlockIOWeight=weight</i>
+           Set the default overall block I/O weight for the executed
+           processes, if the legacy control group hierarchy is used on the
+           system. Takes a single weight value (between 10 and 1000) to set
+           the default block I/O weight. This controls the "blkio.weight"
+           control group attribute, which defaults to 500. For details about
+           this control group attribute, see <b>blkio-controller.txt</b><b></b>[9]. The
+           available I/O bandwidth is split up among all units within one
+           slice relative to their block I/O weight.
+
+           While <i>StartupBlockIOWeight=</i> only applies to the startup phase of
+           the system, <i>BlockIOWeight=</i> applies to the later runtime of the
+           system, and if the former is not set also to the startup phase.
+           This allows prioritizing specific services at boot-up differently
+           than during runtime.
+
+           Implies "BlockIOAccounting=true".
+
+           These settings are deprecated. Use <i>IOWeight=</i> and <i>StartupIOWeight=</i>
+           instead.
+
+       <i>BlockIODeviceWeight=device weight</i>
+           Set the per-device overall block I/O weight for the executed
+           processes, if the legacy control group hierarchy is used on the
+           system. Takes a space-separated pair of a file path and a weight
+           value to specify the device specific weight value, between 10 and
+           1000. (Example: "/dev/sda 500"). The file path may be specified
+           as path to a block device node or as any other file, in which
+           case the backing block device of the file system of the file is
+           determined. This controls the "blkio.weight_device" control group
+           attribute, which defaults to 1000. Use this option multiple times
+           to set weights for multiple devices. For details about this
+           control group attribute, see <b>blkio-controller.txt</b><b></b>[9].
+
+           Implies "BlockIOAccounting=true".
+
+           This setting is deprecated. Use <i>IODeviceWeight=</i> instead.
+
+       <i>BlockIOReadBandwidth=device bytes</i>, <i>BlockIOWriteBandwidth=device bytes</i>
+           Set the per-device overall block I/O bandwidth limit for the
+           executed processes, if the legacy control group hierarchy is used
+           on the system. Takes a space-separated pair of a file path and a
+           bandwidth value (in bytes per second) to specify the device
+           specific bandwidth. The file path may be a path to a block device
+           node, or as any other file in which case the backing block device
+           of the file system of the file is used. If the bandwidth is
+           suffixed with K, M, G, or T, the specified bandwidth is parsed as
+           Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to
+           the base of 1000. (Example:
+           "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This
+           controls the "blkio.throttle.read_bps_device" and
+           "blkio.throttle.write_bps_device" control group attributes. Use
+           this option multiple times to set bandwidth limits for multiple
+           devices. For details about these control group attributes, see
+           <b>blkio-controller.txt</b><b></b>[9].
+
+           Implies "BlockIOAccounting=true".
+
+           These settings are deprecated. Use <i>IOReadBandwidthMax=</i> and
+           <i>IOWriteBandwidthMax=</i> instead.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="systemd.unit.5.html">systemd.unit(5)</a>, <a href="systemd.service.5.html">systemd.service(5)</a>, <a href="systemd.slice.5.html">systemd.slice(5)</a>,
+       <a href="systemd.scope.5.html">systemd.scope(5)</a>, <a href="systemd.socket.5.html">systemd.socket(5)</a>, <a href="systemd.mount.5.html">systemd.mount(5)</a>,
+       <a href="systemd.swap.5.html">systemd.swap(5)</a>, <a href="systemd.exec.5.html">systemd.exec(5)</a>, <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,
+       <a href="../man7/systemd.special.7.html">systemd.special(7)</a>, The documentation for control groups and specific
+       controllers in the Linux kernel: <b>cgroups.txt</b><b></b>[4], <b>cpuacct.txt</b><b></b>[10],
+       <b>memory.txt</b><b></b>[8], <b>blkio-controller.txt</b><b></b>[9].
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. New Control Group Interfaces
+           <a href="https://www.freedesktop.org/wiki/Software/systemd/ControlGroupInterface/">https://www.freedesktop.org/wiki/Software/systemd/ControlGroupInterface/</a>
+
+        2. cgroup-v2.txt
+           <a href="https://www.kernel.org/doc/Documentation/cgroup-v2.txt">https://www.kernel.org/doc/Documentation/cgroup-v2.txt</a>
+
+        3. cgroup-v2-cpu.txt
+           <a href="https://git.kernel.org/cgit/linux/kernel/git/tj/cgroup.git/tree/Documentation/cgroup-v2-cpu.txt?h=cgroup-v2-cpu">https://git.kernel.org/cgit/linux/kernel/git/tj/cgroup.git/tree/Documentation/cgroup-v2-cpu.txt?h=cgroup-v2-cpu</a>
+
+        4. cgroups.txt
+           <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/cgroups.txt">https://www.kernel.org/doc/Documentation/cgroup-v1/cgroups.txt</a>
+
+        5. sched-design-CFS.txt
+           <a href="https://www.kernel.org/doc/Documentation/scheduler/sched-design-CFS.txt">https://www.kernel.org/doc/Documentation/scheduler/sched-design-CFS.txt</a>
+
+        6. pids.txt
+           <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/pids.txt">https://www.kernel.org/doc/Documentation/cgroup-v1/pids.txt</a>
+
+        7. devices.txt
+           <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt">https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt</a>
+
+        8. memory.txt
+           <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt">https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt</a>
+
+        9. blkio-controller.txt
+           <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt">https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt</a>
+
+       10. cpuacct.txt
+           <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/cpuacct.txt">https://www.kernel.org/doc/Documentation/cgroup-v1/cpuacct.txt</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                      SYSTEMD.RESOURCE-CONTROL(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemctl.1.html">systemctl(1)</a>,&nbsp; 
+    <a href="../man1/systemd-cgtop.1.html">systemd-cgtop(1)</a>,&nbsp; 
+    <a href="../man1/systemd-run.1.html">systemd-run(1)</a>,&nbsp; 
+    <a href="logind.conf.5.html">logind.conf(5)</a>,&nbsp; 
+    <a href="systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="systemd.mount.5.html">systemd.mount(5)</a>,&nbsp; 
+    <a href="systemd.scope.5.html">systemd.scope(5)</a>,&nbsp; 
+    <a href="systemd.service.5.html">systemd.service(5)</a>,&nbsp; 
+    <a href="systemd.slice.5.html">systemd.slice(5)</a>,&nbsp; 
+    <a href="systemd.socket.5.html">systemd.socket(5)</a>,&nbsp; 
+    <a href="systemd.swap.5.html">systemd.swap(5)</a>,&nbsp; 
+    <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

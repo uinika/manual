@@ -1,0 +1,299 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>lttng-gen-tp(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#ENVIRONMENT_VARIABLES">ENVIRONMENT&nbsp;VARIABLES</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#BUGS">BUGS</a> | <a href="#RESOURCES">RESOURCES</a> | <a href="#COPYRIGHTS">COPYRIGHTS</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LTTNG-GEN-TP(1)                 LTTng Manual                 LTTNG-GEN-TP(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       lttng-gen-tp - Generate LTTng-UST tracepoint provider code
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lttng-gen-tp </b>[<b>--verbose</b>] [<b>--output</b>=<i>FILE</i>.c]
+                    [<b>--output</b>=<i>FILE</i>.h] [<b>--output</b>=<i>FILE</i>.o] <i>TEMPLATE</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>lttng-gen-tp </b>tool simplifies the generation of LTTng-UST
+       tracepoint provider files. It takes a simple template file, <i>TEMPLATE</i>,
+       and generates the necessary C code to use the defined tracepoints in
+       your application. See the <i>Template file format</i> section below for more
+       information about the format of <i>TEMPLATE</i>.
+
+       Currently, <b>lttng-gen-tp </b>can generate the <b>.h</b>, <b>.c</b>, and <b>.o </b>files
+       associated with your tracepoint provider. The generated <b>.h </b>file can
+       be included directly in your application. You can let <b>lttng-gen-tp</b>
+       generate the <b>.o </b>file or compile the <b>.c </b>file yourself. See
+       <a href="../man3/lttng-ust.3.html">lttng-ust(3)</a> for more information about compiling LTTng-UST
+       tracepoint providers.
+
+       By default, <b>lttng-gen-tp </b>generates the <b>.h</b>, <b>.c</b>, and <b>.o </b>files, their
+       basename being the basename of <i>TEMPLATE</i>. You can generate one or more
+       specific file types with the <b>--output </b>option, repeated if needed.
+
+   <b>Template file format</b>
+       The template file, which usually has the <b>.tp </b>extension, contains a
+       list of <b>TRACEPOINT_EVENT() </b>definitions and other optional definition
+       entries, like <b>TRACEPOINT_LOGLEVEL()</b>. See <a href="../man3/lttng-ust.3.html">lttng-ust(3)</a> for the
+       complete list of available definitions.
+
+       The <b>TRACEPOINT_EVENT() </b>definitions are written as you would write
+       them in an LTTng-UST template provider header file. C comments are
+       supported (<b>/* */ </b>and <b>//</b>), as well as lines starting with <b>#</b>.
+
+           <b>Note</b>
+           The provider name (the first argument of <b>TRACEPOINT_EVENT()</b>) must
+           be the same in all the <b>TRACEPOINT_EVENT() </b>macros of <i>TEMPLATE</i>.
+
+       Here’s an example:
+
+           TRACEPOINT_EVENT(
+               // Tracepoint provider name
+               my_provider,
+
+               // Tracepoint/event name
+               my_event,
+
+               // Tracepoint arguments (input)
+               TP_ARGS(char *, text),
+
+               // Tracepoint/event fields (output)
+               TP_FIELDS(
+                   ctf_string(message, text)
+               )
+           )
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-o</b>, <b>--output</b>=<i>FILE</i>
+           Do not generate default files: generate <i>FILE</i>.
+
+           The extension of <i>FILE</i> determines what is generated, amongst <b>.h</b>,
+           <b>.c</b>, and <b>.o</b>. This option can be used more than one time to
+           generate different file types.
+
+       <b>-v</b>, <b>--verbose</b>
+           Increase verbosity.
+
+       <b>-h</b>, <b>--help</b>
+           Show command help.
+</pre>
+<h2><a id="ENVIRONMENT_VARIABLES" href="#ENVIRONMENT_VARIABLES"></a>ENVIRONMENT VARIABLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>CC</b>
+           C compiler to use. Default: <b>cc</b>, then <b>gcc </b>if <b>cc </b>is not found. This
+           option is only relevant when generating the <b>.o </b>file.
+
+       <b>CFLAGS</b>
+           Flags and options passed directly to the compiler (<b>$CC</b>). This
+           option is only relevant when generating the <b>.o </b>file.
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>0</b>
+           Success
+
+       <b>Non-zero</b>
+           Error
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If you encounter any issue or usability problem, please report it on
+       the LTTng bug tracker &lt;<a href="https://bugs.lttng.org/projects/lttng-ust">https://bugs.lttng.org/projects/lttng-ust</a>&gt;.
+</pre>
+<h2><a id="RESOURCES" href="#RESOURCES"></a>RESOURCES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ·   LTTng project website &lt;<a href="http://lttng.org/">http://lttng.org</a>&gt;
+
+       ·   LTTng documentation &lt;<a href="http://lttng.org/docs">http://lttng.org/docs</a>&gt;
+
+       ·   Git repositories &lt;<a href="http://git.lttng.org/">http://git.lttng.org</a>&gt;
+
+       ·   GitHub organization &lt;<a href="http://github.com/lttng">http://github.com/lttng</a>&gt;
+
+       ·   Continuous integration &lt;<a href="http://ci.lttng.org/">http://ci.lttng.org/</a>&gt;
+
+       ·   Mailing list &lt;<a href="http://lists.lttng.org/">http://lists.lttng.org</a>&gt; for support and
+           development: <b>lttng-dev@lists.lttng.org</b>
+
+       ·   IRC channel &lt;irc://irc.oftc.net/lttng&gt;: <b>#lttng </b>on <b>irc.oftc.net</b>
+</pre>
+<h2><a id="COPYRIGHTS" href="#COPYRIGHTS"></a>COPYRIGHTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lttng-gen-tp </b>is part of the LTTng-UST project.
+
+       <b>lttng-gen-tp </b>is distributed under the GNU General Public License,
+       version 2 &lt;<a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html">http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html</a>&gt;.
+       See the <b>COPYING </b>&lt;https://github.com/lttng/lttng-
+       ust/blob/master/COPYING&gt; file for more details.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lttng-gen-tp </b>was originally written by Yannick Brosseau
+       &lt;mailto:yannick.brosseau@gmail.com&gt;. It is currently maintained by
+       Mathieu Desnoyers &lt;mailto:mathieu.desnoyers@efficios.com&gt;.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man3/lttng-ust.3.html">lttng-ust(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>LTTng-UST</i> (    LTTng Userspace Tracer)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://lttng.org/">http://lttng.org/</a>⟩.  It is not known how to report bugs for this man
+       page; if you know, please send a mail to man-pages@man7.org.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨git://git.lttng.org/lttng-ust.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">LTTng 2.9.0-pre                  07/16/2016                  LTTNG-GEN-TP(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man3/lttng-ust.3.html">lttng-ust(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,1653 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>groff(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#GROFF_ELEMENTS">GROFF&nbsp;ELEMENTS</a> | <a href="#CONTROL_CHARACTERS">CONTROL&nbsp;CHARACTERS</a> | <a href="#NUMERICAL_EXPRESSIONS">NUMERICAL&nbsp;EXPRESSIONS</a> | <a href="#CONDITIONS">CONDITIONS</a> | <a href="#REQUESTS">REQUESTS</a> | <a href="#ESCAPE_SEQUENCES">ESCAPE&nbsp;SEQUENCES</a> | <a href="#REGISTERS">REGISTERS</a> | <a href="#UNDERLINING">UNDERLINING</a> | <a href="#COMPATIBILITY">COMPATIBILITY</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYING">COPYING</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GROFF(7)              Miscellaneous Information Manual              GROFF(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       groff - a short reference for the GNU roff language
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The name <i>groff</i> stands for <i>GNU roff</i> and is the free implementation of
+       the roff type-setting system.  See <a href="roff.7.html">roff(7)</a> for a survey and the
+       background of the groff system.
+
+       This document gives only short descriptions of the predefined roff
+       language elements as used in groff.  Both the classical features and
+       the groff extensions are provided.
+
+       Historically, the <i>roff language</i> was called <i>troff</i>.  <i>groff</i> is
+       compatible with the classical system and provides proper extensions.
+       So in GNU, the terms <i>roff</i>, <i>troff</i>, and <i>groff language</i> could be used as
+       synonyms.  However <i>troff</i> slightly tends to refer more to the
+       classical aspects, whereas <i>groff</i> emphasizes the GNU extensions, and
+       <i>roff</i> is the general term for the language.
+
+       This file is only a short version of the complete documentation that
+       is found in the <i>groff</i> <b>info</b>(1) file, which contains more detailed,
+       actual, and concise information.
+
+       The general syntax for writing groff documents is relatively easy,
+       but writing extensions to the roff language can be a bit harder.
+
+       The roff language is line-oriented.  There are only two kinds of
+       lines, control lines and text lines.  The control lines start with a
+       control character, by default a period “<b>.</b>”  or a single quote “<b>'</b>”;
+       all other lines are text lines.
+
+       <b>Control lines </b>represent commands, optionally with arguments.  They
+       have the following syntax.  The leading control character can be
+       followed by a command name; arguments, if any, are separated by
+       spaces (but not tab characters) from the command name and among
+       themselves, for example,
+
+              .command_name arg1 arg2
+
+       For indentation, any number of space or tab characters can be
+       inserted between the leading control character and the command name,
+       but the control character must be on the first position of the line.
+
+       <b>Text lines </b>represent the parts that is printed.  They can be modified
+       by escape sequences, which are recognized by a leading backslash ‘<b>\</b>’.
+       These are in-line or even in-word formatting elements or functions.
+       Some of these take arguments separated by single quotes “<b>'</b>”, others
+       are regulated by a length encoding introduced by an open parenthesis
+       ‘<b>(</b>’ or enclosed in brackets ‘<b>[</b>’ and ‘<b>]</b>’.
+
+       The roff language provides flexible instruments for writing language
+       extension, such as macros.  When interpreting macro definitions, the
+       roff system enters a special operating mode, called the <b>copy mode</b>.
+
+       The copy mode behaviour can be quite tricky, but there are some rules
+       that ensure a safe usage.
+
+       1.     Printable backslashes must be denoted as <b>\e</b>.  To be more
+              precise, <b>\e </b>represents the current escape character.  To get a
+              backslash glyph, use <b>\(rs </b>or <b>\[rs]</b>.
+
+       2.     Double all backslashes.
+
+       3.     Begin all text lines with the special non-spacing character
+              <b>\&amp;</b>.
+
+       This does not produce the most efficient code, but it should work as
+       a first measure.  For better strategies, see the groff info file and
+       <a href="../man5/groff_tmac.5.html">groff_tmac(5)</a>.
+
+       Reading roff source files is easier, just reduce all double
+       backslashes to a single one in all macro definitions.
+</pre>
+<h2><a id="GROFF_ELEMENTS" href="#GROFF_ELEMENTS"></a>GROFF ELEMENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The roff language elements add formatting information to a text file.
+       The fundamental elements are predefined commands and variables that
+       make roff a full-blown programming language.
+
+       There are two kinds of roff commands, possibly with arguments.
+       <b>Requests </b>are written on a line of their own starting with a dot ‘<b>.</b>’
+       or a “<b>'</b>”, whereas <b>Escape sequences </b>are in-line functions and in-word
+       formatting elements starting with a backslash ‘<b>\</b>’.
+
+       The user can define her own formatting commands using the <b>de </b>request.
+       These commands are called <b>macros</b>, but they are used exactly like
+       requests.  Macro packages are pre-defined sets of macros written in
+       the groff language.  A user's possibilities to create escape
+       sequences herself is very limited, only special characters can be
+       mapped.
+
+       The groff language provides several kinds of variables with different
+       interfaces.  There are pre-defined variables, but the user can define
+       her own variables as well.
+
+       <b>String </b>variables store character sequences.  They are set with the <b>ds</b>
+       request and retrieved by the <b>\* </b>escape sequences.  Strings can have
+       variables.
+
+       <b>Register </b>variables can store numerical values, numbers with a scale
+       unit, and occasionally string-like objects.  They are set with the <b>nr</b>
+       request and retrieved by the <b>\n </b>escape sequences.
+
+       <b>Environments </b>allow the user to temporarily store global formatting
+       parameters like line length, font size, etc. for later reuse.  This
+       is done by the <b>ev </b>request.
+
+       <b>Fonts </b>are identified either by a name or by an internal number.  The
+       current font is chosen by the <b>ft </b>request or by the <b>\f </b>escape
+       sequences.  Each device has special fonts, but the following fonts
+       are available for all devices.  <b>R </b>is the standard font Roman.  <b>B </b>is
+       its <b>bold </b>counterpart.  The <i>italic</i> font is called <b>I </b>and is available
+       everywhere, but on text devices it is displayed as an underlined
+       Roman font.  For the graphical output devices, there exist constant-
+       width pendants of these fonts, <b>CR</b>, <b>CI</b>, and <b>CB</b>.  On text devices, all
+       glyphs have a constant width anyway.
+
+       <b>Glyphs </b>are visual representation forms of <b>characters</b>.  In groff, the
+       distinction between those two elements is not always obvious (and a
+       full discussion is beyond the scope of this man page).  A first
+       approximation is that glyphs have a specific size and colour and are
+       taken from a specific font; they can't be modified any more –
+       characters are the input, and glyphs are the output.  As soon as an
+       output line has been generated, it no longer contains characters but
+       glyphs.  In this man page, we use either ‘glyph’ or ‘character’,
+       whatever is more appropriate.
+
+       Moreover, there are some advanced roff elements.  A <b>diversion </b>stores
+       (formatted) information into a macro for later usage.  A <b>trap </b>is a
+       positional condition like a certain number of lines from page top or
+       in a diversion or in the input.  Some action can be prescribed to be
+       run automatically when the condition is met.
+
+       More detailed information and examples can be found in the groff info
+       file.
+</pre>
+<h2><a id="CONTROL_CHARACTERS" href="#CONTROL_CHARACTERS"></a>CONTROL CHARACTERS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       There is a small set of characters that have a special controlling
+       task in certain conditions.
+
+       <b>.      </b>A dot is only special at the beginning of a line or after the
+              condition in the requests <b>if</b>, <b>ie</b>, <b>el</b>, and <b>while</b>.  There it is
+              the control character that introduces a request (or macro).
+              By using the <b>cc </b>request, the control character can be set to a
+              different character, making the dot ‘<b>.</b>’  a non-special
+              character.
+
+              In all other positions, it just means a dot character.  In
+              text paragraphs, it is advantageous to start each sentence at
+              a line of its own.
+
+       <b>'      </b>The single quote has two controlling tasks.  At the beginning
+              of a line and in the conditional requests it is the non-
+              breaking control character.  That means that it introduces a
+              request like the dot, but with the additional property that
+              this request doesn't cause a linebreak.  By using the <b>c2</b>
+              request, the non-break control character can be set to a
+              different character.
+
+              As a second task, it is the most commonly used argument
+              separator in some functional escape sequences (but any pair of
+              characters not part of the argument do work).  In all other
+              positions, it denotes the single quote or apostrophe
+              character.  Groff provides a printable representation with the
+              <b>\(cq </b>escape sequence.
+
+       <b>"      </b>The double quote is used to enclose arguments in macros (but
+              not in requests and strings).  In the <b>ds </b>and <b>as </b>requests, a
+              leading double quote in the argument is stripped off, making
+              everything else afterwards the string to be defined (enabling
+              leading whitespace).  The escaped double quote <b>\" </b>introduces a
+              comment.  Otherwise, it is not special.  Groff provides a
+              printable representation with the <b>\(dq </b>escape sequence.
+
+       <b>\      </b>The backslash usually introduces an escape sequence (this can
+              be changed with the <b>ec </b>request).  A printed version of the
+              escape character is the <b>\e </b>escape; a backslash glyph can be
+              obtained by <b>\(rs</b>.
+
+       <b>(      </b>The open parenthesis is only special in escape sequences when
+              introducing an escape name or argument consisting of exactly
+              two characters.  In groff, this behaviour can be replaced by
+              the <b>[] </b>construct.
+
+       <b>[      </b>The opening bracket is only special in groff escape sequences;
+              there it is used to introduce a long escape name or long
+              escape argument.  Otherwise, it is non-special, e.g. in macro
+              calls.
+
+       <b>]      </b>The closing bracket is only special in groff escape sequences;
+              there it terminates a long escape name or long escape
+              argument.  Otherwise, it is non-special.
+
+       <i>space</i>  Space characters are only functional characters.  They
+              separate the arguments in requests, macros, and strings, and
+              the words in text lines.  They are subject to groff's
+              horizontal spacing calculations.  To get a defined space
+              width, escape sequences like ‘<b>\ </b>’ (this is the escape
+              character followed by a space), <b>\|</b>, <b>\^</b>, or <b>\h </b>should be used.
+
+       <i>newline</i>
+              In text paragraphs, newlines mostly behave like space
+              characters.  Continuation lines can be specified by an escaped
+              newline, i.e., by specifying a backslash ‘<b>\</b>’ as the last
+              character of a line.
+
+       <i>tab</i>    If a tab character occurs during text the interpreter makes a
+              horizontal jump to the next pre-defined tab position.  There
+              is a sophisticated interface for handling tab positions.
+</pre>
+<h2><a id="NUMERICAL_EXPRESSIONS" href="#NUMERICAL_EXPRESSIONS"></a>NUMERICAL EXPRESSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A <b>numerical value </b>is a signed or unsigned integer or float with or
+       without an appended scaling indicator.  A <b>scaling indicator </b>is a one-
+       character abbreviation for a unit of measurement.  A number followed
+       by a scaling indicator signifies a size value.  By default, numerical
+       values do not have a scaling indicator, i.e., they are normal
+       numbers.
+
+       The <i>roff</i> language defines the following scaling indicators.
+
+              <b>c         </b>Centimeter
+              <b>i         </b>Inch
+              <b>P         </b>Pica = 1/6 inch
+              <b>p         </b>Point = 1/72 inch
+              <b>m         </b>Em = the font size in points (approx. width of
+                        letter ‘m’)
+              <b>M         </b>100th of an Em
+              <b>n         </b>En = Em/2
+              <b>u         </b>Basic unit for actual output device
+              <b>v         </b>Vertical line space in basic units scaled
+                        point = 1/<i>sizescale</i> of a point (defined in font <i>DESC</i>
+                        file)
+              <b>f         </b>Scale by 65536.
+
+       <b>Numerical expressions </b>are combinations of the numerical values
+       defined above with the following arithmetical operators already
+       defined in classical troff.
+
+              <b>+         </b>Addition
+              <b>-         </b>Subtraction
+              <b>*         </b>Multiplication
+              <b>/         </b>Division
+              <b>%         </b>Modulo
+              <b>=         </b>Equals
+              <b>==        </b>Equals
+              <b>&lt;         </b>Less than
+              <b>&gt;         </b>Greater than
+              <b>&lt;=        </b>Less or equal
+              <b>&gt;=        </b>Greater or equal
+              <b>&amp;         </b>Logical and
+              <b>:         </b>Logical or
+              <b>!         </b>Logical not
+              <b>(         </b>Grouping of expressions
+              <b>)         </b>Close current grouping
+
+       Moreover, <i>groff</i> added the following operators for numerical
+       expressions:
+
+              <i>e1</i><b>&gt;?</b><i>e2</i>    The maximum of <i>e1</i> and <i>e2</i>.
+              <i>e1</i><b>&lt;?</b><i>e2</i>    The minimum of <i>e1</i> and <i>e2</i>.
+              <b>(</b><i>c</i><b>;</b><i>e</i><b>)     </b>Evaluate <i>e</i> using <i>c</i> as the default scaling indicator.
+
+       For details see the groff info file.
+</pre>
+<h2><a id="CONDITIONS" href="#CONDITIONS"></a>CONDITIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Conditions </b>occur in tests raised by the <b>if</b>, <b>ie</b>, and the <b>while</b>
+       requests.  The following table characterizes the different types of
+       conditions.
+
+              <i>N</i>         A numerical expression <i>N</i> yields true if its value is
+                        greater than 0.
+              <b>!</b><i>N</i>        True if the value of <i>N</i> is 0 (see below).
+              <b>'</b><i>s1</i><b>'</b><i>s2</i><b>'   </b>True if string <i>s1</i> is identical to string <i>s2</i>.
+              <b>!'</b><i>s1</i><b>'</b><i>s2</i><b>'  </b>True if string <i>s1</i> is not identical to string <i>s2</i> (see
+                        below).
+              <b>c</b><i>ch</i>       True if there is a glyph <i>ch</i> available.
+              <b>d</b><i>name</i>     True if there is a string, macro, diversion, or
+                        request called <i>name</i>.
+              <b>e         </b>Current page number is even.
+              <b>o         </b>Current page number is odd.
+              <b>m</b><i>name</i>     True if there is a color called <i>name</i>.
+              <b>n         </b>Formatter is <b>nroff</b>.
+              <b>r</b><i>reg</i>      True if there is a register named <i>reg</i>.
+              <b>t         </b>Formatter is <b>troff</b>.
+              <b>F</b><i>font</i>     True if there exists a font named <i>font</i>.
+              <b>S</b><i>style</i>    True if a style named <i>style</i> has been registered.
+
+       Note that the <b>!  </b>operator may only appear at the beginning of an
+       expression, and negates the entire expression.  This maintains bug-
+       compatibility with AT&amp;T <i>troff</i>.
+</pre>
+<h2><a id="REQUESTS" href="#REQUESTS"></a>REQUESTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This section provides a short reference for the predefined requests.
+       In groff, request, macro, and string names can be arbitrarily long.
+       No bracketing or marking of long names is needed.
+
+       Most requests take one or more arguments.  The arguments are
+       separated by space characters (no tabs!); there is no inherent limit
+       for their length or number.
+
+       Some requests have optional arguments with a different behaviour.
+       Not all of these details are outlined here.  Refer to the groff info
+       file and <a href="groff_diff.7.html">groff_diff(7)</a> for all details.
+
+       In the following request specifications, most argument names were
+       chosen to be descriptive.  Only the following denotations need
+       clarification.
+
+              <i>c</i>         denotes a single character.
+              <i>font</i>      a font either specified as a font name or a font
+                        number.
+              <i>anything</i>  all characters up to the end of the line or within
+                        <b>\{ </b>and <b>\}</b>.
+              <i>n</i>         is a numerical expression that evaluates to an
+                        integer value.
+              <i>N</i>         is an arbitrary numerical expression, signed or
+                        unsigned.
+              <i>±N</i>        has three meanings depending on its sign, described
+                        below.
+
+       If an expression defined as <i>±N</i> starts with a ‘<b>+</b>’ sign the resulting
+       value of the expression is added to an already existing value
+       inherent to the related request, e.g. adding to a number register.
+       If the expression starts with a ‘<b>-</b>’ the value of the expression is
+       subtracted from the request value.
+
+       Without a sign, <i>N</i> replaces the existing value directly.  To assign a
+       negative number either prepend 0 or enclose the negative number in
+       parentheses.
+
+   <b>Request Short Reference</b>
+       <b>.         </b>Empty line, ignored.  Useful for structuring documents.
+       <b>.\" </b><i>anything</i>
+                 Complete line is a comment.
+       <b>.ab </b><i>string</i>
+                 Print <i>string</i> on standard error, exit program.
+       <b>.ad       </b>Begin line adjustment for output lines in current adjust
+                 mode.
+       <b>.ad </b><i>c</i>     Start line adjustment in mode <i>c</i> (<i>c</i>=l,r,c,b,n).
+       <b>.af </b><i>register c</i>
+                 Assign format <i>c</i> to <i>register</i> (<i>c</i>=l,i,I,a,A).
+       <b>.aln </b><i>alias register</i>
+                 Create alias name for <i>register</i>.
+       <b>.als </b><i>alias object</i>
+                 Create alias name for request, string, macro, or diversion
+                 <i>object</i>.
+       <b>.am </b><i>macro</i> Append to <i>macro</i> until <b>.. </b>is encountered.
+       <b>.am </b><i>macro end</i>
+                 Append to <i>macro</i> until <b>.</b><i>end</i> is called.
+       <b>.am1 </b><i>macro</i>
+                 Same as <b>.am </b>but with compatibility mode switched off during
+                 macro expansion.
+       <b>.am1 </b><i>macro end</i>
+                 Same as <b>.am </b>but with compatibility mode switched off during
+                 macro expansion.
+       <b>.ami </b><i>macro</i>
+                 Append to a macro whose name is contained in the string
+                 register <i>macro</i> until <b>.. </b>is encountered.
+       <b>.ami </b><i>macro end</i>
+                 Append to a macro indirectly.  <i>macro</i> and <i>end</i> are string
+                 registers whose contents are interpolated for the macro
+                 name and the end macro, respectively.
+       <b>.ami1 </b><i>macro</i>
+                 Same as <b>.ami </b>but with compatibility mode switched off
+                 during macro expansion.
+       <b>.ami1 </b><i>macro end</i>
+                 Same as <b>.ami </b>but with compatibility mode switched off
+                 during macro expansion.
+       <b>.as </b><i>stringvar anything</i>
+                 Append <i>anything</i> to <i>stringvar</i>.
+       <b>.as1 </b><i>stringvar anything</i>
+                 Same as <b>.as </b>but with compatibility mode switched off during
+                 string expansion.
+       <b>.asciify </b><i>diversion</i>
+                 Unformat ASCII characters, spaces, and some escape
+                 sequences in <i>diversion</i>.
+       <b>.backtrace</b>
+                 Print a backtrace of the input on stderr.
+       <b>.bd </b><i>font N</i>
+                 Embolden <i>font</i> by <i>N</i>-1 units.
+       <b>.bd </b><i>S font N</i>
+                 Embolden Special Font <i>S</i> when current font is <i>font</i>.
+       <b>.blm      </b>Unset the blank line macro.
+       <b>.blm </b><i>macro</i>
+                 Set the blank line macro to <i>macro</i>.
+       <b>.box      </b>End current diversion.
+       <b>.box </b><i>macro</i>
+                 Divert to <i>macro</i>, omitting a partially filled line.
+       <b>.boxa     </b>End current diversion.
+       <b>.boxa </b><i>macro</i>
+                 Divert and append to <i>macro</i>, omitting a partially filled
+                 line.
+       <b>.bp       </b>Eject current page and begin new page.
+       <b>.bp </b><i>±N</i>    Eject current page; next page number <i>±N</i>.
+       <b>.br       </b>Line break.
+       <b>.brp      </b>Break and spread output line.  Same as <b>\p</b>.
+       <b>.break    </b>Break out of a while loop.
+       <b>.c2       </b>Reset no-break control character to “<b>'</b>”.
+       <b>.c2 </b><i>c</i>     Set no-break control character to <i>c</i>.
+       <b>.cc       </b>Reset control character to ‘<b>.</b>’.
+       <b>.cc </b><i>c</i>     Set control character to <i>c</i>.
+       <b>.ce       </b>Center the next input line.
+       <b>.ce </b><i>N</i>     Center following <i>N</i> input lines.
+       <b>.cf </b><i>filename</i>
+                 Copy contents of file <i>filename</i> unprocessed to stdout or to
+                 the diversion.
+       <b>.cflags </b><i>mode c1 c2 ...</i>
+                 Treat characters <i>c1</i>, <i>c2</i>, <i>...</i> according to <i>mode</i> number.
+       <b>.ch </b><i>trap N</i>
+                 Change <i>trap</i> location to <i>N</i>.
+       <b>.char </b><i>c anything</i>
+                 Define entity <i>c</i> as string <i>anything</i>.
+       <b>.chop </b><i>object</i>
+                 Chop the last character off macro, string, or diversion
+                 <i>object</i>.
+       <b>.class </b><i>name c1 c2 ...</i>
+                 Assign a set of characters, character ranges, or classes
+                 <i>c1</i>, <i>c2</i>, <i>...</i> to <i>name</i>.
+       <b>.close </b><i>stream</i>
+                 Close the <i>stream</i>.
+       <b>.color    </b>Enable colors.
+       <b>.color </b><i>N</i>  If <i>N</i> is zero disable colors, otherwise enable them.
+       <b>.composite </b><i>from to</i>
+                 Map glyph name <i>from</i> to glyph name <i>to</i> while constructing a
+                 composite glyph name.
+       <b>.continue </b>Finish the current iteration of a while loop.
+       <b>.cp       </b>Enable compatibility mode.
+       <b>.cp </b><i>N</i>     If <i>N</i> is zero disable compatibility mode, otherwise enable
+                 it.
+       <b>.cs </b><i>font N M</i>
+                 Set constant character width mode for <i>font</i> to <i>N</i>/36 ems with
+                 em <i>M</i>.
+       <b>.cu </b><i>N</i>     Continuous underline in nroff, like <b>.ul </b>in troff.
+       <b>.da       </b>End current diversion.
+       <b>.da </b><i>macro</i> Divert and append to <i>macro</i>.
+       <b>.de </b><i>macro</i> Define or redefine <i>macro</i> until <b>.. </b>is encountered.
+       <b>.de </b><i>macro end</i>
+                 Define or redefine <i>macro</i> until <b>.</b><i>end</i> is called.
+       <b>.de1 </b><i>macro</i>
+                 Same as <b>.de </b>but with compatibility mode switched off during
+                 macro expansion.
+       <b>.de1 </b><i>macro end</i>
+                 Same as <b>.de </b>but with compatibility mode switched off during
+                 macro expansion.
+       <b>.defcolor </b><i>color scheme component</i>
+                 Define or redefine a color with name <i>color</i>.  <i>scheme</i> can be
+                 <b>rgb</b>, <b>cym</b>, <b>cymk</b>, <b>gray</b>, or <b>grey</b>.  <i>component</i> can be single
+                 components specified as fractions in the range 0 to 1
+                 (default scaling indicator <b>f</b>), as a string of two-digit
+                 hexadecimal color components with a leading <b>#</b>, or as a
+                 string of four-digit hexadecimal components with two
+                 leading <b>#</b>.  The color <b>default </b>can't be redefined.
+       <b>.dei </b><i>macro</i>
+                 Define or redefine a macro whose name is contained in the
+                 string register <i>macro</i> until <b>.. </b>is encountered.
+       <b>.dei </b><i>macro end</i>
+                 Define or redefine a macro indirectly.  <i>macro</i> and <i>end</i> are
+                 string registers whose contents are interpolated for the
+                 macro name and the end macro, respectively.
+       <b>.dei1 </b><i>macro</i>
+                 Same as <b>.dei </b>but with compatibility mode switched off
+                 during macro expansion.
+       <b>.dei1 </b><i>macro end</i>
+                 Same as <b>.dei </b>but with compatibility mode switched off
+                 during macro expansion.
+       <b>.device </b><i>anything</i>
+                 Write <i>anything</i> to the intermediate output as a device
+                 control function.
+       <b>.devicem </b><i>name</i>
+                 Write contents of macro or string <i>name</i> uninterpreted to the
+                 intermediate output as a device control function.
+       <b>.di       </b>End current diversion.
+       <b>.di </b><i>macro</i> Divert to <i>macro</i>.
+       <b>.do </b><i>name</i>  Interpret <b>.</b><i>name</i> with compatibility mode disabled.
+       <b>.ds </b><i>stringvar anything</i>
+                 Set <i>stringvar</i> to <i>anything</i>.
+       <b>.ds1 </b><i>stringvar anything</i>
+                 Same as <b>.ds </b>but with compatibility mode switched off during
+                 string expansion.
+       <b>.dt </b><i>N trap</i>
+                 Set diversion trap to position <i>N</i> (default scaling
+                 indicator <b>v</b>).
+       <b>.ec       </b>Reset escape character to ‘<b>\</b>’.
+       <b>.ec </b><i>c</i>     Set escape character to <i>c</i>.
+       <b>.ecr      </b>Restore escape character saved with <b>.ecs</b>.
+       <b>.ecs      </b>Save current escape character.
+       <b>.el </b><i>anything</i>
+                 Else part for if-else (<b>ie</b>) request.
+       <b>.em </b><i>macro</i> The <i>macro</i> is run after the end of input.
+       <b>.eo       </b>Turn off escape character mechanism.
+       <b>.ev       </b>Switch to previous environment and pop it off the stack.
+       <b>.ev </b><i>env</i>   Push down environment number or name <i>env</i> to the stack and
+                 switch to it.
+       <b>.evc </b><i>env</i>  Copy the contents of environment <i>env</i> to the current
+                 environment.  No pushing or popping.
+       <b>.ex       </b>Exit from roff processing.
+       <b>.fam      </b>Return to previous font family.
+       <b>.fam </b><i>name</i> Set the current font family to <i>name</i>.
+       <b>.fc       </b>Disable field mechanism.
+       <b>.fc </b><i>a</i>     Set field delimiter to <i>a</i> and pad glyph to space.
+       <b>.fc </b><i>a b</i>   Set field delimiter to <i>a</i> and pad glyph to <i>b</i>.
+       <b>.fchar </b><i>c anything</i>
+                 Define fallback character (or glyph) <i>c</i> as string <i>anything</i>.
+       <b>.fcolor   </b>Set fill color to previous fill color.
+       <b>.fcolor </b><i>c</i> Set fill color to <i>c</i>.
+       <b>.fi       </b>Fill output lines.
+       <b>.fl       </b>Flush output buffer.
+       <b>.fp </b><i>n font</i>
+                 Mount <i>font</i> on position <i>n</i>.
+       <b>.fp </b><i>n internal external</i>
+                 Mount font with long <i>external</i> name to short <i>internal</i> name
+                 on position <i>n</i>.
+       <b>.fschar </b><i>f c anything</i>
+                 Define fallback character (or glyph) <i>c</i> for font <i>f</i> as string
+                 <i>anything</i>.
+       <b>.fspecial </b><i>font</i>
+                 Reset list of special fonts for <i>font</i> to be empty.
+       <b>.fspecial </b><i>font s1 s2 ...</i>
+                 When the current font is <i>font</i>, then the fonts <i>s1</i>, <i>s2</i>, <i>...</i>
+                 are special.
+       <b>.ft       </b>Return to previous font.  Same as <b>\f[] </b>or <b>\fP</b>.
+       <b>.ft </b><i>font</i>  Change to font name or number <i>font</i>; same as <b>\f[</b><i>font</i><b>] </b>escape
+                 sequence.
+       <b>.ftr </b><i>font1 font2</i>
+                 Translate <i>font1</i> to <i>font2</i>.
+       <b>.fzoom </b><i>font</i>
+                 Don't magnify <i>font</i>.
+       <b>.fzoom </b><i>font zoom</i>
+                 Set zoom factor for <i>font</i> (in multiples of 1/1000th).
+       <b>.gcolor   </b>Set glyph color to previous glyph color.
+       <b>.gcolor </b><i>c</i> Set glyph color to <i>c</i>.
+       <b>.hc       </b>Remove additional hyphenation indicator character.
+       <b>.hc </b><i>c</i>     Set up additional hyphenation indicator character <i>c</i>.
+       <b>.hcode </b><i>c1 code1 c2 code2 ...</i>
+                 Set the hyphenation code of character <i>c1</i> to <i>code1</i>, that of
+                 <i>c2</i> to <i>code2</i>, etc.
+       <b>.hla </b><i>lang</i> Set the current hyphenation language to <i>lang</i>.
+       <b>.hlm </b><i>n</i>    Set the maximum number of consecutive hyphenated lines to
+                 <i>n</i>.
+       <b>.hpf </b><i>file</i> Read hyphenation patterns from <i>file</i>.
+       <b>.hpfa </b><i>file</i>
+                 Append hyphenation patterns from <i>file</i>.
+       <b>.hpfcode </b><i>a b c d ...</i>
+                 Set input mapping for <b>.hpf</b>.
+       <b>.hw </b><i>words</i> List of <i>words</i> with exceptional hyphenation.
+       <b>.hy </b><i>N</i>     Switch to hyphenation mode <i>N</i>.
+       <b>.hym </b><i>n</i>    Set the hyphenation margin to <i>n</i> (default scaling
+                 indicator <b>m</b>).
+       <b>.hys </b><i>n</i>    Set the hyphenation space to <i>n</i>.
+       <b>.ie </b><i>cond anything</i>
+                 If <i>cond</i> then <i>anything</i> else goto <b>.el</b>.
+       <b>.if </b><i>cond anything</i>
+                 If <i>cond</i> then <i>anything</i>; otherwise do nothing.
+       <b>.ig       </b>Ignore text until <b>.. </b>is encountered.
+       <b>.ig </b><i>end</i>   Ignore text until <b>.</b><i>end</i> is called.
+       <b>.in       </b>Change to previous indentation value.
+       <b>.in </b><i>±N</i>    Change indentation according to <i>±N</i> (default scaling
+                 indicator <b>m</b>).
+       <b>.it </b><i>N trap</i>
+                 Set an input-line count trap for the next <i>N</i> lines.
+       <b>.itc </b><i>N trap</i>
+                 Same as <b>.it </b>but count lines interrupted with <b>\c </b>as one
+                 line.
+       <b>.kern     </b>Enable pairwise kerning.
+       <b>.kern </b><i>n</i>   If <i>n</i> is zero, disable pairwise kerning, otherwise enable
+                 it.
+       <b>.lc       </b>Remove leader repetition glyph.
+       <b>.lc </b><i>c</i>     Set leader repetition glyph to <i>c</i>.
+       <b>.length </b><i>register anything</i>
+                 Write the length of the string <i>anything</i> to <i>register</i>.
+       <b>.linetabs </b>Enable line-tabs mode (i.e., calculate tab positions
+                 relative to output line).
+       <b>.linetabs </b><i>n</i>
+                 If <i>n</i> is zero, disable line-tabs mode, otherwise enable it.
+       <b>.lf </b><i>N</i>     Set input line number to <i>N</i>.
+       <b>.lf </b><i>N file</i>
+                 Set input line number to <i>N</i> and filename to <i>file</i>.
+       <b>.lg </b><i>N</i>     Ligature mode on if <i>N</i>&gt;0.
+       <b>.ll       </b>Change to previous line length.
+       <b>.ll </b><i>±N</i>    Set line length according to <i>±N</i> (default length 6.5<b>i</b>,
+                 default scaling indicator <b>m</b>).
+       <b>.lsm      </b>Unset the leading spaces macro.
+       <b>.lsm </b><i>macro</i>
+                 Set the leading spaces macro to <i>macro</i>.
+       <b>.ls       </b>Change to the previous value of additional intra-line skip.
+       <b>.ls </b><i>N</i>     Set additional intra-line skip value to <i>N</i>, i.e., <i>N</i>-1 blank
+                 lines are inserted after each text output line.
+       <b>.lt </b><i>±N</i>    Length of title (default scaling indicator <b>m</b>).
+       <b>.mc       </b>Margin glyph off.
+       <b>.mc </b><i>c</i>     Print glyph <i>c</i> after each text line at actual distance from
+                 right margin.
+       <b>.mc </b><i>c N</i>   Set margin glyph to <i>c</i> and distance to <i>N</i> from right margin
+                 (default scaling indicator <b>m</b>).
+       <b>.mk </b><i>register</i>
+                 Mark current vertical position in <i>register</i>.
+       <b>.mso </b><i>file</i> The same as <b>.so </b>except that <i>file</i> is searched in the tmac
+                 directories.
+       <b>.na       </b>No output-line adjusting.
+       <b>.ne       </b>Need a one-line vertical space.
+       <b>.ne </b><i>N</i>     Need <i>N</i> vertical space (default scaling indicator <b>v</b>).
+       <b>.nf       </b>No filling or adjusting of output-lines.
+       <b>.nh       </b>No hyphenation.
+       <b>.nm       </b>Number mode off.
+       <b>.nm </b><i>±N</i> [<i>M</i> [<i>S</i> [<i>I</i>]]]
+                 In line number mode, set number, multiple, spacing, and
+                 indentation.
+       <b>.nn       </b>Do not number next line.
+       <b>.nn </b><i>N</i>     Do not number next <i>N</i> lines.
+       <b>.nop </b><i>anything</i>
+                 Always process <i>anything</i>.
+       <b>.nr </b><i>register ±N</i> [<i>M</i>]
+                 Define or modify <i>register</i> using <i>±N</i> with auto-increment <i>M</i>.
+       <b>.nroff    </b>Make the built-in conditions <b>n </b>true and <b>t </b>false.
+       <b>.ns       </b>Turn on no-space mode.
+       <b>.nx       </b>Immediately jump to end of current file.
+       <b>.nx </b><i>filename</i>
+                 Immediately continue processing with file <i>file</i>.
+       <b>.open </b><i>stream filename</i>
+                 Open <i>filename</i> for writing and associate the stream named
+                 <i>stream</i> with it.
+       <b>.opena </b><i>stream filename</i>
+                 Like <b>.open </b>but append to it.
+       <b>.os       </b>Output vertical distance that was saved by the <b>sv </b>request.
+       <b>.output </b><i>string</i>
+                 Emit <i>string</i> directly to intermediate output, allowing
+                 leading whitespace if <i>string</i> starts with <b>" </b>(which is
+                 stripped off).
+       <b>.pc       </b>Reset page number character to ‘<b>%</b>’.
+       <b>.pc </b><i>c</i>     Page number character.
+       <b>.pev      </b>Print the current environment and each defined environment
+                 state to stderr.
+       <b>.pi </b><i>program</i>
+                 Pipe output to <i>program</i> (nroff only).
+       <b>.pl       </b>Set page length to default 11<b>i</b>.  The current page length is
+                 stored in register <b>.p</b>.
+       <b>.pl </b><i>±N</i>    Change page length to <i>±N</i> (default scaling indicator <b>v</b>).
+       <b>.pm       </b>Print macro names and sizes (number of blocks of 128
+                 bytes).
+       <b>.pm </b><i>t</i>     Print only total of sizes of macros (number of 128 bytes
+                 blocks).
+       <b>.pn </b><i>±N</i>    Next page number <i>N</i>.
+       <b>.pnr      </b>Print the names and contents of all currently defined
+                 number registers on stderr.
+       <b>.po       </b>Change to previous page offset.  The current page offset is
+                 available in register <b>.o</b>.
+       <b>.po </b><i>±N</i>    Page offset <i>N</i>.
+       <b>.ps       </b>Return to previous point size.
+       <b>.ps </b><i>±N</i>    Point size; same as <b>\s[</b><i>±N</i><b>]</b>.
+       <b>.psbb </b><i>filename</i>
+                 Get the bounding box of a PostScript image <i>filename</i>.
+       <b>.pso </b><i>command</i>
+                 This behaves like the <b>so </b>request except that input comes
+                 from the standard output of <i>command</i>.
+       <b>.ptr      </b>Print the names and positions of all traps (not including
+                 input line traps and diversion traps) on stderr.
+       <b>.pvs      </b>Change to previous post-vertical line spacing.
+       <b>.pvs </b><i>±N</i>   Change post-vertical line spacing according to <i>±N</i> (default
+                 scaling indicator <b>p</b>).
+       <b>.rchar </b><i>c1 c2 ...</i>
+                 Remove the definitions of entities <i>c1</i>, <i>c2</i>, <i>...</i>
+       <b>.rd </b><i>prompt</i>
+                 Read insertion.
+       <b>.return   </b>Return from a macro.
+       <b>.return </b><i>anything</i>
+                 Return twice, namely from the macro at the current level
+                 and from the macro one level higher.
+       <b>.rfschar </b><i>f c1 c2 ...</i>
+                 Remove the definitions of entities <i>c1</i>, <i>c2</i>, <i>...</i> for font <i>f</i>.
+       <b>.rj </b><i>n</i>     Right justify the next <i>n</i> input lines.
+       <b>.rm </b><i>name</i>  Remove request, macro, or string <i>name</i>.
+       <b>.rn </b><i>old new</i>
+                 Rename request, macro, or string <i>old</i> to <i>new</i>.
+       <b>.rnn </b><i>reg1 reg2</i>
+                 Rename register <i>reg1</i> to <i>reg2</i>.
+       <b>.rr </b><i>register</i>
+                 Remove <i>register</i>.
+       <b>.rs       </b>Restore spacing; turn no-space mode off.
+       <b>.rt </b><i>±N</i>    Return <i>(upward only)</i> to marked vertical place (default
+                 scaling indicator <b>v</b>).
+       <b>.schar </b><i>c anything</i>
+                 Define global fallback character (or glyph) <i>c</i> as string
+                 <i>anything</i>.
+       <b>.shc      </b>Reset soft hyphen glyph to <b>\(hy</b>.
+       <b>.shc </b><i>c</i>    Set the soft hyphen glyph to <i>c</i>.
+       <b>.shift </b><i>n</i>  In a macro, shift the arguments by <i>n</i> positions.
+       <b>.sizes </b><i>s1 s2 ... sn</i> <b>[0]</b>
+                 Set available font sizes similar to the <b>sizes </b>command in a
+                 <b>DESC </b>file.
+       <b>.so </b><i>filename</i>
+                 Include source file.
+       <b>.sp       </b>Skip one line vertically.
+       <b>.sp </b><i>N</i>     Space vertical distance <i>N</i> up or down according to sign of <i>N</i>
+                 (default scaling indicator <b>v</b>).
+       <b>.special  </b>Reset global list of special fonts to be empty.
+       <b>.special </b><i>s1 s2 ...</i>
+                 Fonts <i>s1</i>, <i>s2</i>, etc. are special and are searched for glyphs
+                 not in the current font.
+       <b>.spreadwarn</b>
+                 Toggle the spread warning on and off without changing its
+                 value.
+       <b>.spreadwarn </b><i>limit</i>
+                 Emit a warning if each space in an output line is widened
+                 by <i>limit</i> or more (default scaling indicator <b>m</b>).
+       <b>.ss </b><i>N</i>     Set space glyph size to <i>N</i>/12 of the space width in the
+                 current font.
+       <b>.ss </b><i>N M</i>   Set space glyph size to <i>N</i>/12 and sentence space size set to
+                 <i>M</i>/12 of the space width in the current font.
+       <b>.sty </b><i>n style</i>
+                 Associate <i>style</i> with font position <i>n</i>.
+       <b>.substring </b><i>xx n1 n2</i>
+                 Replace the string named <i>xx</i> with the substring defined by
+                 the indices <i>n1</i> and <i>n2</i>.
+       <b>.sv       </b>Save 1 v of vertical space.
+       <b>.sv </b><i>N</i>     Save the vertical distance <i>N</i> for later output with <b>os</b>
+                 request (default scaling indicator <b>v</b>).
+       <b>.sy </b><i>command-line</i>
+                 Execute program <i>command-line</i>.
+       <b>.ta </b><i>T N</i>   Set tabs after every position that is a multiple of <i>N</i>
+                 (default scaling indicator <b>m</b>).
+       <b>.ta </b><i>n1 n2 ... nn</i> <b>T </b><i>r1 r2 ... rn</i>
+                 Set tabs at positions <i>n1</i>, <i>n2</i>, ..., <i>nn</i>, then set tabs at
+                 <i>nn</i>+<i>r1</i>, <i>nn</i>+<i>r2</i>, ..., <i>nn</i>+<i>rn</i>, then at <i>nn</i>+<i>rn</i>+<i>r1</i>, <i>nn</i>+<i>rn</i>+<i>r2</i>, ...,
+                 <i>nn</i>+<i>rn</i>+<i>rn</i>, and so on.
+       <b>.tc       </b>Remove tab repetition glyph.
+       <b>.tc </b><i>c</i>     Set tab repetition glyph to <i>c</i>.
+       <b>.ti </b><i>±N</i>    Temporary indent next line (default scaling indicator <b>m</b>).
+       <b>.tkf </b><i>font s1 n1 s2 n2</i>
+                 Enable track kerning for <i>font</i>.
+       <b>.tl ’</b><i>left</i><b>’</b><i>center</i><b>’</b><i>right</i><b>’</b>
+                 Three-part title.
+       <b>.tm </b><i>anything</i>
+                 Print <i>anything</i> on stdout.
+       <b>.tm1 </b><i>anything</i>
+                 Print <i>anything</i> on stdout, allowing leading whitespace if
+                 <i>anything</i> starts with <b>" </b>(which is stripped off).
+       <b>.tmc </b><i>anything</i>
+                 Similar to <b>.tm1 </b>without emitting a final newline.
+       <b>.tr </b><i>abcd...</i>
+                 Translate <i>a</i> to <i>b</i>, <i>c</i> to <i>d</i>, etc. on output.
+       <b>.trf </b><i>filename</i>
+                 Transparently output the contents of file <i>filename</i>.
+       <b>.trin </b><i>abcd...</i>
+                 This is the same as the <b>tr </b>request except that the <b>asciify</b>
+                 request uses the character code (if any) before the
+                 character translation.
+       <b>.trnt </b><i>abcd...</i>
+                 This is the same as the <b>tr </b>request except that the
+                 translations do not apply to text that is transparently
+                 throughput into a diversion with <b>\!</b>.
+       <b>.troff    </b>Make the built-in conditions <b>t </b>true and <b>n </b>false.
+       <b>.uf </b><i>font</i>  Set underline font to <i>font</i> (to be switched to by <b>.ul</b>).
+       <b>.ul </b><i>N</i>     Underline (italicize in troff) <i>N</i> input lines.
+       <b>.unformat </b><i>diversion</i>
+                 Unformat space characters and tabs in <i>diversion</i>, preserving
+                 font information.
+       <b>.vpt </b><i>n</i>    Enable vertical position traps if <i>n</i> is non-zero, disable
+                 them otherwise.
+       <b>.vs       </b>Change to previous vertical base line spacing.
+       <b>.vs </b><i>±N</i>    Set vertical base line spacing to <i>±N</i> (default scaling
+                 indicator <b>p</b>).
+       <b>.warn </b><i>n</i>   Set warnings code to <i>n</i>.
+       <b>.warnscale </b><i>si</i>
+                 Set scaling indicator used in warnings to <i>si</i>.
+       <b>.wh </b><i>N</i>     Remove (first) trap at position <i>N</i>.
+       <b>.wh </b><i>N trap</i>
+                 Set location trap; negative means from page bottom.
+       <b>.while </b><i>cond anything</i>
+                 While condition <i>cond</i> is true, accept <i>anything</i> as input.
+       <b>.write </b><i>stream anything</i>
+                 Write <i>anything</i> to the stream named <i>stream</i>.
+       <b>.writec </b><i>stream anything</i>
+                 Similar to <b>.write </b>without emitting a final newline.
+       <b>.writem </b><i>stream xx</i>
+                 Write contents of macro or string <i>xx</i> to the stream named
+                 <i>stream</i>.
+
+       Besides these standard groff requests, there might be further macro
+       calls.  They can originate from a macro package (see <a href="roff.7.html">roff(7)</a> for an
+       overview) or from a preprocessor.
+
+       Preprocessor macros are easy to be recognized.  They enclose their
+       code into a pair of characteristic macros.
+
+                 ┌─────────────┬─────────────────┬────────────────┐
+                 │preprocessor │   start macro   │    end macro   │
+                 ├─────────────┼─────────────────┼────────────────┤
+                 │    <b>chem     </b>│     <b>.cstart     </b>│     <b>.cend      </b>│
+                 │    <b>eqn      </b>│       <b>.EQ       </b>│      <b>.EN       </b>│
+                 │   <b>gideal    </b>│       <b>.IS       </b>│      <b>.IE       </b>│
+                 │    <b>grap     </b>│       <b>.G1       </b>│      <b>.G2       </b>│
+                 │    <b>grn      </b>│       <b>.GS       </b>│      <b>.GE       </b>│
+                 │             │                 │      <b>.IF       </b>│
+                 │    <b>pic      </b>│       <b>.PS       </b>│      <b>.PE       </b>│
+                 │   <b>refer     </b>│       <b>.R1       </b>│      <b>.R2       </b>│
+                 │   <b>soelim    </b>│      <i>none</i>       │      <i>none</i>      │
+                 │    <b>tbl      </b>│       <b>.TS       </b>│      <b>.TE       </b>│
+                 ├─────────────┼─────────────────┼────────────────┤
+                 │ <b>glilypond   </b>│ <b>.lilypond start </b>│ <b>.lilypond stop </b>│
+                 │   <b>gperl     </b>│   <b>.Perl start   </b>│   <b>.Perl stop   </b>│
+                 │  <b>gpinyin    </b>│  <b>.pinyin start  </b>│  <b>.pinyin stop  </b>│
+                 └─────────────┴─────────────────┴────────────────┘
+       Note that the ‘ideal’ preprocessor is not available in groff yet.
+</pre>
+<h2><a id="ESCAPE_SEQUENCES" href="#ESCAPE_SEQUENCES"></a>ESCAPE SEQUENCES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Escape sequences are in-line language elements usually introduced by
+       a backslash ‘<b>\</b>’ and followed by an escape name and sometimes by a
+       required argument.  Input processing is continued directly after the
+       escaped character or the argument (without an intervening separation
+       character).  So there must be a way to determine the end of the
+       escape name and the end of the argument.
+
+       This is done by enclosing names (escape name and arguments consisting
+       of a variable name) by a pair of brackets <b>[</b><i>name</i><b>] </b>and constant
+       arguments (number expressions and characters) by apostrophes (ASCII
+       0x27) like <b>’</b><i>constant</i><b>’</b>.
+
+       There are abbreviations for short names.  Two-character escape names
+       can be specified by an opening parenthesis like <b>\(</b>xy or <b>\*(</b>xy without
+       a closing counterpart.  And all one-character names different from
+       the special characters ‘<b>[</b>’ and ‘<b>(</b>’ can even be specified without a
+       marker, for example <b>\n</b>c or <b>\$</b>c.
+
+       Constant arguments of length 1 can omit the marker apostrophes, too,
+       but there is no two-character analogue.
+
+       While one-character escape sequences are mainly used for in-line
+       functions and system related tasks, the two-letter names following
+       the <b>\( </b>construct are glyphs predefined by the roff system; these are
+       called ‘Special Characters’ in the classical documentation.  Escapes
+       sequences of the form <b>\[</b><i>name</i><b>] </b>denote glyphs too.
+
+   <b>Single-Character Escapes</b>
+       <b>\"     </b>Start of a comment.  Everything up to the end of the line is
+              ignored.
+       <b>\#     </b>Everything up to and including the next newline is ignored.
+              This is interpreted in copy mode.  This is like <b>\" </b>except that
+              the terminating newline is ignored as well.
+       <b>\*</b><i>s</i>    The string stored in the string variable with one-character
+              name <i>s</i>.
+       <b>\*(</b><i>st</i>  The string stored in the string variable with two-character
+              name <i>st</i>.
+       <b>\*[</b><i>string</i><b>]</b>
+              The string stored in the string variable with name <i>string</i>
+              (with arbitrary length).
+       <b>\*[</b><i>stringvar arg1 arg2 ...</i><b>]</b>
+              The string stored in the string variable with arbitrarily long
+              name <i>stringvar</i>, taking <i>arg1</i>, <i>arg2</i>, <i>...</i> as arguments.
+       <b>\$0    </b>The name by which the current macro was invoked.  The <b>als</b>
+              request can make a macro have more than one name.
+       <b>\$</b><i>x</i>    Macro or string argument with one-digit number <i>x</i> in the range
+              1 to 9.
+       <b>\$(</b><i>xy</i>  Macro or string argument with two-digit number <i>xy</i> (larger than
+              zero).
+       <b>\$[</b><i>nexp</i><b>]</b>
+              Macro or string argument with number <i>nexp</i>, where <i>nexp</i> is a
+              numerical expression evaluating to an integer ≥1.
+       <b>\$*    </b>In a macro or string, the concatenation of all the arguments
+              separated by spaces.
+       <b>\$@    </b>In a macro or string, the concatenation of all the arguments
+              with each surrounded by double quotes, and separated by
+              spaces.
+       <b>\$^    </b>In a macro, the representation of all parameters as if they
+              were an argument to the <b>ds </b>request.
+       <b>\\     </b>reduces to a single backslash; useful to delay its
+              interpretation as escape character in copy mode.  For a
+              printable backslash, use <b>\e</b>, or even better <b>\[rs]</b>, to be
+              independent from the current escape character.
+       <b>\´     </b>The acute accent ´; same as <b>\(aa</b>.  Unescaped: apostrophe,
+              right quotation mark, single quote (ASCII 0x27).
+       <b>\`     </b>The grave accent `; same as <b>\(ga</b>.  Unescaped: left quote,
+              backquote (ASCII 0x60).
+       <b>\-     </b>The - (minus) sign in the current font.
+       <b>\_     </b>The same as <b>\(ul</b>, the underline character.
+       <b>\.     </b>The same as a dot (‘.’).  Necessary in nested macro
+              definitions so that ‘\\..’ expands to ‘..’.
+       <b>\%     </b>Default optional hyphenation character.
+       <b>\!     </b>Transparent line indicator.
+       <b>\?</b><i>anything</i><b>?</b>
+              In a diversion, this transparently embeds <i>anything</i> in the
+              diversion.  <i>anything</i> is read in copy mode.  See also the
+              escape sequences <b>\!  </b>and <b>\?</b>.
+       <b>\</b><i>space</i> Unpaddable space size space glyph (no line break).
+       <b>\0     </b>Digit-width space.
+       <b>\|     </b>1/6 em narrow space glyph; zero width in nroff.
+       <b>\^     </b>1/12 em half-narrow space glyph; zero width in nroff.
+       <b>\&amp;     </b>Non-printable, zero-width glyph.
+       <b>\)     </b>Like <b>\&amp; </b>except that it behaves like a glyph declared with the
+              <b>cflags </b>request to be transparent for the purposes of end-of-
+              sentence recognition.
+       <b>\/     </b>Increases the width of the preceding glyph so that the spacing
+              between that glyph and the following glyph is correct if the
+              following glyph is a roman glyph.
+       <b>\,     </b>Modifies the spacing of the following glyph so that the
+              spacing between that glyph and the preceding glyph is correct
+              if the preceding glyph is a roman glyph.
+       <b>\~     </b>Unbreakable space that stretches like a normal inter-word
+              space when a line is adjusted.
+       <b>\:     </b>Inserts a zero-width break point (similar to <b>\% </b>but without a
+              soft hyphen character).
+       <b>\</b><i>newline</i>
+              Ignored newline, for continuation lines.
+       <b>\{     </b>Begin conditional input.
+       <b>\}     </b>End conditional input.
+       <b>\(</b><i>sc</i>   A glyph with two-character name <i>sc</i>; see section <b>Special</b>
+              <b>Characters</b>.
+       <b>\[</b><i>name</i><b>]</b>
+              A glyph with name <i>name</i> (of arbitrary length).
+       <b>\[</b><i>comp1 comp2 ...</i><b>]</b>
+              A composite glyph with components <i>comp1</i>, <i>comp2</i>, <i>...</i>
+       <b>\a     </b>Non-interpreted leader character.
+       <b>\A’</b><i>anything</i><b>’</b>
+              If <i>anything</i> is acceptable as a name of a string, macro,
+              diversion, register, environment or font it expands to 1, and
+              to 0 otherwise.
+       <b>\b’</b><i>abc...</i><b>’</b>
+              Bracket building function.
+       <b>\B’</b><i>anything</i><b>’</b>
+              If <i>anything</i> is acceptable as a valid numeric expression it
+              expands to 1, and to 0 otherwise.
+       <b>\c     </b>Interrupt text processing.
+       <b>\C’</b><i>glyph</i><b>’</b>
+              The glyph called <i>glyph</i>; same as <b>\[</b><i>glyph</i><b>]</b>, but compatible to
+              other roff versions.
+       <b>\d     </b>Forward (down) 1/2 em (1/2 line in nroff).
+       <b>\D’</b><i>charseq</i><b>’</b>
+              Draw a graphical element defined by the characters in <i>charseq</i>;
+              see the groff info file for details.
+       <b>\e     </b>Printable version of the current escape character.
+       <b>\E     </b>Equivalent to an escape character, but is not interpreted in
+              copy mode.
+       <b>\f</b><i>F</i>    Change to font with one-character name or one-digit number <i>F</i>.
+       <b>\fP    </b>Switch back to previous font.
+       <b>\f(</b><i>fo</i>  Change to font with two-character name or two-digit number <i>fo</i>.
+       <b>\f[</b><i>font</i><b>]</b>
+              Change to font with arbitrarily long name or number expression
+              <i>font</i>.
+       <b>\f[]   </b>Switch back to previous font.
+       <b>\F</b><i>f</i>    Change to font family with one-character name <i>f</i>.
+       <b>\F(</b><i>fm</i>  Change to font family with two-character name <i>fm</i>.
+       <b>\F[</b><i>fam</i><b>]</b>
+              Change to font family with arbitrarily long name <i>fam</i>.
+       <b>\F[]   </b>Switch back to previous font family.
+       <b>\g</b><i>r</i>    Return format of register with one-character name <i>r</i> suitable
+              for <b>af </b>request.
+       <b>\g(</b><i>rg</i>  Return format of register with two-character name <i>rg</i> suitable
+              for <b>af </b>request.
+       <b>\g[</b><i>reg</i><b>]</b>
+              Return format of register with arbitrarily long name <i>reg</i>
+              suitable for <b>af </b>request.
+       <b>\h’</b><i>N</i><b>’  </b>Local horizontal motion; move right <i>N</i> (left if negative).
+       <b>\H’</b><i>N</i><b>’  </b>Set height of current font to <i>N</i>.
+       <b>\k</b><i>r</i>    Mark horizontal input place in one-character register <i>r</i>.
+       <b>\k(</b><i>rg</i>  Mark horizontal input place in two-character register <i>rg</i>.
+       <b>\k[</b><i>reg</i><b>]</b>
+              Mark horizontal input place in register with arbitrarily long
+              name <i>reg</i>.
+       <b>\l’</b><i>Nc</i><b>’ </b>Horizontal line drawing function (optionally using character
+              <i>c</i>).
+       <b>\L’</b><i>Nc</i><b>’ </b>Vertical line drawing function (optionally using character <i>c</i>).
+       <b>\m</b><i>c</i>    Change to color with one-character name <i>c</i>.
+       <b>\m(</b><i>cl</i>  Change to color with two-character name <i>cl</i>.
+       <b>\m[</b><i>color</i><b>]</b>
+              Change to color with arbitrarily long name <i>color</i>.
+       <b>\m[]   </b>Switch back to previous color.
+       <b>\M</b><i>c</i>    Change filling color for closed drawn objects to color with
+              one-character name <i>c</i>.
+       <b>\M(</b><i>cl</i>  Change filling color for closed drawn objects to color with
+              two-character name <i>cl</i>.
+       <b>\M[</b><i>color</i><b>]</b>
+              Change filling color for closed drawn objects to color with
+              arbitrarily long name <i>color</i>.
+       <b>\M[]   </b>Switch to previous fill color.
+       <b>\n</b><i>r</i>    The numerical value stored in the register variable with the
+              one-character name <i>r</i>.
+       <b>\n(</b><i>re</i>  The numerical value stored in the register variable with the
+              two-character name <i>re</i>.
+       <b>\n[</b><i>reg</i><b>]</b>
+              The numerical value stored in the register variable with
+              arbitrarily long name <i>reg</i>.
+       <b>\N’</b><i>n</i><b>’  </b>Typeset the glyph with index <i>n</i> in the current font.  No
+              special fonts are searched.  Useful for adding (named)
+              entities to a document using the <b>char </b>request and friends.
+       <b>\o’</b><i>abc...</i><b>’</b>
+              Overstrike glyphs <i>a</i>, <i>b</i>, <i>c</i>, etc.
+       <b>\O0    </b>Disable glyph output.  Mainly for internal use.
+       <b>\O1    </b>Enable glyph output.  Mainly for internal use.
+       <b>\p     </b>Break and spread output line.
+       <b>\r     </b>Reverse 1 em vertical motion (reverse line in nroff).
+       <b>\R’</b><i>name ±n</i><b>’</b>
+              The same as <b>.nr </b><i>name ±n</i>.
+       <b>\s</b><i>±N</i>   Set/increase/decrease the point size to/by <i>N</i> scaled points; <i>N</i>
+              is a one-digit number in the range 1 to 9.  Same as <b>ps</b>
+              request.
+       <b>\s(</b><i>±N</i>
+       <b>\s±(</b><i>N</i>  Set/increase/decrease the point size to/by <i>N</i> scaled points; <i>N</i>
+              is a two-digit number ≥1.  Same as <b>ps </b>request.
+       <b>\s[</b><i>±N</i><b>]</b>
+       <b>\s±[</b><i>N</i><b>]</b>
+       <b>\s’</b><i>±N</i><b>’</b>
+       <b>\s±’</b><i>N</i><b>’ </b>Set/increase/decrease the point size to/by <i>N</i> scaled points.
+              Same as <b>ps </b>request.
+       <b>\S’</b><i>N</i><b>’  </b>Slant output by <i>N</i> degrees.
+       <b>\t     </b>Non-interpreted horizontal tab.
+       <b>\u     </b>Reverse (up) 1/2 em vertical motion (1/2 line in nroff).
+       <b>\v’</b><i>N</i><b>’  </b>Local vertical motion; move down <i>N</i> (up if negative).
+       <b>\V</b><i>e</i>    The contents of the environment variable with one-character
+              name <i>e</i>.
+       <b>\V(</b><i>ev</i>  The contents of the environment variable with two-character
+              name <i>ev</i>.
+       <b>\V[</b><i>env</i><b>]</b>
+              The contents of the environment variable with arbitrarily long
+              name <i>env</i>.
+       <b>\w’</b><i>string</i><b>’</b>
+              The width of the glyph sequence <i>string</i>.
+       <b>\x’</b><i>N</i><b>’  </b>Extra line-space function (negative before, positive after).
+       <b>\X’</b><i>string</i><b>’</b>
+              Output <i>string</i> as device control function.
+       <b>\Y</b><i>n</i>    Output string variable or macro with one-character name <i>n</i>
+              uninterpreted as device control function.
+       <b>\Y(</b><i>nm</i>  Output string variable or macro with two-character name <i>nm</i>
+              uninterpreted as device control function.
+       <b>\Y[</b><i>name</i><b>]</b>
+              Output string variable or macro with arbitrarily long name
+              <i>name</i> uninterpreted as device control function.
+       <b>\z</b><i>c</i>    Print <i>c</i> with zero width (without spacing).
+       <b>\Z’</b><i>anything</i><b>’</b>
+              Print <i>anything</i> and then restore the horizontal and vertical
+              position; <i>anything</i> may not contain tabs or leaders.
+
+       The escape sequences <b>\e</b>, <b>\.</b>, <b>\"</b>, <b>\$</b>, <b>\*</b>, <b>\a</b>, <b>\n</b>, <b>\t</b>, <b>\g</b>, and <b>\</b><i>newline</i>
+       are interpreted in copy mode.
+
+       Escape sequences starting with <b>\( </b>or <b>\[ </b>do not represent single
+       character escape sequences, but introduce escape names with two or
+       more characters.
+
+       If a backslash is followed by a character that does not constitute a
+       defined escape sequence, the backslash is silently ignored and the
+       character maps to itself.
+
+   <b>Special Characters</b>
+       [Note: ‘Special Characters’ is a misnomer; those entities are
+       (output) glyphs, not (input) characters.]
+
+       Common special characters are predefined by escape sequences of the
+       form <b>\(</b><i>xy</i> with characters <i>x</i> and <i>y</i>.  In <i>groff</i>, it is also possible to
+       use the writing <b>\[</b><i>xy</i><b>] </b>as well.
+
+       Some of these special characters exist in the usual font while most
+       of them are only available in the special font.  Below you can see a
+       small selection of the most important glyphs; a complete list can be
+       found in <a href="groff_char.7.html">groff_char(7)</a>.
+
+              <b>\(Do   </b>Dollar <b>$</b>
+              <b>\(Eu   </b>Euro <b>€</b>
+              <b>\(Po   </b>British pound sterling <b>£</b>
+              <b>\(aq   </b>Apostrophe quote <b>'</b>
+              <b>\(bu   </b>Bullet sign <b>·</b>
+              <b>\(co   </b>Copyright <b>©</b>
+              <b>\(cq   </b>Single closing quote (right) <b>’</b>
+              <b>\(ct   </b>Cent <b>¢</b>
+              <b>\(dd   </b>Double dagger <b>‡</b>
+              <b>\(de   </b>Degree <b>°</b>
+              <b>\(dg   </b>Dagger <b>†</b>
+              <b>\(dq   </b>Double quote (ASCII 34) <b>"</b>
+              <b>\(em   </b>Em-dash <b>—</b>
+              <b>\(en   </b>En-dash <b>–</b>
+              <b>\(hy   </b>Hyphen <b>‐</b>
+              <b>\(lq   </b>Double quote left <b>“</b>
+              <b>\(oq   </b>Single opening quote (left) <b>‘</b>
+              <b>\(rg   </b>Registered sign <b>®</b>
+              <b>\(rq   </b>Double quote right <b>”</b>
+              <b>\(rs   </b>Printable backslash character <b>\</b>
+              <b>\(sc   </b>Section sign <b>§</b>
+              <b>\(tm   </b>Trademark symbol <b>™</b>
+              <b>\(ul   </b>Underline character <b>_</b>
+              <b>\(==   </b>Identical <b>≡</b>
+              <b>\(&gt;=   </b>Larger or equal <b>≥</b>
+              <b>\(&lt;=   </b>Less or equal <b>≤</b>
+              <b>\(!=   </b>Not equal <b>≠</b>
+              <b>\(-&gt;   </b>Right arrow <b>→</b>
+              <b>\(&lt;-   </b>Left arrow <b>←</b>
+              <b>\(+-   </b>Plus-minus sign <b>±</b>
+
+   <b>Unicode Characters</b>
+       There is the extended escape <b>u </b>that allows to include all available
+       Unicode characters into some <i>roff</i> file.
+
+       <b>\[u</b><i>xxxx</i><b>]</b>
+              <b>u </b>is the escape name.  <i>xxxx</i> is a hexadecimal number of 4 hex
+              digits, such as <b>0041 </b>for the letter <b>A</b>, see <b>\[u0041]</b>.
+
+       <b>\[u</b><i>yyyyy</i><b>]</b>
+              <b>u </b>is the escape name.  <i>yyyyy</i> is a hexadecimal number of 5 hex
+              digits, such as <b>2FA1A </b>for a Chinese looking character for <i>CJK</i>
+              <i>Compatibility Ideographs Supplement</i>, see <b>\[u2FA1A]</b>.
+
+       Both hexadecimal collections mean the corresponding Unicode code for
+       a character.
+
+       <b>\[u</b><i>hex1</i><b>_</b><i>hex2</i><b>]</b>
+       <b>\[u</b><i>hex1</i><b>_</b><i>hex2</i><b>_</b><i>hex3</i><b>]</b>
+              <i>hex1</i>, <i>hex2</i>, and <i>hex3</i> are all Unicode hexadecimal codes (4 or 5
+              hex digits) that are used for overstriking, e.g.
+              <b>\[u0041_0301] </b>is <i>A acute</i> <b>Á</b>.
+
+       The availability of the Unicode characters depends on the used font.
+       For text mode, the device <b>-Tutf8 </b>is quite complete, for <i>troff</i> modes
+       it might happen that some or many characters will not be displayed.
+       Please check your fonts.
+
+   <b>Strings</b>
+       Strings are defined by the <b>ds </b>request and can be retrieved by the <b>\*</b>
+       escape sequence.
+
+       Strings share their name space with macros.  So strings and macros
+       without arguments are roughly equivalent; it is possible to call a
+       string like a macro and vice-versa, but this often leads to
+       unpredictable results.  The following string is the only one
+       predefined in groff.
+
+       \*[<b>.T</b>]    The name of the current output device as specified by the
+                 <b>-T </b>command line option.
+</pre>
+<h2><a id="REGISTERS" href="#REGISTERS"></a>REGISTERS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Registers are variables that store a value.  In groff, most registers
+       store numerical values (see section <b>NUMERICAL EXPRESSIONS </b>above), but
+       some can also hold a string value.
+
+       Each register is given a name.  Arbitrary registers can be defined
+       and set with the <b>nr </b>request.
+
+       The value stored in a register can be retrieved by the escape
+       sequences introduced by <b>\n</b>.
+
+       Most useful are predefined registers.  In the following the notation
+       <i>name</i> is used to refer to register <b>name </b>to make clear that we speak
+       about registers.  Please keep in mind that the <b>\n[] </b>decoration is not
+       part of the register name.
+
+   <b>Read-only Registers</b>
+       The following registers have predefined values that should not be
+       modified by the user (usually, registers starting with a dot are
+       read-only).  Mostly, they provide information on the current settings
+       or store results from request calls.
+
+       \n[<b>$$</b>]    The process ID of <b>troff</b>.
+       \n[<b>.$</b>]    Number of arguments in the current macro or string.
+       \n[<b>.a</b>]    Post-line extra line-space most recently utilized using <b>\x</b>.
+       \n[<b>.A</b>]    Set to 1 in <b>troff </b>if option <b>-A </b>is used; always 1 in <b>nroff</b>.
+       \n[<b>.b</b>]    The emboldening offset while <b>.bd </b>is active.
+       \n[<b>.br</b>]   Within a macro, set to 1 if macro called with the ‘normal’
+                 control character, and to 0 otherwise.
+       \n[<b>.c</b>]    Current input line number.
+       \n[<b>.C</b>]    1 if compatibility mode is in effect, 0 otherwise.
+       \n[<b>.cdp</b>]  The depth of the last glyph added to the current
+                 environment.  It is positive if the glyph extends below the
+                 baseline.
+       \n[<b>.ce</b>]   The number of lines remaining to be centered, as set by the
+                 <b>ce </b>request.
+       \n[<b>.cht</b>]  The height of the last glyph added to the current
+                 environment.  It is positive if the glyph extends above the
+                 baseline.
+       \n[<b>.color</b>]
+                 1 if colors are enabled, 0 otherwise.
+       \n[<b>.csk</b>]  The skew of the last glyph added to the current
+                 environment.  The skew of a glyph is how far to the right
+                 of the center of a glyph the center of an accent over that
+                 glyph should be placed.
+       \n[<b>.d</b>]    Current vertical place in current diversion; equal to
+                 register <b>nl</b>.
+       \n[<b>.ev</b>]   The name or number of the current environment (string-
+                 valued).
+       \n[<b>.f</b>]    Current font number.
+       \n[<b>.F</b>]    The name of the current input file (string-valued).
+       \n[<b>.fam</b>]  The current font family (string-valued).
+       \n[<b>.fn</b>]   The current (internal) real font name (string-valued).
+       \n[<b>.fp</b>]   The number of the next free font position.
+       \n[<b>.g</b>]    Always 1 in GNU troff.  Macros should use it to test if
+                 running under groff.
+       \n[<b>.h</b>]    Text base-line high-water mark on current page or
+                 diversion.
+       \n[<b>.H</b>]    Available horizontal resolution in basic units.
+       \n[<b>.height</b>]
+                 The current font height as set with <b>\H</b>.
+       \n[<b>.hla</b>]  The current hyphenation language as set by the <b>hla </b>request.
+       \n[<b>.hlc</b>]  The number of immediately preceding consecutive hyphenated
+                 lines.
+       \n[<b>.hlm</b>]  The maximum allowed number of consecutive hyphenated lines,
+                 as set by the <b>hlm </b>request.
+       \n[<b>.hy</b>]   The current hyphenation flags (as set by the <b>hy </b>request).
+       \n[<b>.hym</b>]  The current hyphenation margin (as set by the <b>hym </b>request).
+       \n[<b>.hys</b>]  The current hyphenation space (as set by the <b>hys </b>request).
+       \n[<b>.i</b>]    Current indentation.
+       \n[<b>.in</b>]   The indentation that applies to the current output line.
+       \n[<b>.int</b>]  Positive if last output line contains <b>\c</b>.
+       \n[<b>.j</b>]    The current adjustment mode.  It can be stored and used to
+                 set adjustment.  (n = 1, b = 1, l = 0, r = 5, c = 3).
+       \n[<b>.k</b>]    The current horizontal output position (relative to the
+                 current indentation).
+       \n[<b>.kern</b>] 1 if pairwise kerning is enabled, 0 otherwise.
+       \n[<b>.l</b>]    Current line length.
+       \n[<b>.L</b>]    The current line spacing setting as set by <b>.ls</b>.
+       \n[<b>.lg</b>]   The current ligature mode (as set by the <b>lg </b>request).
+       \n[<b>.linetabs</b>]
+                 The current line-tabs mode (as set by the <b>linetabs</b>
+                 request).
+       \n[<b>.ll</b>]   The line length that applies to the current output line.
+       \n[<b>.lt</b>]   The title length (as set by the <b>lt </b>request).
+       \n[<b>.m</b>]    The current drawing color (string-valued).
+       \n[<b>.M</b>]    The current background color (string-valued).
+       \n[<b>.n</b>]    Length of text portion on previous output line.
+       \n[<b>.ne</b>]   The amount of space that was needed in the last <b>ne </b>request
+                 that caused a trap to be sprung.  Useful in conjunction
+                 with register <b>.trunc</b>.
+       \n[<b>.ns</b>]   1 if in no-space mode, 0 otherwise.
+       \n[<b>.o</b>]    Current page offset.
+       \n[<b>.O</b>]    The suppression nesting level (see <b>\O</b>).
+       \n[<b>.p</b>]    Current page length.
+       \n[<b>.P</b>]    1 if the current page is being printed, 0 otherwise (as
+                 determined by the <b>-o </b>command line option).
+       \n[<b>.pe</b>]   1 during page ejection, 0 otherwise.
+       \n[<b>.pn</b>]   The number of the next page: either the value set by a <b>pn</b>
+                 request, or the number of the current page plus 1.
+       \n[<b>.ps</b>]   The current point size in scaled points.
+       \n[<b>.psr</b>]  The last-requested point size in scaled points.
+       \n[<b>.pvs</b>]  The current post-vertical line spacing.
+       \n[<b>.R</b>]    The number of unused number registers.  Always 10000 in GNU
+                 troff.
+       \n[<b>.rj</b>]   The number of lines to be right-justified as set by the <b>rj</b>
+                 request.
+       \n[<b>.s</b>]    Current point size as a decimal fraction.
+       \n[<b>.slant</b>]
+                 The slant of the current font as set with <b>\S</b>.
+       \n[<b>.sr</b>]   The last requested point size in points as a decimal
+                 fraction (string-valued).
+       \n[<b>.ss</b>]   The value of the parameters set by the first argument of
+                 the <b>ss </b>request.
+       \n[<b>.sss</b>]  The value of the parameters set by the second argument of
+                 the <b>ss </b>request.
+       \n[<b>.sty</b>]  The current font style (string-valued).
+       \n[<b>.t</b>]    Vertical distance to the next trap.
+       \n[<b>.T</b>]    Set to 1 if option <b>-T </b>is used.
+       \n[<b>.tabs</b>] A string representation of the current tab settings
+                 suitable for use as an argument to the <b>ta </b>request.
+       \n[<b>.trunc</b>]
+                 The amount of vertical space truncated by the most recently
+                 sprung vertical position trap, or, if the trap was sprung
+                 by a <b>ne </b>request, minus the amount of vertical motion
+                 produced by <b>.ne</b>.  Useful in conjunction with the register
+                 <b>.ne</b>.
+       \n[<b>.u</b>]    Equal to 1 in fill mode and 0 in no-fill mode.
+       \n[<b>.U</b>]    Equal to 1 in safer mode and 0 in unsafe mode.
+       \n[<b>.v</b>]    Current vertical line spacing.
+       \n[<b>.V</b>]    Available vertical resolution in basic units.
+       \n[<b>.vpt</b>]  1 if vertical position traps are enabled, 0 otherwise.
+       \n[<b>.w</b>]    Width of previous glyph.
+       \n[<b>.warn</b>] The sum of the number codes of the currently enabled
+                 warnings.
+       \n[<b>.x</b>]    The major version number.
+       \n[<b>.y</b>]    The minor version number.
+       \n[<b>.Y</b>]    The revision number of groff.
+       \n[<b>.z</b>]    Name of current diversion.
+       \n[<b>.zoom</b>] Zoom factor for current font (in multiples of 1/1000th;
+                 zero if no magnification).
+
+   <b>Writable Registers</b>
+       The following registers can be read and written by the user.  They
+       have predefined default values, but these can be modified for
+       customizing a document.
+
+       \n[<b>%</b>]     Current page number.
+       \n[<b>c.</b>]    Current input line number.
+       \n[<b>ct</b>]    Character type (set by width function <b>\w</b>).
+       \n[<b>dl</b>]    Maximal width of last completed diversion.
+       \n[<b>dn</b>]    Height of last completed diversion.
+       \n[<b>dw</b>]    Current day of week (1–7).
+       \n[<b>dy</b>]    Current day of month (1–31).
+       \n[<b>hours</b>] The number of hours past midnight.  Initialized at start-
+                 up.
+       \n[<b>hp</b>]    Current horizontal position at input line.
+       \n[<b>llx</b>]   Lower left x-coordinate (in PostScript units) of a given
+                 PostScript image (set by <b>.psbb</b>).
+       \n[<b>lly</b>]   Lower left y-coordinate (in PostScript units) of a given
+                 PostScript image (set by <b>.psbb</b>).
+       \n[<b>ln</b>]    Output line number.
+       \n[<b>lsn</b>]   The number of leading spaces of an input line.
+       \n[<b>lss</b>]   The horizontal space corresponding to the leading spaces of
+                 an input line.
+       \n[<b>minutes</b>]
+                 The number of minutes after the hour.  Initialized at
+                 start-up.
+       \n[<b>mo</b>]    Current month (1–12).
+       \n[<b>nl</b>]    Vertical position of last printed text base-line.
+       \n[<b>opmaxx</b>]
+       \n[<b>opmaxy</b>]
+       \n[<b>opminx</b>]
+       \n[<b>opminy</b>]
+                 These four registers mark the top left and bottom right
+                 hand corners of a box which encompasses all written glyphs.
+                 They are reset to -1 by <b>\O</b><i>0</i> or <b>\O</b><i>1</i>.
+       \n[<b>rsb</b>]   Like register <b>sb</b>, but takes account of the heights and
+                 depths of glyphs.
+       \n[<b>rst</b>]   Like register <b>st</b>, but takes account of the heights and
+                 depths of glyphs.
+       \n[<b>sb</b>]    Depth of string below base line (generated by width
+                 function <b>\w</b>).
+       \n[<b>seconds</b>]
+                 The number of seconds after the minute.  Initialized at
+                 start-up.
+       \n[<b>skw</b>]   Right skip width from the center of the last glyph in the
+                 <b>\w </b>argument.
+       \n[<b>slimit</b>]
+                 If greater than 0, the maximum number of objects on the
+                 input stack.  If ≤0 there is no limit, i.e., recursion can
+                 continue until virtual memory is exhausted.
+       \n[<b>ssc</b>]   The amount of horizontal space (possibly negative) that
+                 should be added to the last glyph before a subscript
+                 (generated by width function <b>\w</b>).
+       \n[<b>st</b>]    Height of string above base line (generated by width
+                 function <b>\w</b>).
+       \n[<b>systat</b>]
+                 The return value of the <i>system()</i> function executed by the
+                 last <b>sy </b>request.
+       \n[<b>urx</b>]   Upper right x-coordinate (in PostScript units) of a given
+                 PostScript image (set by <b>.psbb</b>).
+       \n[<b>ury</b>]   Upper right y-coordinate (in PostScript units) of a given
+                 PostScript image (set by <b>.psbb</b>).
+       \n[<b>year</b>]  The current year (year 2000 compliant).
+       \n[<b>yr</b>]    Current year minus 1900.  For Y2K compliance use register
+                 <b>year </b>instead.
+</pre>
+<h2><a id="UNDERLINING" href="#UNDERLINING"></a>UNDERLINING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In the <i>RUNOFF</i> language, the underlining was quite easy.  But in <i>roff</i>
+       this is much more difficult.
+
+   <b>Underlining with .ul</b>
+       There exists a <i>groff</i> request <b>.ul </b>(see above) that can underline the
+       next or further source lines in <b>nroff</b>, but in <b>troff </b>it produces only
+       a font change into <i>italic</i>.  So this request is not really useful.
+
+   <b>Underlining with .UL from ms</b>
+       In the ‘ms’ macro package in tmac/s.tmac <a href="groff_ms.7.html">groff_ms(7)</a>, there is the
+       macro <b>.UL</b>.  But this works only in <b>troff</b>, not in <b>nroff</b>.
+
+   <b>Underlining macro definitions</b>
+       So one can use the <i>italic</i> <b>nroff </b>idea from <b>.ul </b>and the <b>troff</b>
+       definition in <i>ms</i> for writing a useful new macro, something like
+              .de UNDERLINE
+              . ie n \\$1\f[I]\\$2\f[P]\\$3
+              . el \\$1\Z'\\$2'\v'.25m'\D'l \w'\\$2'u 0'\v'-.25m'\[rs]\$3
+              ..
+       If <b>doclifter</b>(1) makes trouble, change the macro name <b>UNDERLINE </b>into
+       some 2-letter word, like <b>Ul</b>.  Moreover change the font writing from
+       <b>\f[P] </b>to <b>\fP</b>.
+
+   <b>Underlining without macro definitions</b>
+       If one does not want to use macro definitions, e.g. when <b>doclifter</b>
+       gets lost, use the following:
+              .ds u1 before
+              .ds u2 in
+              .ds u3 after
+              .ie n \*[u1]\f[I]\*[u2]\f[P]\*[u3]
+              .el \*[u1]\Z'\*[u2]'\v'.25m'\D'l \w'\*[u2]'u 0'\v'-.25m'\*[u3]
+       Due to <b>doclifter</b>, it might be necessary to change the variable writ‐
+       ing <b>\[xy] </b>and <b>\*[xy] </b>into the strange ancient writing <b>\*(xy </b>and <b>\(xy</b>,
+       and so on.
+
+       Then these lines could look like
+              .ds u1 before
+              .ds u2 in
+              .ds u3 after
+              .ie n \*[u1]\fI\*(u2\fP\*(u3
+              .el \*(u1\Z'\*(u2'\v'.25m'\D'l \w'\*(u2'u 0'\v'-.25m'\*(u3
+
+       The result looks like
+              before _i_n after
+
+   <b>Underlining with Overstriking \z and \(ul</b>
+       There is another possibility for underlining by using overstriking
+       with <b>\z</b><i>c</i> (print <i>c</i> with zero width without spacing) and <b>\(ul </b>(under‐
+       line character).  This produces the underlining of 1 character, both
+       in <b>nroff </b>and in <b>troff</b>.
+
+       For example the underlining of a character say <b>t </b>looks like <b>\z\[ul]t</b>
+       or <b>\z\(ult</b>
+
+       Longer words look then a bit strange, but a useful mode is to write
+       each character into a whole own line.  To underlines the 3 character
+       part "tar" of the word "start":
+              before s\
+              \z\[ul]t\
+              \z\[ul]a\
+              \z\[ul]r\
+              t after
+       or
+              before s\
+              \z\(ult\
+              \z\(ula\
+              \z\(ulr\
+              t after
+
+       The result looks like
+              before s_t_a_rt after
+</pre>
+<h2><a id="COMPATIBILITY" href="#COMPATIBILITY"></a>COMPATIBILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The differences of the groff language in comparison to classical
+       troff as defined by <i>[CSTR #54]</i> are documented in <a href="groff_diff.7.html">groff_diff(7)</a>.
+
+       The groff system provides a compatibility mode, see <a href="../man1/groff.1.html">groff(1)</a> on how
+       to invoke this.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Report bugs to the groff bug mailing list ⟨bug-groff@gnu.org⟩.
+       Include a complete, self-contained example that will allow the bug to
+       be reproduced, and say which version of groff you are using.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The main source of information for the groff language is the <b>groff</b>
+       <b>info</b>(1) file.  Besides the gory details, it contains many examples.
+
+       <a href="../man1/groff.1.html">groff(1)</a>
+              the usage of the groff program and pointers to the
+              documentation and availability of the groff system.
+
+       <a href="groff_diff.7.html">groff_diff(7)</a>
+              the differences of the groff language as compared to classical
+              roff.  This is the authoritative document for the predefined
+              language elements that are specific to groff.
+
+       <a href="groff_char.7.html">groff_char(7)</a>
+              the predefined groff special characters (glyphs).
+
+       <a href="../man5/groff_font.5.html">groff_font(5)</a>
+              the specification of fonts and the DESC file.
+
+       <a href="roff.7.html">roff(7)</a>
+              the history of roff, the common parts shared by all roff
+              systems, and pointers to further documentation.
+
+       <i>[CSTR #54]</i>
+              Nroff/Troff User's Manual by Ossanna &amp; Kernighan 
+              ⟨<a href="../../../../cm.bell-labs.com/cm/cs/cstr/54.ps.gz">http://cm.bell-labs.com/cm/cs/cstr/54.ps.gz</a>⟩ — the bible for
+              classical troff.
+</pre>
+<h2><a id="COPYING" href="#COPYING"></a>COPYING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This file is part of groff, the GNU roff type-setting system.
+
+       Copyright © 2000-2014 Free Software Foundation, Inc.
+
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.3 or
+       any later version published by the Free Software Foundation; with no
+       Front-Cover Texts, and with no Back-Cover Texts.
+
+       A copy of the Free Documentation License is included as a file called
+       FDL in the main directory of the groff source package.  It is also
+       available in the internet at ⟨<a href="http://www.gnu.org/copyleft/fdl.html">http://www.gnu.org/copyleft/fdl.html</a>⟩.
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This documentation was written by Bernd Warken ⟨groff-
+       bernd.warken-72@web.de⟩ and is appended and maintained by Werner
+       Lemberg ⟨wl@gnu.org⟩.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>groff</i> (GNU troff) project.  Information
+       about the project can be found at 
+       ⟨<a href="http://www.gnu.org/software/groff/">http://www.gnu.org/software/groff/</a>⟩.  If you have a bug report for
+       this manual page, see ⟨<a href="http://www.gnu.org/software/groff/">http://www.gnu.org/software/groff/</a>⟩.  This
+       page was obtained from the tarball groff-1.22.3.tar.gz fetched from
+       ⟨ftp://ftp.gnu.org/gnu/groff/⟩ on 2017-07-05.  If you discover any
+       rendering problems in this HTML version of the page, or you believe
+       there is a better or more up-to-date source for the page, or you have
+       corrections or improvements to the information in this COLOPHON
+       (which is <i>not</i> part of the original manual page), send a mail to
+       man-pages@man7.org
+
+<span class="footline">Groff Version 1.22.3           4 November 2014                      GROFF(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/glilypond.1.html">glilypond(1)</a>,&nbsp; 
+    <a href="../man1/gperl.1.html">gperl(1)</a>,&nbsp; 
+    <a href="../man1/gpinyin.1.html">gpinyin(1)</a>,&nbsp; 
+    <a href="../man1/groff.1.html">groff(1)</a>,&nbsp; 
+    <a href="../man1/groffer.1.html">groffer(1)</a>,&nbsp; 
+    <a href="../man1/man.1.html">man(1)</a>,&nbsp; 
+    <a href="../man1/troff.1.html">troff(1)</a>,&nbsp; 
+    <a href="../man5/groff_out.5.html">groff_out(5)</a>,&nbsp; 
+    <a href="../man5/groff_tmac.5.html">groff_tmac(5)</a>,&nbsp; 
+    <a href="groff_char.7.html">groff_char(7)</a>,&nbsp; 
+    <a href="groff_diff.7.html">groff_diff(7)</a>,&nbsp; 
+    <a href="groff_filenames.7.html">groff_filenames(7)</a>,&nbsp; 
+    <a href="groff_trace.7.html">groff_trace(7)</a>,&nbsp; 
+    <a href="man-pages.7.html">man-pages(7)</a>,&nbsp; 
+    <a href="roff.7.html">roff(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

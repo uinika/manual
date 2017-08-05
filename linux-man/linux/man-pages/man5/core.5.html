@@ -1,0 +1,507 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>core(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">CORE(5)                   Linux Programmer's Manual                  CORE(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       core - core dump file
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The default action of certain signals is to cause a process to
+       terminate and produce a <i>core dump file</i>, a disk file containing an
+       image of the process's memory at the time of termination.  This image
+       can be used in a debugger (e.g., <a href="../man1/gdb.1.html">gdb(1)</a>) to inspect the state of the
+       program at the time that it terminated.  A list of the signals which
+       cause a process to dump core can be found in <a href="../man7/signal.7.html">signal(7)</a>.
+
+       A process can set its soft <b>RLIMIT_CORE </b>resource limit to place an
+       upper limit on the size of the core dump file that will be produced
+       if it receives a "core dump" signal; see <a href="../man2/getrlimit.2.html">getrlimit(2)</a> for details.
+
+       There are various circumstances in which a core dump file is not
+       produced:
+
+       *  The process does not have permission to write the core file.  (By
+          default, the core file is called <i>core</i> or <i>core.pid</i>, where <i>pid</i> is
+          the ID of the process that dumped core, and is created in the
+          current working directory.  See below for details on naming.)
+          Writing the core file will fail if the directory in which it is to
+          be created is nonwritable, or if a file with the same name exists
+          and is not writable or is not a regular file (e.g., it is a
+          directory or a symbolic link).
+
+       *  A (writable, regular) file with the same name as would be used for
+          the core dump already exists, but there is more than one hard link
+          to that file.
+
+       *  The filesystem where the core dump file would be created is full;
+          or has run out of inodes; or is mounted read-only; or the user has
+          reached their quota for the filesystem.
+
+       *  The directory in which the core dump file is to be created does
+          not exist.
+
+       *  The <b>RLIMIT_CORE </b>(core file size) or <b>RLIMIT_FSIZE </b>(file size)
+          resource limits for the process are set to zero; see <a href="../man2/getrlimit.2.html">getrlimit(2)</a>
+          and the documentation of the shell's <i>ulimit</i> command (<i>limit</i> in
+          <b>csh</b>(1)).
+
+       *  The binary being executed by the process does not have read
+          permission enabled.
+
+       *  The process is executing a set-user-ID (set-group-ID) program that
+          is owned by a user (group) other than the real user (group) ID of
+          the process, or the process is executing a program that has file
+          capabilities (see <a href="../man7/capabilities.7.html">capabilities(7)</a>).  (However, see the description
+          of the <a href="../man2/prctl.2.html">prctl(2)</a> <b>PR_SET_DUMPABLE </b>operation, and the description of
+          the <i>/proc/sys/fs/suid_dumpable</i> file in <a href="proc.5.html">proc(5)</a>.)
+
+       *  (Since Linux 3.7) The kernel was configured without the
+          <b>CONFIG_COREDUMP </b>option.
+
+       In addition, a core dump may exclude part of the address space of the
+       process if the <a href="../man2/madvise.2.html">madvise(2)</a> <b>MADV_DONTDUMP </b>flag was employed.
+
+   <b>Naming of core dump files</b>
+       By default, a core dump file is named <i>core</i>, but the
+       <i>/proc/sys/kernel/core_pattern</i> file (since Linux 2.6 and 2.4.21) can
+       be set to define a template that is used to name core dump files.
+       The template can contain % specifiers which are substituted by the
+       following values when a core file is created:
+
+           %%  a single % character
+           %c  core file size soft resource limit of crashing process (since
+               Linux 2.6.24)
+           %d  dump mode—same as value returned by <a href="../man2/prctl.2.html">prctl(2)</a> <b>PR_GET_DUMPABLE</b>
+               (since Linux 3.7)
+           %e  executable filename (without path prefix)
+           %E  pathname of executable, with slashes ('/') replaced by
+               exclamation marks ('!') (since Linux 3.0).
+           %g  (numeric) real GID of dumped process
+           %h  hostname (same as <i>nodename</i> returned by <a href="../man2/uname.2.html">uname(2)</a>)
+           %i  TID of thread that triggered core dump, as seen in the PID
+               namespace in which the thread resides (since Linux 3.18)
+           %I  TID of thread that triggered core dump, as seen in the
+               initial PID namespace (since Linux 3.18)
+           %p  PID of dumped process, as seen in the PID namespace in which
+               the process resides
+           %P  PID of dumped process, as seen in the initial PID namespace
+               (since Linux 3.12)
+           %s  number of signal causing dump
+           %t  time of dump, expressed as seconds since the Epoch,
+               1970-01-01 00:00:00 +0000 (UTC)
+           %u  (numeric) real UID of dumped process
+
+       A single % at the end of the template is dropped from the core
+       filename, as is the combination of a % followed by any character
+       other than those listed above.  All other characters in the template
+       become a literal part of the core filename.  The template may include
+       '/' characters, which are interpreted as delimiters for directory
+       names.  The maximum size of the resulting core filename is 128 bytes
+       (64 bytes in kernels before 2.6.19).  The default value in this file
+       is "core".  For backward compatibility, if
+       <i>/proc/sys/kernel/core_pattern</i> does not include <i>%p</i> and
+       <i>/proc/sys/kernel/core_uses_pid</i> (see below) is nonzero, then .PID will
+       be appended to the core filename.
+
+       Paths are interpreted according to the settings that are active for
+       the crashing process.  That means the crashing process's mount
+       namespace (see <a href="../man7/mount_namespaces.7.html">mount_namespaces(7)</a>), its current working directory
+       (found via <a href="../man2/getcwd.2.html">getcwd(2)</a>), and its root directory (see <a href="../man2/chroot.2.html">chroot(2)</a>).
+
+       Since version 2.4, Linux has also provided a more primitive method of
+       controlling the name of the core dump file.  If the
+       <i>/proc/sys/kernel/core_uses_pid</i> file contains the value 0, then a core
+       dump file is simply named <i>core</i>.  If this file contains a nonzero
+       value, then the core dump file includes the process ID in a name of
+       the form <i>core.PID</i>.
+
+       Since Linux 3.6, if <i>/proc/sys/fs/suid_dumpable</i> is set to 2
+       ("suidsafe"), the pattern must be either an absolute pathname
+       (starting with a leading '/' character) or a pipe, as defined below.
+
+   <b>Piping core dumps to a program</b>
+       Since kernel 2.6.19, Linux supports an alternate syntax for the
+       <i>/proc/sys/kernel/core_pattern</i> file.  If the first character of this
+       file is a pipe symbol (<b>|</b>), then the remainder of the line is
+       interpreted as the command-line for a user-space program (or script)
+       that is to be executed.  Instead of being written to a disk file, the
+       core dump is given as standard input to the program.  Note the
+       following points:
+
+       *  The program must be specified using an absolute pathname (or a
+          pathname relative to the root directory, <i>/</i>), and must immediately
+          follow the '|' character.
+
+       *  The command-line arguments can include any of the % specifiers
+          listed above.  For example, to pass the PID of the process that is
+          being dumped, specify <i>%p</i> in an argument.
+
+       *  The process created to run the program runs as user and group
+          <i>root</i>.
+
+       *  Running as <i>root</i> does not confer any exceptional security bypasses.
+          Namely, LSMs (e.g., SELinux) are still active and may prevent the
+          handler from accessing details about the crashed process via
+          <i>/proc/[pid]</i>.
+
+       *  The program pathname is interpreted with respect to the initial
+          mount namespace as it is always executed there.  It is not
+          affected by the settings (e.g., root directory, mount namespace,
+          current working directory) of the crashing process.
+
+       *  The process runs in the initial namespaces (PID, mount, user, and
+          so on) and not in the namespaces of the crashing process.  One can
+          utilize specifiers such as <i>%P</i> to find the right <i>/proc/[pid]</i>
+          directory and probe/enter the crashing process's namespaces if
+          needed.
+
+       *  The process starts with its current working directory as the root
+          directory.  If desired, it is possible change to the working
+          directory of the dumping process by employing the value provided
+          by the <i>%P</i> specifier to change to the location of the dumping
+          process via <i>/proc/[pid]/cwd</i>.
+
+       *  Command-line arguments can be supplied to the program (since Linux
+          2.6.24), delimited by white space (up to a total line length of
+          128 bytes).
+
+   <b>/proc/sys/kernel/core_pipe_limit</b>
+       When collecting core dumps via a pipe to a user-space program, it can
+       be useful for the collecting program to gather data about the
+       crashing process from that process's <i>/proc/[pid]</i> directory.  In order
+       to do this safely, the kernel must wait for the program collecting
+       the core dump to exit, so as not to remove the crashing process's
+       <i>/proc/[pid]</i> files prematurely.  This in turn creates the possibility
+       that a misbehaving collecting program can block the reaping of a
+       crashed process by simply never exiting.
+
+       Since Linux 2.6.32, the <i>/proc/sys/kernel/core_pipe_limit</i> can be used
+       to defend against this possibility.  The value in this file defines
+       how many concurrent crashing processes may be piped to user-space
+       programs in parallel.  If this value is exceeded, then those crashing
+       processes above this value are noted in the kernel log and their core
+       dumps are skipped.
+
+       A value of 0 in this file is special.  It indicates that unlimited
+       processes may be captured in parallel, but that no waiting will take
+       place (i.e., the collecting program is not guaranteed access to
+       <i>/proc/&lt;crashing-PID&gt;</i>).  The default value for this file is 0.
+
+   <b>Controlling which mappings are written to the core dump</b>
+       Since kernel 2.6.23, the Linux-specific <i>/proc/[pid]/coredump_filter</i>
+       file can be used to control which memory segments are written to the
+       core dump file in the event that a core dump is performed for the
+       process with the corresponding process ID.
+
+       The value in the file is a bit mask of memory mapping types (see
+       <a href="../man2/mmap.2.html">mmap(2)</a>).  If a bit is set in the mask, then memory mappings of the
+       corresponding type are dumped; otherwise they are not dumped.  The
+       bits in this file have the following meanings:
+
+           bit 0  Dump anonymous private mappings.
+           bit 1  Dump anonymous shared mappings.
+           bit 2  Dump file-backed private mappings.
+           bit 3  Dump file-backed shared mappings.
+           bit 4 (since Linux 2.6.24)
+                  Dump ELF headers.
+           bit 5 (since Linux 2.6.28)
+                  Dump private huge pages.
+           bit 6 (since Linux 2.6.28)
+                  Dump shared huge pages.
+           bit 7 (since Linux 4.4)
+                  Dump private DAX pages.
+           bit 8 (since Linux 4.4)
+                  Dump shared DAX pages.
+
+       By default, the following bits are set: 0, 1, 4 (if the
+       <b>CONFIG_CORE_DUMP_DEFAULT_ELF_HEADERS </b>kernel configuration option is
+       enabled), and 5.  This default can be modified at boot time using the
+       <i>coredump_filter</i> boot option.
+
+       The value of this file is displayed in hexadecimal.  (The default
+       value is thus displayed as 33.)
+
+       Memory-mapped I/O pages such as frame buffer are never dumped, and
+       virtual DSO pages are always dumped, regardless of the
+       <i>coredump_filter</i> value.
+
+       A child process created via <a href="../man2/fork.2.html">fork(2)</a> inherits its parent's
+       <i>coredump_filter</i> value; the <i>coredump_filter</i> value is preserved across
+       an <a href="../man2/execve.2.html">execve(2)</a>.
+
+       It can be useful to set <i>coredump_filter</i> in the parent shell before
+       running a program, for example:
+
+           $ <b>echo 0x7 &gt; /proc/self/coredump_filter</b>
+           $ <b>./some_program</b>
+
+       This file is provided only if the kernel was built with the
+       <b>CONFIG_ELF_CORE </b>configuration option.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <a href="../man1/gdb.1.html">gdb(1)</a> <i>gcore</i> command can be used to obtain a core dump of a
+       running process.
+
+       In Linux versions up to and including 2.6.27, if a multithreaded
+       process (or, more precisely, a process that shares its memory with
+       another process by being created with the <b>CLONE_VM </b>flag of <a href="../man2/clone.2.html">clone(2)</a>)
+       dumps core, then the process ID is always appended to the core
+       filename, unless the process ID was already included elsewhere in the
+       filename via a <i>%p</i> specification in <i>/proc/sys/kernel/core_pattern</i>.
+       (This is primarily useful when employing the obsolete LinuxThreads
+       implementation, where each thread of a process has a different PID.)
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below can be used to demonstrate the use of the pipe
+       syntax in the <i>/proc/sys/kernel/core_pattern</i> file.  The following
+       shell session demonstrates the use of this program (compiled to
+       create an executable named <i>core_pattern_pipe_test</i>):
+
+           $ <b>cc -o core_pattern_pipe_test core_pattern_pipe_test.c</b>
+           $ <b>su</b>
+           Password:
+           # <b>echo "|$PWD/core_pattern_pipe_test %p UID=%u GID=%g sig=%s" &gt; \</b>
+               <b>/proc/sys/kernel/core_pattern</b>
+           # <b>exit</b>
+           $ <b>sleep 100</b>
+           <b>^\                     </b># type control-backslash
+           Quit (core dumped)
+           $ <b>cat core.info</b>
+           argc=5
+           argc[0]=&lt;/home/mtk/core_pattern_pipe_test&gt;
+           argc[1]=&lt;20575&gt;
+           argc[2]=&lt;UID=1000&gt;
+           argc[3]=&lt;GID=100&gt;
+           argc[4]=&lt;sig=3&gt;
+           Total bytes in core dump: 282624
+
+   <b>Program source</b>
+
+       /* core_pattern_pipe_test.c */
+
+       #define _GNU_SOURCE
+       #include &lt;sys/stat.h&gt;
+       #include &lt;fcntl.h&gt;
+       #include &lt;limits.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;unistd.h&gt;
+
+       #define BUF_SIZE 1024
+
+       int
+       main(int argc, char *argv[])
+       {
+           int tot, j;
+           ssize_t nread;
+           char buf[BUF_SIZE];
+           FILE *fp;
+           char cwd[PATH_MAX];
+
+           /* Change our current working directory to that of the
+              crashing process */
+
+           snprintf(cwd, PATH_MAX, "/proc/%s/cwd", argv[1]);
+           chdir(cwd);
+
+           /* Write output to file "core.info" in that directory */
+
+           fp = fopen("core.info", "w+");
+           if (fp == NULL)
+               exit(EXIT_FAILURE);
+
+           /* Display command-line arguments given to core_pattern
+              pipe program */
+
+           fprintf(fp, "argc=%d\n", argc);
+           for (j = 0; j &lt; argc; j++)
+               fprintf(fp, "argc[%d]=&lt;%s&gt;\n", j, argv[j]);
+
+           /* Count bytes in standard input (the core dump) */
+
+           tot = 0;
+           while ((nread = read(STDIN_FILENO, buf, BUF_SIZE)) &gt; 0)
+               tot += nread;
+           fprintf(fp, "Total bytes in core dump: %d\n", tot);
+
+           fclose(fp);
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/bash.1.html">bash(1)</a>, <a href="../man1/gdb.1.html">gdb(1)</a>, <a href="../man2/getrlimit.2.html">getrlimit(2)</a>, <a href="../man2/mmap.2.html">mmap(2)</a>, <a href="../man2/prctl.2.html">prctl(2)</a>, <a href="../man2/sigaction.2.html">sigaction(2)</a>,
+       <a href="elf.5.html">elf(5)</a>, <a href="proc.5.html">proc(5)</a>, <a href="../man7/pthreads.7.html">pthreads(7)</a>, <a href="../man7/signal.7.html">signal(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-03-13                          CORE(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/getrlimit.2.html">getrlimit(2)</a>,&nbsp; 
+    <a href="../man2/madvise.2.html">madvise(2)</a>,&nbsp; 
+    <a href="../man2/prctl.2.html">prctl(2)</a>,&nbsp; 
+    <a href="../man2/sigaction.2.html">sigaction(2)</a>,&nbsp; 
+    <a href="coredump.conf.5.html">coredump.conf(5)</a>,&nbsp; 
+    <a href="elf.5.html">elf(5)</a>,&nbsp; 
+    <a href="proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man7/signal.7.html">signal(7)</a>,&nbsp; 
+    <a href="../man8/systemd-coredump.8.html">systemd-coredump(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="core.5.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,316 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.environment-generator(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.ENVIRONMENT-GENERATOR(7)environment-generatorNVIRONMENT-GENERATOR(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.environment-generator - Systemd environment file generators
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>/usr/lib/systemd/system-environment-generators/some-generator</b>
+
+       <b>/usr/lib/systemd/user-environment-generators/some-generator</b>
+
+       /run/systemd/system-environment-generators/*
+       /etc/systemd/system-environment-generators/*
+       /usr/local/lib/systemd/system-environment-generators/*
+       /usr/lib/systemd/system-environment-generators/*
+
+       /run/systemd/user-environment-generators/*
+       /etc/systemd/user-environment-generators/*
+       /usr/local/lib/systemd/user-environment-generators/*
+       /usr/lib/systemd/user-environment-generators/*
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Generators are small executables that live in
+       /usr/lib/systemd/system-environment-generators/ and other directories
+       listed above.  <a href="../man1/systemd.1.html">systemd(1)</a> will execute those binaries very early at
+       the startup of each manager and at configuration reload time, before
+       running the generators described in <a href="systemd.generator.7.html">systemd.generator(7)</a> and before
+       starting any units. Environment generators can override the
+       environment that the manager exports to services and other processes.
+
+       Generators are loaded from a set of paths determined during
+       compilation, as listed above. System and user environment generators
+       are loaded from directories with names ending in
+       system-environment-generators/ and user-environment-generators/,
+       respectively. Generators found in directories listed earlier override
+       the ones with the same name in directories lower in the list. A
+       symlink to /dev/null or an empty file can be used to mask a
+       generator, thereby preventing it from running. Please note that the
+       order of the two directories with the highest priority is reversed
+       with respect to the unit load path, and generators in /run overwrite
+       those in /etc.
+
+       After installing new generators or updating the configuration,
+       <b>systemctl daemon-reload </b>may be executed. This will re-run all
+       generators, updating environment configuration. It will be used for
+       any services that are started subsequently.
+
+       Environment file generators are executed similarly to unit file
+       generators described in <a href="systemd.generator.7.html">systemd.generator(7)</a>, with the following
+       differences:
+
+       ·   Generators are executed sequentially in the alphanumerical order
+           of the final component of their name. The output of each
+           generator output is immediately parsed and used to update the
+           environment for generators that run after that. Thus, later
+           generators can use and/or modify the output of earlier
+           generators.
+
+       ·   Generators are run by every manager instance, their output can be
+           different for each user.
+
+       It is recommended to use numerical prefixes for generator names to
+       simplify ordering.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Example 1. A simple generator that extends an environment variable if</b>
+       <b>a directory exists in the file system</b>
+
+           # 50-xdg-data-dirs.sh
+
+           #!/bin/bash
+
+           # set the default value
+           XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share/:/usr/share}"
+
+           # add a directory if it exists
+           if [[ -d /opt/foo/share ]]; then
+              XDG_DATA_DIRS=/opt/foo/share:${XDG_DATA_DIRS}
+           fi
+
+           # write our output
+           echo XDG_DATA_DIRS=$XDG_DATA_DIRS
+
+       <b>Example 2. A more complicated generator which reads existing</b>
+       <b>configuration and mutates one variable</b>
+
+           # 90-rearrange-path.py
+
+           #!/usr/bin/env python3
+
+           """
+
+           Proof-of-concept systemd environment generator that makes sure that bin dirs
+           are always after matching sbin dirs in the path.
+           (Changes /sbin:/bin:/foo/bar to /bin:/sbin:/foo/bar.)
+
+           This generator shows how to override the configuration possibly created by
+           earlier generators. It would be easier to write in bash, but let's have it
+           in Python just to prove that we can, and to serve as a template for more
+           interesting generators.
+
+           """
+
+           import os
+           import pathlib
+
+           def rearrange_bin_sbin(path):
+               """Make sure any pair of .../bin, .../sbin directories is in this order
+
+               &gt;&gt;&gt; rearrange_bin_sbin('/bin:/sbin:/usr/sbin:/usr/bin')
+               '/bin:/sbin:/usr/bin:/usr/sbin'
+               """
+               items = [pathlib.Path(p) for p in path.split(':')]
+               for i in range(len(items)):
+                   if 'sbin' in items[i].parts:
+                       ind = items[i].parts.index('sbin')
+                       bin = pathlib.Path(*items[i].parts[:ind], 'bin', *items[i].parts[ind+1:])
+                       if bin in items[i+1:]:
+                           j = i + 1 + items[i+1:].index(bin)
+                           items[i], items[j] = items[j], items[i]
+               return ':'.join(p.as_posix() for p in items)
+
+           if __name__ == '__main__':
+               path = os.environ['PATH'] # This should be always set.
+                                         # If it's not, we'll just crash, we is OK too.
+               new = rearrange_bin_sbin(path)
+               if new != path:
+                   print('PATH={}'.format(new))
+
+       <b>Example 3. Debugging a generator</b>
+
+           SYSTEMD_LOG_LEVEL=debug VAR_A=something VAR_B="something else" \
+           /usr/lib/systemd/system-environment-generators/path-to-generator
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man8/systemd-environment-d-generator.8.html">systemd-environment-d-generator(8)</a>, <a href="systemd.generator.7.html">systemd.generator(7)</a>, <a href="../man1/systemd.1.html">systemd(1)</a>,
+       <a href="../man1/systemctl.1.html">systemctl(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                 SYSTEMD.ENVIRONMENT-GENERATOR(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/environment.d.5.html">environment.d(5)</a>,&nbsp; 
+    <a href="systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="systemd.generator.7.html">systemd.generator(7)</a>,&nbsp; 
+    <a href="systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man8/systemd-environment-d-generator.8.html">systemd-environment-d-generator(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

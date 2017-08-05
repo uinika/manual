@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>ip-tcp_metrics(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">IP-TCP_METRICS(8)                   Linux                  IP-TCP_METRICS(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ip-tcp_metrics - management for TCP Metrics
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ip </b>[ <i>OPTIONS</i> ] <b>tcp_metrics </b>{ <i>COMMAND</i> | <b>help </b>}
+
+       <b>ip tcp_metrics </b>{ <b>show </b>| <b>flush </b>} <i>SELECTOR</i>
+
+       <b>ip tcp_metrics delete </b>[ <b>address </b>] <i>ADDRESS</i>
+
+       <i>SELECTOR</i> := [ [ <b>address </b>] <i>PREFIX</i> ]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ip tcp_metrics </b>is used to manipulate entries in the kernel that keep
+       TCP information for IPv4 and IPv6 destinations. The entries are
+       created when TCP sockets want to share information for destinations
+       and are stored in a cache keyed by the destination address. The saved
+       information may include values for metrics (initially obtained from
+       routes), recent TSVAL for TIME-WAIT recycling purposes, state for the
+       Fast Open feature, etc.  For performance reasons the cache can not
+       grow above configured limit and the older entries are replaced with
+       fresh information, sometimes reclaimed and used for new destinations.
+       The kernel never removes entries, they can be flushed only with this
+       tool.
+
+   <b>ip tcp_metrics show - show cached entries</b>
+       <b>address </b><i>PREFIX</i> <b>(default)</b>
+              IPv4/IPv6 prefix or address. If no prefix is provided all
+              entries are shown.
+
+       The output may contain the following information:
+
+       <b>age </b><i>&lt;S.MMM&gt;</i><b>sec </b>- time after the entry was created, reset or updated
+       with metrics from sockets. The entry is reset and refreshed on use
+       with metrics from route if the metrics are not updated in last hour.
+       Not all cached values reset the age on update.
+
+       <b>cwnd </b><i>&lt;N&gt;</i> - CWND metric value
+
+       <b>fo_cookie </b><i>&lt;HEX-STRING&gt;</i> - Cookie value received in SYN-ACK to be used
+       by Fast Open for next SYNs
+
+       <b>fo_mss </b><i>&lt;N&gt;</i> - MSS value received in SYN-ACK to be used by Fast Open
+       for next SYNs
+
+       <b>fo_syn_drops </b><i>&lt;N&gt;/&lt;S.MMM&gt;</i><b>sec ago </b>- Number of drops of initial outgoing
+       Fast Open SYNs with data detected by monitoring the received SYN-ACK
+       after SYN retransmission.  The seconds show the time after last SYN
+       drop and together with the drop count can be used to disable Fast
+       Open for some time.
+
+       <b>reordering </b><i>&lt;N&gt;</i> - Reordering metric value
+
+       <b>rtt </b><i>&lt;N&gt;</i><b>us </b>- RTT metric value
+
+       <b>rttvar </b><i>&lt;N&gt;</i><b>us </b>- RTTVAR metric value
+
+       <b>ssthresh </b><i>&lt;SSTHRESH&gt;</i> - SSTHRESH metric value
+
+       <b>tw_ts </b><i>&lt;TSVAL&gt;/&lt;SEC&gt;</i><b>sec ago </b>- recent TSVAL and the seconds after
+       saving it into TIME-WAIT socket
+
+   <b>ip tcp_metrics delete - delete single entry</b>
+       <b>address </b><i>ADDRESS</i> <b>(default)</b>
+              IPv4/IPv6 address. The address is a required argument.
+
+   <b>ip tcp_metrics flush - flush entries</b>
+       This command flushes the entries selected by some criteria.
+
+       This command has the same arguments as <b>show.</b>
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ip tcp_metrics show address 192.168.0.0/24
+           Shows the entries for destinations from subnet
+
+       ip tcp_metrics show 192.168.0.0/24
+           The same but address keyword is optional
+
+       ip tcp_metrics
+           Show all is the default action
+
+       ip tcp_metrics delete 192.168.0.1
+           Removes the entry for 192.168.0.1 from cache.
+
+       ip tcp_metrics flush 192.168.0.0/24
+           Removes entries for destinations from subnet
+
+       ip tcp_metrics flush all
+           Removes all entries from cache
+
+       ip -6 tcp_metrics flush all
+           Removes all IPv6 entries from cache keeping the IPv4 entries.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="ip.8.html">ip(8)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Original Manpage by Julian Anastasov &lt;ja@ssi.bg&gt;
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>iproute2</i> (utilities for controlling TCP/IP
+       networking and traffic) project.  Information about the project can
+       be found at 
+       ⟨<a href="http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2">http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2</a>⟩.
+       If you have a bug report for this manual page, send it to
+       netdev@vger.kernel.org, shemminger@osdl.org.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git⟩
+       on 2017-07-05.  If you discover any rendering problems in this HTML
+       version of the page, or you believe there is a better or more up-to-
+       date source for the page, or you have corrections or improvements to
+       the information in this COLOPHON (which is <i>not</i> part of the original
+       manual page), send a mail to man-pages@man7.org
+
+<span class="footline">iproute2                         23 Aug 2012               IP-TCP_METRICS(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="ip.8.html">ip(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

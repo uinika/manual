@@ -1,0 +1,298 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>setlocale(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SETLOCALE(3)              Linux Programmer's Manual             SETLOCALE(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       setlocale - set the current locale
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;locale.h&gt;</b>
+
+       <b>char *setlocale(int </b><i>category</i><b>, const char *</b><i>locale</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>setlocale</b>() function is used to set or query the program's
+       current locale.
+
+       If <i>locale</i> is not NULL, the program's current locale is modified
+       according to the arguments.  The argument <i>category</i> determines which
+       parts of the program's current locale should be modified.
+
+       <b>Category            Governs</b>
+       <b>LC_ALL              </b>All of the locale
+       <b>LC_ADDRESS          </b>Formatting of addresses and
+                           geography-related items (*)
+       <b>LC_COLLATE          </b>String collation
+       <b>LC_CTYPE            </b>Character classification
+       <b>LC_IDENTIFICATION   </b>Metadata describing the locale (*)
+       <b>LC_MEASUREMENT      </b>Settings related to measurements
+                           (metric versus US customary) (*)
+       <b>LC_MESSAGES         </b>Localizable natural-language messages
+       <b>LC_MONETARY         </b>Formatting of monetary values
+       <b>LC_NAME             </b>Formatting of salutations for persons (*)
+       <b>LC_NUMERIC          </b>Formatting of nonmonetary numeric values
+       <b>LC_PAPER            </b>Settings related to the standard paper size (*)
+       <b>LC_TELEPHONE        </b>Formats to be used with telephone services (*)
+       <b>LC_TIME             </b>Formatting of date and time values
+
+       The categories marked with an asterisk in the above table are GNU
+       extensions.  For further information on these locale categories, see
+       <a href="../man7/locale.7.html">locale(7)</a>.
+
+       The argument <i>locale</i> is a pointer to a character string containing the
+       required setting of <i>category</i>.  Such a string is either a well-known
+       constant like "C" or "da_DK" (see below), or an opaque string that
+       was returned by another call of <b>setlocale</b>().
+
+       If <i>locale</i> is an empty string, <b>""</b>, each part of the locale that should
+       be modified is set according to the environment variables.  The
+       details are implementation-dependent.  For glibc, first (regardless
+       of <i>category</i>), the environment variable <b>LC_ALL </b>is inspected, next the
+       environment variable with the same name as the category (see the
+       table above), and finally the environment variable <b>LANG</b>.  The first
+       existing environment variable is used.  If its value is not a valid
+       locale specification, the locale is unchanged, and <b>setlocale</b>()
+       returns NULL.
+
+       The locale <b>"C" </b>or <b>"POSIX" </b>is a portable locale; it exists on all
+       conforming systems.
+
+       A locale name is typically of the form
+       <i>language</i>[_<i>territory</i>][.<i>codeset</i>][@<i>modifier</i>], where <i>language</i> is an ISO
+       639 language code, <i>territory</i> is an ISO 3166 country code, and <i>codeset</i>
+       is a character set or encoding identifier like <b>ISO-8859-1 </b>or <b>UTF-8</b>.
+       For a list of all supported locales, try "locale -a", cf. <a href="../man1/locale.1.html">locale(1)</a>.
+
+       If <i>locale</i> is NULL, the current locale is only queried, not modified.
+
+       On startup of the main program, the portable <b>"C" </b>locale is selected
+       as default.  A program may be made portable to all locales by
+       calling:
+
+           setlocale(LC_ALL, "");
+
+       after program initialization, by using the values returned from a
+       <a href="localeconv.3.html">localeconv(3)</a> call for locale-dependent information, by using the
+       multibyte and wide character functions for text processing if
+       <b>MB_CUR_MAX &gt; 1</b>, and by using <a href="strcoll.3.html">strcoll(3)</a>, <b>wcscoll</b>(3) or <a href="strxfrm.3.html">strxfrm(3)</a>,
+       <b>wcsxfrm</b>(3) to compare strings.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A successful call to <b>setlocale</b>() returns an opaque string that
+       corresponds to the locale set.  This string may be allocated in
+       static storage.  The string returned is such that a subsequent call
+       with that string and its associated category will restore that part
+       of the process's locale.  The return value is NULL if the request
+       cannot be honored.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────┬───────────────┬────────────────────────────┐
+       │<b>Interface   </b>│ <b>Attribute     </b>│ <b>Value                      </b>│
+       ├────────────┼───────────────┼────────────────────────────┤
+       │<b>setlocale</b>() │ Thread safety │ MT-Unsafe const:locale env │
+       └────────────┴───────────────┴────────────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, C89, C99.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/locale.1.html">locale(1)</a>, <a href="../man1/localedef.1.html">localedef(1)</a>, <a href="isalpha.3.html">isalpha(3)</a>, <a href="localeconv.3.html">localeconv(3)</a>, <a href="nl_langinfo.3.html">nl_langinfo(3)</a>,
+       <a href="rpmatch.3.html">rpmatch(3)</a>, <a href="strcoll.3.html">strcoll(3)</a>, <a href="strftime.3.html">strftime(3)</a>, <a href="../man7/charsets.7.html">charsets(7)</a>, <a href="../man7/locale.7.html">locale(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2015-08-08                     SETLOCALE(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/apropos.1.html">apropos(1)</a>,&nbsp; 
+    <a href="../man1/groffer.1.html">groffer(1)</a>,&nbsp; 
+    <a href="../man1/localedef.1.html">localedef(1)</a>,&nbsp; 
+    <a href="../man1/man.1.html">man(1)</a>,&nbsp; 
+    <a href="../man1/whatis.1.html">whatis(1)</a>,&nbsp; 
+    <a href="catgets.3.html">catgets(3)</a>,&nbsp; 
+    <a href="catopen.3.html">catopen(3)</a>,&nbsp; 
+    <a href="duplocale.3.html">duplocale(3)</a>,&nbsp; 
+    <a href="ecvt.3.html">ecvt(3)</a>,&nbsp; 
+    <a href="getdate.3.html">getdate(3)</a>,&nbsp; 
+    <a href="gettext.3.html">gettext(3)</a>,&nbsp; 
+    <a href="isalpha.3.html">isalpha(3)</a>,&nbsp; 
+    <a href="localeconv.3.html">localeconv(3)</a>,&nbsp; 
+    <a href="newlocale.3.html">newlocale(3)</a>,&nbsp; 
+    <a href="nl_langinfo.3.html">nl_langinfo(3)</a>,&nbsp; 
+    <a href="printf.3.html">printf(3)</a>,&nbsp; 
+    <a href="rpmatch.3.html">rpmatch(3)</a>,&nbsp; 
+    <a href="scanf.3.html">scanf(3)</a>,&nbsp; 
+    <a href="strcoll.3.html">strcoll(3)</a>,&nbsp; 
+    <a href="strfmon.3.html">strfmon(3)</a>,&nbsp; 
+    <a href="strftime.3.html">strftime(3)</a>,&nbsp; 
+    <a href="strptime.3.html">strptime(3)</a>,&nbsp; 
+    <a href="strxfrm.3.html">strxfrm(3)</a>,&nbsp; 
+    <a href="toupper.3.html">toupper(3)</a>,&nbsp; 
+    <a href="uselocale.3.html">uselocale(3)</a>,&nbsp; 
+    <a href="../man5/locale.5.html">locale(5)</a>,&nbsp; 
+    <a href="../man7/locale.7.html">locale(7)</a>,&nbsp; 
+    <a href="../man7/unicode.7.html">unicode(7)</a>,&nbsp; 
+    <a href="../man7/utf-8.7-2.html">utf-8(7)</a>,&nbsp; 
+    <a href="../man8/lsof.8.html">lsof(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="setlocale.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

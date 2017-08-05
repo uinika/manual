@@ -1,0 +1,1735 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.exec(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#AUTOMATIC_DEPENDENCIES">AUTOMATIC&nbsp;DEPENDENCIES</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#ENVIRONMENT_VARIABLES_IN_SPAWNED_PROCESSES">ENVIRONMENT&nbsp;VARIABLES&nbsp;IN&nbsp;SPAWNED&nbsp;PROCESSES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.EXEC(5)                 systemd.exec                 SYSTEMD.EXEC(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.exec - Execution environment configuration
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>service</i>.service, <i>socket</i>.socket, <i>mount</i>.mount, <i>swap</i>.swap
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Unit configuration files for services, sockets, mount points, and
+       swap devices share a subset of configuration options which define the
+       execution environment of spawned processes.
+
+       This man page lists the configuration options shared by these four
+       unit types. See <a href="systemd.unit.5.html">systemd.unit(5)</a> for the common options of all unit
+       configuration files, and <a href="systemd.service.5.html">systemd.service(5)</a>, <a href="systemd.socket.5.html">systemd.socket(5)</a>,
+       <a href="systemd.swap.5.html">systemd.swap(5)</a>, and <a href="systemd.mount.5.html">systemd.mount(5)</a> for more information on the
+       specific unit configuration files. The execution specific
+       configuration options are configured in the [Service], [Socket],
+       [Mount], or [Swap] sections, depending on the unit type.
+
+       In addition, options which control resources through Linux Control
+       Groups (cgroups) are listed in <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>. Those
+       options complement options listed here.
+</pre>
+<h2><a id="AUTOMATIC_DEPENDENCIES" href="#AUTOMATIC_DEPENDENCIES"></a>AUTOMATIC DEPENDENCIES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A few execution parameters result in additional, automatic
+       dependencies to be added.
+
+       Units with <i>WorkingDirectory=</i>, <i>RootDirectory=</i> or <i>RootImage=</i> set
+       automatically gain dependencies of type <i>Requires=</i> and <i>After=</i> on all
+       mount units required to access the specified paths. This is
+       equivalent to having them listed explicitly in <i>RequiresMountsFor=</i>.
+
+       Similar, units with <i>PrivateTmp=</i> enabled automatically get mount unit
+       dependencies for all mounts required to access /tmp and /var/tmp.
+       They will also gain an automatic <i>After=</i> dependency on
+       <a href="../man8/systemd-tmpfiles-setup.service.8.html">systemd-tmpfiles-setup.service(8)</a>.
+
+       Units whose standard output or error output is connected to <b>journal</b>,
+       <b>syslog </b>or <b>kmsg </b>(or their combinations with console output, see below)
+       automatically acquire dependencies of type <i>After=</i> on
+       systemd-journald.socket.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>WorkingDirectory=</i>
+           Takes a directory path relative to the service's root directory
+           specified by <i>RootDirectory=</i>, or the special value "~". Sets the
+           working directory for executed processes. If set to "~", the home
+           directory of the user specified in <i>User=</i> is used. If not set,
+           defaults to the root directory when systemd is running as a
+           system instance and the respective user's home directory if run
+           as user. If the setting is prefixed with the "-" character, a
+           missing working directory is not considered fatal. If
+           <i>RootDirectory=</i>/<i>RootImage=</i> is not set, then <i>WorkingDirectory=</i> is
+           relative to the root of the system running the service manager.
+           Note that setting this parameter might result in additional
+           dependencies to be added to the unit (see above).
+
+       <i>RootDirectory=</i>
+           Takes a directory path relative to the host's root directory
+           (i.e. the root of the system running the service manager). Sets
+           the root directory for executed processes, with the <a href="../man2/chroot.2.html">chroot(2)</a>
+           system call. If this is used, it must be ensured that the process
+           binary and all its auxiliary files are available in the <b>chroot()</b>
+           jail. Note that setting this parameter might result in additional
+           dependencies to be added to the unit (see above).
+
+           The <i>MountAPIVFS=</i> and <i>PrivateUsers=</i> settings are particularly
+           useful in conjunction with <i>RootDirectory=</i>. For details, see
+           below.
+
+       <i>RootImage=</i>
+           Takes a path to a block device node or regular file as argument.
+           This call is similar to <i>RootDirectory=</i> however mounts a file
+           system hierarchy from a block device node or loopback file
+           instead of a directory. The device node or file system image file
+           needs to contain a file system without a partition table, or a
+           file system within an MBR/MS-DOS or GPT partition table with only
+           a single Linux-compatible partition, or a set of file systems
+           within a GPT partition table that follows the <b>Discoverable</b>
+           <b>Partitions Specification</b><b></b>[1].
+
+       <i>MountAPIVFS=</i>
+           Takes a boolean argument. If on, a private mount namespace for
+           the unit's processes is created and the API file systems /proc,
+           /sys, and /dev are mounted inside of it, unless they are already
+           mounted. Note that this option has no effect unless used in
+           conjunction with <i>RootDirectory=</i>/<i>RootImage=</i> as these three mounts
+           are generally mounted in the host anyway, and unless the root
+           directory is changed, the private mount namespace will be a 1:1
+           copy of the host's, and include these three mounts. Note that the
+           /dev file system of the host is bind mounted if this option is
+           used without <i>PrivateDevices=</i>. To run the service with a private,
+           minimal version of /dev/, combine this option with
+           <i>PrivateDevices=</i>.
+
+       <i>User=</i>, <i>Group=</i>
+           Set the UNIX user or group that the processes are executed as,
+           respectively. Takes a single user or group name, or numeric ID as
+           argument. For system services (services run by the system service
+           manager, i.e. managed by PID 1) and for user services of the root
+           user (services managed by root's instance of <b>systemd --user</b>), the
+           default is "root", but <i>User=</i> may be used to specify a different
+           user. For user services of any other user, switching user
+           identity is not permitted, hence the only valid setting is the
+           same user the user's service manager is running as. If no group
+           is set, the default group of the user is used. This setting does
+           not affect commands whose command line is prefixed with "+".
+
+       <i>DynamicUser=</i>
+           Takes a boolean parameter. If set, a UNIX user and group pair is
+           allocated dynamically when the unit is started, and released as
+           soon as it is stopped. The user and group will not be added to
+           /etc/passwd or /etc/group, but are managed transiently during
+           runtime. The <a href="../man8/nss-systemd.8.html">nss-systemd(8)</a> glibc NSS module provides integration
+           of these dynamic users/groups into the system's user and group
+           databases. The user and group name to use may be configured via
+           <i>User=</i> and <i>Group=</i> (see above). If these options are not used and
+           dynamic user/group allocation is enabled for a unit, the name of
+           the dynamic user/group is implicitly derived from the unit name.
+           If the unit name without the type suffix qualifies as valid user
+           name it is used directly, otherwise a name incorporating a hash
+           of it is used. If a statically allocated user or group of the
+           configured name already exists, it is used and no dynamic
+           user/group is allocated. Dynamic users/groups are allocated from
+           the UID/GID range 61184...65519. It is recommended to avoid this
+           range for regular system or login users. At any point in time
+           each UID/GID from this range is only assigned to zero or one
+           dynamically allocated users/groups in use. However, UID/GIDs are
+           recycled after a unit is terminated. Care should be taken that
+           any processes running as part of a unit for which dynamic
+           users/groups are enabled do not leave files or directories owned
+           by these users/groups around, as a different unit might get the
+           same UID/GID assigned later on, and thus gain access to these
+           files or directories. If <i>DynamicUser=</i> is enabled, <i>RemoveIPC=</i>,
+           <i>PrivateTmp=</i> are implied. This ensures that the lifetime of IPC
+           objects and temporary files created by the executed processes is
+           bound to the runtime of the service, and hence the lifetime of
+           the dynamic user/group. Since /tmp and /var/tmp are usually the
+           only world-writable directories on a system this ensures that a
+           unit making use of dynamic user/group allocation cannot leave
+           files around after unit termination. Moreover
+           <i>ProtectSystem=strict</i> and <i>ProtectHome=read-only</i> are implied, thus
+           prohibiting the service to write to arbitrary file system
+           locations. In order to allow the service to write to certain
+           directories, they have to be whitelisted using <i>ReadWritePaths=</i>,
+           but care must be taken so that UID/GID recycling doesn't create
+           security issues involving files created by the service. Use
+           <i>RuntimeDirectory=</i> (see below) in order to assign a writable
+           runtime directory to a service, owned by the dynamic user/group
+           and removed automatically when the unit is terminated. Defaults
+           to off.
+
+       <i>SupplementaryGroups=</i>
+           Sets the supplementary Unix groups the processes are executed as.
+           This takes a space-separated list of group names or IDs. This
+           option may be specified more than once, in which case all listed
+           groups are set as supplementary groups. When the empty string is
+           assigned, the list of supplementary groups is reset, and all
+           assignments prior to this one will have no effect. In any way,
+           this option does not override, but extends the list of
+           supplementary groups configured in the system group database for
+           the user. This does not affect commands prefixed with "+".
+
+       <i>RemoveIPC=</i>
+           Takes a boolean parameter. If set, all System V and POSIX IPC
+           objects owned by the user and group the processes of this unit
+           are run as are removed when the unit is stopped. This setting
+           only has an effect if at least one of <i>User=</i>, <i>Group=</i> and
+           <i>DynamicUser=</i> are used. It has no effect on IPC objects owned by
+           the root user. Specifically, this removes System V semaphores, as
+           well as System V and POSIX shared memory segments and message
+           queues. If multiple units use the same user or group the IPC
+           objects are removed when the last of these units is stopped. This
+           setting is implied if <i>DynamicUser=</i> is set.
+
+       <i>Nice=</i>
+           Sets the default nice level (scheduling priority) for executed
+           processes. Takes an integer between -20 (highest priority) and 19
+           (lowest priority). See <a href="../man2/setpriority.2.html">setpriority(2)</a> for details.
+
+       <i>OOMScoreAdjust=</i>
+           Sets the adjustment level for the Out-Of-Memory killer for
+           executed processes. Takes an integer between -1000 (to disable
+           OOM killing for this process) and 1000 (to make killing of this
+           process under memory pressure very likely). See <b>proc.txt</b><b></b>[2] for
+           details.
+
+       <i>IOSchedulingClass=</i>
+           Sets the I/O scheduling class for executed processes. Takes an
+           integer between 0 and 3 or one of the strings <b>none</b>, <b>realtime</b>,
+           <b>best-effort </b>or <b>idle</b>. See <a href="../man2/ioprio_set.2.html">ioprio_set(2)</a> for details.
+
+       <i>IOSchedulingPriority=</i>
+           Sets the I/O scheduling priority for executed processes. Takes an
+           integer between 0 (highest priority) and 7 (lowest priority). The
+           available priorities depend on the selected I/O scheduling class
+           (see above). See <a href="../man2/ioprio_set.2.html">ioprio_set(2)</a> for details.
+
+       <i>CPUSchedulingPolicy=</i>
+           Sets the CPU scheduling policy for executed processes. Takes one
+           of <b>other</b>, <b>batch</b>, <b>idle</b>, <b>fifo </b>or <b>rr</b>. See <a href="../man2/sched_setscheduler.2.html">sched_setscheduler(2)</a> for
+           details.
+
+       <i>CPUSchedulingPriority=</i>
+           Sets the CPU scheduling priority for executed processes. The
+           available priority range depends on the selected CPU scheduling
+           policy (see above). For real-time scheduling policies an integer
+           between 1 (lowest priority) and 99 (highest priority) can be
+           used. See <a href="../man2/sched_setscheduler.2.html">sched_setscheduler(2)</a> for details.
+
+       <i>CPUSchedulingResetOnFork=</i>
+           Takes a boolean argument. If true, elevated CPU scheduling
+           priorities and policies will be reset when the executed processes
+           fork, and can hence not leak into child processes. See
+           <a href="../man2/sched_setscheduler.2.html">sched_setscheduler(2)</a> for details. Defaults to false.
+
+       <i>CPUAffinity=</i>
+           Controls the CPU affinity of the executed processes. Takes a list
+           of CPU indices or ranges separated by either whitespace or
+           commas. CPU ranges are specified by the lower and upper CPU
+           indices separated by a dash. This option may be specified more
+           than once, in which case the specified CPU affinity masks are
+           merged. If the empty string is assigned, the mask is reset, all
+           assignments prior to this will have no effect. See
+           <a href="../man2/sched_setaffinity.2.html">sched_setaffinity(2)</a> for details.
+
+       <i>UMask=</i>
+           Controls the file mode creation mask. Takes an access mode in
+           octal notation. See <a href="../man2/umask.2.html">umask(2)</a> for details. Defaults to 0022.
+
+       <i>Environment=</i>
+           Sets environment variables for executed processes. Takes a
+           space-separated list of variable assignments. This option may be
+           specified more than once, in which case all listed variables will
+           be set. If the same variable is set twice, the later setting will
+           override the earlier setting. If the empty string is assigned to
+           this option, the list of environment variables is reset, all
+           prior assignments have no effect. Variable expansion is not
+           performed inside the strings, however, specifier expansion is
+           possible. The $ character has no special meaning. If you need to
+           assign a value containing spaces or the equals sign to a
+           variable, use double quotes (") for the assignment.
+
+           Example:
+
+               Environment="VAR1=word1 word2" VAR2=word3 "VAR3=$word 5 6"
+
+           gives three variables "VAR1", "VAR2", "VAR3" with the values
+           "word1 word2", "word3", "$word 5 6".
+
+           See <a href="../man7/environ.7.html">environ(7)</a> for details about environment variables.
+
+       <i>EnvironmentFile=</i>
+           Similar to <i>Environment=</i> but reads the environment variables from
+           a text file. The text file should contain new-line-separated
+           variable assignments. Empty lines, lines without an "="
+           separator, or lines starting with ; or # will be ignored, which
+           may be used for commenting. A line ending with a backslash will
+           be concatenated with the following one, allowing multiline
+           variable definitions. The parser strips leading and trailing
+           whitespace from the values of assignments, unless you use double
+           quotes (").
+
+           The argument passed should be an absolute filename or wildcard
+           expression, optionally prefixed with "-", which indicates that if
+           the file does not exist, it will not be read and no error or
+           warning message is logged. This option may be specified more than
+           once in which case all specified files are read. If the empty
+           string is assigned to this option, the list of file to read is
+           reset, all prior assignments have no effect.
+
+           The files listed with this directive will be read shortly before
+           the process is executed (more specifically, after all processes
+           from a previous unit state terminated. This means you can
+           generate these files in one unit state, and read it with this
+           option in the next).
+
+           Settings from these files override settings made with
+           <i>Environment=</i>. If the same variable is set twice from these files,
+           the files will be read in the order they are specified and the
+           later setting will override the earlier setting.
+
+       <i>PassEnvironment=</i>
+           Pass environment variables from the systemd system manager to
+           executed processes. Takes a space-separated list of variable
+           names. This option may be specified more than once, in which case
+           all listed variables will be set. If the empty string is assigned
+           to this option, the list of environment variables is reset, all
+           prior assignments have no effect. Variables that are not set in
+           the system manager will not be passed and will be silently
+           ignored.
+
+           Variables passed from this setting are overridden by those passed
+           from <i>Environment=</i> or <i>EnvironmentFile=</i>.
+
+           Example:
+
+               PassEnvironment=VAR1 VAR2 VAR3
+
+           passes three variables "VAR1", "VAR2", "VAR3" with the values set
+           for those variables in PID1.
+
+           See <a href="../man7/environ.7.html">environ(7)</a> for details about environment variables.
+
+       <i>StandardInput=</i>
+           Controls where file descriptor 0 (STDIN) of the executed
+           processes is connected to. Takes one of <b>null</b>, <b>tty</b>, <b>tty-force</b>,
+           <b>tty-fail</b>, <b>socket </b>or <b>fd</b>.
+
+           If <b>null </b>is selected, standard input will be connected to
+           /dev/null, i.e. all read attempts by the process will result in
+           immediate EOF.
+
+           If <b>tty </b>is selected, standard input is connected to a TTY (as
+           configured by <i>TTYPath=</i>, see below) and the executed process
+           becomes the controlling process of the terminal. If the terminal
+           is already being controlled by another process, the executed
+           process waits until the current controlling process releases the
+           terminal.
+
+           <b>tty-force </b>is similar to <b>tty</b>, but the executed process is
+           forcefully and immediately made the controlling process of the
+           terminal, potentially removing previous controlling processes
+           from the terminal.
+
+           <b>tty-fail </b>is similar to <b>tty </b>but if the terminal already has a
+           controlling process start-up of the executed process fails.
+
+           The <b>socket </b>option is only valid in socket-activated services, and
+           only when the socket configuration file (see <a href="systemd.socket.5.html">systemd.socket(5)</a>
+           for details) specifies a single socket only. If this option is
+           set, standard input will be connected to the socket the service
+           was activated from, which is primarily useful for compatibility
+           with daemons designed for use with the traditional <b>inetd</b>(8)
+           daemon.
+
+           The <b>fd </b>option connects the input stream to a single file
+           descriptor provided by a socket unit. A custom named file
+           descriptor can be specified as part of this option, after a ":"
+           (e.g.  "fd:<i>foobar</i>"). If no name is specified, "stdin" is assumed
+           (i.e.  "fd" is equivalent to "fd:stdin"). At least one socket
+           unit defining such name must be explicitly provided via the
+           <i>Sockets=</i> option, and file descriptor name may differ from the
+           name of its containing socket unit. If multiple matches are
+           found, the first one will be used. See <i>FileDescriptorName=</i> in
+           <a href="systemd.socket.5.html">systemd.socket(5)</a> for more details about named descriptors and
+           ordering.
+
+           This setting defaults to <b>null</b>.
+
+       <i>StandardOutput=</i>
+           Controls where file descriptor 1 (STDOUT) of the executed
+           processes is connected to. Takes one of <b>inherit</b>, <b>null</b>, <b>tty</b>,
+           <b>journal</b>, <b>syslog</b>, <b>kmsg</b>, <b>journal+console</b>, <b>syslog+console</b>,
+           <b>kmsg+console</b>, <b>socket </b>or <b>fd</b>.
+
+           <b>inherit </b>duplicates the file descriptor of standard input for
+           standard output.
+
+           <b>null </b>connects standard output to /dev/null, i.e. everything
+           written to it will be lost.
+
+           <b>tty </b>connects standard output to a tty (as configured via
+           <i>TTYPath=</i>, see below). If the TTY is used for output only, the
+           executed process will not become the controlling process of the
+           terminal, and will not fail or wait for other processes to
+           release the terminal.
+
+           <b>journal </b>connects standard output with the journal which is
+           accessible via <a href="../man1/journalctl.1.html">journalctl(1)</a>. Note that everything that is
+           written to syslog or kmsg (see below) is implicitly stored in the
+           journal as well, the specific two options listed below are hence
+           supersets of this one.
+
+           <b>syslog </b>connects standard output to the <a href="../man3/syslog.3.html">syslog(3)</a> system syslog
+           service, in addition to the journal. Note that the journal daemon
+           is usually configured to forward everything it receives to syslog
+           anyway, in which case this option is no different from <b>journal</b>.
+
+           <b>kmsg </b>connects standard output with the kernel log buffer which is
+           accessible via <a href="../man1/dmesg.1.html">dmesg(1)</a>, in addition to the journal. The journal
+           daemon might be configured to send all logs to kmsg anyway, in
+           which case this option is no different from <b>journal</b>.
+
+           <b>journal+console</b>, <b>syslog+console </b>and <b>kmsg+console </b>work in a
+           similar way as the three options above but copy the output to the
+           system console as well.
+
+           <b>socket </b>connects standard output to a socket acquired via socket
+           activation. The semantics are similar to the same option of
+           <i>StandardInput=</i>.
+
+           The <b>fd </b>option connects the output stream to a single file
+           descriptor provided by a socket unit. A custom named file
+           descriptor can be specified as part of this option, after a ":"
+           (e.g.  "fd:<i>foobar</i>"). If no name is specified, "stdout" is assumed
+           (i.e.  "fd" is equivalent to "fd:stdout"). At least one socket
+           unit defining such name must be explicitly provided via the
+           <i>Sockets=</i> option, and file descriptor name may differ from the
+           name of its containing socket unit. If multiple matches are
+           found, the first one will be used. See <i>FileDescriptorName=</i> in
+           <a href="systemd.socket.5.html">systemd.socket(5)</a> for more details about named descriptors and
+           ordering.
+
+           If the standard output (or error output, see below) of a unit is
+           connected to the journal, syslog or the kernel log buffer, the
+           unit will implicitly gain a dependency of type <i>After=</i> on
+           systemd-journald.socket (also see the automatic dependencies
+           section above).
+
+           This setting defaults to the value set with
+           <b>DefaultStandardOutput= </b>in <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>, which defaults
+           to <b>journal</b>. Note that setting this parameter might result in
+           additional dependencies to be added to the unit (see above).
+
+       <i>StandardError=</i>
+           Controls where file descriptor 2 (STDERR) of the executed
+           processes is connected to. The available options are identical to
+           those of <i>StandardOutput=</i>, with some exceptions: if set to <b>inherit</b>
+           the file descriptor used for standard output is duplicated for
+           standard error, while <b>fd </b>operates on the error stream and will
+           look by default for a descriptor named "stderr".
+
+           This setting defaults to the value set with <b>DefaultStandardError=</b>
+           in <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>, which defaults to <b>inherit</b>. Note that
+           setting this parameter might result in additional dependencies to
+           be added to the unit (see above).
+
+       <i>TTYPath=</i>
+           Sets the terminal device node to use if standard input, output,
+           or error are connected to a TTY (see above). Defaults to
+           /dev/console.
+
+       <i>TTYReset=</i>
+           Reset the terminal device specified with <i>TTYPath=</i> before and
+           after execution. Defaults to "no".
+
+       <i>TTYVHangup=</i>
+           Disconnect all clients which have opened the terminal device
+           specified with <i>TTYPath=</i> before and after execution. Defaults to
+           "no".
+
+       <i>TTYVTDisallocate=</i>
+           If the terminal device specified with <i>TTYPath=</i> is a virtual
+           console terminal, try to deallocate the TTY before and after
+           execution. This ensures that the screen and scrollback buffer is
+           cleared. Defaults to "no".
+
+       <i>SyslogIdentifier=</i>
+           Sets the process name to prefix log lines sent to the logging
+           system or the kernel log buffer with. If not set, defaults to the
+           process name of the executed process. This option is only useful
+           when <i>StandardOutput=</i> or <i>StandardError=</i> are set to <b>syslog</b>, <b>journal</b>
+           or <b>kmsg </b>(or to the same settings in combination with <b>+console</b>).
+
+       <i>SyslogFacility=</i>
+           Sets the syslog facility to use when logging to syslog. One of
+           <b>kern</b>, <b>user</b>, <b>mail</b>, <b>daemon</b>, <b>auth</b>, <b>syslog</b>, <b>lpr</b>, <b>news</b>, <b>uucp</b>, <b>cron</b>,
+           <b>authpriv</b>, <b>ftp</b>, <b>local0</b>, <b>local1</b>, <b>local2</b>, <b>local3</b>, <b>local4</b>, <b>local5</b>,
+           <b>local6 </b>or <b>local7</b>. See <a href="../man3/syslog.3.html">syslog(3)</a> for details. This option is only
+           useful when <i>StandardOutput=</i> or <i>StandardError=</i> are set to <b>syslog</b>.
+           Defaults to <b>daemon</b>.
+
+       <i>SyslogLevel=</i>
+           The default syslog level to use when logging to syslog or the
+           kernel log buffer. One of <b>emerg</b>, <b>alert</b>, <b>crit</b>, <b>err</b>, <b>warning</b>,
+           <b>notice</b>, <b>info</b>, <b>debug</b>. See <a href="../man3/syslog.3.html">syslog(3)</a> for details. This option is
+           only useful when <i>StandardOutput=</i> or <i>StandardError=</i> are set to
+           <b>syslog </b>or <b>kmsg</b>. Note that individual lines output by the daemon
+           might be prefixed with a different log level which can be used to
+           override the default log level specified here. The interpretation
+           of these prefixes may be disabled with <i>SyslogLevelPrefix=</i>, see
+           below. For details, see <a href="../man3/sd-daemon.3.html">sd-daemon(3)</a>. Defaults to <b>info</b>.
+
+       <i>SyslogLevelPrefix=</i>
+           Takes a boolean argument. If true and <i>StandardOutput=</i> or
+           <i>StandardError=</i> are set to <b>syslog</b>, <b>kmsg </b>or <b>journal</b>, log lines
+           written by the executed process that are prefixed with a log
+           level will be passed on to syslog with this log level set but the
+           prefix removed. If set to false, the interpretation of these
+           prefixes is disabled and the logged lines are passed on as-is.
+           For details about this prefixing see <a href="../man3/sd-daemon.3.html">sd-daemon(3)</a>. Defaults to
+           true.
+
+       <i>TimerSlackNSec=</i>
+           Sets the timer slack in nanoseconds for the executed processes.
+           The timer slack controls the accuracy of wake-ups triggered by
+           timers. See <a href="../man2/prctl.2.html">prctl(2)</a> for more information. Note that in contrast
+           to most other time span definitions this parameter takes an
+           integer value in nano-seconds if no unit is specified. The usual
+           time units are understood too.
+
+       <i>LimitCPU=</i>, <i>LimitFSIZE=</i>, <i>LimitDATA=</i>, <i>LimitSTACK=</i>, <i>LimitCORE=</i>,
+       <i>LimitRSS=</i>, <i>LimitNOFILE=</i>, <i>LimitAS=</i>, <i>LimitNPROC=</i>, <i>LimitMEMLOCK=</i>,
+       <i>LimitLOCKS=</i>, <i>LimitSIGPENDING=</i>, <i>LimitMSGQUEUE=</i>, <i>LimitNICE=</i>,
+       <i>LimitRTPRIO=</i>, <i>LimitRTTIME=</i>
+           Set soft and hard limits on various resources for executed
+           processes. See <a href="../man2/setrlimit.2.html">setrlimit(2)</a> for details on the resource limit
+           concept. Resource limits may be specified in two formats: either
+           as single value to set a specific soft and hard limit to the same
+           value, or as colon-separated pair <b>soft:hard </b>to set both limits
+           individually (e.g.  "LimitAS=4G:16G"). Use the string <i>infinity</i> to
+           configure no limit on a specific resource. The multiplicative
+           suffixes K, M, G, T, P and E (to the base 1024) may be used for
+           resource limits measured in bytes (e.g. LimitAS=16G). For the
+           limits referring to time values, the usual time units ms, s, min,
+           h and so on may be used (see <a href="../man7/systemd.time.7.html">systemd.time(7)</a> for details). Note
+           that if no time unit is specified for <i>LimitCPU=</i> the default unit
+           of seconds is implied, while for <i>LimitRTTIME=</i> the default unit of
+           microseconds is implied. Also, note that the effective
+           granularity of the limits might influence their enforcement. For
+           example, time limits specified for <i>LimitCPU=</i> will be rounded up
+           implicitly to multiples of 1s. For <i>LimitNICE=</i> the value may be
+           specified in two syntaxes: if prefixed with "+" or "-", the value
+           is understood as regular Linux nice value in the range -20..19.
+           If not prefixed like this the value is understood as raw resource
+           limit parameter in the range 0..40 (with 0 being equivalent to
+           1).
+
+           Note that most process resource limits configured with these
+           options are per-process, and processes may fork in order to
+           acquire a new set of resources that are accounted independently
+           of the original process, and may thus escape limits set. Also
+           note that <i>LimitRSS=</i> is not implemented on Linux, and setting it
+           has no effect. Often it is advisable to prefer the resource
+           controls listed in <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a> over these
+           per-process limits, as they apply to services as a whole, may be
+           altered dynamically at runtime, and are generally more
+           expressive. For example, <i>MemoryLimit=</i> is a more powerful (and
+           working) replacement for <i>LimitRSS=</i>.
+
+           For system units these resource limits may be chosen freely. For
+           user units however (i.e. units run by a per-user instance of
+           <a href="../man1/systemd.1.html">systemd(1)</a>), these limits are bound by (possibly more
+           restrictive) per-user limits enforced by the OS.
+
+           Resource limits not configured explicitly for a unit default to
+           the value configured in the various <i>DefaultLimitCPU=</i>,
+           <i>DefaultLimitFSIZE=</i>, ... options available in
+           <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>, and – if not configured there – the
+           kernel or per-user defaults, as defined by the OS (the latter
+           only for user services, see above).
+
+           <b>Table 1. Resource limit directives, their equivalent ulimit shell</b>
+           <b>commands and the unit used</b>
+           ┌─────────────────┬───────────────────┬─────────────────────┐
+           │<b>Directive        </b>│ <b>ulimit </b>equivalent │ <b>Unit                </b>│
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitCPU=        │ ulimit -t         │ Seconds             │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitFSIZE=      │ ulimit -f         │ Bytes               │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitDATA=       │ ulimit -d         │ Bytes               │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitSTACK=      │ ulimit -s         │ Bytes               │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitCORE=       │ ulimit -c         │ Bytes               │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitRSS=        │ ulimit -m         │ Bytes               │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitNOFILE=     │ ulimit -n         │ Number of File      │
+           │                 │                   │ Descriptors         │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitAS=         │ ulimit -v         │ Bytes               │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitNPROC=      │ ulimit -u         │ Number of Processes │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitMEMLOCK=    │ ulimit -l         │ Bytes               │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitLOCKS=      │ ulimit -x         │ Number of Locks     │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitSIGPENDING= │ ulimit -i         │ Number of Queued    │
+           │                 │                   │ Signals             │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitMSGQUEUE=   │ ulimit -q         │ Bytes               │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitNICE=       │ ulimit -e         │ Nice Level          │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitRTPRIO=     │ ulimit -r         │ Realtime Priority   │
+           ├─────────────────┼───────────────────┼─────────────────────┤
+           │LimitRTTIME=     │ No equivalent     │ Microseconds        │
+           └─────────────────┴───────────────────┴─────────────────────┘
+
+       <i>PAMName=</i>
+           Sets the PAM service name to set up a session as. If set, the
+           executed process will be registered as a PAM session under the
+           specified service name. This is only useful in conjunction with
+           the <i>User=</i> setting, and is otherwise ignored. If not set, no PAM
+           session will be opened for the executed processes. See <a href="../man8/pam.8-2.html">pam(8)</a> for
+           details.
+
+           Note that for each unit making use of this option a PAM session
+           handler process will be maintained as part of the unit and stays
+           around as long as the unit is active, to ensure that appropriate
+           actions can be taken when the unit and hence the PAM session
+           terminates. This process is named "(sd-pam)" and is an immediate
+           child process of the unit's main process.
+
+       <i>CapabilityBoundingSet=</i>
+           Controls which capabilities to include in the capability bounding
+           set for the executed process. See <a href="../man7/capabilities.7.html">capabilities(7)</a> for details.
+           Takes a whitespace-separated list of capability names, e.g.
+           <b>CAP_SYS_ADMIN</b>, <b>CAP_DAC_OVERRIDE</b>, <b>CAP_SYS_PTRACE</b>. Capabilities
+           listed will be included in the bounding set, all others are
+           removed. If the list of capabilities is prefixed with "~", all
+           but the listed capabilities will be included, the effect of the
+           assignment inverted. Note that this option also affects the
+           respective capabilities in the effective, permitted and
+           inheritable capability sets. If this option is not used, the
+           capability bounding set is not modified on process execution,
+           hence no limits on the capabilities of the process are enforced.
+           This option may appear more than once, in which case the bounding
+           sets are merged. If the empty string is assigned to this option,
+           the bounding set is reset to the empty capability set, and all
+           prior settings have no effect. If set to "~" (without any further
+           argument), the bounding set is reset to the full set of available
+           capabilities, also undoing any previous settings. This does not
+           affect commands prefixed with "+".
+
+       <i>AmbientCapabilities=</i>
+           Controls which capabilities to include in the ambient capability
+           set for the executed process. Takes a whitespace-separated list
+           of capability names, e.g.  <b>CAP_SYS_ADMIN</b>, <b>CAP_DAC_OVERRIDE</b>,
+           <b>CAP_SYS_PTRACE</b>. This option may appear more than once in which
+           case the ambient capability sets are merged. If the list of
+           capabilities is prefixed with "~", all but the listed
+           capabilities will be included, the effect of the assignment
+           inverted. If the empty string is assigned to this option, the
+           ambient capability set is reset to the empty capability set, and
+           all prior settings have no effect. If set to "~" (without any
+           further argument), the ambient capability set is reset to the
+           full set of available capabilities, also undoing any previous
+           settings. Note that adding capabilities to ambient capability set
+           adds them to the process's inherited capability set.
+
+           Ambient capability sets are useful if you want to execute a
+           process as a non-privileged user but still want to give it some
+           capabilities. Note that in this case option <b>keep-caps </b>is
+           automatically added to <i>SecureBits=</i> to retain the capabilities
+           over the user change.  <i>AmbientCapabilities=</i> does not affect
+           commands prefixed with "+".
+
+       <i>SecureBits=</i>
+           Controls the secure bits set for the executed process. Takes a
+           space-separated combination of options from the following list:
+           <b>keep-caps</b>, <b>keep-caps-locked</b>, <b>no-setuid-fixup</b>,
+           <b>no-setuid-fixup-locked</b>, <b>noroot</b>, and <b>noroot-locked</b>. This option
+           may appear more than once, in which case the secure bits are
+           ORed. If the empty string is assigned to this option, the bits
+           are reset to 0. This does not affect commands prefixed with "+".
+           See <a href="../man7/capabilities.7.html">capabilities(7)</a> for details.
+
+       <i>ReadWritePaths=</i>, <i>ReadOnlyPaths=</i>, <i>InaccessiblePaths=</i>
+           Sets up a new file system namespace for executed processes. These
+           options may be used to limit access a process might have to the
+           file system hierarchy. Each setting takes a space-separated list
+           of paths relative to the host's root directory (i.e. the system
+           running the service manager). Note that if paths contain
+           symlinks, they are resolved relative to the root directory set
+           with <i>RootDirectory=</i>/<i>RootImage=</i>.
+
+           Paths listed in <i>ReadWritePaths=</i> are accessible from within the
+           namespace with the same access modes as from outside of it. Paths
+           listed in <i>ReadOnlyPaths=</i> are accessible for reading only, writing
+           will be refused even if the usual file access controls would
+           permit this. Nest <i>ReadWritePaths=</i> inside of <i>ReadOnlyPaths=</i> in
+           order to provide writable subdirectories within read-only
+           directories. Use <i>ReadWritePaths=</i> in order to whitelist specific
+           paths for write access if <i>ProtectSystem=strict</i> is used. Paths
+           listed in <i>InaccessiblePaths=</i> will be made inaccessible for
+           processes inside the namespace (along with everything below them
+           in the file system hierarchy).
+
+           Note that restricting access with these options does not extend
+           to submounts of a directory that are created later on.
+           Non-directory paths may be specified as well. These options may
+           be specified more than once, in which case all paths listed will
+           have limited access from within the namespace. If the empty
+           string is assigned to this option, the specific list is reset,
+           and all prior assignments have no effect.
+
+           Paths in <i>ReadWritePaths=</i>, <i>ReadOnlyPaths=</i> and <i>InaccessiblePaths=</i>
+           may be prefixed with "-", in which case they will be ignored when
+           they do not exist. If prefixed with "+" the paths are taken
+           relative to the root directory of the unit, as configured with
+           <i>RootDirectory=</i>/<i>RootImage=</i>, instead of relative to the root
+           directory of the host (see above). When combining "-" and "+" on
+           the same path make sure to specify "-" first, and "+" second.
+
+           Note that using this setting will disconnect propagation of
+           mounts from the service to the host (propagation in the opposite
+           direction continues to work). This means that this setting may
+           not be used for services which shall be able to install mount
+           points in the main mount namespace. Note that the effect of these
+           settings may be undone by privileged processes. In order to set
+           up an effective sandboxed environment for a unit it is thus
+           recommended to combine these settings with either
+           <i>CapabilityBoundingSet=~CAP_SYS_ADMIN</i> or <i>SystemCallFilter=~@mount</i>.
+
+       <i>BindPaths=</i>, <i>BindReadOnlyPaths=</i>
+           Configures unit-specific bind mounts. A bind mount makes a
+           particular file or directory available at an additional place in
+           the unit's view of the file system. Any bind mounts created with
+           this option are specific to the unit, and are not visible in the
+           host's mount table. This option expects a whitespace separated
+           list of bind mount definitions. Each definition consists of a
+           colon-separated triple of source path, destination path and
+           option string, where the latter two are optional. If only a
+           source path is specified the source and destination is taken to
+           be the same. The option string may be either "rbind" or "norbind"
+           for configuring a recursive or non-recursive bind mount. If the
+           destination path is omitted, the option string must be omitted
+           too.
+
+           <i>BindPaths=</i> creates regular writable bind mounts (unless the
+           source file system mount is already marked read-only), while
+           <i>BindReadOnlyPaths=</i> creates read-only bind mounts. These settings
+           may be used more than once, each usage appends to the unit's list
+           of bind mounts. If the empty string is assigned to either of
+           these two options the entire list of bind mounts defined prior to
+           this is reset. Note that in this case both read-only and regular
+           bind mounts are reset, regardless which of the two settings is
+           used.
+
+           This option is particularly useful when <i>RootDirectory=</i>/<i>RootImage=</i>
+           is used. In this case the source path refers to a path on the
+           host file system, while the destination path refers to a path
+           below the root directory of the unit.
+
+       <i>PrivateTmp=</i>
+           Takes a boolean argument. If true, sets up a new file system
+           namespace for the executed processes and mounts private /tmp and
+           /var/tmp directories inside it that is not shared by processes
+           outside of the namespace. This is useful to secure access to
+           temporary files of the process, but makes sharing between
+           processes via /tmp or /var/tmp impossible. If this is enabled,
+           all temporary files created by a service in these directories
+           will be removed after the service is stopped. Defaults to false.
+           It is possible to run two or more units within the same private
+           /tmp and /var/tmp namespace by using the <i>JoinsNamespaceOf=</i>
+           directive, see <a href="systemd.unit.5.html">systemd.unit(5)</a> for details. This setting is
+           implied if <i>DynamicUser=</i> is set. For this setting the same
+           restrictions regarding mount propagation and privileges apply as
+           for <i>ReadOnlyPaths=</i> and related calls, see above. Enabling this
+           setting has the side effect of adding <i>Requires=</i> and <i>After=</i>
+           dependencies on all mount units necessary to access /tmp and
+           /var/tmp. Moreover an implicitly <i>After=</i> ordering on
+           <a href="../man8/systemd-tmpfiles-setup.service.8.html">systemd-tmpfiles-setup.service(8)</a> is added.
+
+       <i>PrivateDevices=</i>
+           Takes a boolean argument. If true, sets up a new /dev namespace
+           for the executed processes and only adds API pseudo devices such
+           as /dev/null, /dev/zero or /dev/random (as well as the pseudo TTY
+           subsystem) to it, but no physical devices such as /dev/sda,
+           system memory /dev/mem, system ports /dev/port and others. This
+           is useful to securely turn off physical device access by the
+           executed process. Defaults to false. Enabling this option will
+           install a system call filter to block low-level I/O system calls
+           that are grouped in the <i>@raw-io</i> set, will also remove <b>CAP_MKNOD</b>
+           and <b>CAP_SYS_RAWIO </b>from the capability bounding set for the unit
+           (see above), and set <i>DevicePolicy=closed</i> (see
+           <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a> for details). Note that using this
+           setting will disconnect propagation of mounts from the service to
+           the host (propagation in the opposite direction continues to
+           work). This means that this setting may not be used for services
+           which shall be able to install mount points in the main mount
+           namespace. The /dev namespace will be mounted read-only and
+           'noexec'. The latter may break old programs which try to set up
+           executable memory by using <a href="../man2/mmap.2.html">mmap(2)</a> of /dev/zero instead of using
+           <b>MAP_ANON</b>. This setting is implied if <i>DynamicUser=</i> is set. For
+           this setting the same restrictions regarding mount propagation
+           and privileges apply as for <i>ReadOnlyPaths=</i> and related calls, see
+           above. If turned on and if running in user mode, or in system
+           mode, but without the <b>CAP_SYS_ADMIN </b>capability (e.g. setting
+           <i>User=</i>), <i>NoNewPrivileges=yes</i> is implied.
+
+       <i>PrivateNetwork=</i>
+           Takes a boolean argument. If true, sets up a new network
+           namespace for the executed processes and configures only the
+           loopback network device "lo" inside it. No other network devices
+           will be available to the executed process. This is useful to
+           securely turn off network access by the executed process.
+           Defaults to false. It is possible to run two or more units within
+           the same private network namespace by using the <i>JoinsNamespaceOf=</i>
+           directive, see <a href="systemd.unit.5.html">systemd.unit(5)</a> for details. Note that this option
+           will disconnect all socket families from the host, this includes
+           AF_NETLINK and AF_UNIX. The latter has the effect that AF_UNIX
+           sockets in the abstract socket namespace will become unavailable
+           to the processes (however, those located in the file system will
+           continue to be accessible).
+
+       <i>PrivateUsers=</i>
+           Takes a boolean argument. If true, sets up a new user namespace
+           for the executed processes and configures a minimal user and
+           group mapping, that maps the "root" user and group as well as the
+           unit's own user and group to themselves and everything else to
+           the "nobody" user and group. This is useful to securely detach
+           the user and group databases used by the unit from the rest of
+           the system, and thus to create an effective sandbox environment.
+           All files, directories, processes, IPC objects and other
+           resources owned by users/groups not equaling "root" or the unit's
+           own will stay visible from within the unit but appear owned by
+           the "nobody" user and group. If this mode is enabled, all unit
+           processes are run without privileges in the host user namespace
+           (regardless if the unit's own user/group is "root" or not).
+           Specifically this means that the process will have zero process
+           capabilities on the host's user namespace, but full capabilities
+           within the service's user namespace. Settings such as
+           <i>CapabilityBoundingSet=</i> will affect only the latter, and there's
+           no way to acquire additional capabilities in the host's user
+           namespace. Defaults to off.
+
+           This setting is particularly useful in conjunction with
+           <i>RootDirectory=</i>/<i>RootImage=</i>, as the need to synchronize the user
+           and group databases in the root directory and on the host is
+           reduced, as the only users and groups who need to be matched are
+           "root", "nobody" and the unit's own user and group.
+
+       <i>ProtectSystem=</i>
+           Takes a boolean argument or the special values "full" or
+           "strict". If true, mounts the /usr and /boot directories
+           read-only for processes invoked by this unit. If set to "full",
+           the /etc directory is mounted read-only, too. If set to "strict"
+           the entire file system hierarchy is mounted read-only, except for
+           the API file system subtrees /dev, /proc and /sys (protect these
+           directories using <i>PrivateDevices=</i>, <i>ProtectKernelTunables=</i>,
+           <i>ProtectControlGroups=</i>). This setting ensures that any
+           modification of the vendor-supplied operating system (and
+           optionally its configuration, and local mounts) is prohibited for
+           the service. It is recommended to enable this setting for all
+           long-running services, unless they are involved with system
+           updates or need to modify the operating system in other ways. If
+           this option is used, <i>ReadWritePaths=</i> may be used to exclude
+           specific directories from being made read-only. This setting is
+           implied if <i>DynamicUser=</i> is set. For this setting the same
+           restrictions regarding mount propagation and privileges apply as
+           for <i>ReadOnlyPaths=</i> and related calls, see above. Defaults to off.
+
+       <i>ProtectHome=</i>
+           Takes a boolean argument or "read-only". If true, the directories
+           /home, /root and /run/user are made inaccessible and empty for
+           processes invoked by this unit. If set to "read-only", the three
+           directories are made read-only instead. It is recommended to
+           enable this setting for all long-running services (in particular
+           network-facing ones), to ensure they cannot get access to private
+           user data, unless the services actually require access to the
+           user's private data. This setting is implied if <i>DynamicUser=</i> is
+           set. For this setting the same restrictions regarding mount
+           propagation and privileges apply as for <i>ReadOnlyPaths=</i> and
+           related calls, see above.
+
+       <i>ProtectKernelTunables=</i>
+           Takes a boolean argument. If true, kernel variables accessible
+           through /proc/sys, /sys, /proc/sysrq-trigger,
+           /proc/latency_stats, /proc/acpi, /proc/timer_stats, /proc/fs and
+           /proc/irq will be made read-only to all processes of the unit.
+           Usually, tunable kernel variables should be initialized only at
+           boot-time, for example with the <a href="sysctl.d.5.html">sysctl.d(5)</a> mechanism. Few
+           services need to write to these at runtime; it is hence
+           recommended to turn this on for most services. For this setting
+           the same restrictions regarding mount propagation and privileges
+           apply as for <i>ReadOnlyPaths=</i> and related calls, see above.
+           Defaults to off. If turned on and if running in user mode, or in
+           system mode, but without the <b>CAP_SYS_ADMIN </b>capability (e.g.
+           services for which <i>User=</i> is set), <i>NoNewPrivileges=yes</i> is implied.
+           Note that this option does not prevent indirect changes to kernel
+           tunables effected by IPC calls to other processes. However,
+           <i>InaccessiblePaths=</i> may be used to make relevant IPC file system
+           objects inaccessible. If <i>ProtectKernelTunables=</i> is set,
+           <i>MountAPIVFS=yes</i> is implied.
+
+       <i>ProtectKernelModules=</i>
+           Takes a boolean argument. If true, explicit module loading will
+           be denied. This allows to turn off module load and unload
+           operations on modular kernels. It is recommended to turn this on
+           for most services that do not need special file systems or extra
+           kernel modules to work. Default to off. Enabling this option
+           removes <b>CAP_SYS_MODULE </b>from the capability bounding set for the
+           unit, and installs a system call filter to block module system
+           calls, also /usr/lib/modules is made inaccessible. For this
+           setting the same restrictions regarding mount propagation and
+           privileges apply as for <i>ReadOnlyPaths=</i> and related calls, see
+           above. Note that limited automatic module loading due to user
+           configuration or kernel mapping tables might still happen as side
+           effect of requested user operations, both privileged and
+           unprivileged. To disable module auto-load feature please see
+           <a href="sysctl.d.5.html">sysctl.d(5)</a><b>kernel.modules_disabled </b>mechanism and
+           /proc/sys/kernel/modules_disabled documentation. If turned on and
+           if running in user mode, or in system mode, but without the
+           <b>CAP_SYS_ADMIN </b>capability (e.g. setting <i>User=</i>),
+           <i>NoNewPrivileges=yes</i> is implied.
+
+       <i>ProtectControlGroups=</i>
+           Takes a boolean argument. If true, the Linux Control Groups (‐
+           <a href="../man7/cgroups.7.html">cgroups(7)</a>) hierarchies accessible through /sys/fs/cgroup will be
+           made read-only to all processes of the unit. Except for container
+           managers no services should require write access to the control
+           groups hierarchies; it is hence recommended to turn this on for
+           most services. For this setting the same restrictions regarding
+           mount propagation and privileges apply as for <i>ReadOnlyPaths=</i> and
+           related calls, see above. Defaults to off. If
+           <i>ProtectControlGroups=</i> is set, <i>MountAPIVFS=yes</i> is implied.
+
+       <i>MountFlags=</i>
+           Takes a mount propagation flag: <b>shared</b>, <b>slave </b>or <b>private</b>, which
+           control whether mounts in the file system namespace set up for
+           this unit's processes will receive or propagate mounts and
+           unmounts. See <a href="../man2/mount.2.html">mount(2)</a> for details. Defaults to <b>shared</b>. Use
+           <b>shared </b>to ensure that mounts and unmounts are propagated from
+           systemd's namespace to the service's namespace and vice versa.
+           Use <b>slave </b>to run processes so that none of their mounts and
+           unmounts will propagate to the host. Use <b>private </b>to also ensure
+           that no mounts and unmounts from the host will propagate into the
+           unit processes' namespace. If this is set to <b>slave </b>or <b>private</b>,
+           any mounts created by spawned processes will be unmounted after
+           the completion of the current command line of <i>ExecStartPre=</i>,
+           <i>ExecStartPost=</i>, <i>ExecStart=</i>, and <i>ExecStopPost=</i>. Note that <b>slave</b>
+           means that file systems mounted on the host might stay mounted
+           continuously in the unit's namespace, and thus keep the device
+           busy. Note that the file system namespace related options
+           (<i>PrivateTmp=</i>, <i>PrivateDevices=</i>, <i>ProtectSystem=</i>, <i>ProtectHome=</i>,
+           <i>ProtectKernelTunables=</i>, <i>ProtectControlGroups=</i>, <i>ReadOnlyPaths=</i>,
+           <i>InaccessiblePaths=</i>, <i>ReadWritePaths=</i>) require that mount and
+           unmount propagation from the unit's file system namespace is
+           disabled, and hence downgrade <b>shared </b>to <b>slave</b>.
+
+       <i>UtmpIdentifier=</i>
+           Takes a four character identifier string for an <a href="utmp.5.html">utmp(5)</a> and wtmp
+           entry for this service. This should only be set for services such
+           as <b>getty </b>implementations (such as <a href="../man8/agetty.8.html">agetty(8)</a>) where utmp/wtmp
+           entries must be created and cleared before and after execution,
+           or for services that shall be executed as if they were run by a
+           <b>getty </b>process (see below). If the configured string is longer
+           than four characters, it is truncated and the terminal four
+           characters are used. This setting interprets %I style string
+           replacements. This setting is unset by default, i.e. no utmp/wtmp
+           entries are created or cleaned up for this service.
+
+       <i>UtmpMode=</i>
+           Takes one of "init", "login" or "user". If <i>UtmpIdentifier=</i> is
+           set, controls which type of <a href="utmp.5.html">utmp(5)</a>/wtmp entries for this service
+           are generated. This setting has no effect unless <i>UtmpIdentifier=</i>
+           is set too. If "init" is set, only an <b>INIT_PROCESS </b>entry is
+           generated and the invoked process must implement a
+           <b>getty</b>-compatible utmp/wtmp logic. If "login" is set, first an
+           <b>INIT_PROCESS </b>entry, followed by a <b>LOGIN_PROCESS </b>entry is
+           generated. In this case, the invoked process must implement a
+           <a href="../man1/login.1.html">login(1)</a>-compatible utmp/wtmp logic. If "user" is set, first an
+           <b>INIT_PROCESS </b>entry, then a <b>LOGIN_PROCESS </b>entry and finally a
+           <b>USER_PROCESS </b>entry is generated. In this case, the invoked
+           process may be any process that is suitable to be run as session
+           leader. Defaults to "init".
+
+       <i>SELinuxContext=</i>
+           Set the SELinux security context of the executed process. If set,
+           this will override the automated domain transition. However, the
+           policy still needs to authorize the transition. This directive is
+           ignored if SELinux is disabled. If prefixed by "-", all errors
+           will be ignored. This does not affect commands prefixed with "+".
+           See <a href="../man3/setexeccon.3.html">setexeccon(3)</a> for details.
+
+       <i>AppArmorProfile=</i>
+           Takes a profile name as argument. The process executed by the
+           unit will switch to this profile when started. Profiles must
+           already be loaded in the kernel, or the unit will fail. This
+           result in a non operation if AppArmor is not enabled. If prefixed
+           by "-", all errors will be ignored. This does not affect commands
+           prefixed with "+".
+
+       <i>SmackProcessLabel=</i>
+           Takes a <b>SMACK64 </b>security label as argument. The process executed
+           by the unit will be started under this label and SMACK will
+           decide whether the process is allowed to run or not, based on it.
+           The process will continue to run under the label specified here
+           unless the executable has its own <b>SMACK64EXEC </b>label, in which
+           case the process will transition to run under that label. When
+           not specified, the label that systemd is running under is used.
+           This directive is ignored if SMACK is disabled.
+
+           The value may be prefixed by "-", in which case all errors will
+           be ignored. An empty value may be specified to unset previous
+           assignments. This does not affect commands prefixed with "+".
+
+       <i>IgnoreSIGPIPE=</i>
+           Takes a boolean argument. If true, causes <b>SIGPIPE </b>to be ignored
+           in the executed process. Defaults to true because <b>SIGPIPE</b>
+           generally is useful only in shell pipelines.
+
+       <i>NoNewPrivileges=</i>
+           Takes a boolean argument. If true, ensures that the service
+           process and all its children can never gain new privileges
+           through <b>execve() </b>(e.g. via setuid or setgid bits, or filesystem
+           capabilities). This is the simplest and most effective way to
+           ensure that a process and its children can never elevate
+           privileges again. Defaults to false, but certain settings force
+           <i>NoNewPrivileges=yes</i>, ignoring the value of this setting. This is
+           the case when <i>SystemCallFilter=</i>, <i>SystemCallArchitectures=</i>,
+           <i>RestrictAddressFamilies=</i>, <i>RestrictNamespaces=</i>, <i>PrivateDevices=</i>,
+           <i>ProtectKernelTunables=</i>, <i>ProtectKernelModules=</i>,
+           <i>MemoryDenyWriteExecute=</i>, or <i>RestrictRealtime=</i> are specified.
+
+       <i>SystemCallFilter=</i>
+           Takes a space-separated list of system call names. If this
+           setting is used, all system calls executed by the unit processes
+           except for the listed ones will result in immediate process
+           termination with the <b>SIGSYS </b>signal (whitelisting). If the first
+           character of the list is "~", the effect is inverted: only the
+           listed system calls will result in immediate process termination
+           (blacklisting). If running in user mode, or in system mode, but
+           without the <b>CAP_SYS_ADMIN </b>capability (e.g. setting <i>User=nobody</i>),
+           <i>NoNewPrivileges=yes</i> is implied. This feature makes use of the
+           Secure Computing Mode 2 interfaces of the kernel ('seccomp
+           filtering') and is useful for enforcing a minimal sandboxing
+           environment. Note that the <b>execve</b>, <b>exit</b>, <b>exit_group</b>, <b>getrlimit</b>,
+           <b>rt_sigreturn</b>, <b>sigreturn </b>system calls and the system calls for
+           querying time and sleeping are implicitly whitelisted and do not
+           need to be listed explicitly. This option may be specified more
+           than once, in which case the filter masks are merged. If the
+           empty string is assigned, the filter is reset, all prior
+           assignments will have no effect. This does not affect commands
+           prefixed with "+".
+
+           Note that on systems supporting multiple ABIs (such as
+           x86/x86-64) it is recommended to turn off alternative ABIs for
+           services, so that they cannot be used to circumvent the
+           restrictions of this option. Specifically, it is recommended to
+           combine this option with <i>SystemCallArchitectures=native</i> or
+           similar.
+
+           Note that strict system call filters may impact execution and
+           error handling code paths of the service invocation.
+           Specifically, access to the <b>execve </b>system call is required for
+           the execution of the service binary — if it is blocked service
+           invocation will necessarily fail. Also, if execution of the
+           service binary fails for some reason (for example: missing
+           service executable), the error handling logic might require
+           access to an additional set of system calls in order to process
+           and log this failure correctly. It might be necessary to
+           temporarily disable system call filters in order to simplify
+           debugging of such failures.
+
+           If you specify both types of this option (i.e. whitelisting and
+           blacklisting), the first encountered will take precedence and
+           will dictate the default action (termination or approval of a
+           system call). Then the next occurrences of this option will add
+           or delete the listed system calls from the set of the filtered
+           system calls, depending of its type and the default action. (For
+           example, if you have started with a whitelisting of <b>read </b>and
+           <b>write</b>, and right after it add a blacklisting of <b>write</b>, then <b>write</b>
+           will be removed from the set.)
+
+           As the number of possible system calls is large, predefined sets
+           of system calls are provided. A set starts with "@" character,
+           followed by name of the set.
+
+           <b>Table 2. Currently predefined system call sets</b>
+           ┌───────────────┬───────────────────────────┐
+           │<b>Set            </b>│ <b>Description               </b>│
+           ├───────────────┼───────────────────────────┤
+           │@basic-io      │ System calls for basic    │
+           │               │ I/O: reading, writing,    │
+           │               │ seeking, file descriptor  │
+           │               │ duplication and closing   │
+           │               │ (<a href="../man2/read.2.html">read(2)</a>, <a href="../man2/write.2.html">write(2)</a>, and   │
+           │               │ related calls)            │
+           ├───────────────┼───────────────────────────┤
+           │@clock         │ System calls for changing │
+           │               │ the system clock (‐       │
+           │               │ <a href="../man2/adjtimex.2.html">adjtimex(2)</a>,              │
+           │               │ <a href="../man2/settimeofday.2.html">settimeofday(2)</a>, and      │
+           │               │ related calls)            │
+           ├───────────────┼───────────────────────────┤
+           │@cpu-emulation │ System calls for CPU      │
+           │               │ emulation functionality   │
+           │               │ (<a href="../man2/vm86.2.html">vm86(2)</a> and related      │
+           │               │ calls)                    │
+           ├───────────────┼───────────────────────────┤
+           │@debug         │ Debugging, performance    │
+           │               │ monitoring and tracing    │
+           │               │ functionality (<a href="../man2/ptrace.2.html">ptrace(2)</a>, │
+           │               │ <a href="../man2/perf_event_open.2.html">perf_event_open(2)</a> and    │
+           │               │ related calls)            │
+           ├───────────────┼───────────────────────────┤
+           │@file-system   │ File system operations:   │
+           │               │ opening, creating files   │
+           │               │ and directories for read  │
+           │               │ and write, renaming and   │
+           │               │ removing them, reading    │
+           │               │ file properties, or       │
+           │               │ creating hard and         │
+           │               │ symbolic links.           │
+           ├───────────────┼───────────────────────────┤
+           │@io-event      │ Event loop system calls   │
+           │               │ (<a href="../man2/poll.2.html">poll(2)</a>, <a href="../man2/select.2.html">select(2)</a>,      │
+           │               │ <a href="../man7/epoll.7.html">epoll(7)</a>, <a href="../man2/eventfd.2.html">eventfd(2)</a> and  │
+           │               │ related calls)            │
+           ├───────────────┼───────────────────────────┤
+           │@ipc           │ Pipes, SysV IPC, POSIX    │
+           │               │ Message Queues and other  │
+           │               │ IPC (<a href="../man7/mq_overview.7.html">mq_overview(7)</a>,      │
+           │               │ <a href="../man7/svipc.7.html">svipc(7)</a>)                 │
+           ├───────────────┼───────────────────────────┤
+           │@keyring       │ Kernel keyring access (‐  │
+           │               │ <a href="../man2/keyctl.2.html">keyctl(2)</a> and related     │
+           │               │ calls)                    │
+           ├───────────────┼───────────────────────────┤
+           │@module        │ Loading and unloading of  │
+           │               │ kernel modules (‐         │
+           │               │ <a href="../man2/init_module.2.html">init_module(2)</a>,           │
+           │               │ <a href="../man2/delete_module.2.html">delete_module(2)</a> and      │
+           │               │ related calls)            │
+           ├───────────────┼───────────────────────────┤
+           │@mount         │ Mounting and unmounting   │
+           │               │ of file systems (‐        │
+           │               │ <a href="../man2/mount.2.html">mount(2)</a>, <a href="../man2/chroot.2.html">chroot(2)</a>, and  │
+           │               │ related calls)            │
+           ├───────────────┼───────────────────────────┤
+           │@network-io    │ Socket I/O (including     │
+           │               │ local AF_UNIX):           │
+           │               │ <a href="../man7/socket.7.html">socket(7)</a>, <a href="../man7/unix.7.html">unix(7)</a>        │
+           ├───────────────┼───────────────────────────┤
+           │@obsolete      │ Unusual, obsolete or      │
+           │               │ unimplemented (‐          │
+           │               │ <a href="../man2/create_module.2.html">create_module(2)</a>,         │
+           │               │ <a href="../man2/gtty.2.html">gtty(2)</a>, ...)             │
+           ├───────────────┼───────────────────────────┤
+           │@privileged    │ All system calls which    │
+           │               │ need super-user           │
+           │               │ capabilities (‐           │
+           │               │ <a href="../man7/capabilities.7.html">capabilities(7)</a>)          │
+           ├───────────────┼───────────────────────────┤
+           │@process       │ Process control,          │
+           │               │ execution, namespaceing   │
+           │               │ operations (<a href="../man2/clone.2.html">clone(2)</a>,     │
+           │               │ <a href="../man2/kill.2.html">kill(2)</a>, <a href="../man7/namespaces.7.html">namespaces(7)</a>,   │
+           │               │ ...                       │
+           ├───────────────┼───────────────────────────┤
+           │@raw-io        │ Raw I/O port access (‐    │
+           │               │ <a href="../man2/ioperm.2.html">ioperm(2)</a>, <a href="../man2/iopl.2.html">iopl(2)</a>,       │
+           │               │ <b>pciconfig_read()</b>, ...)    │
+           ├───────────────┼───────────────────────────┤
+           │@reboot        │ System calls for          │
+           │               │ rebooting and reboot      │
+           │               │ preparation (<a href="../man2/reboot.2.html">reboot(2)</a>,   │
+           │               │ <b>kexec()</b>, ...)             │
+           ├───────────────┼───────────────────────────┤
+           │@resources     │ System calls for changing │
+           │               │ resource limits, memory   │
+           │               │ and scheduling parameters │
+           │               │ (<a href="../man2/setrlimit.2.html">setrlimit(2)</a>,            │
+           │               │ <a href="../man2/setpriority.2.html">setpriority(2)</a>, ...)      │
+           ├───────────────┼───────────────────────────┤
+           │@swap          │ System calls for          │
+           │               │ enabling/disabling swap   │
+           │               │ devices (<a href="../man2/swapon.2.html">swapon(2)</a>,       │
+           │               │ <a href="../man2/swapoff.2.html">swapoff(2)</a>)               │
+           └───────────────┴───────────────────────────┘
+           Note, that as new system calls are added to the kernel,
+           additional system calls might be added to the groups above.
+           Contents of the sets may also change between systemd versions. In
+           addition, the list of system calls depends on the kernel version
+           and architecture for which systemd was compiled. Use
+           <b>systemd-analyze syscall-filter </b>to list the actual list of system
+           calls in each filter.
+
+           It is recommended to combine the file system namespacing related
+           options with <i>SystemCallFilter=~@mount</i>, in order to prohibit the
+           unit's processes to undo the mappings. Specifically these are the
+           options <i>PrivateTmp=</i>, <i>PrivateDevices=</i>, <i>ProtectSystem=</i>,
+           <i>ProtectHome=</i>, <i>ProtectKernelTunables=</i>, <i>ProtectControlGroups=</i>,
+           <i>ReadOnlyPaths=</i>, <i>InaccessiblePaths=</i> and <i>ReadWritePaths=</i>.
+
+       <i>SystemCallErrorNumber=</i>
+           Takes an "errno" error number name to return when the system call
+           filter configured with <i>SystemCallFilter=</i> is triggered, instead of
+           terminating the process immediately. Takes an error name such as
+           <b>EPERM</b>, <b>EACCES </b>or <b>EUCLEAN</b>. When this setting is not used, or when
+           the empty string is assigned, the process will be terminated
+           immediately when the filter is triggered.
+
+       <i>SystemCallArchitectures=</i>
+           Takes a space-separated list of architecture identifiers to
+           include in the system call filter. The known architecture
+           identifiers are the same as for <i>ConditionArchitecture=</i> described
+           in <a href="systemd.unit.5.html">systemd.unit(5)</a>, as well as <b>x32</b>, <b>mips64-n32</b>, <b>mips64-le-n32</b>,
+           and the special identifier <b>native</b>. Only system calls of the
+           specified architectures will be permitted to processes of this
+           unit. This is an effective way to disable compatibility with
+           non-native architectures for processes, for example to prohibit
+           execution of 32-bit x86 binaries on 64-bit x86-64 systems. The
+           special <b>native </b>identifier implicitly maps to the native
+           architecture of the system (or more strictly: to the architecture
+           the system manager is compiled for). If running in user mode, or
+           in system mode, but without the <b>CAP_SYS_ADMIN </b>capability (e.g.
+           setting <i>User=nobody</i>), <i>NoNewPrivileges=yes</i> is implied. Note that
+           setting this option to a non-empty list implies that <b>native </b>is
+           included too. By default, this option is set to the empty list,
+           i.e. no system call architecture filtering is applied.
+
+           Note that system call filtering is not equally effective on all
+           architectures. For example, on x86 filtering of network
+           socket-related calls is not possible, due to ABI limitations — a
+           limitation that x86-64 does not have, however. On systems
+           supporting multiple ABIs at the same time — such as x86/x86-64 —
+           it is hence recommended to limit the set of permitted system call
+           architectures so that secondary ABIs may not be used to
+           circumvent the restrictions applied to the native ABI of the
+           system. In particular, setting <i>SystemCallFilter=native</i> is a good
+           choice for disabling non-native ABIs.
+
+           System call architectures may also be restricted system-wide via
+           the <i>SystemCallArchitectures=</i> option in the global configuration.
+           See <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a> for details.
+
+       <i>RestrictAddressFamilies=</i>
+           Restricts the set of socket address families accessible to the
+           processes of this unit. Takes a space-separated list of address
+           family names to whitelist, such as <b>AF_UNIX</b>, <b>AF_INET </b>or <b>AF_INET6</b>.
+           When prefixed with <b>~ </b>the listed address families will be applied
+           as blacklist, otherwise as whitelist. Note that this restricts
+           access to the <a href="../man2/socket.2.html">socket(2)</a> system call only. Sockets passed into the
+           process by other means (for example, by using socket activation
+           with socket units, see <a href="systemd.socket.5.html">systemd.socket(5)</a>) are unaffected. Also,
+           sockets created with <b>socketpair() </b>(which creates connected
+           AF_UNIX sockets only) are unaffected. Note that this option has
+           no effect on 32-bit x86, s390, s390x, mips, mips-le, ppc, ppc-le,
+           pcc64, ppc64-le and is ignored (but works correctly on other
+           ABIs, including x86-64). Note that on systems supporting multiple
+           ABIs (such as x86/x86-64) it is recommended to turn off
+           alternative ABIs for services, so that they cannot be used to
+           circumvent the restrictions of this option. Specifically, it is
+           recommended to combine this option with
+           <i>SystemCallArchitectures=native</i> or similar. If running in user
+           mode, or in system mode, but without the <b>CAP_SYS_ADMIN </b>capability
+           (e.g. setting <i>User=nobody</i>), <i>NoNewPrivileges=yes</i> is implied. By
+           default, no restrictions apply, all address families are
+           accessible to processes. If assigned the empty string, any
+           previous address familiy restriction changes are undone. This
+           setting does not affect commands prefixed with "+".
+
+           Use this option to limit exposure of processes to remote access,
+           in particular via exotic and sensitive network protocols, such as
+           <b>AF_PACKET</b>. Note that in most cases, the local <b>AF_UNIX </b>address
+           family should be included in the configured whitelist as it is
+           frequently used for local communication, including for <a href="../man2/syslog.2.html">syslog(2)</a>
+           logging.
+
+       <i>RestrictNamespaces=</i>
+           Restricts access to Linux namespace functionality for the
+           processes of this unit. For details about Linux namespaces, see
+           <a href="../man7/namespaces.7.html">namespaces(7)</a>. Either takes a boolean argument, or a
+           space-separated list of namespace type identifiers. If false (the
+           default), no restrictions on namespace creation and switching are
+           made. If true, access to any kind of namespacing is prohibited.
+           Otherwise, a space-separated list of namespace type identifiers
+           must be specified, consisting of any combination of: <b>cgroup</b>, <b>ipc</b>,
+           <b>net</b>, <b>mnt</b>, <b>pid</b>, <b>user </b>and <b>uts</b>. Any namespace type listed is made
+           accessible to the unit's processes, access to namespace types not
+           listed is prohibited (whitelisting). By prepending the list with
+           a single tilda character ("~") the effect may be inverted: only
+           the listed namespace types will be made inaccessible, all
+           unlisted ones are permitted (blacklisting). If the empty string
+           is assigned, the default namespace restrictions are applied,
+           which is equivalent to false. Internally, this setting limits
+           access to the <a href="../man2/unshare.2.html">unshare(2)</a>, <a href="../man2/clone.2.html">clone(2)</a> and <a href="../man2/setns.2.html">setns(2)</a> system calls,
+           taking the specified flags parameters into account. Note that —
+           if this option is used — in addition to restricting creation and
+           switching of the specified types of namespaces (or all of them,
+           if true) access to the <b>setns() </b>system call with a zero flags
+           parameter is prohibited. This setting is only supported on x86,
+           x86-64, mips, mips-le, mips64, mips64-le, mips64-n32,
+           mips64-le-n32, ppc64, ppc64-le, s390 and s390x, and enforces no
+           restrictions on other architectures. If running in user mode, or
+           in system mode, but without the <b>CAP_SYS_ADMIN </b>capability (e.g.
+           setting <i>User=</i>), <i>NoNewPrivileges=yes</i> is implied.
+
+       <i>Personality=</i>
+           Controls which kernel architecture <a href="../man2/uname.2.html">uname(2)</a> shall report, when
+           invoked by unit processes. Takes one of the architecture
+           identifiers <b>x86</b>, <b>x86-64</b>, <b>ppc</b>, <b>ppc-le</b>, <b>ppc64</b>, <b>ppc64-le</b>, <b>s390 </b>or
+           <b>s390x</b>. Which personality architectures are supported depends on
+           the system architecture. Usually the 64bit versions of the
+           various system architectures support their immediate 32bit
+           personality architecture counterpart, but no others. For example,
+           <b>x86-64 </b>systems support the <b>x86-64 </b>and <b>x86 </b>personalities but no
+           others. The personality feature is useful when running 32-bit
+           services on a 64-bit host system. If not specified, the
+           personality is left unmodified and thus reflects the personality
+           of the host system's kernel.
+
+       <i>RuntimeDirectory=</i>
+           Takes a list of directory names. If set, one or more directories
+           by the specified names will be created below /run (for system
+           services) or below <i>$XDG_RUNTIME_DIR</i> (for user services) when the
+           unit is started, and removed when the unit is stopped. The
+           directories will have the access mode specified in
+           <i>RuntimeDirectoryMode=</i>, and will be owned by the user and group
+           specified in <i>User=</i> and <i>Group=</i>. Use this to manage one or more
+           runtime directories of the unit and bind their lifetime to the
+           daemon runtime. The specified directory names must be relative,
+           and may not include a "/", i.e. must refer to simple directories
+           to create or remove. This is particularly useful for unprivileged
+           daemons that cannot create runtime directories in /run due to
+           lack of privileges, and to make sure the runtime directory is
+           cleaned up automatically after use. For runtime directories that
+           require more complex or different configuration or lifetime
+           guarantees, please consider using <a href="tmpfiles.d.5.html">tmpfiles.d(5)</a>.
+
+       <i>RuntimeDirectoryMode=</i>
+           Specifies the access mode of the directories specified in
+           <i>RuntimeDirectory=</i> as an octal number. Defaults to <b>0755</b>. See
+           "Permissions" in <a href="../man7/path_resolution.7.html">path_resolution(7)</a> for a discussion of the
+           meaning of permission bits.
+
+       <i>MemoryDenyWriteExecute=</i>
+           Takes a boolean argument. If set, attempts to create memory
+           mappings that are writable and executable at the same time, or to
+           change existing memory mappings to become executable, or mapping
+           shared memory segments as executable are prohibited.
+           Specifically, a system call filter is added that rejects <a href="../man2/mmap.2.html">mmap(2)</a>
+           system calls with both <b>PROT_EXEC </b>and <b>PROT_WRITE </b>set, <a href="../man2/mprotect.2.html">mprotect(2)</a>
+           system calls with <b>PROT_EXEC </b>set and <a href="../man2/shmat.2.html">shmat(2)</a> system calls with
+           <b>SHM_EXEC </b>set. Note that this option is incompatible with programs
+           and libraries that generate program code dynamically at runtime,
+           including JIT execution engines, executable stacks, and code
+           "trampoline" feature of various C compilers. This option improves
+           service security, as it makes harder for software exploits to
+           change running code dynamically. Note that this feature is fully
+           available on x86-64, and partially on x86. Specifically, the
+           <b>shmat() </b>protection is not available on x86. Note that on systems
+           supporting multiple ABIs (such as x86/x86-64) it is recommended
+           to turn off alternative ABIs for services, so that they cannot be
+           used to circumvent the restrictions of this option. Specifically,
+           it is recommended to combine this option with
+           <i>SystemCallArchitectures=native</i> or similar. If running in user
+           mode, or in system mode, but without the <b>CAP_SYS_ADMIN </b>capability
+           (e.g. setting <i>User=</i>), <i>NoNewPrivileges=yes</i> is implied.
+
+       <i>RestrictRealtime=</i>
+           Takes a boolean argument. If set, any attempts to enable realtime
+           scheduling in a process of the unit are refused. This restricts
+           access to realtime task scheduling policies such as <b>SCHED_FIFO</b>,
+           <b>SCHED_RR </b>or <b>SCHED_DEADLINE</b>. See <a href="../man7/sched.7.html">sched(7)</a> for details about these
+           scheduling policies. If running in user mode, or in system mode,
+           but without the <b>CAP_SYS_ADMIN </b>capability (e.g. setting <i>User=</i>),
+           <i>NoNewPrivileges=yes</i> is implied. Realtime scheduling policies may
+           be used to monopolize CPU time for longer periods of time, and
+           may hence be used to lock up or otherwise trigger
+           Denial-of-Service situations on the system. It is hence
+           recommended to restrict access to realtime scheduling to the few
+           programs that actually require them. Defaults to off.
+</pre>
+<h2><a id="ENVIRONMENT_VARIABLES_IN_SPAWNED_PROCESSES" href="#ENVIRONMENT_VARIABLES_IN_SPAWNED_PROCESSES"></a>ENVIRONMENT VARIABLES IN SPAWNED PROCESSES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Processes started by the system are executed in a clean environment
+       in which select variables listed below are set. System processes
+       started by systemd do not inherit variables from PID 1, but processes
+       started by user systemd instances inherit all environment variables
+       from the user systemd instance.
+
+       <i>$PATH</i>
+           Colon-separated list of directories to use when launching
+           executables. Systemd uses a fixed value of
+           /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin.
+
+       <i>$LANG</i>
+           Locale. Can be set in <a href="locale.conf.5.html">locale.conf(5)</a> or on the kernel command
+           line (see <a href="../man1/systemd.1.html">systemd(1)</a> and <a href="../man7/kernel-command-line.7.html">kernel-command-line(7)</a>).
+
+       <i>$USER</i>, <i>$LOGNAME</i>, <i>$HOME</i>, <i>$SHELL</i>
+           User name (twice), home directory, and the login shell. The
+           variables are set for the units that have <i>User=</i> set, which
+           includes user <b>systemd </b>instances. See <a href="passwd.5.html">passwd(5)</a>.
+
+       <i>$INVOCATION_ID</i>
+           Contains a randomized, unique 128bit ID identifying each runtime
+           cycle of the unit, formatted as 32 character hexadecimal string.
+           A new ID is assigned each time the unit changes from an inactive
+           state into an activating or active state, and may be used to
+           identify this specific runtime cycle, in particular in data
+           stored offline, such as the journal. The same ID is passed to all
+           processes run as part of the unit.
+
+       <i>$XDG_RUNTIME_DIR</i>
+           The directory for volatile state. Set for the user <b>systemd</b>
+           instance, and also in user sessions. See <a href="../man8/pam_systemd.8.html">pam_systemd(8)</a>.
+
+       <i>$XDG_SESSION_ID</i>, <i>$XDG_SEAT</i>, <i>$XDG_VTNR</i>
+           The identifier of the session, the seat name, and virtual
+           terminal of the session. Set by <a href="../man8/pam_systemd.8.html">pam_systemd(8)</a> for login
+           sessions.  <i>$XDG_SEAT</i> and <i>$XDG_VTNR</i> will only be set when attached
+           to a seat and a tty.
+
+       <i>$MAINPID</i>
+           The PID of the unit's main process if it is known. This is only
+           set for control processes as invoked by <i>ExecReload=</i> and similar.
+
+       <i>$MANAGERPID</i>
+           The PID of the user <b>systemd </b>instance, set for processes spawned
+           by it.
+
+       <i>$LISTEN_FDS</i>, <i>$LISTEN_PID</i>, <i>$LISTEN_FDNAMES</i>
+           Information about file descriptors passed to a service for socket
+           activation. See <a href="../man3/sd_listen_fds.3.html">sd_listen_fds(3)</a>.
+
+       <i>$NOTIFY_SOCKET</i>
+           The socket <b>sd_notify() </b>talks to. See <a href="../man3/sd_notify.3.html">sd_notify(3)</a>.
+
+       <i>$WATCHDOG_PID</i>, <i>$WATCHDOG_USEC</i>
+           Information about watchdog keep-alive notifications. See
+           <a href="../man3/sd_watchdog_enabled.3.html">sd_watchdog_enabled(3)</a>.
+
+       <i>$TERM</i>
+           Terminal type, set only for units connected to a terminal
+           (<i>StandardInput=tty</i>, <i>StandardOutput=tty</i>, or <i>StandardError=tty</i>).
+           See <a href="termcap.5.html">termcap(5)</a>.
+
+       <i>$JOURNAL_STREAM</i>
+           If the standard output or standard error output of the executed
+           processes are connected to the journal (for example, by setting
+           <i>StandardError=journal</i>) <i>$JOURNAL_STREAM</i> contains the device and
+           inode numbers of the connection file descriptor, formatted in
+           decimal, separated by a colon (":"). This permits invoked
+           processes to safely detect whether their standard output or
+           standard error output are connected to the journal. The device
+           and inode numbers of the file descriptors should be compared with
+           the values set in the environment variable to determine whether
+           the process output is still connected to the journal. Note that
+           it is generally not sufficient to only check whether
+           <i>$JOURNAL_STREAM</i> is set at all as services might invoke external
+           processes replacing their standard output or standard error
+           output, without unsetting the environment variable.
+
+           This environment variable is primarily useful to allow services
+           to optionally upgrade their used log protocol to the native
+           journal protocol (using <a href="../man3/sd_journal_print.3.html">sd_journal_print(3)</a> and other functions)
+           if their standard output or standard error output is connected to
+           the journal anyway, thus enabling delivery of structured metadata
+           along with logged messages.
+
+       <i>$SERVICE_RESULT</i>
+           Only defined for the service unit type, this environment variable
+           is passed to all <i>ExecStop=</i> and <i>ExecStopPost=</i> processes, and
+           encodes the service "result". Currently, the following values are
+           defined: "protocol" (in case of a protocol violation; if a
+           service did not take the steps required by its unit
+           configuration), "timeout" (in case of an operation timeout),
+           "exit-code" (if a service process exited with a non-zero exit
+           code; see <i>$EXIT_CODE</i> below for the actual exit code returned),
+           "signal" (if a service process was terminated abnormally by a
+           signal; see <i>$EXIT_CODE</i> below for the actual signal used for the
+           termination), "core-dump" (if a service process terminated
+           abnormally and dumped core), "watchdog" (if the watchdog
+           keep-alive ping was enabled for the service but it missed the
+           deadline), or "resources" (a catch-all condition in case a system
+           operation failed).
+
+           This environment variable is useful to monitor failure or
+           successful termination of a service. Even though this variable is
+           available in both <i>ExecStop=</i> and <i>ExecStopPost=</i>, it is usually a
+           better choice to place monitoring tools in the latter, as the
+           former is only invoked for services that managed to start up
+           correctly, and the latter covers both services that failed during
+           their start-up and those which failed during their runtime.
+
+       <i>$EXIT_CODE</i>, <i>$EXIT_STATUS</i>
+           Only defined for the service unit type, these environment
+           variables are passed to all <i>ExecStop=</i>, <i>ExecStopPost=</i> processes
+           and contain exit status/code information of the main process of
+           the service. For the precise definition of the exit code and
+           status, see <a href="../man2/wait.2.html">wait(2)</a>.  <i>$EXIT_CODE</i> is one of "exited", "killed",
+           "dumped".  <i>$EXIT_STATUS</i> contains the numeric exit code formatted
+           as string if <i>$EXIT_CODE</i> is "exited", and the signal name in all
+           other cases. Note that these environment variables are only set
+           if the service manager succeeded to start and identify the main
+           process of the service.
+
+           <b>Table 3. Summary of possible service result variable values</b>
+           ┌──────────────────┬────────────────────┬─────────────────────┐
+           │<i>$SERVICE_RESULT</i>   │ <i>$EXIT_CODE</i>         │ <i>$EXIT_STATUS</i>        │
+           ├──────────────────┼────────────────────┼─────────────────────┤
+           │"protocol"        │ not set            │ not set             │
+           │                  ├────────────────────┼─────────────────────┤
+           │                  │ "exited"           │ "0"                 │
+           ├──────────────────┼────────────────────┼─────────────────────┤
+           │"timeout"         │ "killed"           │ "TERM", "KILL"      │
+           │                  ├────────────────────┼─────────────────────┤
+           │                  │ "exited"           │ "0", "1", "2", "3", │
+           │                  │                    │ ..., "255"          │
+           ├──────────────────┼────────────────────┼─────────────────────┤
+           │"exit-code"       │ "exited"           │ "0", "1", "2", "3", │
+           │                  │                    │ ..., "255"          │
+           ├──────────────────┼────────────────────┼─────────────────────┤
+           │"signal"          │ "killed"           │ "HUP", "INT",       │
+           │                  │                    │ "KILL", ...         │
+           ├──────────────────┼────────────────────┼─────────────────────┤
+           │"core-dump"       │ "dumped"           │ "ABRT", "SEGV",     │
+           │                  │                    │ "QUIT", ...         │
+           ├──────────────────┼────────────────────┼─────────────────────┤
+           │"watchdog"        │ "dumped"           │ "ABRT"              │
+           │                  ├────────────────────┼─────────────────────┤
+           │                  │ "killed"           │ "TERM", "KILL"      │
+           │                  ├────────────────────┼─────────────────────┤
+           │                  │ "exited"           │ "0", "1", "2", "3", │
+           │                  │                    │ ..., "255"          │
+           ├──────────────────┼────────────────────┼─────────────────────┤
+           │"resources"       │ any of the above   │ any of the above    │
+           ├──────────────────┴────────────────────┼─────────────────────┤
+           │Note: the process may be also          │                     │
+           │terminated by a signal not sent by     │                     │
+           │systemd. In particular the process may │                     │
+           │send an arbitrary signal to itself in  │                     │
+           │a handler for any of the non-maskable  │                     │
+           │signals. Nevertheless, in the          │                     │
+           │"timeout" and "watchdog" rows above    │                     │
+           │only the signals that systemd sends    │                     │
+           │have been included.                    │                     │
+           └───────────────────────────────────────┴─────────────────────┘
+
+       Additional variables may be configured by the following means: for
+       processes spawned in specific units, use the <i>Environment=</i>,
+       <i>EnvironmentFile=</i> and <i>PassEnvironment=</i> options above; to specify
+       variables globally, use <i>DefaultEnvironment=</i> (see
+       <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>) or the kernel option <i>systemd.setenv=</i> (see
+       <a href="../man1/systemd.1.html">systemd(1)</a>). Additional variables may also be set through PAM,
+       cf. <a href="../man8/pam_env.8.html">pam_env(8)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/systemd.1.html">systemd(1)</a>, <a href="../man1/systemctl.1.html">systemctl(1)</a>, <a href="../man1/systemd-analyze.1.html">systemd-analyze(1)</a>, <b>journalctl</b>(8),
+       <a href="systemd.unit.5.html">systemd.unit(5)</a>, <a href="systemd.service.5.html">systemd.service(5)</a>, <a href="systemd.socket.5.html">systemd.socket(5)</a>,
+       <a href="systemd.swap.5.html">systemd.swap(5)</a>, <a href="systemd.mount.5.html">systemd.mount(5)</a>, <a href="systemd.kill.5.html">systemd.kill(5)</a>,
+       <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>, <a href="../man7/systemd.time.7.html">systemd.time(7)</a>, <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,
+       <a href="tmpfiles.d.5.html">tmpfiles.d(5)</a>, <a href="../man3/exec.3.html">exec(3)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. Discoverable Partitions Specification
+           <a href="https://www.freedesktop.org/wiki/Specifications/DiscoverablePartitionsSpec/">https://www.freedesktop.org/wiki/Specifications/DiscoverablePartitionsSpec/</a>
+
+        2. proc.txt
+           <a href="https://www.kernel.org/doc/Documentation/filesystems/proc.txt">https://www.kernel.org/doc/Documentation/filesystems/proc.txt</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                  SYSTEMD.EXEC(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/systemd.1.html">systemd(1)</a>,&nbsp; 
+    <a href="../man1/systemd-run.1.html">systemd-run(1)</a>,&nbsp; 
+    <a href="../man3/sd_bus_creds_get_pid.3.html">sd_bus_creds_get_pid(3)</a>,&nbsp; 
+    <a href="../man3/sd_id128_get_machine.3.html">sd_id128_get_machine(3)</a>,&nbsp; 
+    <a href="systemd.kill.5.html">systemd.kill(5)</a>,&nbsp; 
+    <a href="systemd.mount.5.html">systemd.mount(5)</a>,&nbsp; 
+    <a href="systemd.resource-control.5.html">systemd.resource-control(5)</a>,&nbsp; 
+    <a href="systemd.service.5.html">systemd.service(5)</a>,&nbsp; 
+    <a href="systemd.socket.5.html">systemd.socket(5)</a>,&nbsp; 
+    <a href="systemd.swap.5.html">systemd.swap(5)</a>,&nbsp; 
+    <a href="systemd-system.conf.5.html">systemd-system.conf(5)</a>,&nbsp; 
+    <a href="systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="tmpfiles.d.5.html">tmpfiles.d(5)</a>,&nbsp; 
+    <a href="../man7/daemon.7.html">daemon(7)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man7/systemd.journal-fields.7.html">systemd.journal-fields(7)</a>,&nbsp; 
+    <a href="../man8/nss-systemd.8.html">nss-systemd(8)</a>,&nbsp; 
+    <a href="../man8/systemd-coredump.8.html">systemd-coredump(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

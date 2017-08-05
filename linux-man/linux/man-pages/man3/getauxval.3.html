@@ -1,0 +1,352 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getauxval(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETAUXVAL(3)              Linux Programmer's Manual             GETAUXVAL(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getauxval - retrieve a value from the auxiliary vector
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/auxv.h&gt;</b>
+
+       <b>unsigned long getauxval(unsigned long </b><i>type</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>getauxval</b>() function retrieves values from the auxiliary vector,
+       a mechanism that the kernel's ELF binary loader uses to pass certain
+       information to user space when a program is executed.
+
+       Each entry in the auxiliary vector consists of a pair of values: a
+       type that identifies what this entry represents, and a value for that
+       type.  Given the argument <i>type</i>, <b>getauxval</b>() returns the corresponding
+       value.
+
+       The value returned for each <i>type</i> is given in the following list.  Not
+       all <i>type</i> values are present on all architectures.
+
+       <b>AT_BASE</b>
+              The base address of the program interpreter (usually, the
+              dynamic linker).
+
+       <b>AT_BASE_PLATFORM</b>
+              A string identifying the real platform; may differ from
+              <b>AT_PLATFORM </b>(PowerPC only).
+
+       <b>AT_CLKTCK</b>
+              The frequency with which <a href="../man2/times.2.html">times(2)</a> counts.  This value can also
+              be obtained via <i>sysconf(_SC_CLK_TCK)</i>.
+
+       <b>AT_DCACHEBSIZE</b>
+              The data cache block size.
+
+       <b>AT_EGID</b>
+              The effective group ID of the thread.
+
+       <b>AT_ENTRY</b>
+              The entry address of the executable.
+
+       <b>AT_EUID</b>
+              The effective user ID of the thread.
+
+       <b>AT_EXECFD</b>
+              File descriptor of program.
+
+       <b>AT_EXECFN</b>
+              Pathname used to execute program.
+
+       <b>AT_FLAGS</b>
+              Flags (unused).
+
+       <b>AT_FPUCW</b>
+              Used FPU control word (SuperH architecture only).  This gives
+              some information about the FPU initialization performed by the
+              kernel.
+
+       <b>AT_GID </b>The real group ID of the thread.
+
+       <b>AT_HWCAP</b>
+              An architecture and ABI dependent bit-mask whose settings
+              indicate detailed processor capabilities.  The contents of the
+              bit mask are hardware dependent (for example, see the kernel
+              source file <i>arch/x86/include/asm/cpufeature.h</i> for details
+              relating to the Intel x86 architecture; the value returned is
+              the first 32-bit word of the array described there).  A human-
+              readable version of the same information is available via
+              <i>/proc/cpuinfo</i>.
+
+       <b>AT_HWCAP2 </b>(since glibc 2.18)
+              Further machine-dependent hints about processor capabilities.
+
+       <b>AT_ICACHEBSIZE</b>
+              The instruction cache block size.
+
+       <b>AT_PAGESZ</b>
+              The system page size (the same value returned by
+              <i>sysconf(_SC_PAGESIZE)</i>).
+
+       <b>AT_PHDR</b>
+              The address of the program headers of the executable.
+
+       <b>AT_PHENT</b>
+              The size of program header entry.
+
+       <b>AT_PHNUM</b>
+              The number of program headers.
+
+       <b>AT_PLATFORM</b>
+              A pointer to a string that identifies the hardware platform
+              that the program is running on.  The dynamic linker uses this
+              in the interpretation of <i>rpath</i> values.
+
+       <b>AT_RANDOM</b>
+              The address of sixteen bytes containing a random value.
+
+       <b>AT_SECURE</b>
+              Has a nonzero value if this executable should be treated
+              securely.  Most commonly, a nonzero value indicates that the
+              process is executing a set-user-ID or set-group-ID binary (so
+              that its real and effective UIDs or GIDs differ from one
+              another), or that it gained capabilities by executing a binary
+              file that has capabilities (see <a href="../man7/capabilities.7.html">capabilities(7)</a>).
+              Alternatively, a nonzero value may be triggered by a Linux
+              Security Module.  When this value is nonzero, the dynamic
+              linker disables the use of certain environment variables (see
+              <a href="../man8/ld-linux.so.8.html">ld-linux.so(8)</a>) and glibc changes other aspects of its
+              behavior.  (See also <a href="secure_getenv.3.html">secure_getenv(3)</a>.)
+
+       <b>AT_SYSINFO</b>
+              The entry point to the system call function in the vDSO.  Not
+              present/needed on all architectures (e.g., absent on x86-64).
+
+       <b>AT_SYSINFO_EHDR</b>
+              The address of a page containing the virtual Dynamic Shared
+              Object (vDSO) that the kernel creates in order to provide fast
+              implementations of certain system calls.
+
+       <b>AT_UCACHEBSIZE</b>
+              The unified cache block size.
+
+       <b>AT_UID </b>The real user ID of the thread.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>getauxval</b>() returns the value corresponding to <i>type</i>.  If
+       <i>type</i> is not found, 0 is returned.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ENOENT </b>(since glibc 2.19)
+              No entry corresponding to <i>type</i> could be found in the auxiliary
+              vector.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>getauxval</b>() function was added to glibc in version 2.16.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────┬───────────────┬─────────┐
+       │<b>Interface   </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────┼───────────────┼─────────┤
+       │<b>getauxval</b>() │ Thread safety │ MT-Safe │
+       └────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This function is a nonstandard glibc extension.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The primary consumer of the information in the auxiliary vector is
+       the dynamic linker <a href="../man8/ld-linux.so.8.html">ld-linux.so(8)</a>.  The auxiliary vector is a
+       convenient and efficient shortcut that allows the kernel to
+       communicate a certain set of standard information that the dynamic
+       linker usually or always needs.  In some cases, the same information
+       could be obtained by system calls, but using the auxiliary vector is
+       cheaper.
+
+       The auxiliary vector resides just above the argument list and
+       environment in the process address space.  The auxiliary vector
+       supplied to a program can be viewed by setting the <b>LD_SHOW_AUXV</b>
+       environment variable when running a program:
+
+           $ LD_SHOW_AUXV=1 sleep 1
+
+       The auxiliary vector of any process can (subject to file permissions)
+       be obtained via <i>/proc/[pid]/auxv</i>; see <a href="../man5/proc.5.html">proc(5)</a> for more information.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Before the addition of the <b>ENOENT </b>error in glibc 2.19, there was no
+       way to unambiguously distinguish the case where <i>type</i> could not be
+       found from the case where the value corresponding to <i>type</i> was zero.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="secure_getenv.3.html">secure_getenv(3)</a>, <a href="../man7/vdso.7.html">vdso(7)</a>, <a href="../man8/ld-linux.so.8.html">ld-linux.so(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2016-07-17                     GETAUXVAL(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/getunwind.2.html">getunwind(2)</a>,&nbsp; 
+    <a href="getenv.3.html">getenv(3)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man7/libc.7.html">libc(7)</a>,&nbsp; 
+    <a href="../man7/random.7.html">random(7)</a>,&nbsp; 
+    <a href="../man7/vdso.7.html">vdso(7)</a>,&nbsp; 
+    <a href="../man8/ld.so.8.html">ld.so(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getauxval.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

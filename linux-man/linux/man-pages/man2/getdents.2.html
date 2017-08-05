@@ -1,0 +1,376 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getdents(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETDENTS(2)               Linux Programmer's Manual              GETDENTS(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getdents, getdents64 - get directory entries
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>int getdents(unsigned int </b><i>fd</i><b>, struct linux_dirent *</b><i>dirp</i><b>,</b>
+                    <b>unsigned int </b><i>count</i><b>);</b>
+       <b>int getdents64(unsigned int </b><i>fd</i><b>, struct linux_dirent64 *</b><i>dirp</i><b>,</b>
+                    <b>unsigned int </b><i>count</i><b>);</b>
+
+       <i>Note</i>: There are no glibc wrappers for these system calls; see NOTES.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These are not the interfaces you are interested in.  Look at
+       <a href="../man3/readdir.3.html">readdir(3)</a> for the POSIX-conforming C library interface.  This page
+       documents the bare kernel system call interfaces.
+
+   <b>getdents()</b>
+       The system call <b>getdents</b>() reads several <i>linux_dirent</i> structures from
+       the directory referred to by the open file descriptor <i>fd</i> into the
+       buffer pointed to by <i>dirp</i>.  The argument <i>count</i> specifies the size of
+       that buffer.
+
+       The <i>linux_dirent</i> structure is declared as follows:
+
+           struct linux_dirent {
+               unsigned long  d_ino;     /* Inode number */
+               unsigned long  d_off;     /* Offset to next <i>linux_dirent</i> */
+               unsigned short d_reclen;  /* Length of this <i>linux_dirent</i> */
+               char           d_name[];  /* Filename (null-terminated) */
+                                 /* length is actually (d_reclen - 2 -
+                                    offsetof(struct linux_dirent, d_name)) */
+               /*
+               char           pad;       // Zero padding byte
+               char           d_type;    // File type (only since Linux
+                                         // 2.6.4); offset is (d_reclen - 1)
+               */
+           }
+
+       <i>d_ino</i> is an inode number.  <i>d_off</i> is the distance from the start of
+       the directory to the start of the next <i>linux_dirent</i>.  <i>d_reclen</i> is the
+       size of this entire <i>linux_dirent</i>.  <i>d_name</i> is a null-terminated
+       filename.
+
+       <i>d_type</i> is a byte at the end of the structure that indicates the file
+       type.  It contains one of the following values (defined in
+       <i>&lt;dirent.h&gt;</i>):
+
+       <b>DT_BLK      </b>This is a block device.
+
+       <b>DT_CHR      </b>This is a character device.
+
+       <b>DT_DIR      </b>This is a directory.
+
+       <b>DT_FIFO     </b>This is a named pipe (FIFO).
+
+       <b>DT_LNK      </b>This is a symbolic link.
+
+       <b>DT_REG      </b>This is a regular file.
+
+       <b>DT_SOCK     </b>This is a UNIX domain socket.
+
+       <b>DT_UNKNOWN  </b>The file type is unknown.
+
+       The <i>d_type</i> field is implemented since Linux 2.6.4.  It occupies a
+       space that was previously a zero-filled padding byte in the
+       <i>linux_dirent</i> structure.  Thus, on kernels up to and including 2.6.3,
+       attempting to access this field always provides the value 0
+       (<b>DT_UNKNOWN</b>).
+
+       Currently, only some filesystems (among them: Btrfs, ext2, ext3, and
+       ext4) have full support for returning the file type in <i>d_type</i>.  All
+       applications must properly handle a return of <b>DT_UNKNOWN</b>.
+
+   <b>getdents64()</b>
+       The original Linux <b>getdents</b>() system call did not handle large
+       filesystems and large file offsets.  Consequently, Linux 2.4 added
+       <b>getdents64</b>(), with wider types for the <i>d_ino</i> and <i>d_off</i> fields.  In
+       addition, <b>getdents64</b>() supports an explicit <i>d_type</i> field.
+
+       The <b>getdents64</b>() system call is like <b>getdents</b>(), except that its
+       second argument is a pointer to a buffer containing structures of the
+       following type:
+
+           struct linux_dirent64 {
+               ino64_t        d_ino;    /* 64-bit inode number */
+               off64_t        d_off;    /* 64-bit offset to next structure */
+               unsigned short d_reclen; /* Size of this dirent */
+               unsigned char  d_type;   /* File type */
+               char           d_name[]; /* Filename (null-terminated) */
+           };
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, the number of bytes read is returned.  On end of
+       directory, 0 is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is set
+       appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EBADF  </b>Invalid file descriptor <i>fd</i>.
+
+       <b>EFAULT </b>Argument points outside the calling process's address space.
+
+       <b>EINVAL </b>Result buffer is too small.
+
+       <b>ENOENT </b>No such directory.
+
+       <b>ENOTDIR</b>
+              File descriptor does not refer to a directory.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       SVr4.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Glibc does not provide a wrapper for these system calls; call them
+       using <a href="syscall.2.html">syscall(2)</a>.  You will need to define the <i>linux_dirent</i> or
+       <i>linux_dirent64</i> structure yourself.  However, you probably want to use
+       <a href="../man3/readdir.3.html">readdir(3)</a> instead.
+
+       These calls supersede <a href="readdir.2.html">readdir(2)</a>.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The program below demonstrates the use of <b>getdents</b>().  The following
+       output shows an example of what we see when running this program on
+       an ext2 directory:
+
+           $ <b>./a.out /testfs/</b>
+           --------------- nread=120 ---------------
+           inode#    file type  d_reclen  d_off   d_name
+                  2  directory    16         12  .
+                  2  directory    16         24  ..
+                 11  directory    24         44  lost+found
+                 12  regular      16         56  a
+             228929  directory    16         68  sub
+              16353  directory    16         80  sub2
+             130817  directory    16       4096  sub3
+
+   <b>Program source</b>
+
+       #define _GNU_SOURCE
+       #include &lt;dirent.h&gt;     /* Defines DT_* constants */
+       #include &lt;fcntl.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;unistd.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;sys/stat.h&gt;
+       #include &lt;sys/syscall.h&gt;
+
+       #define handle_error(msg) \
+               do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
+       struct linux_dirent {
+           long           d_ino;
+           off_t          d_off;
+           unsigned short d_reclen;
+           char           d_name[];
+       };
+
+       #define BUF_SIZE 1024
+
+       int
+       main(int argc, char *argv[])
+       {
+           int fd, nread;
+           char buf[BUF_SIZE];
+           struct linux_dirent *d;
+           int bpos;
+           char d_type;
+
+           fd = open(argc &gt; 1 ? argv[1] : ".", O_RDONLY | O_DIRECTORY);
+           if (fd == -1)
+               handle_error("open");
+
+           for ( ; ; ) {
+               nread = syscall(SYS_getdents, fd, buf, BUF_SIZE);
+               if (nread == -1)
+                   handle_error("getdents");
+
+               if (nread == 0)
+                   break;
+
+               printf("--------------- nread=%d ---------------\n", nread);
+               printf("inode#    file type  d_reclen  d_off   d_name\n");
+               for (bpos = 0; bpos &lt; nread;) {
+                   d = (struct linux_dirent *) (buf + bpos);
+                   printf("%8ld  ", d-&gt;d_ino);
+                   d_type = *(buf + bpos + d-&gt;d_reclen - 1);
+                   printf("%-10s ", (d_type == DT_REG) ?  "regular" :
+                                    (d_type == DT_DIR) ?  "directory" :
+                                    (d_type == DT_FIFO) ? "FIFO" :
+                                    (d_type == DT_SOCK) ? "socket" :
+                                    (d_type == DT_LNK) ?  "symlink" :
+                                    (d_type == DT_BLK) ?  "block dev" :
+                                    (d_type == DT_CHR) ?  "char dev" : "???");
+                   printf("%4d %10lld  %s\n", d-&gt;d_reclen,
+                           (long long) d-&gt;d_off, d-&gt;d_name);
+                   bpos += d-&gt;d_reclen;
+               }
+           }
+
+           exit(EXIT_SUCCESS);
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="readdir.2.html">readdir(2)</a>, <a href="../man3/readdir.3.html">readdir(3)</a>, <a href="../man7/inode.7.html">inode(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                      GETDENTS(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="readdir.2.html">readdir(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/readdir.3.html">readdir(3)</a>,&nbsp; 
+    <a href="../man8/mkfs.xfs.8.html">mkfs.xfs(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getdents.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

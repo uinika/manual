@@ -1,0 +1,298 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getmntent(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#FILES">FILES</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETMNTENT(3)              Linux Programmer's Manual             GETMNTENT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getmntent,  setmntent, addmntent, endmntent, hasmntopt, getmntent_r -
+       get filesystem descriptor file entry
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdio.h&gt;</b>
+       <b>#include &lt;mntent.h&gt;</b>
+
+       <b>FILE *setmntent(const char *</b><i>filename</i><b>, const char *</b><i>type</i><b>);</b>
+
+       <b>struct mntent *getmntent(FILE *</b><i>stream</i><b>);</b>
+
+       <b>int addmntent(FILE *</b><i>stream</i><b>, const struct mntent *</b><i>mnt</i><b>);</b>
+
+       <b>int endmntent(FILE *</b><i>streamp</i><b>);</b>
+
+       <b>char *hasmntopt(const struct mntent *</b><i>mnt</i><b>, const char *</b><i>opt</i><b>);</b>
+
+       /* GNU extension */
+       <b>#include &lt;mntent.h&gt;</b>
+
+       <b>struct mntent *getmntent_r(FILE *</b><i>streamp</i><b>, struct mntent *</b><i>mntbuf</i><b>,</b>
+                                  <b>char *</b><i>buf</i><b>, int </b><i>buflen</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>getmntent_r</b>():
+           Since glibc 2.19:
+               _DEFAULT_SOURCE
+           Glibc 2.19 and earlier:
+               _BSD_SOURCE || _SVID_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These routines are used to access the filesystem description file
+       <i>/etc/fstab</i> and the mounted filesystem description file <i>/etc/mtab</i>.
+
+       The <b>setmntent</b>() function opens the filesystem description file
+       <i>filename</i> and returns a file pointer which can be used by <b>getmntent</b>().
+       The argument <i>type</i> is the type of access required and can take the
+       same values as the <i>mode</i> argument of <a href="fopen.3.html">fopen(3)</a>.
+
+       The <b>getmntent</b>() function reads the next line of the filesystem
+       description file from <i>stream</i> and returns a pointer to a structure
+       containing the broken out fields from a line in the file.  The
+       pointer points to a static area of memory which is overwritten by
+       subsequent calls to <b>getmntent</b>().
+
+       The <b>addmntent</b>() function adds the <i>mntent</i> structure <i>mnt</i> to the end of
+       the open <i>stream</i>.
+
+       The <b>endmntent</b>() function closes the <i>stream</i> associated with the
+       filesystem description file.
+
+       The <b>hasmntopt</b>() function scans the <i>mnt_opts</i> field (see below) of the
+       <i>mntent</i> structure <i>mnt</i> for a substring that matches <i>opt</i>.  See
+       <i>&lt;mntent.h&gt;</i> and <a href="../man8/mount.8.html">mount(8)</a> for valid mount options.
+
+       The reentrant <b>getmntent_r</b>() function is similar to <b>getmntent</b>(), but
+       stores the <i>struct mount</i> in the provided <i>*mntbuf</i> and stores the
+       strings pointed to by the entries in that struct in the provided
+       array <i>buf</i> of size <i>buflen</i>.
+
+       The <i>mntent</i> structure is defined in <i>&lt;mntent.h&gt;</i> as follows:
+
+           struct mntent {
+               char *mnt_fsname;   /* name of mounted filesystem */
+               char *mnt_dir;      /* filesystem path prefix */
+               char *mnt_type;     /* mount type (see mntent.h) */
+               char *mnt_opts;     /* mount options (see mntent.h) */
+               int   mnt_freq;     /* dump frequency in days */
+               int   mnt_passno;   /* pass number on parallel fsck */
+           };
+
+       Since fields in the mtab and fstab files are separated by whitespace,
+       octal escapes are used to represent the characters space (\040), tab
+       (\011), newline (\012), and backslash (\\) in those files when they
+       occur in one of the four strings in a <i>mntent</i> structure.  The routines
+       <b>addmntent</b>() and <b>getmntent</b>() will convert from string representation
+       to escaped representation and back.  When converting from escaped
+       representation, the sequence \134 is also converted to a backslash.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>getmntent</b>() and <b>getmntent_r</b>() functions return a pointer to the
+       <i>mntent</i> structure or NULL on failure.
+
+       The <b>addmntent</b>() function returns 0 on success and 1 on failure.
+
+       The <b>endmntent</b>() function always returns 1.
+
+       The <b>hasmntopt</b>() function returns the address of the substring if a
+       match is found and NULL otherwise.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       /etc/fstab          filesystem description file
+       /etc/mtab           mounted filesystem description file
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────┬───────────────┬─────────────────────────────────┐
+       │<b>Interface     </b>│ <b>Attribute     </b>│ <b>Value                           </b>│
+       ├──────────────┼───────────────┼─────────────────────────────────┤
+       │<b>setmntent</b>(),  │ Thread safety │ MT-Safe                         │
+       │<b>endmntent</b>(),  │               │                                 │
+       │<b>hasmntopt</b>()   │               │                                 │
+       ├──────────────┼───────────────┼─────────────────────────────────┤
+       │<b>getmntent</b>()   │ Thread safety │ MT-Unsafe race:mntentbuf locale │
+       ├──────────────┼───────────────┼─────────────────────────────────┤
+       │<b>addmntent</b>()   │ Thread safety │ MT-Safe race:stream locale      │
+       ├──────────────┼───────────────┼─────────────────────────────────┤
+       │<b>getmntent_r</b>() │ Thread safety │ MT-Safe locale                  │
+       └──────────────┴───────────────┴─────────────────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The nonreentrant functions are from SunOS 4.1.3.  A routine
+       <b>getmntent_r</b>() was introduced in HP-UX 10, but it returns an int.  The
+       prototype shown above is glibc-only.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       System V also has a <b>getmntent</b>() function but the calling sequence
+       differs, and the returned structure is different.  Under System V
+       <i>/etc/mnttab</i> is used.  4.4BSD and Digital UNIX have a routine
+       <b>getmntinfo</b>(), a wrapper around the system call <b>getfsstat</b>().
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="fopen.3.html">fopen(3)</a>, <a href="../man5/fstab.5.html">fstab(5)</a>, <a href="../man8/mount.8.html">mount(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">                                 2017-03-13                     GETMNTENT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="getfsent.3.html">getfsent(3)</a>,&nbsp; 
+    <a href="../man5/fstab.5.html">fstab(5)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getmntent.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

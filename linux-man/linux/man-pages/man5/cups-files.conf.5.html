@@ -1,0 +1,386 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>cups-files.conf(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYRIGHT">COPYRIGHT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">cups-files.conf(5)               Apple Inc.               cups-files.conf(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       cups-files.conf - file and directory configuration file for cups
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>cups-files.conf </b>file configures the files and directories used by
+       the CUPS scheduler, <a href="../man8/cupsd.8.html">cupsd(8)</a>.  It is normally located in the
+       <i>/etc/cups</i> directory.
+
+       Each line in the file can be a configuration directive, a blank line,
+       or a comment.  Configuration directives typically consist of a name
+       and zero or more values separated by whitespace.  The configuration
+       directive name and values are case-insensitive.  Comment lines start
+       with the # character.
+
+   <b>DIRECTIVES</b>
+       The following directives are understood by <a href="../man8/cupsd.8.html">cupsd(8)</a>:
+
+       <b>AccessLog</b>
+
+       <b>AccessLog </b><i>filename</i>
+
+       <b>AccessLog stderr</b>
+
+       <b>AccessLog syslog</b>
+            Defines the access log filename.  Specifying a blank filename
+            disables access log generation.  The value "stderr" causes log
+            entries to be sent to the standard error file when the scheduler
+            is running in the foreground, or to the system log daemon when
+            run in the background.  The value "syslog" causes log entries to
+            be sent to the system log daemon.  The server name may be
+            included in filenames using the string "%s", for example:
+
+                AccessLog /var/log/cups/%s-access_log
+
+            The default is "/var/log/cups/access_log".
+
+       <b>ConfigFilePerm </b><i>mode</i>
+            Specifies the permissions for all configuration files that the
+            scheduler writes.  The default is "0644" on macOS and "0640" on
+            all other operating systems.
+
+       <b>Note: </b>The permissions for the <i>printers.conf</i> file are currently masked
+       to only allow access from the scheduler user (typically root).  This
+       is done because printer device URIs sometimes contain sensitive
+       authentication information that should not be generally known on the
+       system.  There is no way to disable this security feature.
+
+       <b>CreateSelfSignedCerts yes</b>
+
+       <b>CreateSelfSignedCerts no</b>
+            Specifies whether the scheduler automatically creates self-
+            signed certificates for client connections using TLS.  The
+            default is yes.
+
+       <b>DataDir </b><i>path</i>
+            Specifies the directory where data files can be found.  The
+            default is usually "/usr/share/cups".
+
+       <b>DocumentRoot </b><i>directory</i>
+            Specifies the root directory for the CUPS web interface content.
+            The default is usually "/usr/share/doc/cups".
+
+       <b>ErrorLog</b>
+
+       <b>ErrorLog </b><i>filename</i>
+
+       <b>ErrorLog stderr</b>
+
+       <b>ErrorLog syslog</b>
+            Defines the error log filename.  Specifying a blank filename
+            disables error log generation.  The value "stderr" causes log
+            entries to be sent to the standard error file when the scheduler
+            is running in the foreground, or to the system log daemon when
+            run in the background.  The value "syslog" causes log entries to
+            be sent to the system log daemon.  The server name may be
+            included in filenames using the string "%s", for example:
+
+                ErrorLog /var/log/cups/%s-error_log
+
+            The default is "/var/log/cups/error_log".
+
+       <b>FatalErrors none</b>
+
+       <b>FatalErrors all </b><i>-kind</i> [ ... <i>-kind</i> ]
+
+       <b>FatalErrors </b><i>kind</i> [ ... <i>kind</i> ]
+            Specifies which errors are fatal, causing the scheduler to exit.
+            The default is "config".  The <i>kind</i> strings are:
+
+            <b>none </b>No errors are fatal.
+
+            <b>all  </b>All of the errors below are fatal.
+
+            <b>browse</b>
+                 Browsing initialization errors are fatal, for example
+                 failed connections to the DNS-SD daemon.
+
+            <b>config</b>
+                 Configuration file syntax errors are fatal.
+
+            <b>listen</b>
+                 Listen or Port errors are fatal, except for IPv6 failures
+                 on the loopback or "any" addresses.
+
+            <b>log  </b>Log file creation or write errors are fatal.
+
+            <b>permissions</b>
+                 Bad startup file permissions are fatal, for example shared
+                 TLS certificate and key files with world-read permissions.
+
+       <b>FileDevice Yes</b>
+
+       <b>FileDevice No</b>
+            Specifies whether the file pseudo-device can be used for new
+            printer queues.  The URI "file:///dev/null" is always allowed.
+
+       <b>Group </b><i>group-name-or-number</i>
+            Specifies the group name or ID that will be used when executing
+            external programs.  The default group is operating system
+            specific but is usually "lp" or "nobody".
+
+       <b>LogFilePerm </b><i>mode</i>
+            Specifies the permissions of all log files that the scheduler
+            writes.  The default is "0644".
+
+       <b>PageLog </b>[ <i>filename</i> ]
+
+       <b>PageLog stderr</b>
+
+       <b>PageLog syslog</b>
+            Defines the page log filename.  The value "stderr" causes log
+            entries to be sent to the standard error file when the scheduler
+            is running in the foreground, or to the system log daemon when
+            run in the background.  The value "syslog" causes log entries to
+            be sent to the system log daemon.  Specifying a blank filename
+            disables page log generation.  The server name may be included
+            in filenames using the string "%s", for example:
+
+                PageLog /var/log/cups/%s-page_log
+
+            The default is "/var/log/cups/page_log".
+
+       <b>RemoteRoot </b><i>username</i>
+            Specifies the username that is associated with unauthenticated
+            accesses by clients claiming to be the root user.  The default
+            is "remroot".
+
+       <b>RequestRoot </b><i>directory</i>
+            Specifies the directory that contains print jobs and other HTTP
+            request data.  The default is "/var/spool/cups".
+
+       <b>Sandboxing relaxed</b>
+
+       <b>Sandboxing strict</b>
+            Specifies the level of security sandboxing that is applied to
+            print filters, backends, and other child processes of the
+            scheduler.  The default is "strict".  This directive is
+            currently only used/supported on macOS.
+
+       <b>ServerBin </b><i>directory</i>
+            Specifies the directory containing the backends, CGI programs,
+            filters, helper programs, notifiers, and port monitors.  The
+            default is "/usr/lib/cups" or "/usr/libexec/cups" depending on
+            the platform.
+
+       <b>ServerKeychain </b><i>path</i>
+            Specifies the location of TLS certificates and private keys.
+            The default is "/Library/Keychains/System.keychain" on macOS and
+            "/etc/cups/ssl" on all other operating systems.  macOS uses its
+            keychain database to store certificates and keys while other
+            platforms use separate files in the specified directory, *.crt
+            for PEM-encoded certificates and *.key for PEM-encoded private
+            keys.
+
+       <b>ServerRoot </b><i>directory</i>
+            Specifies the directory containing the server configuration
+            files.  The default is "/etc/cups".
+
+       <b>SyncOnClose Yes</b>
+
+       <b>SyncOnClose No</b>
+            Specifies whether the scheduler calls <a href="../man2/fsync.2.html">fsync(2)</a> after writing
+            configuration or state files.  The default is "No".
+
+       <b>SystemGroup </b><i>group-name</i> [ ... <i>group-name</i> ]
+            Specifies the group(s) to use for <i>@SYSTEM</i> group authentication.
+            The default contains "admin", "lpadmin", "root", "sys", and/or
+            "system".
+
+       <b>TempDir </b><i>directory</i>
+            Specifies the directory where temporary files are stored.  The
+            default is "/var/spool/cups/tmp".
+
+       <b>User </b><i>username</i>
+            Specifies the user name or ID that is used when running external
+            programs.  The default is "lp".
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="classes.conf.5.html">classes.conf(5)</a>, <a href="../man1/cups.1.html">cups(1)</a>, <a href="../man8/cupsd.8.html">cupsd(8)</a>, <a href="cupsd.conf.5.html">cupsd.conf(5)</a>, <a href="mime.convs.5.html">mime.convs(5)</a>,
+       <a href="mime.types.5.html">mime.types(5)</a>, <a href="printers.conf.5.html">printers.conf(5)</a>, <a href="subscriptions.conf.5.html">subscriptions.conf(5)</a>, CUPS Online
+       Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Copyright © 2007-2017 by Apple Inc.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>CUPS</i> (a standards-based, open source
+       printing system) project.  Information about the project can be found
+       at ⟨<a href="http://www.cups.org/">http://www.cups.org/</a>⟩.  If you have a bug report for this manual
+       page, see ⟨<a href="http://www.cups.org/">http://www.cups.org/</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/apple/cups">https://github.com/apple/cups</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">19 September 2016                   CUPS                  cups-files.conf(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="cupsd.conf.5.html">cupsd.conf(5)</a>,&nbsp; 
+    <a href="cupsd-logs.5.html">cupsd-logs(5)</a>,&nbsp; 
+    <a href="mime.convs.5.html">mime.convs(5)</a>,&nbsp; 
+    <a href="mime.types.5.html">mime.types(5)</a>,&nbsp; 
+    <a href="../man7/backend.7.html">backend(7)</a>,&nbsp; 
+    <a href="../man7/filter.7.html">filter(7)</a>,&nbsp; 
+    <a href="../man8/cupsd.8.html">cupsd(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

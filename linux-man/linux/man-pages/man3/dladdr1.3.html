@@ -1,0 +1,336 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>dladdr(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">DLADDR(3)                 Linux Programmer's Manual                DLADDR(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       dladdr, dladdr1 - translate address to symbolic information
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#define _GNU_SOURCE</b>
+       <b>#include &lt;dlfcn.h&gt;</b>
+
+       <b>int dladdr(void *</b><i>addr</i><b>, Dl_info *</b><i>info</i><b>);</b>
+
+       <b>int dladdr1(void *</b><i>addr</i><b>, Dl_info *</b><i>info</i><b>, void **</b><i>extra_info</i><b>, int </b><i>flags</i><b>);</b>
+
+       Link with <i>-ldl</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The function <b>dladdr</b>() determines whether the address specified in
+       <i>addr</i> is located in one of the shared objects loaded by the calling
+       application.  If it is, then <b>dladdr</b>() returns information about the
+       shared object and symbol that overlaps <i>addr</i>.  This information is
+       returned in a <i>Dl_info</i> structure:
+
+           typedef struct {
+               const char *dli_fname;  /* Pathname of shared object that
+                                          contains address */
+               void       *dli_fbase;  /* Base address at which shared
+                                          object is loaded */
+               const char *dli_sname;  /* Name of symbol whose definition
+                                          overlaps <i>addr</i> */
+               void       *dli_saddr;  /* Exact address of symbol named
+                                          in <i>dli_sname</i> */
+           } Dl_info;
+
+       If no symbol matching <i>addr</i> could be found, then <i>dli_sname</i> and
+       <i>dli_saddr</i> are set to NULL.
+
+       The function <b>dladdr1</b>() is like <b>dladdr</b>(), but returns additional
+       information via the argument <i>extra_info</i>.  The information returned
+       depends on the value specified in <i>flags</i>, which can have one of the
+       following values:
+
+       <b>RTLD_DL_LINKMAP</b>
+              Obtain a pointer to the link map for the matched file.  The
+              <i>extra_info</i> argument points to a pointer to a <i>link_map</i>
+              structure (i.e., <i>struct link_map **</i>), defined in <i>&lt;link.h&gt;</i> as:
+
+                  struct link_map {
+                      ElfW(Addr) l_addr;  /* Difference between the
+                                             address in the ELF file and
+                                             the address in memory */
+                      char      *l_name;  /* Absolute pathname where
+                                             object was found */
+                      ElfW(Dyn) *l_ld;    /* Dynamic section of the
+                                             shared object */
+                      struct link_map *l_next, *l_prev;
+                                          /* Chain of loaded objects */
+
+                      /* Plus additional fields private to the
+                         implementation */
+                  };
+
+       <b>RTLD_DL_SYMENT</b>
+              Obtain a pointer to the ELF symbol table entry of the matching
+              symbol.  The <i>extra_info</i> argument is a pointer to a symbol
+              pointer: <i>const ElfW(Sym) **</i>.  The <i>ElfW</i>() macro definition
+              turns its argument into the name of an ELF data type suitable
+              for the hardware architecture.  For example, on a 64-bit
+              platform, <i>ElfW(Sym)</i> yields the data type name <i>Elf64_Sym</i>, which
+              is defined in <i>&lt;elf.h&gt;</i> as:
+
+                  typedef struct  {
+                      Elf64_Word    st_name;     /* Symbol name */
+                      unsigned char st_info;     /* Symbol type and binding */
+                      unsigned char st_other;    /* Symbol visibility */
+                      Elf64_Section st_shndx;    /* Section index */
+                      Elf64_Addr    st_value;    /* Symbol value */
+                      Elf64_Xword   st_size;     /* Symbol size */
+                  } Elf64_Sym;
+
+              The <i>st_name</i> field is an index into the string table.
+
+              The <i>st_info</i> field encodes the symbol's type and binding.  The
+              type can be extracted using the macro <b>ELF64_ST_TYPE(st_info)</b>
+              (or <b>ELF32_ST_TYPE() </b>on 32-bit platforms), which yields one of
+              the following values:
+
+                  <b>Value           Description</b>
+                  <b>STT_NOTYPE      </b>Symbol type is unspecified
+                  <b>STT_OBJECT      </b>Symbol is a data object
+                  <b>STT_FUNC        </b>Symbol is a code object
+                  <b>STT_SECTION     </b>Symbol associated with a section
+                  <b>STT_FILE        </b>Symbol's name is file name
+                  <b>STT_COMMON      </b>Symbol is a common data object
+                  <b>STT_TLS         </b>Symbol is thread-local data object
+                  <b>STT_GNU_IFUNC   </b>Symbol is indirect code object
+
+              The symbol binding can be extracted from the <i>st_info</i> field
+              using the macro <b>ELF64_ST_BIND(st_info) </b>(or <b>ELF32_ST_BIND() </b>on
+              32-bit platforms), which yields one of the following values:
+
+                  <b>Value            Description</b>
+                  <b>STB_LOCAL        </b>Local symbol
+                  <b>STB_GLOBAL       </b>Global symbol
+                  <b>STB_WEAK         </b>Weak symbol
+                  <b>STB_GNU_UNIQUE   </b>Unique symbol
+
+              The <i>st_other</i> field contains the symbol's visibility, which can
+              be extracted using the macro <b>ELF64_ST_VISIBILITY(st_info) </b>(or
+              <b>ELF32_ST_VISIBILITY() </b>on 32-bit platforms), which yields one
+              of the following values:
+
+                  <b>Value           Description</b>
+                  <b>STV_DEFAULT     </b>Default symbol visibility rules
+                  <b>STV_INTERNAL    </b>Processor-specific hidden class
+                  <b>STV_HIDDEN      </b>Symbol unavailable in other modules
+                  <b>STV_PROTECTED   </b>Not preemptible, not exported
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, these functions return a nonzero value.  If the address
+       specified in <i>addr</i> could be matched to a shared object, but not to a
+       symbol in the shared object, then the <i>info-&gt;dli_sname</i> and
+       <i>info-&gt;dli_saddr</i> fields are set to NULL.
+
+       If the address specified in <i>addr</i> could not be matched to a shared
+       object, then these functions return 0.  In this case, an error
+       message is <i>not</i> available via <a href="dlerror.3.html">dlerror(3)</a>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>dladdr</b>() is present in glibc 2.0 and later.  <b>dladdr1</b>() first appeared
+       in glibc 2.3.3.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────────────┬───────────────┬─────────┐
+       │<b>Interface           </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────────────┼───────────────┼─────────┤
+       │<b>dladdr</b>(), <b>dladdr1</b>() │ Thread safety │ MT-Safe │
+       └────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are nonstandard GNU extensions that are also present
+       on Solaris.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Sometimes, the function pointers you pass to <b>dladdr</b>() may surprise
+       you.  On some architectures (notably i386 and x86_64), <i>dli_fname</i> and
+       <i>dli_fbase</i> may end up pointing back at the object from which you
+       called <b>dladdr</b>(), even if the function used as an argument should come
+       from a dynamically linked library.
+
+       The problem is that the function pointer will still be resolved at
+       compile time, but merely point to the <i>plt</i> (Procedure Linkage Table)
+       section of the original object (which dispatches the call after
+       asking the dynamic linker to resolve the symbol).  To work around
+       this, you can try to compile the code to be position-independent:
+       then, the compiler cannot prepare the pointer at compile time any
+       more and <a href="../man1/gcc.1.html">gcc(1)</a> will generate code that just loads the final symbol
+       address from the <i>got</i> (Global Offset Table) at run time before passing
+       it to <b>dladdr</b>().
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="dl_iterate_phdr.3.html">dl_iterate_phdr(3)</a>, <a href="dlinfo.3.html">dlinfo(3)</a>, <a href="dlopen.3.html">dlopen(3)</a>, <a href="dlsym.3.html">dlsym(3)</a>, <a href="../man8/ld.so.8.html">ld.so(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-08-08                        DLADDR(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="dlerror.3.html">dlerror(3)</a>,&nbsp; 
+    <a href="dlinfo.3.html">dlinfo(3)</a>,&nbsp; 
+    <a href="dl_iterate_phdr.3.html">dl_iterate_phdr(3)</a>,&nbsp; 
+    <a href="dlopen.3.html">dlopen(3)</a>,&nbsp; 
+    <a href="dlsym.3.html">dlsym(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="dladdr.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

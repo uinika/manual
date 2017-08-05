@@ -1,0 +1,413 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>slapd-bdb(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFIGURATION">CONFIGURATION</a> | <a href="#ACCESS_CONTROL">ACCESS&nbsp;CONTROL</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SLAPD-BDB(5)                 File Formats Manual                SLAPD-BDB(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       slapd-bdb, slapd-hdb - Berkeley DB backends to slapd
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ETCDIR/slapd.conf</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>bdb </b>backend to <a href="../man8/slapd.8.html">slapd(8)</a> uses the Oracle Berkeley DB (BDB) package
+       to store data.  It makes extensive use of indexing and caching to
+       speed data access.
+
+       Note that BDB is deprecated and support will be dropped in future
+       OpenLDAP releases. Installations should use the <b>mdb </b>backend instead.
+
+       <b>hdb </b>is a variant of the <b>bdb </b>backend that uses a hierarchical database
+       layout which supports subtree renames. It is both more space-
+       efficient and more execution-efficient than the <b>bdb </b>backend.  It is
+       otherwise identical to the <b>bdb </b>behavior, and all the same
+       configuration options apply.
+
+       It is noted that these options are intended to complement Berkeley DB
+       configuration options set in the environment's <b>DB_CONFIG </b>file.  See
+       Berkeley DB documentation for details on <b>DB_CONFIG </b>configuration
+       options.  Where there is overlap, settings in <b>DB_CONFIG </b>take
+       precedence.
+</pre>
+<h2><a id="CONFIGURATION" href="#CONFIGURATION"></a>CONFIGURATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These <b>slapd.conf </b>options apply to the <b>bdb </b>and <b>hdb </b>backend database.
+       That is, they must follow a "database bdb" or "database hdb" line and
+       come before any subsequent "backend" or "database" lines.  Other
+       database options are described in the <a href="slapd.conf.5.html">slapd.conf(5)</a> manual page.
+
+       <b>cachesize </b><i>&lt;integer&gt;</i>
+              Specify the size in entries of the in-memory entry cache
+              maintained by the <b>bdb </b>or <b>hdb </b>backend database instance.  The
+              default is 1000 entries.
+
+       <b>cachefree </b><i>&lt;integer&gt;</i>
+              Specify the number of entries to free from the entry cache
+              when the cache reaches the <b>cachesize </b>limit.  The default is 1
+              entry.
+
+       <b>checkpoint </b><i>&lt;kbyte&gt; &lt;min&gt;</i>
+              Specify the frequency for checkpointing the database
+              transaction log.  A checkpoint operation flushes the database
+              buffers to disk and writes a checkpoint record in the log.
+              The checkpoint will occur if either <i>&lt;kbyte&gt;</i> data has been
+              written or <i>&lt;min&gt;</i> minutes have passed since the last
+              checkpoint.  Both arguments default to zero, in which case
+              they are ignored. When the <i>&lt;min&gt;</i> argument is non-zero, an
+              internal task will run every <i>&lt;min&gt;</i> minutes to perform the
+              checkpoint.  See the Berkeley DB reference guide for more
+              details.
+
+       <b>checksum</b>
+              Enable checksum validation of DB pages whenever they are read
+              from disk.  This setting can only be configured before any
+              database files are created.
+
+       <b>cryptfile </b><i>&lt;file&gt;</i>
+              Specify the pathname of a file containing an encryption key to
+              use for encrypting the database. Encryption is performed using
+              Berkeley DB's implementation of AES. Note that encryption can
+              only be configured before any database files are created, and
+              changing the key can only be done after destroying the current
+              database and recreating it. Encryption is not enabled by
+              default, and some distributions of Berkeley DB do not support
+              encryption.
+
+       <b>cryptkey </b><i>&lt;key&gt;</i>
+              Specify an encryption key to use for encrypting the database.
+              This option may be used when a separate <i>cryptfile</i> is not
+              desired. Only one of <b>cryptkey </b>or <b>cryptfile </b>may be configured.
+
+       <b>dbconfig </b><i>&lt;Berkeley-DB-setting&gt;</i>
+              Specify a configuration directive to be placed in the
+              <b>DB_CONFIG </b>file of the database directory. The <b>dbconfig</b>
+              directive is just a convenience to allow all necessary
+              configuration to be set in the <b>slapd.conf </b>file.  The options
+              set using this directive will only be written to the <b>DB_CONFIG</b>
+              file if no such file existed at server startup time, otherwise
+              they are completely ignored. This allows one to set initial
+              values without overwriting/destroying a <b>DB_CONFIG </b>file that
+              was already customized through other means.  This directive
+              may be specified multiple times, as needed.  For example:
+                   dbconfig set_cachesize 0 1048576 0
+                   dbconfig set_lg_bsize 2097152
+
+       <b>dbnosync</b>
+              Specify that on-disk database contents should not be
+              immediately synchronized with in memory changes.  Enabling
+              this option may improve performance at the expense of data
+              security.  See the Berkeley DB reference guide for more
+              details.
+
+       <b>dbpagesize  </b><i>&lt;dbfile&gt; &lt;size&gt;</i>
+              Specify the page size to use for a particular database file,
+              in units of 1024 bytes. The default for the <b>id2entry </b>file is
+              16, the default for all other files depends on the size of the
+              underlying filesystem's block size (typically 4 or 8).  The
+              maximum that BerkeleyDB supports is 64. This setting usually
+              should not need to be changed, but if BerkeleyDB's "db_stat
+              -d" shows a large amount of overflow pages in use in a file,
+              setting a larger size may increase performance at the expense
+              of data integrity. This setting only takes effect when a
+              database is being newly created. See the Berkeley DB reference
+              guide for more details.
+
+       <b>directory </b><i>&lt;directory&gt;</i>
+              Specify the directory where the BDB files containing this
+              database and associated indexes live.  A separate directory
+              must be specified for each database.  The default is
+              <b>LOCALSTATEDIR/openldap-data</b>.
+
+       <b>dirtyread</b>
+              Allow reads of modified but not yet committed data.  Usually
+              transactions are isolated to prevent other operations from
+              accessing uncommitted data.  This option may improve
+              performance, but may also return inconsistent results if the
+              data comes from a transaction that is later aborted.  In this
+              case, the modified data is discarded and a subsequent search
+              will return a different result.
+
+       <b>dncachesize </b><i>&lt;integer&gt;</i>
+              Specify the maximum number of DNs in the in-memory DN cache.
+              Ideally this cache should be large enough to contain the DNs
+              of every entry in the database. If set to a smaller value than
+              the <b>cachesize </b>it will be silently increased to equal the
+              <b>cachesize</b>. The default value is 0 which means unlimited, i.e.
+              the DN cache will grow without bound.
+
+              It should be noted that the <b>DN cache </b>is allowed to temporarily
+              grow beyond the configured size. It does this if many entries
+              are locked when it tries to do a purge, because that means
+              they're legitimately in use. Also, the <b>DN cache </b>never purges
+              entries that have cached children, so depending on the shape
+              of the DIT, it could have lots of cached DNs over the defined
+              limit.
+
+       <b>idlcachesize </b><i>&lt;integer&gt;</i>
+              Specify the size of the in-memory index cache, in index slots.
+              The default is zero. A larger value will speed up frequent
+              searches of indexed entries. An <b>hdb </b>database needs a large
+              <b>idlcachesize </b>for good search performance, typically three
+              times the <b>cachesize </b>(entry cache size) or larger.
+
+       <b>index </b>{<i>&lt;attrlist&gt;</i>|<b>default</b>} [<b>pres</b>,<b>eq</b>,<b>approx</b>,<b>sub</b>,<i>&lt;special&gt;</i>]
+              Specify the indexes to maintain for the given attribute (or
+              list of attributes).  Some attributes only support a subset of
+              indexes.  If only an <i>&lt;attr&gt;</i> is given, the indices specified
+              for <b>default </b>are maintained.  Note that setting a default does
+              not imply that all attributes will be indexed. Also, for best
+              performance, an <b>eq </b>index should always be configured for the
+              <b>objectClass </b>attribute.
+
+              A number of special index parameters may be specified.  The
+              index type <b>sub </b>can be decomposed into <b>subinitial</b>, <b>subany</b>, and
+              <b>subfinal </b>indices.  The special type <b>nolang </b>may be specified to
+              disallow use of this index by language subtypes.  The special
+              type <b>nosubtypes </b>may be specified to disallow use of this index
+              by named subtypes.  Note: changing <b>index </b>settings in
+              slapindex(8);
+              changing <b>index </b>settings dynamically by LDAPModifying
+              "cn=config" automatically causes rebuilding of the indices
+              online in a background task.
+
+       <b>linearindex</b>
+              Tell <b>slapindex </b>to index one attribute at a time. By default,
+              all indexed attributes in an entry are processed at the same
+              time. With this option, each indexed attribute is processed
+              individually, using multiple passes through the entire
+              database. This option improves <b>slapindex </b>performance when the
+              database size exceeds the <b>dbcache </b>size. When the <b>dbcache </b>is
+              large enough, this option is not needed and will decrease
+              performance.  Also by default, <b>slapadd </b>performs full indexing
+              and so a separate <b>slapindex </b>run is not needed. With this
+              option, <b>slapadd </b>does no indexing and <b>slapindex </b>must be used.
+
+       <b>lockdetect </b>{<b>oldest</b>|<b>youngest</b>|<b>fewest</b>|<b>random</b>|<b>default</b>}
+              Specify which transaction to abort when a deadlock is
+              detected.  The default is <b>random</b>.
+
+       <b>mode </b><i>&lt;integer&gt;</i>
+              Specify the file protection mode that newly created database
+              index files should have.  The default is 0600.
+
+       <b>searchstack </b><i>&lt;depth&gt;</i>
+              Specify the depth of the stack used for search filter
+              evaluation.  Search filters are evaluated on a stack to
+              accommodate nested AND / OR clauses. An individual stack is
+              assigned to each server thread.  The depth of the stack
+              determines how complex a filter can be evaluated without
+              requiring any additional memory allocation. Filters that are
+              nested deeper than the search stack depth will cause a
+              separate stack to be allocated for that particular search
+              operation. These allocations can have a major negative impact
+              on server performance, but specifying too much stack will also
+              consume a great deal of memory.  Each search stack uses 512K
+              bytes per level. The default stack depth is 16, thus 8MB per
+              thread is used.
+
+       <b>shm_key </b><i>&lt;integer&gt;</i>
+              Specify a key for a shared memory BDB environment. By default
+              the BDB environment uses memory mapped files. If a non-zero
+              value is specified, it will be used as the key to identify a
+              shared memory region that will house the environment.
+</pre>
+<h2><a id="ACCESS_CONTROL" href="#ACCESS_CONTROL"></a>ACCESS CONTROL  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>bdb </b>and <b>hdb </b>backends honor access control semantics as indicated
+       in <a href="slapd.access.5.html">slapd.access(5)</a>.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ETCDIR/slapd.conf</b>
+              default <b>slapd </b>configuration file
+
+       <b>DB_CONFIG</b>
+              Berkeley DB configuration file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="slapd.conf.5.html">slapd.conf(5)</a>, <a href="slapd-config.5.html">slapd-config(5)</a>, <a href="slapd-mdb.5.html">slapd-mdb(5)</a>, <a href="../man8/slapd.8.html">slapd(8)</a>, <a href="../man8/slapadd.8.html">slapadd(8)</a>,
+       <a href="../man8/slapcat.8.html">slapcat(8)</a>, <a href="../man8/slapindex.8.html">slapindex(8)</a>, Berkeley DB documentation.
+</pre>
+<h2><a id="ACKNOWLEDGEMENTS" href="#ACKNOWLEDGEMENTS"></a>ACKNOWLEDGEMENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>OpenLDAP Software </b>is developed and maintained by The OpenLDAP Project
+       &lt;<a href="http://www.openldap.org/">http://www.openldap.org/</a>&gt;.  <b>OpenLDAP Software </b>is derived from the
+       University of Michigan LDAP 3.3 Release.  Originally begun by Kurt
+       Zeilenga. Caching mechanisms originally designed by Jong-Hyuk Choi.
+       Completion and subsequent work, as well as back-hdb, by Howard Chu.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>OpenLDAP</i> (an open source implementation of
+       the Lightweight Directory Access Protocol) project.  Information
+       about the project can be found at ⟨<a href="http://www.openldap.org/">http://www.openldap.org/</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="http://www.openldap.org/its/">http://www.openldap.org/its/</a>⟩.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.openldap.org/openldap.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">OpenLDAP LDVERSION               RELEASEDATE                    SLAPD-BDB(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="slapd.backends.5.html">slapd.backends(5)</a>,&nbsp; 
+    <a href="slapd-ldbm.5.html">slapd-ldbm(5)</a>,&nbsp; 
+    <a href="slapd.overlays.5.html">slapd.overlays(5)</a>,&nbsp; 
+    <a href="slapo-refint.5.html">slapo-refint(5)</a>,&nbsp; 
+    <a href="slapo-translucent.5.html">slapo-translucent(5)</a>,&nbsp; 
+    <a href="slapo-unique.5.html">slapo-unique(5)</a>,&nbsp; 
+    <a href="../man8/slapcat.8.html">slapcat(8)</a>,&nbsp; 
+    <a href="../man8/slapschema.8.html">slapschema(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

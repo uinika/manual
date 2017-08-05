@@ -1,0 +1,365 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmfault(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#C_SYNOPSIS">C&nbsp;SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RUN-TIME_CONTROL">RUN-TIME&nbsp;CONTROL</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#DIAGNOSTICS">DIAGNOSTICS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMFAULT(3)                Library Functions Manual                PMFAULT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>__pmFaultInject</b>,  <b>PM_FAULT_POINT</b>,  <b>PM_FAULT_CHECK</b>, <b>__pmFaultSummary </b>-
+       Fault Injection Infrastracture for QA
+</pre>
+<h2><a id="C_SYNOPSIS" href="#C_SYNOPSIS"></a>C SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;pcp/pmapi.h&gt;</b>
+       <b>#include &lt;pcp/impl.h&gt;</b>
+       <b>#include &lt;pcp/fault.h&gt;</b>
+
+       <b>void __pmFaultInject(const char *</b><i>ident</i><b>, int </b><i>class</i><b>);</b>
+       <b>void __pmFaultSummary(FILE *</b><i>f</i><b>);</b>
+
+       <b>PM_FAULT_POINT(</b><i>ident</i><b>, </b><i>class</i><b>);</b>
+       <b>PM_FAULT_CHECK(</b><i>class</i><b>);</b>
+
+       <b>cc -DPM_FAULT_INJECTION=1 ... -lpcp_fault</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       As part of the coverage-driven changes to QA in PCP 3.6, it became
+       apparent that we needed someway to exercise the ``uncommon'' code
+       paths associated with error detection and recovery.
+
+       The facilities described below provide a basic fault injection
+       infrastructure (for <i>libpcp</i> only at this stage, alhough the mechanism
+       is far more general and could easily be extended).
+
+       A special build is required to create <i>libpcp_fault</i> and the associated
+       <i>&lt;pcp/fault.h&gt;</i> header file.  Once this has been done, new QA
+       applications may be built with <b>-DPM_FAULT_INJECTION=1 </b>and/or existing
+       applications can be exercised in presence of fault injection by
+       forcing <i>libpcp_fault</i> to be used in preference to <i>libpcp</i> as described
+       below.
+
+       In the code to be tested, <b>__pmFaultInject </b>defines a fault point at
+       which a fault of type <i>class</i> may be injected.  <i>ident</i> is a string to
+       uniquely identify the fault point across all of the PCP source code,
+       so something like "libpcp/" __FILE__ ":&lt;number&gt;" works just fine.
+       The <i>ident</i> string also determines if a fault will be injected at run-
+       time or not - refer to the <b>RUN-TIME CONTROL </b>section below.  <i>class</i>
+       selects a failure type, using one of the following defined values
+       (this list may well grow over time):
+
+       <b>PM_FAULT_ALLOC</b>
+              Will cause the <b>next </b>call to <a href="malloc.3.html">malloc(3)</a>, <a href="realloc.3.html">realloc(3)</a> or <a href="strdup.3.html">strdup(3)</a>
+              to fail, returning NULL and setting <i><a href="errno.3.html">errno</a></i> to <b>ENOMEM</b>.  We could
+              extend the coverage to all of the malloc-related routines, but
+              these three are sufficient to cover the vast majority of the
+              uses within <i>libpcp</i>.
+
+       <b>PM_FAULT_PMAPI</b>
+              Will cause the <b>next </b>call to a PMAPI routine to fail by
+              returning the (new) PCP error code <b>PM_ERR_FAULT</b>.  At the this
+              stage, only <b>__pmRegisterAnon</b>(3) has been instrumented as a
+              proof of concept for this part of the facility.
+
+       <b>PM_FAULT_TIMEOUT</b>
+              Will cause the <b>next </b>call to an instrumented routine to return
+              the PCP error code <b>PM_ERR_TIMEOUT.  </b>At this stage, only
+              <b>__pmGetPDU</b>(3) has been instrumented to check for this class of
+              fault injection.
+
+       To allow fault injection to co-exist within the production source
+       code, <b>PM_FAULT_POINT </b>is a macro that emits no code by default, but
+       when <b>PM_FAULT_INJECTION </b>is defined this becomes a call to
+       <b>__pmFaultInject</b>.  Throughout <i>libpcp</i> we use <b>PM_FAULT_POINT </b>and <b>not</b>
+       <b>__pmFaultInject </b>so that both <i>libpcp</i> and <i>libpcp_fault</i> can be built
+       from the same source code.
+
+       Similarly, the macro <b>PM_FAULT_CHECK </b>emits no code unless
+       <b>PM_FAULT_INJECTION </b>is defined, in which case if a fault of type <i>class</i>
+       has been armed with <b>__pmFaultInject </b>then, the enclosing routine will
+       trigger the associated error behaviour.  For the moment, this only
+       works for the following <i>class</i> types:
+
+       <b>PM_FAULT_PMAPI</b>
+              The enclosing routine will return immediately with the value
+              <b>PM_ERR_FAULT </b>- this assumes the enclosing routine is of type
+              <b>int foo(...)  </b>like all of the PMAPI routines.
+
+       <b>PM_FAULT_TIMEOUT</b>
+              The enclosing routine will return immediately with the value
+              <b>PM_ERR_TIMEOUT </b>- this assumes the enclosing routine is of type
+              <b>int foo(...)  </b>like all of the PMAPI routines.
+
+       A summary of fault points seen and faults injected is produced on
+       stdio stream <i>f</i> by <b>__pmFaultSummary</b>.
+
+       Additional tracing (via <b>-Dfault </b>and <b>DBG_TRACE_FAULT</b>) and a new PMAPI
+       error code (<b>PM_ERR_FAULT</b>) are also defined, although these will only
+       ever be seen or used in <i>libpcp_fault</i>.  If <b>DBG_TRACE_FAULT </b>is set the
+       first time <b>__pmFaultInject </b>is called, then <b>__pmFaultSummary </b>will be
+       called automatically to report on <i>stderr</i> when the application exits
+       (via <a href="atexit.3.html">atexit(3)</a>).
+
+       Fault injection cannot be nested.  Each call to <b>__pmFaultInject</b>
+       clears any previous fault injection that has been armed, but not yet
+       executed.
+
+       The fault injection infrastructure is <b>not </b>thread-safe and should only
+       be used with applications that are known to be single-threaded.
+</pre>
+<h2><a id="RUN-TIME_CONTROL" href="#RUN-TIME_CONTROL"></a>RUN-TIME CONTROL  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       By default, no fault injection is enabled at run-time, even when
+       <b>__pmFaultInject </b>is called.
+
+       Faults are selectively enabled using a control file, identified by
+       the environment variable <b>$PM_FAULT_CONTROL</b>; if this is not set, no
+       faults are enabled.
+
+       The control file (if it exists) is read the first time
+       <b>__pmFaultInject </b>is called, and contains lines of the form:
+               <i>ident op number</i>
+       that define fault injection guards.
+
+       <i>ident</i> is a fault point string (as defined by a call to
+       <b>__pmFaultInject</b>, or more usually the <b>PM_FAULT_POINT </b>macro).  So one
+       needs access to the <i>libpcp</i> source code to determine the available
+       <i>ident</i> strings and their semantics.
+
+       <i>op</i> is one of the C-style operators <b>&gt;=</b>, <b>&gt;</b>, <b>==</b>, <b>&lt;</b>, <b>&lt;=</b>, <b>!= </b>or <b>% </b>and
+       <i>number</i> is an unsigned integer.  <i>op number</i> is optional and the default
+       is <b>&gt;0</b>
+
+       The semantics of the fault injection guards are that each time
+       <b>__pmFaultInject </b>is called for a particular <i>ident</i>, a trip count is
+       incremented (the first trip is 1); if the C-style expression
+       <i>tripcount op number</i> has the value 1 (so <b>true </b>for most <i>op</i>s, or the
+       remainder equals 1 for the <b>% </b><i>op</i>), then a fault of the <i>class</i> defined
+       for the fault point associated with <i>ident</i> will be armed, and executed
+       as soon as possible.
+
+       Within the control file, blank lines are ignored and lines beginning
+       with # are treated as comments.
+
+       For an existing application linked with <i>libpcp</i> fault injection may
+       still be used by forcing <i>libpcp_fault</i> to be used in the place of
+       <i>libpcp</i>.  The following example shows how this might be done.
+       $ export PM_FAULT_CONTROL=/tmp/control
+       $ cat $PM_FAULT_CONTROL
+       # ok for 2 trips, then inject errors
+       libpcp/events.c:1  &gt;2
+
+       $ export LD_PRELOAD=/usr/lib/libpcp_fault.so
+       $ pmevent -Dfault -s 3 sample.event.records
+       host:      localhost
+       samples:   3
+       interval:  1.00 sec
+       sample.event.records[fungus]: 0 event records
+       __pmFaultInject(libpcp/events.c:1) ntrip=1 SKIP
+       sample.event.records[bogus]: 2 event records
+         10:46:12.413 --- event record [0] flags 0x1 (point) ---
+           sample.event.param_string "fetch #0"
+         10:46:12.413 --- event record [1] flags 0x1 (point) ---
+           sample.event.param_string "bingo!"
+       __pmFaultInject(libpcp/events.c:1) ntrip=2 SKIP
+       sample.event.records[fungus]: 1 event records
+         10:46:03.416 --- event record [0] flags 0x1 (point) ---
+       __pmFaultInject(libpcp/events.c:1) ntrip=3 INJECT
+       sample.event.records[bogus]: pmUnpackEventRecords: Cannot allocate memory
+       __pmFaultInject(libpcp/events.c:1) ntrip=4 INJECT
+       sample.event.records[fungus]: pmUnpackEventRecords: Cannot allocate memory
+       __pmFaultInject(libpcp/events.c:1) ntrip=5 INJECT
+       sample.event.records[bogus]: pmUnpackEventRecords: Cannot allocate memory
+       === Fault Injection Summary Report ===
+       libpcp/events.c:1: guard trip&gt;2, 5 trips, 3 faults
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Refer to the PCP and PCP QA source code.
+
+       <i>src/libpcp/src/derive.c</i> uses <b>PM_FAULT_CHECK</b>.
+
+       <i>src/libpcp/src/err.c</i> and <i>src/libpcp/src/events.c</i> use <b>PM_FAULT_POINT</b>.
+
+       <i>src/libpcp/src/fault.c</i> contains all of the the underlying
+       implementation.
+
+       <i>src/libpcp_fault</i> contains the recipe and Makefile for creating and
+       installing <i>libpcp_fault</i> and <i>&lt;pcp/fault.h&gt;</i>.
+
+       <i>QA/477</i> and <i>QA/478</i> show examples of control file use.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>PM_FAULT_CONTROL</b>
+              Full path to the fault injection control file.
+
+       <b>LD_PRELOAD</b>
+              Force <i>libpcp_fault</i> to be used in preference to <i>libpcp</i>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PMAPI.3.html">PMAPI(3)</a>
+</pre>
+<h2><a id="DIAGNOSTICS" href="#DIAGNOSTICS"></a>DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Some non-recoverable errors are reported on <i>stderr</i>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                                              PMFAULT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

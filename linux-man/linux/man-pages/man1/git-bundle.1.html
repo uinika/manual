@@ -1,0 +1,345 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>git-bundle(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SPECIFYING_REFERENCES">SPECIFYING&nbsp;REFERENCES</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#GIT">GIT</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GIT-BUNDLE(1)                    Git Manual                    GIT-BUNDLE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       git-bundle - Move objects and refs by archive
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git bundle</i> create &lt;file&gt; &lt;git-rev-list-args&gt;
+       <i>git bundle</i> verify &lt;file&gt;
+       <i>git bundle</i> list-heads &lt;file&gt; [&lt;refname&gt;...]
+       <i>git bundle</i> unbundle &lt;file&gt; [&lt;refname&gt;...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Some workflows require that one or more branches of development on
+       one machine be replicated on another machine, but the two machines
+       cannot be directly connected, and therefore the interactive Git
+       protocols (git, ssh, http) cannot be used. This command provides
+       support for <i>git fetch</i> and <i>git pull</i> to operate by packaging objects
+       and references in an archive at the originating machine, then
+       importing those into another repository using <i>git fetch</i> and <i>git pull</i>
+       after moving the archive by some means (e.g., by sneakernet). As no
+       direct connection between the repositories exists, the user must
+       specify a basis for the bundle that is held by the destination
+       repository: the bundle assumes that all objects in the basis are
+       already in the destination repository.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       create &lt;file&gt;
+           Used to create a bundle named <i>file</i>. This requires the
+           <i>git-rev-list-args</i> arguments to define the bundle contents.
+
+       verify &lt;file&gt;
+           Used to check that a bundle file is valid and will apply cleanly
+           to the current repository. This includes checks on the bundle
+           format itself as well as checking that the prerequisite commits
+           exist and are fully linked in the current repository.  <i>git bundle</i>
+           prints a list of missing commits, if any, and exits with a
+           non-zero status.
+
+       list-heads &lt;file&gt;
+           Lists the references defined in the bundle. If followed by a list
+           of references, only references matching those given are printed
+           out.
+
+       unbundle &lt;file&gt;
+           Passes the objects in the bundle to <i>git index-pack</i> for storage in
+           the repository, then prints the names of all defined references.
+           If a list of references is given, only references matching those
+           in the list are printed. This command is really plumbing,
+           intended to be called only by <i>git fetch</i>.
+
+       &lt;git-rev-list-args&gt;
+           A list of arguments, acceptable to <i>git rev-parse</i> and <i>git rev-list</i>
+           (and containing a named ref, see SPECIFYING REFERENCES below),
+           that specifies the specific objects and references to transport.
+           For example, master~10..master causes the current master
+           reference to be packaged along with all objects added since its
+           10th ancestor commit. There is no explicit limit to the number of
+           references and objects that may be packaged.
+
+       [&lt;refname&gt;...]
+           A list of references used to limit the references reported as
+           available. This is principally of use to <i>git fetch</i>, which expects
+           to receive only those references asked for and not necessarily
+           everything in the pack (in this case, <i>git bundle</i> acts like <i>git</i>
+           <i>fetch-pack</i>).
+</pre>
+<h2><a id="SPECIFYING_REFERENCES" href="#SPECIFYING_REFERENCES"></a>SPECIFYING REFERENCES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>git bundle</i> will only package references that are shown by <i>git</i>
+       <i>show-ref</i>: this includes heads, tags, and remote heads. References
+       such as master~1 cannot be packaged, but are perfectly suitable for
+       defining the basis. More than one reference may be packaged, and more
+       than one basis can be specified. The objects packaged are those not
+       contained in the union of the given bases. Each basis can be
+       specified explicitly (e.g. ^master~10), or implicitly (e.g.
+       master~10..master, --since=10.days.ago master).
+
+       It is very important that the basis used be held by the destination.
+       It is okay to err on the side of caution, causing the bundle file to
+       contain objects already in the destination, as these are ignored when
+       unpacking at the destination.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Assume you want to transfer the history from a repository R1 on
+       machine A to another repository R2 on machine B. For whatever reason,
+       direct connection between A and B is not allowed, but we can move
+       data from A to B via some mechanism (CD, email, etc.). We want to
+       update R2 with development made on the branch master in R1.
+
+       To bootstrap the process, you can first create a bundle that does not
+       have any basis. You can use a tag to remember up to what commit you
+       last processed, in order to make it easy to later update the other
+       repository with an incremental bundle:
+
+           machineA$ cd R1
+           machineA$ git bundle create file.bundle master
+           machineA$ git tag -f lastR2bundle master
+
+       Then you transfer file.bundle to the target machine B. Because this
+       bundle does not require any existing object to be extracted, you can
+       create a new repository on machine B by cloning from it:
+
+           machineB$ git clone -b master /home/me/tmp/file.bundle R2
+
+       This will define a remote called "origin" in the resulting repository
+       that lets you fetch and pull from the bundle. The $GIT_DIR/config
+       file in R2 will have an entry like this:
+
+           [remote "origin"]
+               url = /home/me/tmp/file.bundle
+               fetch = refs/heads/*:refs/remotes/origin/*
+
+       To update the resulting mine.git repository, you can fetch or pull
+       after replacing the bundle stored at /home/me/tmp/file.bundle with
+       incremental updates.
+
+       After working some more in the original repository, you can create an
+       incremental bundle to update the other repository:
+
+           machineA$ cd R1
+           machineA$ git bundle create file.bundle lastR2bundle..master
+           machineA$ git tag -f lastR2bundle master
+
+       You then transfer the bundle to the other machine to replace
+       /home/me/tmp/file.bundle, and pull from it.
+
+           machineB$ cd R2
+           machineB$ git pull
+
+       If you know up to what commit the intended recipient repository
+       should have the necessary objects, you can use that knowledge to
+       specify the basis, giving a cut-off point to limit the revisions and
+       objects that go in the resulting bundle. The previous example used
+       the lastR2bundle tag for this purpose, but you can use any other
+       options that you would give to the <a href="git-log.1.html">git-log(1)</a> command. Here are more
+       examples:
+
+       You can use a tag that is present in both:
+
+           $ git bundle create mybundle v1.0.0..master
+
+       You can use a basis based on time:
+
+           $ git bundle create mybundle --since=10.days master
+
+       You can use the number of commits:
+
+           $ git bundle create mybundle -10 master
+
+       You can run git-bundle verify to see if you can extract from a bundle
+       that was created with a basis:
+
+           $ git bundle verify mybundle
+
+       This will list what commits you must have in order to extract from
+       the bundle and will error out if you do not have them.
+
+       A bundle from a recipient repository’s point of view is just like a
+       regular repository which it fetches or pulls from. You can, for
+       example, map references when fetching:
+
+           $ git fetch mybundle master:localRef
+
+       You can also see what references it offers:
+
+           $ git ls-remote mybundle
+</pre>
+<h2><a id="GIT" href="#GIT"></a>GIT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Part of the <a href="git.1.html">git(1)</a> suite
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>git</i> (Git distributed version control system)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://git-scm.com/">http://git-scm.com/</a>⟩.  If you have a bug report for this manual page,
+       see ⟨<a href="http://git-scm.com/community">http://git-scm.com/community</a>⟩.  This page was obtained from the
+       project's upstream Git repository ⟨<a href="https://github.com/git/git.git">https://github.com/git/git.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">Git 2.8.0.rc1                    03/10/2016                    GIT-BUNDLE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="dpkg-source.1.html">dpkg-source(1)</a>,&nbsp; 
+    <a href="git.1.html">git(1)</a>,&nbsp; 
+    <a href="git-fast-export.1.html">git-fast-export(1)</a>,&nbsp; 
+    <a href="git-pack-objects.1.html">git-pack-objects(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

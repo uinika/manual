@@ -1,0 +1,439 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd-resolve(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD-RESOLVE(1)             systemd-resolve            SYSTEMD-RESOLVE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-resolve - Resolve domain names, IPV4 and IPv6 addresses, DNS
+       resource records, and services
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-resolve </b>[OPTIONS...] <i>HOSTNAME</i>...
+
+       <b>systemd-resolve </b>[OPTIONS...] <i>ADDRESS</i>...
+
+       <b>systemd-resolve </b>[OPTIONS...] <b>--type=</b><i>TYPE DOMAIN</i>...
+
+       <b>systemd-resolve </b>[OPTIONS...] <b>--service </b>[[<i>NAME</i>] <i>TYPE</i>] <i>DOMAIN</i>
+
+       <b>systemd-resolve </b>[OPTIONS...] <b>--openpgp </b><i>USER@DOMAIN</i>
+
+       <b>systemd-resolve </b>[OPTIONS...] <b>--tlsa </b><i>DOMAIN[:PORT]</i>
+
+       <b>systemd-resolve </b>[OPTIONS...] <b>--statistics</b>
+
+       <b>systemd-resolve </b>[OPTIONS...] <b>--reset-statistics</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-resolve </b>may be used to resolve domain names, IPv4 and IPv6
+       addresses, DNS resource records and services with the
+       <a href="../man8/systemd-resolved.service.8.html">systemd-resolved.service(8)</a> resolver service. By default, the
+       specified list of parameters will be resolved as hostnames,
+       retrieving their IPv4 and IPv6 addresses. If the parameters specified
+       are formatted as IPv4 or IPv6 operation the reverse operation is
+       done, and a hostname is retrieved for the specified addresses.
+
+       The program's output contains information about the protocol used for
+       the look-up and on which network interface the data was discovered.
+       It also contains information on whether the information could be
+       authenticated. All data for which local DNSSEC validation succeeds is
+       considered authenticated. Moreover all data originating from local,
+       trusted sources is also reported authenticated, including resolution
+       of the local host name, the "localhost" host name or all data from
+       /etc/hosts.
+
+       The <b>--type= </b>switch may be used to specify a DNS resource record type
+       (A, AAAA, SOA, MX, ...) in order to request a specific DNS resource
+       record, instead of the address or reverse address lookups. The
+       special value "help" may be used to list known values.
+
+       The <b>--service </b>switch may be used to resolve <b>SRV</b><b></b>[1] and <b>DNS-SD</b><b></b>[2]
+       services (see below). In this mode, between one and three arguments
+       are required. If three parameters are passed the first is assumed to
+       be the DNS-SD service name, the second the SRV service type, and the
+       third the domain to search in. In this case a full DNS-SD style SRV
+       and TXT lookup is executed. If only two parameters are specified, the
+       first is assumed to be the SRV service type, and the second the
+       domain to look in. In this case no TXT RR is requested. Finally, if
+       only one parameter is specified, it is assumed to be a domain name,
+       that is already prefixed with an SRV type, and an SRV lookup is done
+       (no TXT).
+
+       The <b>--openpgp </b>switch may be used to query PGP keys stored as
+       <b>OPENPGPKEY</b><b></b>[3] resource records. When this option is specified one or
+       more e-mail address must be specified.
+
+       The <b>--tlsa </b>switch maybe be used to query TLS public keys stored as
+       <b>TLSA</b><b></b>[4] resource records. When this option is specified one or more
+       domain names must be specified.
+
+       The <b>--statistics </b>switch may be used to show resolver statistics,
+       including information about the number of successful and failed
+       DNSSEC validations.
+
+       The <b>--reset-statistics </b>may be used to reset various statistics
+       counters maintained the resolver, including those shown in the
+       <b>--statistics </b>output. This operation requires root privileges.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-4</b>, <b>-6</b>
+           By default, when resolving a hostname, both IPv4 and IPv6
+           addresses are acquired. By specifying <b>-4 </b>only IPv4 addresses are
+           requested, by specifying <b>-6 </b>only IPv6 addresses are requested.
+
+       <b>-i </b><i>INTERFACE</i>, <b>--interface=</b><i>INTERFACE</i>
+           Specifies the network interface to execute the query on. This may
+           either be specified as numeric interface index or as network
+           interface string (e.g.  "en0"). Note that this option has no
+           effect if system-wide DNS configuration (as configured in
+           /etc/resolv.conf or /etc/systemd/resolve.conf) in place of
+           per-link configuration is used.
+
+       <b>-p </b><i>PROTOCOL</i>, <b>--protocol=</b><i>PROTOCOL</i>
+           Specifies the network protocol for the query. May be one of "dns"
+           (i.e. classic unicast DNS), "llmnr" (<b>Link-Local Multicast Name</b>
+           <b>Resolution</b><b></b>[5]), "llmnr-ipv4", "llmnr-ipv6" (LLMNR via the
+           indicated underlying IP protocols), "mdns" (<b>Multicast DNS</b><b></b>[6]),
+           "mdns-ipv4", "mdns-ipv6" (MDNS via the indicated underlying IP
+           protocols). By default the lookup is done via all protocols
+           suitable for the lookup. If used, limits the set of protocols
+           that may be used. Use this option multiple times to enable
+           resolving via multiple protocols at the same time. The setting
+           "llmnr" is identical to specifying this switch once with
+           "llmnr-ipv4" and once via "llmnr-ipv6". Note that this option
+           does not force the service to resolve the operation with the
+           specified protocol, as that might require a suitable network
+           interface and configuration. The special value "help" may be used
+           to list known values.
+
+       <b>-t </b><i>TYPE</i>, <b>--type=</b><i>TYPE</i>, <b>-c </b><i>CLASS</i>, <b>--class=</b><i>CLASS</i>
+           Specifies the DNS resource record type (e.g. A, AAAA, MX, ...)
+           and class (e.g. IN, ANY, ...) to look up. If these options are
+           used a DNS resource record set matching the specified class and
+           type is requested. The class defaults to IN if only a type is
+           specified. The special value "help" may be used to list known
+           values.
+
+       <b>--service</b>
+           Enables service resolution. This enables DNS-SD and simple SRV
+           service resolution, depending on the specified list of parameters
+           (see above).
+
+       <b>--service-address=</b><i>BOOL</i>
+           Takes a boolean parameter. If true (the default), when doing a
+           service lookup with <b>--service </b>the hostnames contained in the SRV
+           resource records are resolved as well.
+
+       <b>--service-txt=</b><i>BOOL</i>
+           Takes a boolean parameter. If true (the default), when doing a
+           DNS-SD service lookup with <b>--service </b>the TXT service metadata
+           record is resolved as well.
+
+       <b>--openpgp</b>
+           Enables OPENPGPKEY resource record resolution (see above).
+           Specified e-mail addresses are converted to the corresponding DNS
+           domain name, and any OPENPGPKEY keys are printed.
+
+       <b>--tlsa</b>
+           Enables TLSA resource record resolution (see above). A query will
+           be performed for each of the specified names prefixed with the
+           port and family ("_<i>port</i>._<i>family</i>.<i>domain</i>"). The port number may be
+           specified after a colon (":"), otherwise <b>443 </b>will be used by
+           default. The family may be specified as an argument after <b>--tlsa</b>,
+           otherwise <b>tcp </b>will be used.
+
+       <b>--cname=</b><i>BOOL</i>
+           Takes a boolean parameter. If true (the default), DNS CNAME or
+           DNAME redirections are followed. Otherwise, if a CNAME or DNAME
+           record is encountered while resolving, an error is returned.
+
+       <b>--search=</b><i>BOOL</i>
+           Takes a boolean parameter. If true (the default), any specified
+           single-label hostnames will be searched in the domains configured
+           in the search domain list, if it is non-empty. Otherwise, the
+           search domain logic is disabled.
+
+       <b>--raw</b>[=payload|packet]
+           Dump the answer as binary data. If there is no argument or if the
+           argument is "payload", the payload of the packet is exported. If
+           the argument is "packet", the whole packet is dumped in wire
+           format, prefixed by length specified as a little-endian 64-bit
+           number. This format allows multiple packets to be dumped and
+           unambiguously parsed.
+
+       <b>--legend=</b><i>BOOL</i>
+           Takes a boolean parameter. If true (the default), column headers
+           and meta information about the query response are shown.
+           Otherwise, this output is suppressed.
+
+       <b>--statistics</b>
+           If specified general resolver statistics are shown, including
+           information whether DNSSEC is enabled and available, as well as
+           resolution and validation statistics.
+
+       <b>--reset-statistics</b>
+           Resets the statistics counters shown in <b>--statistics </b>to zero.
+
+       <b>--flush-caches</b>
+           Flushes all DNS resource record caches the service maintains
+           locally.
+
+       <b>--status</b>
+           Shows the global and per-link DNS settings in currently in
+           effect.
+
+       <b>-h</b>, <b>--help</b>
+           Print a short help text and exit.
+
+       <b>--version</b>
+           Print a short version string and exit.
+
+       <b>--no-pager</b>
+           Do not pipe output into a pager.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Example 1. Retrieve the addresses of the "www.0pointer.net" domain</b>
+
+           $ systemd-resolve www.0pointer.net
+           www.0pointer.net: 2a01:238:43ed:c300:10c3:bcf3:3266:da74
+                             85.214.157.71
+
+           -- Information acquired via protocol DNS in 611.6ms.
+           -- Data is authenticated: no
+
+       <b>Example 2. Retrieve the domain of the "85.214.157.71" IP address</b>
+
+           $ systemd-resolve 85.214.157.71
+           85.214.157.71: gardel.0pointer.net
+
+           -- Information acquired via protocol DNS in 1.2997s.
+           -- Data is authenticated: no
+
+       <b>Example 3. Retrieve the MX record of the "yahoo.com" domain</b>
+
+           $ systemd-resolve -t MX yahoo.com --legend=no
+           yahoo.com. IN MX    1 mta7.am0.yahoodns.net
+           yahoo.com. IN MX    1 mta6.am0.yahoodns.net
+           yahoo.com. IN MX    1 mta5.am0.yahoodns.net
+
+       <b>Example 4. Resolve an SRV service</b>
+
+           $ systemd-resolve --service _xmpp-server._tcp gmail.com
+           _xmpp-server._tcp/gmail.com: alt1.xmpp-server.l.google.com:5269 [priority=20, weight=0]
+                                        173.194.210.125
+                                        alt4.xmpp-server.l.google.com:5269 [priority=20, weight=0]
+                                        173.194.65.125
+                                        ...
+
+       <b>Example 5. Retrieve a PGP key</b>
+
+           $ systemd-resolve --openpgp zbyszek@fedoraproject.org
+           d08ee310438ca124a6149ea5cc21b6313b390dce485576eff96f8722._openpgpkey.fedoraproject.org. IN OPENPGPKEY
+                   mQINBFBHPMsBEACeInGYJCb+7TurKfb6wGyTottCDtiSJB310i37/6ZYoeIay/5soJjlMyf
+                   MFQ9T2XNT/0LM6gTa0MpC1st9LnzYTMsT6tzRly1D1UbVI6xw0g0vE5y2Cjk3xUwAynCsSs
+                   ...
+
+       <b>Example 6. Retrieve a TLS key ("=tcp" and ":443" could be skipped)</b>
+
+           $ systemd-resolve --tlsa=tcp fedoraproject.org:443
+           _443._tcp.fedoraproject.org IN TLSA 0 0 1 19400be5b7a31fb733917700789d2f0a2471c0c9d506c0e504c06c16d7cb17c0
+                   -- Cert. usage: CA constraint
+                   -- Selector: Full Certificate
+                   -- Matching type: SHA-256
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="systemd.1.html">systemd(1)</a>, <a href="../man8/systemd-resolved.service.8.html">systemd-resolved.service(8)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. SRV
+           <a href="https://tools.ietf.org/html/rfc2782">https://tools.ietf.org/html/rfc2782</a>
+
+        2. DNS-SD
+           <a href="https://tools.ietf.org/html/rfc6763">https://tools.ietf.org/html/rfc6763</a>
+
+        3. OPENPGPKEY
+           <a href="https://tools.ietf.org/html/rfc7929">https://tools.ietf.org/html/rfc7929</a>
+
+        4. TLSA
+           <a href="https://tools.ietf.org/html/rfc6698">https://tools.ietf.org/html/rfc6698</a>
+
+        5. Link-Local Multicast Name Resolution
+           <a href="https://tools.ietf.org/html/rfc4795">https://tools.ietf.org/html/rfc4795</a>
+
+        6. Multicast DNS
+           <a href="https://www.ietf.org/rfc/rfc6762.txt">https://www.ietf.org/rfc/rfc6762.txt</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                               SYSTEMD-RESOLVE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man8/systemd-resolved.service.8.html">systemd-resolved.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

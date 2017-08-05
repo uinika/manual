@@ -1,0 +1,320 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>opannotate(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#FILES">FILES</a> | <a href="#VERSION">VERSION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">OPANNOTATE(1)              General Commands Manual             OPANNOTATE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       opannotate - produce source or assembly annotated with profile data
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>opannotate </b>[ <i>options</i> ] [profile specification]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>opannotate </b>outputs annotated source and/or assembly from profile data
+       of an OProfile session. See oprofile(1) for how to write profile
+       specifications.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>--assembly / -a</b>
+              Output annotated assembly. The binary file to be annotated
+              does not need full debugging information to use this option,
+              but symbol information <i>is</i> required. Without symbol
+              information, <b>opannotate </b>will silently refuse to annotate the
+              binary.  If this option is combined with --source, then mixed
+              source / assembly annotations are output.
+
+       <b>--demangle / -D none|smart|normal</b>
+              none: no demangling. normal: use default demangler (default)
+              smart: use pattern-matching to make C++ symbol demangling more
+              readable.
+
+       <b>--exclude-dependent / -x</b>
+              Do not include application-specific images for libraries,
+              kernel modules and the kernel. This option only makes sense if
+              the profile session used --separate.
+
+       <b>--exclude-file [files]</b>
+              Exclude all files in the given comma-separated list of glob
+              patterns. This option is supported solely with the <i>--source</i>
+              option. It can be used to filter out source files in the
+              output using the following types of specifications:
+
+              · filenames (basename -- i.e., no path)
+
+              · filename glob specifications (all files whose base filename
+                matches the given pattern)
+
+              · directory segments (all source files located in the
+                specified directory; e.g. "libio")
+
+              · directory segment glob specifications (e.g., "libi*")
+
+       <b>--exclude-symbols / -e [symbols]</b>
+              Exclude all the symbols in the given comma-separated list.
+
+       <b>--help / -? / --usage</b>
+              Show help message.
+
+       <b>--image-path / -p [paths]</b>
+              Comma-separated list of additional paths to search for
+              binaries.  This is needed to find modules in kernels 2.6 and
+              upwards.
+
+       <b>--root / -R [path]</b>
+              A path to a filesystem to search for additional binaries.
+
+       <b>--include-file [files]</b>
+              Only include files in the given comma-separated list of glob
+              patterns.  The same rules apply for this option as for the
+              <i>--exclude-file</i> option.
+
+       <b>--merge / -m [lib,cpu,tid,tgid,unitmask,all]</b>
+              Merge any profiles separated in a --separate session.
+
+       <b>--include-symbols / -i [symbols]</b>
+              Only include symbols in the given comma-separated list.
+
+       <b>--objdump-params [params]</b>
+              Pass the given parameters as extra values when calling
+              objdump.  If more than one option is to be passed to objdump,
+              the parameters must be enclosed in a quoted string.
+
+              An example of where this option is useful is when your
+              toolchain does not automatically recognize instructions that
+              are specific to your processor.  For example, on IBM
+              POWER7/RHEL 6, objdump must be told that a binary file may
+              have POWER7-specific instructions. The opannotate option to
+              show the POWER7-specific instructions is:
+                 --objdump-params=-Mpower7
+
+              The opannotate option to show the POWER7-specific
+              instructions, the source code (--source) and the line numbers
+              (-l) would be:
+                 --objdump-params="-Mpower7 -l --source"
+
+       <b>--output-dir / -o [dir]</b>
+              Output directory. This makes opannotate output one annotated
+              file for each source file. This option can't be used in
+              conjunction with --assembly.
+
+       <b>--search-dirs / -d [paths]</b>
+              Comma-separated list of paths to search for source files. You
+              may need to use this option when the debug information for an
+              image contains relative paths.
+
+       <b>--base-dirs / -b [paths]</b>
+              Comma-separated list of paths to strip from debug source
+              files, prior to looking for them in --search-dirs.
+
+       <b>--session-dir=</b><i>dir_path</i>
+              Use sample database from the specified directory <i>dir_path</i>
+              instead of the default location. If <i>--session-dir</i> is not
+              specified, then <b>opannotate </b>will search for samples in
+              &lt;current_dir&gt;/oprofile_data first. If that directory does not
+              exist, the standard session-dir of /var/lib/oprofile is used.
+
+       <b>--source / -s</b>
+              Output annotated source. This requires debugging information
+              to be available for the binaries.
+
+       <b>--threshold / -t [percentage]</b>
+              For annotated assembly, only output data for symbols that have
+              more than the given percentage of total samples. For profiles
+              using multiple events, if the threshold is reached for any
+              event, then all sample data for the symbol is shown.
+
+              For annotated source, only output data for source files that
+              have more than the given percentage of total samples. For
+              profiles using multiple events, if the threshold is reached
+              for any event, then all sample data for the source file is
+              shown.
+
+       <b>--verbose / -V [options]</b>
+              Give verbose debugging output.
+
+       <b>--version / -v</b>
+              Show version.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       No special environment variables are recognised by opannotate.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>&lt;session_dir&gt;/samples</i>
+              The location of the generated sample files.
+</pre>
+<h2><a id="VERSION" href="#VERSION"></a>VERSION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This man page is current for oprofile-1.2.0git.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>/usr/local/share/doc/oprofile/, oprofile</b>(1)
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>oprofile</i> (a system-wide profiler for Linux)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://oprofile.sourceforge.net/news/">http://oprofile.sourceforge.net/news/</a>⟩.  If you have a bug report for
+       this manual page, see ⟨<a href="http://oprofile.sourceforge.net/bugs/">http://oprofile.sourceforge.net/bugs/</a>⟩.  This
+       page was obtained from the project's upstream Git repository ⟨git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">4th Berkeley Distribution     Wed 05 July 2017                 OPANNOTATE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="oprofile.1.html">oprofile(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

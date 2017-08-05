@@ -1,0 +1,334 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>shm_open(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SHM_OPEN(3)               Linux Programmer's Manual              SHM_OPEN(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       shm_open,  shm_unlink  -  create/open  or  unlink POSIX shared memory
+       objects
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/mman.h&gt;</b>
+       <b>#include &lt;sys/stat.h&gt;        </b>/* For mode constants */
+       <b>#include &lt;fcntl.h&gt;           </b>/* For O_* constants */
+
+       <b>int shm_open(const char *</b><i>name</i><b>, int </b><i>oflag</i><b>, mode_t </b><i>mode</i><b>);</b>
+
+       <b>int shm_unlink(const char *</b><i>name</i><b>);</b>
+
+       Link with <i>-lrt</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>shm_open</b>() creates and opens a new, or opens an existing, POSIX
+       shared memory object.  A POSIX shared memory object is in effect a
+       handle which can be used by unrelated processes to <a href="../man2/mmap.2.html">mmap(2)</a> the same
+       region of shared memory.  The <b>shm_unlink</b>() function performs the
+       converse operation, removing an object previously created by
+       <b>shm_open</b>().
+
+       The operation of <b>shm_open</b>() is analogous to that of <a href="../man2/open.2.html">open(2)</a>.  <i>name</i>
+       specifies the shared memory object to be created or opened.  For
+       portable use, a shared memory object should be identified by a name
+       of the form <i>/somename</i>; that is, a null-terminated string of up to
+       <b>NAME_MAX </b>(i.e., 255) characters consisting of an initial slash,
+       followed by one or more characters, none of which are slashes.
+
+       <i>oflag</i> is a bit mask created by ORing together exactly one of <b>O_RDONLY</b>
+       or <b>O_RDWR </b>and any of the other flags listed here:
+
+       <b>O_RDONLY   </b>Open the object for read access.  A shared memory object
+                  opened in this way can be <a href="../man2/mmap.2.html">mmap(2)</a>ed only for read
+                  (<b>PROT_READ</b>) access.
+
+       <b>O_RDWR     </b>Open the object for read-write access.
+
+       <b>O_CREAT    </b>Create the shared memory object if it does not exist.  The
+                  user and group ownership of the object are taken from the
+                  corresponding effective IDs of the calling process, and
+                  the object's permission bits are set according to the low-
+                  order 9 bits of <i>mode</i>, except that those bits set in the
+                  process file mode creation mask (see <a href="../man2/umask.2.html">umask(2)</a>) are cleared
+                  for the new object.  A set of macro constants which can be
+                  used to define <i>mode</i> is listed in <a href="../man2/open.2.html">open(2)</a>.  (Symbolic
+                  definitions of these constants can be obtained by
+                  including <i>&lt;sys/stat.h&gt;</i>.)
+
+                  A new shared memory object initially has zero length—the
+                  size of the object can be set using <a href="../man2/ftruncate.2.html">ftruncate(2)</a>.  The
+                  newly allocated bytes of a shared memory object are
+                  automatically initialized to 0.
+
+       <b>O_EXCL     </b>If <b>O_CREAT </b>was also specified, and a shared memory object
+                  with the given <i>name</i> already exists, return an error.  The
+                  check for the existence of the object, and its creation if
+                  it does not exist, are performed atomically.
+
+       <b>O_TRUNC    </b>If the shared memory object already exists, truncate it to
+                  zero bytes.
+
+       Definitions of these flag values can be obtained by including
+       <i>&lt;fcntl.h&gt;</i>.
+
+       On successful completion <b>shm_open</b>() returns a new file descriptor
+       referring to the shared memory object.  This file descriptor is
+       guaranteed to be the lowest-numbered file descriptor not previously
+       opened within the process.  The <b>FD_CLOEXEC </b>flag (see <a href="../man2/fcntl.2.html">fcntl(2)</a>) is set
+       for the file descriptor.
+
+       The file descriptor is normally used in subsequent calls to
+       <a href="../man2/ftruncate.2.html">ftruncate(2)</a> (for a newly created object) and <a href="../man2/mmap.2.html">mmap(2)</a>.  After a call
+       to <a href="../man2/mmap.2.html">mmap(2)</a> the file descriptor may be closed without affecting the
+       memory mapping.
+
+       The operation of <b>shm_unlink</b>() is analogous to <a href="../man2/unlink.2.html">unlink(2)</a>: it removes a
+       shared memory object name, and, once all processes have unmapped the
+       object, de-allocates and destroys the contents of the associated
+       memory region.  After a successful <b>shm_unlink</b>(), attempts to
+       <b>shm_open</b>() an object with the same <i>name</i> will fail (unless <b>O_CREAT </b>was
+       specified, in which case a new, distinct object is created).
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>shm_open</b>() returns a nonnegative file descriptor.  On
+       failure, <b>shm_open</b>() returns -1.  <b>shm_unlink</b>() returns 0 on success,
+       or -1 on error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On failure, <i><a href="errno.3.html">errno</a></i> is set to indicate the cause of the error.  Values
+       which may appear in <i><a href="errno.3.html">errno</a></i> include the following:
+
+       <b>EACCES </b>Permission to <b>shm_unlink</b>() the shared memory object was
+              denied.
+
+       <b>EACCES </b>Permission was denied to <b>shm_open</b>() <i>name</i> in the specified
+              <i>mode</i>, or <b>O_TRUNC </b>was specified and the caller does not have
+              write permission on the object.
+
+       <b>EEXIST </b>Both <b>O_CREAT </b>and <b>O_EXCL </b>were specified to <b>shm_open</b>() and the
+              shared memory object specified by <i>name</i> already exists.
+
+       <b>EINVAL </b>The <i>name</i> argument to <b>shm_open</b>() was invalid.
+
+       <b>EMFILE </b>The per-process limit on the number of open file descriptors
+              has been reached.
+
+       <b>ENAMETOOLONG</b>
+              The length of <i>name</i> exceeds <b>PATH_MAX</b>.
+
+       <b>ENFILE </b>The system-wide limit on the total number of open files has
+              been reached.
+
+       <b>ENOENT </b>An attempt was made to <b>shm_open</b>() a <i>name</i> that did not exist,
+              and <b>O_CREAT </b>was not specified.
+
+       <b>ENOENT </b>An attempt was to made to <b>shm_unlink</b>() a <i>name</i> that does not
+              exist.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are provided in glibc 2.2 and later.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌─────────────────────────┬───────────────┬────────────────┐
+       │<b>Interface                </b>│ <b>Attribute     </b>│ <b>Value          </b>│
+       ├─────────────────────────┼───────────────┼────────────────┤
+       │<b>shm_open</b>(), <b>shm_unlink</b>() │ Thread safety │ MT-Safe locale │
+       └─────────────────────────┴───────────────┴────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+
+       POSIX.1-2001 says that the group ownership of a newly created shared
+       memory object is set to either the calling process's effective group
+       ID or "a system default group ID".  POSIX.1-2008 says that the group
+       ownership may be set to either the calling process's effective group
+       ID or, if the object is visible in the filesystem, the group ID of
+       the parent directory.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX leaves the behavior of the combination of <b>O_RDONLY </b>and <b>O_TRUNC</b>
+       unspecified.  On Linux, this will successfully truncate an existing
+       shared memory object—this may not be so on other UNIX systems.
+
+       The POSIX shared memory object implementation on Linux makes use of a
+       dedicated <a href="../man5/tmpfs.5.html">tmpfs(5)</a> filesystem that is normally mounted under
+       <i>/dev/shm</i>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/close.2.html">close(2)</a>, <a href="../man2/fchmod.2.html">fchmod(2)</a>, <a href="../man2/fchown.2.html">fchown(2)</a>, <a href="../man2/fcntl.2.html">fcntl(2)</a>, <a href="../man2/fstat.2.html">fstat(2)</a>, <a href="../man2/ftruncate.2.html">ftruncate(2)</a>,
+       <a href="../man2/memfd_create.2.html">memfd_create(2)</a>, <a href="../man2/mmap.2.html">mmap(2)</a>, <a href="../man2/open.2.html">open(2)</a>, <a href="../man2/umask.2.html">umask(2)</a>, <a href="../man7/shm_overview.7.html">shm_overview(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                      SHM_OPEN(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/execve.2.html">execve(2)</a>,&nbsp; 
+    <a href="../man2/memfd_create.2.html">memfd_create(2)</a>,&nbsp; 
+    <a href="../man2/mmap2.2.html">mmap2(2)</a>,&nbsp; 
+    <a href="../man2/mmap.2.html">mmap(2)</a>,&nbsp; 
+    <a href="../man2/umask.2.html">umask(2)</a>,&nbsp; 
+    <a href="sem_init.3.html">sem_init(3)</a>,&nbsp; 
+    <a href="../man5/tmpfs.5.html">tmpfs(5)</a>,&nbsp; 
+    <a href="../man7/file-hierarchy.7.html">file-hierarchy(7)</a>,&nbsp; 
+    <a href="../man7/sem_overview.7.html">sem_overview(7)</a>,&nbsp; 
+    <a href="../man7/shm_overview.7.html">shm_overview(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="shm_open.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,366 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getpwuid.3p - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#PROLOG">PROLOG</a> | <a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#APPLICATION_USAGE">APPLICATION&nbsp;USAGE</a> | <a href="#RATIONALE">RATIONALE</a> | <a href="#FUTURE_DIRECTIONS">FUTURE&nbsp;DIRECTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COPYRIGHT">COPYRIGHT</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETPWUID(3P)              POSIX Programmer's Manual             GETPWUID(3P)</span>
+</pre>
+<h2><a id="PROLOG" href="#PROLOG"></a>PROLOG  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page is part of the POSIX Programmer's Manual.  The Linux
+       implementation of this interface may differ (consult the
+       corresponding Linux manual page for details of Linux behavior), or
+       the interface may not be implemented on Linux.
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getpwuid, getpwuid_r — search user database for a user ID
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #include &lt;pwd.h&gt;
+
+       struct passwd *getpwuid(uid_t <i>uid</i>);
+       int getpwuid_r(uid_t <i>uid</i>, struct passwd *<i>pwd</i>, char *<i>buffer</i>,
+           size_t <i>bufsize</i>, struct passwd **<i>result</i>);
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>getpwuid</i>() function shall search the user database for an entry
+       with a matching <i>uid</i>.
+
+       The <i>getpwuid</i>() function need not be thread-safe.
+
+       Applications wishing to check for error situations should set <i><a href="errno.3.html">errno</a></i>
+       to 0 before calling <i>getpwuid</i>().  If <i>getpwuid</i>() returns a null pointer
+       and <i><a href="errno.3.html">errno</a></i> is set to non-zero, an error occurred.
+
+       The <i>getpwuid_r</i>() function shall update the <b>passwd </b>structure pointed
+       to by <i>pwd</i> and store a pointer to that structure at the location
+       pointed to by <i>result</i>.  The structure shall contain an entry from the
+       user database with a matching <i>uid</i>.  Storage referenced by the
+       structure is allocated from the memory provided with the <i>buffer</i>
+       parameter, which is <i>bufsize</i> bytes in size. A call to
+       <i>sysconf</i>(_SC_GETPW_R_SIZE_MAX) returns either −1 without changing
+       <i><a href="errno.3.html">errno</a></i> or an initial value suggested for the size of this buffer.  A
+       null pointer shall be returned at the location pointed to by <i>result</i>
+       on error or if the requested entry is not found.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>getpwuid</i>() function shall return a pointer to a <b>struct passwd</b>
+       with the structure as defined in <i>&lt;pwd.h&gt;</i> with a matching entry if
+       found. A null pointer shall be returned if the requested entry is not
+       found, or an error occurs. On error, <i><a href="errno.3.html">errno</a></i> shall be set to indicate
+       the error.
+
+       The application shall not modify the structure to which the return
+       value points, nor any storage areas pointed to by pointers within the
+       structure. The returned pointer, and pointers within the structure,
+       might be invalidated or the structure or the storage areas might be
+       overwritten by a subsequent call to <i>getpwent</i>(), <i>getpwnam</i>(), or
+       <i>getpwuid</i>().
+
+       If successful, the <i>getpwuid_r</i>() function shall return zero;
+       otherwise, an error number shall be returned to indicate the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions may fail if:
+
+       <b>EIO    </b>An I/O error has occurred.
+
+       <b>EINTR  </b>A signal was caught during <i>getpwuid</i>().
+
+       <b>EMFILE </b>All file descriptors available to the process are currently
+              open.
+
+       <b>ENFILE </b>The maximum allowable number of files is currently open in the
+              system.
+
+       The <i>getpwuid_r</i>() function may fail if:
+
+       <b>ERANGE </b>Insufficient storage was supplied via <i>buffer</i> and <i>bufsize</i> to
+              contain the data to be referenced by the resulting <b>passwd</b>
+              structure.
+
+       <i>The following sections are informative.</i>
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Note that <i>sysconf</i>(_SC_GETPW_R_SIZE_MAX) may return −1 if there is no
+       hard limit on the size of the buffer needed to store all the groups
+       returned. This example shows how an application can allocate a buffer
+       of sufficient size to work with <i>getpwuid_r</i>().
+
+           <b>long int initlen = sysconf(_SC_GETPW_R_SIZE_MAX);</b>
+           <b>size_t len;</b>
+           <b>if (initlen == −1)</b>
+               <b>/* Default initial length. */</b>
+               <b>len = 1024;</b>
+           <b>else</b>
+               <b>len = (size_t) initlen;</b>
+           <b>struct passwd result;</b>
+           <b>struct passwd *resultp;</b>
+           <b>char *buffer = malloc(len);</b>
+           <b>if (buffer == NULL)</b>
+               <b>...handle error...</b>
+           <b>int e;</b>
+           <b>while ((e = getpwuid_r(42, &amp;result, buffer, len, &amp;resultp)) == ERANGE)</b>
+               <b>{</b>
+               <b>size_t newlen = 2 * len;</b>
+               <b>if (newlen &lt; len)</b>
+                   <b>...handle error...</b>
+               <b>len = newlen;</b>
+               <b>char *newbuffer = realloc(buffer, len);</b>
+               <b>if (newbuffer == NULL)</b>
+                   <b>...handle error...</b>
+               <b>buffer = newbuffer;</b>
+               <b>}</b>
+           <b>if (e != 0)</b>
+               <b>...handle error...</b>
+           <b>free (buffer);</b>
+
+   <b>Getting an Entry for the Root User</b>
+       The following example gets the user database entry for the user with
+       user ID 0 (root).
+
+           <b>#include &lt;sys/types.h&gt;</b>
+           <b>#include &lt;pwd.h&gt;</b>
+           <b>...</b>
+           <b>uid_t id = 0;</b>
+           <b>struct passwd *pwd;</b>
+
+           pwd = getpwuid(id);
+
+   <b>Finding the Name for the Effective User ID</b>
+       The following example defines <i>pws</i> as a pointer to a structure of type
+       <b>passwd</b>, which is used to store the structure pointer returned by the
+       call to the <i>getpwuid</i>() function. The <i>geteuid</i>() function shall return
+       the effective user ID of the calling process; this is used as the
+       search criteria for the <i>getpwuid</i>() function. The call to <i>getpwuid</i>()
+       shall return a pointer to the structure containing that user ID
+       value.
+
+           <b>#include &lt;unistd.h&gt;</b>
+           <b>#include &lt;sys/types.h&gt;</b>
+           <b>#include &lt;pwd.h&gt;</b>
+           <b>...</b>
+           <b>struct passwd *pws;</b>
+           <b>pws = getpwuid(geteuid());</b>
+
+   <b>Finding an Entry in the User Database</b>
+       The following example uses <i>getpwuid</i>() to search the user database for
+       a user ID that was previously stored in a <b>stat </b>structure, then prints
+       out the user name if it is found. If the user is not found, the
+       program prints the numeric value of the user ID for the entry.
+
+           <b>#include &lt;sys/types.h&gt;</b>
+           <b>#include &lt;pwd.h&gt;</b>
+           <b>#include &lt;stdio.h&gt;</b>
+           <b>...</b>
+           <b>struct stat statbuf;</b>
+           <b>struct passwd *pwd;</b>
+           <b>...</b>
+           <b>if ((pwd = getpwuid(statbuf.st_uid)) != NULL)</b>
+               <b>printf(" %-8.8s", pwd-&gt;pw_name);</b>
+           <b>else</b>
+               <b>printf(" %-8d", statbuf.st_uid);</b>
+</pre>
+<h2><a id="APPLICATION_USAGE" href="#APPLICATION_USAGE"></a>APPLICATION USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Three names associated with the current process can be determined:
+       <i>getpwuid</i>(<i>geteuid</i>()) returns the name associated with the effective
+       user ID of the process; <i>getlogin</i>() returns the name associated with
+       the current login activity; and <i>getpwuid</i>(<i>getuid</i>()) returns the name
+       associated with the real user ID of the process.
+
+       The <i>getpwuid_r</i>() function is thread-safe and returns values in a
+       user-supplied buffer instead of possibly using a static data area
+       that may be overwritten by each call.
+
+       Portable applications should take into account that it is usual for
+       an implementation to return −1 from <i>sysconf</i>() indicating that there
+       is no maximum for _SC_GETPW_R_SIZE_MAX.
+</pre>
+<h2><a id="RATIONALE" href="#RATIONALE"></a>RATIONALE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="FUTURE_DIRECTIONS" href="#FUTURE_DIRECTIONS"></a>FUTURE DIRECTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       None.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="getpwnam.3p.html">getpwnam(3p)</a>, <a href="geteuid.3p.html">geteuid(3p)</a>, <a href="getuid.3p.html">getuid(3p)</a>, <a href="getlogin.3p.html">getlogin(3p)</a>, <a href="sysconf.3p.html">sysconf(3p)</a>
+
+       The Base Definitions volume of POSIX.1‐2008, <a href="../man0/pwd.h.0p.html">pwd.h(0p)</a>,
+       <a href="../man0/sys_types.h.0p.html">sys_types.h(0p)</a>
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Portions of this text are reprinted and reproduced in electronic form
+       from IEEE Std 1003.1, 2013 Edition, Standard for Information
+       Technology -- Portable Operating System Interface (POSIX), The Open
+       Group Base Specifications Issue 7, Copyright (C) 2013 by the
+       Institute of Electrical and Electronics Engineers, Inc and The Open
+       Group.  (This is POSIX.1-2008 with the 2013 Technical Corrigendum 1
+       applied.) In the event of any discrepancy between this version and
+       the original IEEE and The Open Group Standard, the original IEEE and
+       The Open Group Standard is the referee document. The original
+       Standard can be obtained online at <a href="http://www.unix.org/online.html">http://www.unix.org/online.html</a> .
+
+       Any typographical or formatting errors that appear in this page are
+       most likely to have been introduced during the conversion of the
+       source files to man page format. To report such errors, see
+       <a href="https://www.kernel.org/doc/man-pages/reporting_bugs.html">https://www.kernel.org/doc/man-pages/reporting_bugs.html</a> .
+
+<span class="footline">IEEE/The Open Group                 2013                        GETPWUID(3P)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man0/pwd.h.0p.html">pwd.h(0p)</a>,&nbsp; 
+    <a href="../man1/find.1p.html">find(1p)</a>,&nbsp; 
+    <a href="endpwent.3p.html">endpwent(3p)</a>,&nbsp; 
+    <a href="getlogin.3p.html">getlogin(3p)</a>,&nbsp; 
+    <a href="getpwnam.3p.html">getpwnam(3p)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

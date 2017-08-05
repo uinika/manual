@@ -1,0 +1,386 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>fenv(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">FENV(3)                   Linux Programmer's Manual                  FENV(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       feclearexcept,   fegetexceptflag,   feraiseexcept,   fesetexceptflag,
+       fetestexcept, fegetenv, fegetround,  feholdexcept,  fesetround,  fes‐
+       etenv,  feupdateenv,  feenableexcept,  fedisableexcept, fegetexcept -
+       floating-point rounding and exception handling
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;fenv.h&gt;</b>
+
+       <b>int feclearexcept(int </b><i>excepts</i><b>);</b>
+       <b>int fegetexceptflag(fexcept_t *</b><i>flagp</i><b>, int </b><i>excepts</i><b>);</b>
+       <b>int feraiseexcept(int </b><i>excepts</i><b>);</b>
+       <b>int fesetexceptflag(const fexcept_t *</b><i>flagp</i><b>, int </b><i>excepts</i><b>);</b>
+       <b>int fetestexcept(int </b><i>excepts</i><b>);</b>
+
+       <b>int fegetround(void);</b>
+       <b>int fesetround(int </b><i>rounding_mode</i><b>);</b>
+
+       <b>int fegetenv(fenv_t *</b><i>envp</i><b>);</b>
+       <b>int feholdexcept(fenv_t *</b><i>envp</i><b>);</b>
+       <b>int fesetenv(const fenv_t *</b><i>envp</i><b>);</b>
+       <b>int feupdateenv(const fenv_t *</b><i>envp</i><b>);</b>
+
+       Link with <i>-lm</i>.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These eleven functions were defined in C99, and describe the handling
+       of floating-point rounding and exceptions (overflow, zero-divide,
+       etc.).
+
+   <b>Exceptions</b>
+       The <i>divide-by-zero</i> exception occurs when an operation on finite
+       numbers produces infinity as exact answer.
+
+       The <i>overflow</i> exception occurs when a result has to be represented as
+       a floating-point number, but has (much) larger absolute value than
+       the largest (finite) floating-point number that is representable.
+
+       The <i>underflow</i> exception occurs when a result has to be represented as
+       a floating-point number, but has smaller absolute value than the
+       smallest positive normalized floating-point number (and would lose
+       much accuracy when represented as a denormalized number).
+
+       The <i>inexact</i> exception occurs when the rounded result of an operation
+       is not equal to the infinite precision result.  It may occur whenever
+       <i>overflow</i> or <i>underflow</i> occurs.
+
+       The <i>invalid</i> exception occurs when there is no well-defined result for
+       an operation, as for 0/0 or infinity - infinity or sqrt(-1).
+
+   <b>Exception handling</b>
+       Exceptions are represented in two ways: as a single bit (exception
+       present/absent), and these bits correspond in some implementation-
+       defined way with bit positions in an integer, and also as an opaque
+       structure that may contain more information about the exception
+       (perhaps the code address where it occurred).
+
+       Each of the macros <b>FE_DIVBYZERO</b>, <b>FE_INEXACT</b>, <b>FE_INVALID</b>, <b>FE_OVERFLOW</b>,
+       <b>FE_UNDERFLOW </b>is defined when the implementation supports handling of
+       the corresponding exception, and if so then defines the corresponding
+       bit(s), so that one can call exception handling functions, for
+       example, using the integer argument <b>FE_OVERFLOW</b>|<b>FE_UNDERFLOW</b>.  Other
+       exceptions may be supported.  The macro <b>FE_ALL_EXCEPT </b>is the bitwise
+       OR of all bits corresponding to supported exceptions.
+
+       The <b>feclearexcept</b>() function clears the supported exceptions
+       represented by the bits in its argument.
+
+       The <b>fegetexceptflag</b>() function stores a representation of the state
+       of the exception flags represented by the argument <i>excepts</i> in the
+       opaque object <i>*flagp</i>.
+
+       The <b>feraiseexcept</b>() function raises the supported exceptions
+       represented by the bits in <i>excepts</i>.
+
+       The <b>fesetexceptflag</b>() function sets the complete status for the
+       exceptions represented by <i>excepts</i> to the value <i>*flagp</i>.  This value
+       must have been obtained by an earlier call of <b>fegetexceptflag</b>() with
+       a last argument that contained all bits in <i>excepts</i>.
+
+       The <b>fetestexcept</b>() function returns a word in which the bits are set
+       that were set in the argument <i>excepts</i> and for which the corresponding
+       exception is currently set.
+
+   <b>Rounding mode</b>
+       The rounding mode determines how the result of floating-point
+       operations is treated when the result cannot be exactly represented
+       in the significand.  Various rounding modes may be provided: round to
+       nearest (the default), round up (toward positive infinity), round
+       down (toward negative infinity), and round toward zero.
+
+       Each of the macros <b>FE_TONEAREST</b>, <b>FE_UPWARD</b>, <b>FE_DOWNWARD</b>, and
+       <b>FE_TOWARDZERO </b>is defined when the implementation supports getting and
+       setting the corresponding rounding direction.
+
+       The <b>fegetround</b>() function returns the macro corresponding to the
+       current rounding mode.
+
+       The <b>fesetround</b>() function sets the rounding mode as specified by its
+       argument and returns zero when it was successful.
+
+       C99 and POSIX.1-2008 specify an identifier, <b>FLT_ROUNDS</b>, defined in
+       <i>&lt;float.h&gt;</i>, which indicates the implementation-defined rounding
+       behavior for floating-point addition.  This identifier has one of the
+       following values:
+
+       -1     The rounding mode is not determinable.
+
+       0      Rounding is toward 0.
+
+       1      Rounding is toward nearest number.
+
+       2      Rounding is toward positive infinity.
+
+       3      Rounding is toward negative infinity.
+
+       Other values represent machine-dependent, nonstandard rounding modes.
+
+       The value of <b>FLT_ROUNDS </b>should reflect the current rounding mode as
+       set by <b>fesetround</b>() (but see BUGS).
+
+   <b>Floating-point environment</b>
+       The entire floating-point environment, including control modes and
+       status flags, can be handled as one opaque object, of type <i>fenv_t</i>.
+       The default environment is denoted by <b>FE_DFL_ENV </b>(of type <i>const</i>
+       <i>fenv_t *</i>).  This is the environment setup at program start and it is
+       defined by ISO C to have round to nearest, all exceptions cleared and
+       a nonstop (continue on exceptions) mode.
+
+       The <b>fegetenv</b>() function saves the current floating-point environment
+       in the object <i>*envp</i>.
+
+       The <b>feholdexcept</b>() function does the same, then clears all exception
+       flags, and sets a nonstop (continue on exceptions) mode, if
+       available.  It returns zero when successful.
+
+       The <b>fesetenv</b>() function restores the floating-point environment from
+       the object <i>*envp</i>.  This object must be known to be valid, for
+       example, the result of a call to <b>fegetenv</b>() or <b>feholdexcept</b>() or
+       equal to <b>FE_DFL_ENV</b>.  This call does not raise exceptions.
+
+       The <b>feupdateenv</b>() function installs the floating-point environment
+       represented by the object <i>*envp</i>, except that currently raised
+       exceptions are not cleared.  After calling this function, the raised
+       exceptions will be a bitwise OR of those previously set with those in
+       <i>*envp</i>.  As before, the object <i>*envp</i> must be known to be valid.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions return zero on success and nonzero if an error
+       occurred.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions first appeared in glibc in version 2.1.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────────────────────────────┬───────────────┬─────────┐
+       │<b>Interface                           </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────────────────────────────┼───────────────┼─────────┤
+       │<b>feclearexcept</b>(), <b>fegetexceptflag</b>(), │ Thread safety │ MT-Safe │
+       │<b>feraiseexcept</b>(), <b>fesetexceptflag</b>(), │               │         │
+       │<b>fetestexcept</b>(), <b>fegetround</b>(),       │               │         │
+       │<b>fesetround</b>(), <b>fegetenv</b>(),           │               │         │
+       │<b>feholdexcept</b>(), <b>fesetenv</b>(),         │               │         │
+       │<b>feupdateenv</b>(), <b>feenableexcept</b>(),    │               │         │
+       │<b>fedisableexcept</b>(), <b>fegetexcept</b>()    │               │         │
+       └────────────────────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       IEC 60559 (IEC 559:1989), ANSI/IEEE 854, C99, POSIX.1-2001.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Glibc notes</b>
+       If possible, the GNU C Library defines a macro <b>FE_NOMASK_ENV </b>which
+       represents an environment where every exception raised causes a trap
+       to occur.  You can test for this macro using <b>#ifdef</b>.  It is defined
+       only if <b>_GNU_SOURCE </b>is defined.  The C99 standard does not define a
+       way to set individual bits in the floating-point mask, for example,
+       to trap on specific flags.  Since version 2.2, glibc supports the
+       functions <b>feenableexcept</b>() and <b>fedisableexcept</b>() to set individual
+       floating-point traps, and <b>fegetexcept</b>() to query the state.
+
+       <b>#define _GNU_SOURCE         </b>/* See feature_test_macros(7) */
+       <b>#include &lt;fenv.h&gt;</b>
+
+       <b>int feenableexcept(int </b><i>excepts</i><b>);</b>
+       <b>int fedisableexcept(int </b><i>excepts</i><b>);</b>
+       <b>int fegetexcept(void);</b>
+
+       The <b>feenableexcept</b>() and <b>fedisableexcept</b>() functions enable (disable)
+       traps for each of the exceptions represented by <i>excepts</i> and return
+       the previous set of enabled exceptions when successful, and -1
+       otherwise.  The <b>fegetexcept</b>() function returns the set of all
+       currently enabled exceptions.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       C99 specifies that the value of <b>FLT_ROUNDS </b>should reflect changes to
+       the current rounding mode, as set by <b>fesetround</b>().  Currently, this
+       does not occur: <b>FLT_ROUNDS </b>always has the value 1.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man7/math_error.7.html">math_error(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2015-03-02                          FENV(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man2/execve.2.html">execve(2)</a>,&nbsp; 
+    <a href="fma.3.html">fma(3)</a>,&nbsp; 
+    <a href="j0.3.html">j0(3)</a>,&nbsp; 
+    <a href="lrint.3.html">lrint(3)</a>,&nbsp; 
+    <a href="lround.3.html">lround(3)</a>,&nbsp; 
+    <a href="matherr.3.html">matherr(3)</a>,&nbsp; 
+    <a href="pthread_create.3.html">pthread_create(3)</a>,&nbsp; 
+    <a href="remainder.3.html">remainder(3)</a>,&nbsp; 
+    <a href="rint.3.html">rint(3)</a>,&nbsp; 
+    <a href="round.3.html">round(3)</a>,&nbsp; 
+    <a href="__setfpucw.3.html">__setfpucw(3)</a>,&nbsp; 
+    <a href="y0.3.html">y0(3)</a>,&nbsp; 
+    <a href="../man7/math_error.7.html">math_error(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="fenv.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

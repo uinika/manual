@@ -1,0 +1,325 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>panel.3x - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#FUNCTIONS">FUNCTIONS</a> | <a href="#DIAGNOSTICS">DIAGNOSTICS</a> | <a href="#COMPATIBILITY">COMPATIBILITY</a> | <a href="#NOTE">NOTE</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">panel(3X)                                                          panel(3X)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       panel - panel stack extension for curses
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;panel.h&gt;</b>
+
+       <b>cc [flags] sourcefiles -lpanel -lncurses</b>
+
+       <b>PANEL *new_panel(WINDOW *win);</b>
+       <b>int bottom_panel(PANEL *pan);</b>
+       <b>int top_panel(PANEL *pan);</b>
+       <b>int show_panel(PANEL *pan);</b>
+       <b>void update_panels();</b>
+       <b>int hide_panel(PANEL *pan);</b>
+       <b>WINDOW *panel_window(const PANEL *pan);</b>
+       <b>int replace_panel(PANEL *pan, WINDOW *window);</b>
+       <b>int move_panel(PANEL *pan, int starty, int startx);</b>
+       <b>int panel_hidden(const PANEL *pan);</b>
+       <b>PANEL *panel_above(const PANEL *pan);</b>
+       <b>PANEL *panel_below(const PANEL *pan);</b>
+       <b>int set_panel_userptr(PANEL *pan, const void *ptr);</b>
+       <b>const void *panel_userptr(const PANEL *pan);</b>
+       <b>int del_panel(PANEL *pan);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Panels are <b>curses</b>(3X) windows with the added feature of depth.  Panel
+       functions allow the use of stacked windows and ensure the proper
+       portions of each window and the curses <b>stdscr </b>window are hidden or
+       displayed when panels are added, moved, modified or removed.  The set
+       of currently visible panels is the stack of panels.  The <b>stdscr</b>
+       window is beneath all panels, and is not considered part of the
+       stack.
+
+       A window is associated with every panel. The panel routines enable
+       you to create, move, hide, and show panels, as well as position a
+       panel at any desired location in the stack.
+
+       Panel routines are a functional layer added to <b>curses</b>(3X), make only
+       high-level curses calls, and work anywhere terminfo curses does.
+</pre>
+<h2><a id="FUNCTIONS" href="#FUNCTIONS"></a>FUNCTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>new_panel(win)</b>
+              allocates  a  <b>PANEL </b>structure, associates it with <b>win</b>, places
+              the panel on the top of the stack  (causes  it to  be
+              displayed above any other panel) and returns a pointer to the
+              new panel.
+
+       <b>update_panels</b>
+              refreshes the virtual screen to reflect the relations between
+              the panels in the stack, but does not call <b>doupdate </b>to refresh
+              the physical screen.  Use this function and not <b>wrefresh </b>or
+              <b>wnoutrefresh</b>.  <b>update_panels </b>may be called more than once
+              before a call to <b>doupdate</b>, but <b>doupdate </b>is the function
+              responsible for updating the physical screen.
+
+       <b>del_panel(pan)</b>
+              removes the given panel from the  stack and deallocates the
+              <b>PANEL </b>structure (but not its associated window).
+
+       <b>hide_panel(pan)</b>
+              removes the given panel from the panel stack and thus hides it
+              from view. The <b>PANEL </b>structure is not lost, merely removed
+              from the stack.
+
+       <b>panel_hidden(pan)</b>
+              returns <b>TRUE </b>if the panel is in the panel stack, <b>FALSE </b>if it
+              is not.  If the panel is a null pointer, return ERR.
+
+       <b>show_panel(pan)</b>
+              makes a hidden panel visible by placing it on top of the
+              panels in the panel stack. See COMPATIBILITY below.
+
+       <b>top_panel(pan)</b>
+              puts the given visible panel on top of all panels in the
+              stack.  See COMPATIBILITY below.
+
+       <b>bottom_panel(pan)</b>
+              puts panel at the bottom of all panels.
+
+       <b>move_panel(pan,starty,startx)</b>
+              moves the given panel window so that its upper-left corner is
+              at <b>starty</b>, <b>startx</b>.  It does not change the position of the
+              panel in the stack.  Be sure to use this function, not <b>mvwin</b>,
+              to move a panel window.
+
+       <b>replace_panel(pan,window)</b>
+              replaces the current window of panel with <b>window </b>(useful, for
+              example if you want to resize a panel; if you're using
+              <b>ncurses</b>, you can call <b>replace_panel </b>on the output of
+              <b>wresize</b>(3X)).  It does not change the position of the panel in
+              the stack.
+
+       <b>panel_above(pan)</b>
+              returns a pointer to the panel above pan.  If the panel
+              argument is <b>(PANEL *)0</b>, it returns a pointer to the bottom
+              panel in the stack.
+
+       <b>panel_below(pan)</b>
+              returns a pointer to the panel just below pan.  If the panel
+              argument is <b>(PANEL *)0</b>, it returns a pointer to the top panel
+              in the stack.
+
+       <b>set_panel_userptr(pan,ptr)</b>
+              sets the panel's user pointer.
+
+       <b>panel_userptr(pan)</b>
+              returns the user pointer for a given panel.
+
+       <b>panel_window(pan)</b>
+              returns a pointer to the window of the given panel.
+</pre>
+<h2><a id="DIAGNOSTICS" href="#DIAGNOSTICS"></a>DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Each routine that returns a pointer returns <b>NULL </b>if an error occurs.
+       Each routine that returns an int value returns <b>OK </b>if it executes
+       successfully and <b>ERR </b>if not.
+</pre>
+<h2><a id="COMPATIBILITY" href="#COMPATIBILITY"></a>COMPATIBILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Reasonable care has been taken to  ensure  compatibility with  the
+       native  panel facility introduced in SVr3.2 (inspection of the SVr4
+       manual pages suggests the programming interface is unchanged).  The
+       <b>PANEL </b>data structures are merely  similar. The  programmer is
+       cautioned not to directly use <b>PANEL </b>fields.
+
+       The functions <b>show_panel </b>and <b>top_panel </b>are identical in this
+       implementation, and work equally well with displayed or hidden
+       panels.  In the native System V implementation, <b>show_panel </b>is
+       intended for making a hidden panel visible (at the top of the stack)
+       and <b>top_panel </b>is intended for making an already-visible panel move to
+       the top of the stack. You are cautioned to use the correct function
+       to ensure compatibility with native panel libraries.
+</pre>
+<h2><a id="NOTE" href="#NOTE"></a>NOTE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In your library list, libpanel.a should be before libncurses.a; that
+       is, you should say “-lpanel -lncurses”, not the other way around
+       (which would give a link-error with static libraries).
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       panel.h interface for the panels library
+
+       libpanel.a the panels library itself
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>curses</b>(3X), <b>curs_variables</b>(3X),
+
+       This describes <b>ncurses </b>version @NCURSES_MAJOR@.@NCURSES_MINOR@ (patch
+       @NCURSES_PATCH@).
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Originally written by Warren Tucker &lt;wht@n4hgf.mt-park.ga.us&gt;,
+       primarily to assist in porting u386mon to systems without a native
+       panels library.  Repackaged for ncurses by Zeyd ben-Halim.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>ncurses</i> (new curses) project.  Information
+       about the project can be found at 
+       ⟨<a href="https://www.gnu.org/software/ncurses/ncurses.html">https://www.gnu.org/software/ncurses/ncurses.html</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       bug-ncurses-request@gnu.org.  This page was obtained from the
+       project's upstream Git mirror of the CVS repository 
+       ⟨git://ncurses.scripts.mit.edu/ncurses.git⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                                                   panel(3X)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

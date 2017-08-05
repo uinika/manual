@@ -1,0 +1,356 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>audit2allow(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">AUDIT2ALLOW(1)                       NSA                      AUDIT2ALLOW(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>audit2allow </b>- generate SELinux policy allow/dontaudit rules from logs
+       of denied operations
+
+       <b>audit2why </b>- translates SELinux audit messages into a  description  of
+       why the access was denied (audit2allow -w)
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>audit2allow </b>[<i>options</i>]
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-a | --all</b>
+              Read input from audit and message log, conflicts with -i
+
+       <b>-b | --boot</b>
+              Read input from audit messages since last boot conflicts with
+              -i
+
+       <b>-d | --dmesg</b>
+              Read input from output of <i>/bin/dmesg.</i>  Note that all audit
+              messages are not available via dmesg when auditd is running;
+              use "ausearch -m avc | audit2allow"  or "-a" instead.
+
+       <b>-D | --dontaudit</b>
+              Generate dontaudit rules (Default: allow)
+
+       <b>-h | --help</b>
+              Print a short usage message
+
+       <b>-i  &lt;inputfile&gt; | --input &lt;inputfile&gt;</b>
+              read input from <i>&lt;inputfile&gt;</i>
+
+       <b>-l | --lastreload</b>
+              read input only after last policy reload
+
+       <b>-m &lt;modulename&gt; | --module &lt;modulename&gt;</b>
+              Generate module/require output &lt;modulename&gt;
+
+       <b>-M &lt;modulename&gt;</b>
+              Generate loadable module package, conflicts with -o
+
+       <b>-p &lt;policyfile&gt; | --policy &lt;policyfile&gt;</b>
+              Policy file to use for analysis
+
+       <b>-o &lt;outputfile&gt; | --output &lt;outputfile&gt;</b>
+              append output to <i>&lt;outputfile&gt;</i>
+
+       <b>-r | --requires</b>
+              Generate require output syntax for loadable modules.
+
+       <b>-N | --noreference</b>
+              Do not generate reference policy, traditional style allow
+              rules.  This is the default behavior.
+
+       <b>-R | --reference</b>
+              Generate reference policy using installed macros.  This
+              attempts to match denials against interfaces and may be
+              inaccurate.
+
+       <b>-w | --why</b>
+              Translates SELinux audit messages into a description of why
+              the access was denied
+
+       <b>-v | --verbose</b>
+              Turn on verbose output
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This utility scans the logs for messages logged when the system
+       denied permission for operations, and generates a snippet of policy
+       rules which, if loaded into policy, might have allowed those
+       operations to succeed. However, this utility only generates Type
+       Enforcement (TE) allow rules.  Certain permission denials may require
+       other kinds of policy changes, e.g. adding an attribute to a type
+       declaration to satisfy an existing constraint, adding a role allow
+       rule, or modifying a constraint.  The <b>audit2why</b>(8) utility may be
+       used to diagnose the reason when it is unclear.
+
+       Care must be exercised while acting on the output of this utility to
+       ensure that the operations being permitted do not pose a security
+       threat. Often it is better to define new domains and/or types, or
+       make other structural changes to narrowly allow an optimal set of
+       operations to succeed, as opposed to blindly implementing the
+       sometimes broad changes recommended by this utility.   Certain
+       permission denials are not fatal to the application, in which case it
+       may be preferable to simply suppress logging of the denial via a
+       'dontaudit' rule rather than an 'allow' rule.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>NOTE: These examples are for systems using the audit package. If you do</b>
+       <b>not use the audit package, the AVC messages will be in /var/log/messages.</b>
+       <b>Please substitute /var/log/messages for /var/log/audit/audit.log in the</b>
+       <b>examples.</b>
+
+       <b>Using audit2allow to generate module policy</b>
+
+       $ cat /var/log/audit/audit.log | audit2allow -m local &gt; local.te
+       $ cat local.te
+       module local 1.0;
+
+       require {
+               class file {  getattr open read };
+
+               type myapp_t;
+               type etc_t;
+        };
+
+       allow myapp_t etc_t:file { getattr open read };
+       &lt;review local.te and customize as desired&gt;
+
+       <b>Using audit2allow to generate module policy using reference policy</b>
+
+       $ cat /var/log/audit/audit.log | audit2allow -R -m local &gt; local.te
+       $ cat local.te
+       policy_module(local, 1.0)
+
+       gen_require(`
+               type myapp_t;
+               type etc_t;
+        };
+
+       files_read_etc_files(myapp_t)
+       &lt;review local.te and customize as desired&gt;
+
+       <b>Building module policy using Makefile</b>
+
+       # SELinux provides a policy devel environment under
+       # /usr/share/selinux/devel including all of the shipped
+       # interface files.
+       # You can create a te file and compile it by executing
+
+       $ make -f /usr/share/selinux/devel/Makefile local.pp
+
+       # This make command will compile a local.te file in the current
+       # directory. If you did not specify a "pp" file, the make file
+       # will compile all "te" files in the current directory.  After
+       # you compile your te file into a "pp" file, you need to install
+       # it using the semodule command.
+
+       $ semodule -i local.pp
+
+       <b>Building module policy manually</b>
+
+       # Compile the module
+       $ checkmodule -M -m -o local.mod local.te
+
+       # Create the package
+       $ semodule_package -o local.pp -m local.mod
+
+       # Load the module into the kernel
+       $ semodule -i local.pp
+
+       <b>Using audit2allow to generate and build module policy</b>
+
+       $ cat /var/log/audit/audit.log | audit2allow -M local
+       Generating type enforcement file: local.te
+
+       Compiling policy: checkmodule -M -m -o local.mod local.te
+       Building package: semodule_package -o local.pp -m local.mod
+
+       ******************** IMPORTANT ***********************
+
+       In order to load this newly created policy package into the kernel,
+       you are required to execute
+
+       semodule -i local.pp
+
+       <b>Using audit2allow to generate monolithic (non-module) policy</b>
+
+       $ cd /etc/selinux/$SELINUXTYPE/src/policy
+       $ cat /var/log/audit/audit.log | audit2allow &gt;&gt; domains/misc/local.te
+       $ cat domains/misc/local.te
+       allow cupsd_config_t unconfined_t:fifo_file { getattr ioctl };
+       &lt;review domains/misc/local.te and customize as desired&gt;
+       $ make load
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This manual page was written by <i>Manoj Srivastava</i>
+       <i>&lt;srivasta@debian.org&gt;,</i> for the Debian GNU/Linux system. It was
+       updated by Dan Walsh &lt;dwalsh@redhat.com&gt;
+
+       The <b>audit2allow </b>utility has contributions from several people,
+       including <i>Justin R. Smith</i> and <i>Yuichi Nakamura.</i>  and <i>Dan Walsh</i>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Security Enhanced Linux         October 2010                  AUDIT2ALLOW(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

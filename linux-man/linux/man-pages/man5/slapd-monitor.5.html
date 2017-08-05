@@ -1,0 +1,257 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>slapd-monitor(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFIGURATION">CONFIGURATION</a> | <a href="#USAGE">USAGE</a> | <a href="#ACCESS_CONTROL">ACCESS&nbsp;CONTROL</a> | <a href="#KNOWN_LIMITATIONS">KNOWN&nbsp;LIMITATIONS</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SLAPD-MONITOR(5)             File Formats Manual            SLAPD-MONITOR(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       slapd-monitor - Monitor backend to slapd
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ETCDIR/slapd.conf
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>monitor </b>backend to <a href="../man8/slapd.8.html">slapd(8)</a> is not an actual database; if
+       enabled, it is automatically generated and dynamically maintained by
+       <b>slapd </b>with information about the running status of the daemon.
+
+       To inspect all monitor information, issue a subtree search with base
+       cn=Monitor, requesting that attributes "+" and "*" are returned.  The
+       monitor backend produces mostly operational attributes, and LDAP only
+       returns operational attributes that are explicitly requested.
+       Requesting attribute "+" is an extension which requests all
+       operational attributes.
+</pre>
+<h2><a id="CONFIGURATION" href="#CONFIGURATION"></a>CONFIGURATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These <b>slapd.conf </b>options apply to the <b>monitor </b>backend database.  That
+       is, they must follow a "database monitor" line and come before any
+       subsequent "backend" or "database" lines.
+
+       As opposed to most databases, the <b>monitor </b>database can be
+       instantiated only once, i.e. only one occurrence of "database
+       monitor" can occur in the <a href="slapd.conf.5.html">slapd.conf(5)</a> file.  Moreover, the suffix
+       of the database cannot be explicitly set by means of the <b>suffix</b>
+       directive.  The suffix is automatically set to "<i>cn=Monitor</i>".
+
+       The <b>monitor </b>database honors the <b>rootdn </b>and the <b>rootpw </b>directives, and
+       the usual ACL directives, e.g. the <b>access </b>directive.
+
+       Other database options are described in the <a href="slapd.conf.5.html">slapd.conf(5)</a> manual
+       page.
+</pre>
+<h2><a id="USAGE" href="#USAGE"></a>USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The usage is:
+
+       1) enable the <b>monitor </b>backend at configure:
+
+              configure --enable-monitor
+
+       2) activate the <b>monitor </b>database in the <a href="slapd.conf.5.html">slapd.conf(5)</a> file:
+
+              database monitor
+
+       3) add ACLs as detailed in <a href="slapd.access.5.html">slapd.access(5)</a> to control access to the
+       database, e.g.:
+
+              access to dn.subtree="cn=Monitor"
+                   by dn.exact="uid=Admin,dc=my,dc=org" write
+                   by users read
+                   by * none
+
+       4) ensure that the <b>core.schema </b>file is loaded.
+              The <b>monitor </b>backend relies on some standard track
+              attributeTypes that must be already defined when the backend
+              is started.
+</pre>
+<h2><a id="ACCESS_CONTROL" href="#ACCESS_CONTROL"></a>ACCESS CONTROL  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>monitor </b>backend honors access control semantics as indicated in
+       <a href="slapd.access.5.html">slapd.access(5)</a>, including the <b>disclose </b>access privilege, on all
+       currently implemented operations.
+</pre>
+<h2><a id="KNOWN_LIMITATIONS" href="#KNOWN_LIMITATIONS"></a>KNOWN LIMITATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>monitor </b>backend does not honor size/time limits in search
+       operations.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>ETCDIR/slapd.conf</b>
+              default slapd configuration file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="slapd.conf.5.html">slapd.conf(5)</a>, <a href="slapd-config.5.html">slapd-config(5)</a>, <a href="slapd.access.5.html">slapd.access(5)</a>, <a href="../man8/slapd.8.html">slapd(8)</a>, <a href="../man3/ldap.3.html">ldap(3)</a>.
+</pre>
+<h2><a id="ACKNOWLEDGEMENTS" href="#ACKNOWLEDGEMENTS"></a>ACKNOWLEDGEMENTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>OpenLDAP Software </b>is developed and maintained by The OpenLDAP Project
+       &lt;<a href="http://www.openldap.org/">http://www.openldap.org/</a>&gt;.  <b>OpenLDAP Software </b>is derived from the
+       University of Michigan LDAP 3.3 Release.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>OpenLDAP</i> (an open source implementation of
+       the Lightweight Directory Access Protocol) project.  Information
+       about the project can be found at ⟨<a href="http://www.openldap.org/">http://www.openldap.org/</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="http://www.openldap.org/its/">http://www.openldap.org/its/</a>⟩.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.openldap.org/openldap.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">OpenLDAP LDVERSION               RELEASEDATE                SLAPD-MONITOR(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="slapd.backends.5.html">slapd.backends(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

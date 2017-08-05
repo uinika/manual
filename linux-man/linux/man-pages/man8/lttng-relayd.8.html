@@ -1,0 +1,395 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>lttng-relayd(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#ENVIRONMENT_VARIABLES">ENVIRONMENT&nbsp;VARIABLES</a> | <a href="#FILES">FILES</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#LIMITATIONS">LIMITATIONS</a> | <a href="#BUGS">BUGS</a> | <a href="#RESOURCES">RESOURCES</a> | <a href="#COPYRIGHTS">COPYRIGHTS</a> | <a href="#THANKS">THANKS</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">LTTNG-RELAYD(8)                 LTTng Manual                 LTTNG-RELAYD(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       lttng-relayd - LTTng 2 relay daemon
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>lttng-relayd </b>[<b>--background </b>| <b>--daemonize</b>]
+                    [<b>--control-port</b>=<i>URL</i>] [<b>--data-port</b>=<i>URL</i>] [<b>--live-port</b>=<i>URL</i>]
+                    [<b>--output</b>=<i>PATH</i>] [<b>-v </b>| <b>-vv </b>| <b>-vvv</b>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>Linux Trace Toolkit: next generation</i> &lt;<a href="http://lttng.org/">http://lttng.org/</a>&gt; is an
+       open source software package used for correlated tracing of the Linux
+       kernel, user applications, and user libraries.
+
+       LTTng consists of Linux kernel modules (for Linux kernel tracing) and
+       dynamically loaded libraries (for user application and library
+       tracing).
+
+       The <i>LTTng relay daemon</i> is responsible for receiving trace data from
+       possibly remote LTTng session/consumer daemons and for writing it to
+       the local file system. The relay daemon also accepts <i>LTTng live</i>
+       connections from compatible viewers; this is the official approach to
+       viewing LTTng events as they are emitted.
+
+       The relay daemon listens by default on all network interfaces to
+       gather trace data, but only on localhost for LTTng live connections.
+
+       The relay daemon does not require any particular permissions, as long
+       as it can write to the output directory and listen on the configured
+       ports. If a user is within a secured network and/or has proper
+       firewall settings, <b>lttng-relayd </b>can listen to LTTng live connections
+       from <i>all</i> network interfaces by specifying <b>--live-</b>
+       <b>port=tcp://localhost:5344</b>.
+
+       Once a trace has been streamed completely, the trace can be processed
+       by any tool that can process an LTTng trace located on the local file
+       system.
+
+   <b>Output directory</b>
+       By default, the relay daemon writes the traces to:
+
+           $LTTNG_HOME/lttng-traces/<i>HOSTNAME</i>/<i>SESSION</i>/<i>DOMAIN</i>
+
+       with:
+
+       <i>HOSTNAME</i>
+           Remote hostname.
+
+       <i>SESSION</i>
+           Full session name.
+
+       <i>DOMAIN</i>
+           Tracing domain.
+
+       You can override the default output directory prefix
+       (<b>$LTTNG_HOME/lttng-traces</b>) with the <b>--output </b>option. The other parts
+       depend on the remote configuration.
+
+   <b>URL format</b>
+       The <b>--control-port</b>, <b>--data-port</b>, and <b>--live-port </b>options specify
+       URLs.
+
+       The format of those URLs is:
+
+           tcp://(<i>HOST</i> | <i>IPADDR</i>):<i>PORT</i>
+
+       with:
+
+       (<i>HOST</i> | <i>IPADDR</i>)
+           Binding hostname or IP address (IPv6 address <b>must </b>be enclosed in
+           brackets (<b>[ </b>and <b>]</b>); see RFC 2732
+           &lt;<a href="https://www.ietf.org/rfc/rfc2732.txt">https://www.ietf.org/rfc/rfc2732.txt</a>&gt;).
+
+       <i>PORT</i>
+           TCP port.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>Daemon</b>
+       <b>-b</b>, <b>--background</b>
+           Start as Unix daemon, but keep file descriptors (console) open.
+           Use the <b>--daemonize </b>option instead to close the file descriptors.
+
+       <b>-d</b>, <b>--daemonize</b>
+           Start as Unix daemon, and close file descriptors (console). Use
+           the <b>--background </b>option instead to keep the file descriptors
+           open.
+
+       <b>-g </b><i>GROUP</i>, <b>--group</b>=<i>GROUP</i>
+           Use <i>GROUP</i> as Unix tracing group (default: <b>tracing</b>).
+
+       <b>-o </b><i>PATH</i>, <b>--output</b>=<i>PATH</i>
+           Set base directory of written trace data to <i>PATH</i>.
+
+           See the <i>Output directory</i> section above for more information.
+
+       <b>-v</b>, <b>--verbose</b>
+           Increase verbosity.
+
+           Three levels of verbosity are available, which are triggered by
+           appending additional <b>v </b>letters to the option (that is, <b>-vv </b>and
+           <b>-vvv</b>).
+
+   <b>Ports</b>
+       See the <i>URL format</i> section above for more information about the
+       syntax of the following options' <i>URL</i> argument.
+
+       <b>-C </b><i>URL</i>, <b>--control-port</b>=<i>URL</i>
+           Listen to control data on URL <i>URL</i> (default: <b>tcp://0.0.0.0:5342</b>).
+
+       <b>-D </b><i>URL</i>, <b>--data-port</b>=<i>URL</i>
+           Listen to trace data on URL <i>URL</i> (default: <b>tcp://0.0.0.0:5343</b>).
+
+       <b>-L </b><i>URL</i>, <b>--live-port</b>=<i>URL</i>
+           Listen to LTTng live connections on URL <i>URL</i> (default:
+           <b>tcp://localhost:5344</b>).
+
+   <b>Program information</b>
+       <b>-h</b>, <b>--help</b>
+           Show help.
+
+       <b>-V</b>, <b>--version</b>
+           Show version.
+</pre>
+<h2><a id="ENVIRONMENT_VARIABLES" href="#ENVIRONMENT_VARIABLES"></a>ENVIRONMENT VARIABLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>LTTNG_ABORT_ON_ERROR</b>
+           Set to 1 to abort the process after the first error is
+           encountered.
+
+       <b>LTTNG_NETWORK_SOCKET_TIMEOUT</b>
+           Socket connection, receive and send timeout (milliseconds). A
+           value of 0 or -1 uses the timeout of the operating system
+           (default).
+
+       <b>LTTNG_RELAYD_HEALTH</b>
+           Path to relay daemon health’s socket.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>$LTTNG_HOME/.lttng</b>
+           User LTTng runtime and configuration directory.
+
+       <b>$LTTNG_HOME/lttng-traces</b>
+           Default output directory of LTTng traces. This can be overridden
+           with the <b>--output </b>option.
+
+           <b>Note</b>
+           <b>$LTTNG_HOME </b>defaults to <b>$HOME </b>when not explicitly set.
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>0</b>
+           Success
+
+       <b>1</b>
+           Error
+
+       <b>3</b>
+           Fatal error
+</pre>
+<h2><a id="LIMITATIONS" href="#LIMITATIONS"></a>LIMITATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       As of this version, only the TCP protocol is supported for both
+       control and data ports. In future versions, TCP will remain the sole
+       available protocol for control data since those communications are
+       low-volume and need absolute reliability; trace data could be carried
+       over UDP.
+
+       For an unprivileged user running <b>lttng-relayd</b>, the maximum number of
+       file descriptors per process is usually 1024. This limits the number
+       of connections and opened trace files. This limit can be configured
+       with <a href="../man3/ulimit.3.html">ulimit(3)</a>.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If you encounter any issue or usability problem, please report it on
+       the LTTng bug tracker &lt;<a href="https://bugs.lttng.org/projects/lttng-tools">https://bugs.lttng.org/projects/lttng-tools</a>&gt;.
+</pre>
+<h2><a id="RESOURCES" href="#RESOURCES"></a>RESOURCES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ·   LTTng project website &lt;<a href="http://lttng.org/">http://lttng.org</a>&gt;
+
+       ·   LTTng documentation &lt;<a href="http://lttng.org/docs">http://lttng.org/docs</a>&gt;
+
+       ·   Git repositories &lt;<a href="http://git.lttng.org/">http://git.lttng.org</a>&gt;
+
+       ·   GitHub organization &lt;<a href="http://github.com/lttng">http://github.com/lttng</a>&gt;
+
+       ·   Continuous integration &lt;<a href="http://ci.lttng.org/">http://ci.lttng.org/</a>&gt;
+
+       ·   Mailing list &lt;<a href="http://lists.lttng.org/">http://lists.lttng.org</a>&gt; for support and
+           development: <b>lttng-dev@lists.lttng.org</b>
+
+       ·   IRC channel &lt;irc://irc.oftc.net/lttng&gt;: <b>#lttng </b>on <b>irc.oftc.net</b>
+</pre>
+<h2><a id="COPYRIGHTS" href="#COPYRIGHTS"></a>COPYRIGHTS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This program is part of the LTTng-tools project.
+
+       LTTng-tools is distributed under the GNU General Public License
+       version 2 &lt;<a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html">http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html</a>&gt;.
+       See the <b>LICENSE </b>&lt;https://github.com/lttng/lttng-
+       tools/blob/master/LICENSE&gt; file for details.
+</pre>
+<h2><a id="THANKS" href="#THANKS"></a>THANKS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Special thanks to Michel Dagenais and the DORSAL laboratory
+       &lt;<a href="http://www.dorsal.polymtl.ca/">http://www.dorsal.polymtl.ca/</a>&gt; at École Polytechnique de Montréal
+       for the LTTng journey.
+
+       Also thanks to the Ericsson teams working on tracing which helped us
+       greatly with detailed bug reports and unusual test cases.
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       LTTng-tools was originally written by Mathieu Desnoyers, Julien
+       Desfossez, and David Goulet. More people have since contributed to
+       it.
+
+       LTTng-tools is currently maintained by Jérémie Galarneau
+       &lt;mailto:jeremie.galarneau@efficios.com&gt;.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/lttng.1.html">lttng(1)</a>, <a href="lttng-sessiond.8.html">lttng-sessiond(8)</a>, <a href="../man1/lttng-crash.1.html">lttng-crash(1)</a>, <a href="../man3/lttng-ust.3.html">lttng-ust(3)</a>,
+       <a href="../man1/babeltrace.1.html">babeltrace(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>LTTng-Tools</i> (    LTTng tools) project.
+       Information about the project can be found at ⟨<a href="http://lttng.org/">http://lttng.org/</a>⟩.
+       It is not known how to report bugs for this man page; if you know,
+       please send a mail to man-pages@man7.org.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.lttng.org/lttng-tools.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">LTTng 2.10.0-pre                 05/03/2017                  LTTNG-RELAYD(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/lttng.1.html">lttng(1)</a>,&nbsp; 
+    <a href="../man1/lttng-crash.1.html">lttng-crash(1)</a>,&nbsp; 
+    <a href="../man1/lttng-create.1.html">lttng-create(1)</a>,&nbsp; 
+    <a href="lttng-sessiond.8.html">lttng-sessiond(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

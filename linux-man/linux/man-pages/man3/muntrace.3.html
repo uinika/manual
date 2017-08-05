@@ -1,0 +1,283 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>mtrace(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MTRACE(3)                 Linux Programmer's Manual                MTRACE(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       mtrace, muntrace - malloc tracing
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;mcheck.h&gt;</b>
+
+       <b>void mtrace(void);</b>
+
+       <b>void muntrace(void);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>mtrace</b>() function installs hook functions for the memory-
+       allocation functions (<a href="malloc.3.html">malloc(3)</a>, <a href="realloc.3.html">realloc(3)</a> <a href="memalign.3.html">memalign(3)</a>, <a href="free.3.html">free(3)</a>).
+       These hook functions record tracing information about memory
+       allocation and deallocation.  The tracing information can be used to
+       discover memory leaks and attempts to free nonallocated memory in a
+       program.
+
+       The <b>muntrace</b>() function disables the hook functions installed by
+       <b>mtrace</b>(), so that tracing information is no longer recorded for the
+       memory-allocation functions.  If no hook functions were successfully
+       installed by <b>mtrace</b>(), <b>muntrace</b>() does nothing.
+
+       When <b>mtrace</b>() is called, it checks the value of the environment
+       variable <b>MALLOC_TRACE</b>, which should contain the pathname of a file in
+       which the tracing information is to be recorded.  If the pathname is
+       successfully opened, it is truncated to zero length.
+
+       If <b>MALLOC_TRACE </b>is not set, or the pathname it specifies is invalid
+       or not writable, then no hook functions are installed, and <b>mtrace</b>()
+       has no effect.  In set-user-ID and set-group-ID programs,
+       <b>MALLOC_TRACE </b>is ignored, and <b>mtrace</b>() has no effect.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌─────────────────────┬───────────────┬───────────┐
+       │<b>Interface            </b>│ <b>Attribute     </b>│ <b>Value     </b>│
+       ├─────────────────────┼───────────────┼───────────┤
+       │<b>mtrace</b>(), <b>muntrace</b>() │ Thread safety │ MT-Unsafe │
+       └─────────────────────┴───────────────┴───────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These functions are GNU extensions.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In normal usage, <b>mtrace</b>() is called once at the start of execution of
+       a program, and <b>muntrace</b>() is never called.
+
+       The tracing output produced after a call to <b>mtrace</b>() is textual, but
+       not designed to be human readable.  The GNU C library provides a Perl
+       script, <a href="../man1/mtrace.1.html">mtrace(1)</a>, that interprets the trace log and produces human-
+       readable output.  For best results, the traced program should be
+       compiled with debugging enabled, so that line-number information is
+       recorded in the executable.
+
+       The tracing performed by <b>mtrace</b>() incurs a performance penalty (if
+       <b>MALLOC_TRACE </b>points to a valid, writable pathname).
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The line-number information produced by <a href="../man1/mtrace.1.html">mtrace(1)</a> is not always
+       precise: the line number references may refer to the previous or
+       following (nonblank) line of the source code.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The shell session below demonstrates the use of the <b>mtrace</b>() function
+       and the <a href="../man1/mtrace.1.html">mtrace(1)</a> command in a program that has memory leaks at two
+       different locations.  The demonstration uses the following program:
+
+           $ <b>cat t_mtrace.c</b>
+           #include &lt;mcheck.h&gt;
+           #include &lt;stdlib.h&gt;
+           #include &lt;stdio.h&gt;
+
+           int
+           main(int argc, char *argv[])
+           {
+               int j;
+
+               mtrace();
+
+               for (j = 0; j &lt; 2; j++)
+                   malloc(100);            /* Never freed--a memory leak */
+
+               calloc(16, 16);             /* Never freed--a memory leak */
+               exit(EXIT_SUCCESS);
+           }
+
+       When we run the program as follows, we see that <b>mtrace</b>() diagnosed
+       memory leaks at two different locations in the program:
+
+           $ <b>cc -g t_mtrace.c -o t_mtrace</b>
+           $ <b>export MALLOC_TRACE=/tmp/t</b>
+           $ <b>./t_mtrace</b>
+           $ <b>mtrace ./t_mtrace $MALLOC_TRACE</b>
+           Memory not freed:
+           -----------------
+              Address     Size     Caller
+           0x084c9378     0x64  at /home/cecilia/t_mtrace.c:12
+           0x084c93e0     0x64  at /home/cecilia/t_mtrace.c:12
+           0x084c9448    0x100  at /home/cecilia/t_mtrace.c:16
+
+       The first two messages about unfreed memory correspond to the two
+       <a href="malloc.3.html">malloc(3)</a> calls inside the <i>for</i> loop.  The final message corresponds
+       to the call to <a href="calloc.3.html">calloc(3)</a> (which in turn calls <a href="malloc.3.html">malloc(3)</a>).
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/mtrace.1.html">mtrace(1)</a>, <a href="malloc.3.html">malloc(3)</a>, <a href="malloc_hook.3.html">malloc_hook(3)</a>, <a href="mcheck.3.html">mcheck(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2015-03-02                        MTRACE(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/mtrace.1.html">mtrace(1)</a>,&nbsp; 
+    <a href="malloc.3.html">malloc(3)</a>,&nbsp; 
+    <a href="malloc_hook.3.html">malloc_hook(3)</a>,&nbsp; 
+    <a href="mallopt.3.html">mallopt(3)</a>,&nbsp; 
+    <a href="mcheck.3.html">mcheck(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="mtrace.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

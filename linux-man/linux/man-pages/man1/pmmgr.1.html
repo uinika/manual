@@ -1,0 +1,489 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmmgr(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CONFIGURATION">CONFIGURATION</a> | <a href="#FILES">FILES</a> | <a href="#PCP_ENVIRONMENT">PCP&nbsp;ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMMGR(1)                   General Commands Manual                  PMMGR(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmmgr </b>- pcp daemon manager
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmmgr </b>[<b>-v</b>] [<b>-c </b><i>config-directory</i>] [<b>-p </b><i>polling-interval</i>] [<b>-l </b><i>log-file</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmmgr </b>manages a collection of PCP daemons for a set of discovered
+       local and remote hosts running the Performance Metrics Collection
+       Daemon (PMCD), according to zero or more configuration directories.
+       It keeps a matching set of <b>pmie</b>, <b>pmlogger</b>, <b>pmrep </b>and other daemons
+       running, and their archives/logs merged/rotated.  It provides an
+       alternative to the default <b>cron</b>(1)-based management scripts for
+       <b>pmlogger </b>and <b>pmie</b>.
+
+       <b>pmmgr </b>is largely self-configuring and perseveres despite most run-
+       time errors.  <b>pmmgr </b>runs in the foreground until interrupted.  When
+       signaled, it will stop its running daemons before exiting.
+
+       A description of the command line options specific to <b>pmmgr </b>follows:
+
+       <b>-c   </b><i>directory</i> adds a given configuration directory to <b>pmmgr</b>.  <b>pmmgr</b>
+            can supervise multiple different configurations at the same
+            time, so this option may be repeated.  Errors in the
+            configuration may be noted to standard error, but <b>pmmgr </b>will
+            fill in missing information with built-in defaults.  The default
+            directory is <i>$PCP_SYSCONF_DIR/pmmgr</i>
+
+       <b>-p   </b><i>polling-interval</i> sets the host-discovery polling interval to the
+            given number of seconds.  The default is 60.  Daemons for a
+            particular target host will be restarted no more frequently than
+            this interval.  There may be a short-lived thread inside <b>pmmgr</b>
+            for startup and shutdown of each daemon for each target host.
+
+       <b>-l   </b><i>log-file</i> redirects standard output and error to the given log
+            file, which is created anew
+
+       <b>-v   </b>adds more verbose tracing to standard output.
+</pre>
+<h2><a id="CONFIGURATION" href="#CONFIGURATION"></a>CONFIGURATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A <b>pmmgr </b>configuration identifies which hosts should be monitored,
+       which daemons should be maintained for them, and what options those
+       daemons should be run with.  <b>pmmgr </b>uses a small number of files in a
+       configuration directory, instead of lines in a text file.  The
+       individual files carry zero or more lines of 100% pure configuration
+       text, and no comments.  (If desired, a configuration may be commented
+       upon with any other file, such as a free-form README.)
+
+   <b>TARGET SELECTION</b>
+       This set of configuration files identifies where <b>pmmgr </b>should search
+       for <b>pmcd </b>instances, how to uniquely identify them, and where state
+       such as log files should be kept for each.  Ideally, a persistent and
+       unique host-id string is computed for each potential target pmcd from
+       specified metric values.  This host-id is also used as a subdirectory
+       name for locating daemon data.
+
+       <i>hostid-static</i>
+              This file contains a single line specifying the static string
+              that should be used for the host-id value.  Specifying a value
+              in this file overrides the <i>hostid-metrics</i> file specified
+              below.  It should be noted that using this option will cause
+              all target pmcds to be assigned the same hostid.  Thus, this
+              is useful in monitoring single hosts, or if each monitored
+              host has its own configuration directory.
+
+       <i>hostid-metrics</i>
+              This file contains one or more lines of metric specifications
+              in the format accepted by <i>pmParseMetricSpec</i>.  Metrics without
+              instance specifiers mean all instances of that metric.  These
+              are used to generate the <i>unique</i> host-id string for each <b>pmcd</b>
+              server that <b>pmmgr </b>discovers.  Upon discovery, all the
+              metrics/instances named are queried, string values fetched,
+              and normalized/concatenated into a single hyphenated printable
+              string.  The default is the single metric <b>pmcd.hostname</b>, which
+              is sufficient if all the hosts discovered have unique
+              hostname(2).  If they don't, you should add other pcp metric
+              specifications to set them apart at your site.  The more you
+              add, the longer the host-id string, but the more likely that
+              accidental duplication is prevented.
+
+       However, it may be desirable for a host-id to also be <i>persistent</i>, so
+       that if the target host goes offline and later returns, the new host-
+       id matches the previous one, because then old and new histories can
+       be joined.  This argues against using metrics whose values vary from
+       boot to boot.
+
+       Some candidate metrics to consider: <i>network.interface.hw_addr</i>,
+       <i>network.interface.inet_addr["eth0"]</i>, <i>network.interface.ipv6_addr</i>,
+       <i>kernel.uname.nodename</i>
+
+       <i>log-directory</i>
+              This file contains the path of a directory beneath which the
+              per-host-id subdirectories are to be created by <b>pmmgr</b>.  If it
+              is not a full path, it is implicitly relative to the
+              configuration directory itself.  The default is
+              <b>$PCP_LOG_DIR/pmmgr/</b>.
+
+       <i>target-host</i>
+              This file contains one or more lines containing <b>pmcd </b>host
+              specifications, as described on the <i>PCPintro</i>(1) manual page.
+              Each poll interval, <b>pmmgr </b>will attempt to make a brief
+              <i>pmNewContext</i> connection to the host to check liveness.  It is
+              not a problem if more than one specification for the same host
+              is listed, because the host-id processing eliminates
+              duplicates, and chooses an arbitrary specification among them.
+              The default is to target pmcd at <b>local:</b>.
+
+       <i>target-discovery</i>
+              This file contains one or more lines containing specifications
+              for the <i>pmDiscoverServices</i> PMAPI call, each of which may map
+              onto a fluctuating set of local or remote pmcd servers.  Each
+              poll interval, <b>pmmgr </b>will attempt to rerun discovery with all
+              of the given specifications.  Again, it is not a problem if
+              more than one specification matches the same actual pmcd: one
+              confirmed access path is arbitrarily selected.  The default is
+              to do <b>no discovery</b>.  Consider including <i>avahi,timeout=5</i> to
+              rely in pmcd self-announcements on the local network
+              (searching for up to five seconds each time).  Consider
+              including <i>probe=192.168.1.0/24</i> to quickly scan the given IP
+              address range.
+
+       <i>subtarget-containers</i>
+              If this file exists, <b>pmmgr </b>will scan each host that is found
+              for running containers.  For each running container, it will
+              create independent subtargets for running requested daemons.
+              The host-id string for these subtargets is the host's host-id
+              string, followed by a double-hyphen, then the full unique
+              container instance-name string.
+
+       <i>target-threads</i>
+              This file contains a limit on the number of concurrent threads
+              that analyze potential target pmcds for their hostids and/or
+              containers.  The default is <b>a few dozen threads per CPU core</b>,
+              if known.  Set this to zero if remote pmcds should be analyzed
+              sequentially.  A small number of threads is not a good idea if
+              any potential target pmcds are unreachable, since
+              $PMCD_CONNECT_TIMEOUT may be several seconds long each.
+
+       <i>log-subdirectory-gc</i>
+              This file may contain a time interval specification as per the
+              <a href="pcpintro.1-2.html">PCPintro(1)</a> manual page.  All subdirectories of the
+              log-directory are presumed to contain data for <b>pmmgr</b>-monitored
+              servers.  Those that have not been modified in at least that
+              long, and not associated with a currently monitored target,
+              are deleted entirely.  This value should be longer than the
+              longest interval that <b>pmmgr </b>normally recreates archives (such
+              as due to <b>pmmgr </b>restarts, and <b>pmlogmerge </b>intervals).  The
+              default value is <i>90days</i>.
+
+   <b>PMLOGGER CONFIGURATION</b>
+       This group of configuration options controls a <b>pmlogger </b>daemon for
+       each host.  This may include generating its configuration, and
+       managing its archives.
+
+       <i>pmlogger</i>
+              If and only if this file exists, pmmgr will maintain a
+              <b>pmlogger </b>daemon for each targeted host.  This file contains
+              one line of additional space-separated options for the <b>pmie</b>
+              daemon.  (<b>pmmgr </b>already adds -h, -f, -r, -l, and perhaps -c.)
+              The default is to maintain <b>no pmlogger </b>(and no other
+              configuration in this section is processed).
+
+       <i>pmlogger-timefmt</i>
+              Specify a time format to use in the archive-* name for
+              <b>pmlogger </b>generated archives. The default is "%Y%m%d.%H%M%S".
+              Expected to be in <a href="../man3/strftime.3.html">strftime(3)</a> format.
+
+       <i>pmlogconf</i>
+              If and only if this file exists, <b>pmmgr </b>will run <b>pmlogconf </b>to
+              generate a configuration file for each target <b>pmcd</b>.  The file
+              contains one line of space-separated additional options for
+              the <b>pmlogconf </b>program.  <b>pmlogconf</b>'s generated output file will
+              be stored under the log-directory/hostid subdirectory.  (<b>pmmgr</b>
+              already adds -c, -r, and -h.)  The default is <b>no pmlogconf</b>, so
+              instead, the <b>pmlogger </b>file above should probably contain a -c
+              option, to specify a fixed <b>pmlogger </b>configuration.
+
+   <b>ARCHIVE LOG MANAGEMENT</b>
+       Default <b>pmlogger </b>configurations can collect tens of megabytes of data
+       per day (possibly split into multiple archives), per target host.  If
+       your disk space is less than infinite, or archive-splitting unwieldy,
+       this should be managed.  In the default, unmanaged case, the system
+       administrator is responsible for managing the individual <i>archive-*</i>
+       files from the per-host logging subdirectories.  <b>pmmgr </b>offers several
+       other options, each representing different performance and usability
+       tradeoffs.
+
+   <b>ARCHIVE LOG MANAGEMENT - pmlogmerge</b>
+       This style of archive log management regularly creates a single
+       merged archive from prior archives for each target host, in effect
+       lopping off old data and appending the new.  A single merged archive
+       can be relatively large (defaults to approximately 100-400 MB per
+       host), and puts a corresponding I/O load on storage, but is most
+       convenient for a detailed long-timeframe analysis.  Once <b>pmlogger </b>is
+       restarted, it always creates a new archive, so in the steady state,
+       there will be one merged archive of recent history, and one current
+       archive being written-to by <b>pmlogger</b>.
+
+       <i>pmlogmerge</i>
+              If this file exists, <b>pmmgr </b>will run <b>pmlogextract </b>to
+              periodically merge together preexisting log archives for each
+              target pmcd into a single large one.  Then, the preexisting
+              log archives are deleted (including any prior merged ones).
+              This configuration file may contain a time interval
+              specification as per the <a href="pcpintro.1-2.html">PCPintro(1)</a> manual page, representing
+              the period after which <b>pmlogger </b>should be temporarily stopped,
+              and archives merged.  It represents the maximum amount of time
+              that the merged archive <i>lags</i> the present time.  The default is
+              <i>24hours</i>.
+
+       <i>pmlogmerge-granular</i>
+              If this file also exists, <b>pmmgr </b>will merge only a subset of
+              preexisting log archives into the new one, instead of all of
+              them, so as to approximate a granular, aligned set of merged
+              archives.  The subset chosen corresponds to the previous time
+              interval specified by the <i>pmlogmerge</i> control file.  The
+              default is <b>no granularity</b>.
+
+       <i>pmlogcheck-corrupt-gc</i>
+              Before archives are considered for merging, they are processed
+              through <b>pmlogcheck </b>to check for corruption.  In the unlikely
+              case of a problem, such archives are renamed out of the way
+              (named "corrupt-*"), and retained up to a limited time.  This
+              file specifies how long.  If this file exists, it the time
+              interval it contains is the maximum age.  The default is
+              <b>90days</b>.  To store corrupt archives indefinitely, set this to a
+              large quantity like "99999weeks".
+
+       <i>pmlogmerge-rewrite</i>
+              If this file exists, <b>pmmgr </b>will run <b>pmlogrewrite -i </b>(plus any
+              other options listed in this file) on each input archive
+              before merging it.  This will naturally require more disk I/O.
+              The default is <b>no rewriting</b>.
+
+       <i>pmlogmerge-retain</i>
+              <b>pmmgr </b>reduces/deletes any original-resolution archives after a
+              time period specified by this file, as measured by the file
+              mtime.  The period will also be passed to <b>pmlogextract </b>as a
+              negative parameter to <i>-S</i>.  The default is <i>14days</i>.  To store
+              archives indefinitely, set this to a large quantity like
+              "99999weeks".
+
+       <i>pmlogreduce</i>
+              If this file exists, then prior to removing archives that
+              expire past the <i>pmlogmerge-retain</i> period, they are processed
+              with <b>pmlogreduce </b>to create reduced archives (named <b>reduced-*</b>).
+              If the file contains space-separated options, they are passed
+              onto pmlogreduce.  (By default, pmlogreduce down-samples to a
+              600-second interval.)
+
+       <i>pmlogreduce-retain</i>
+              If this file exists, then reduced archives (identified by the
+              <b>reduced-* </b>pattern) are deleted after a time period specified
+              by this file, as measured from the file mtime.  Since this
+              time is likely that of the pmlogreduce run, the total
+              retention time will be approximately the pmlogmerge-retain
+              time <b>plus </b>the pmlogreduce-retain time.  The default is <b>90days</b>.
+              To store reduced archives indefinitely, set this to a large
+              quantity like "99999weeks".
+
+   <b>PMIE CONFIGURATION</b>
+       This group of configuration options controls a <b>pmie </b>daemon for each
+       host.  This may include generating a custom configuration.
+
+       <i>pmie</i>   If and only if this file exists, pmmgr will maintain a <b>pmie</b>
+              daemon for each targeted <b>pmcd</b>.  This file contains one line of
+              additional space-separated options for the <b>pmie </b>daemon.
+              (pmmgr already adds -h, -f, -l, and perhaps -c.)  The default
+              is to maintain <b>no pmie </b>(and no other configuration in this
+              section is processed).
+
+       <i>pmieconf</i>
+              If and only if this file exists, <b>pmmgr </b>will run <b>pmieconf </b>to
+              generate a configuration file for each target <b>pmcd</b>.  The file
+              contains one line of space-separated additional options for
+              the <b>pmieconf </b>program.  <b>pmieconf</b>- generated output file will be
+              stored under the log-directory/hostid subdirectory.  (<b>pmmgr</b>
+              already adds -F, -c, and -f.)  The default is <b>no pmieconf</b>, so
+              instead, the <i>pmie</i> file above should probably contain a -c
+              option, to specify a fixed <b>pmie configuration.</b>
+
+   <b>MONITOR DAEMON MANAGEMENT</b>
+       <b>pmmgr </b>may be used to invoke arbitrary PCP client programs for each
+       target <b>pmcd</b>.  This can enable automated invocation of reporting or
+       relaying tools, such as <b>pmrep</b>, <b>pcp2graphite </b>or <b>pcp2influxdb </b>without
+       needing a specialized system service.
+
+       <i>monitor</i>
+              If this file exists, then for each line in this file, a new
+              background process will be invoked.  (It is restarted if it
+              exits.)  The line specifies the beginning of the command line
+              (including the program name); <b>pmmgr </b>appends a -h HOSTSPEC, and
+              arranges to collect the standard output and standard error
+              into separate <b>monitor-NN.out </b>and <b>monitor-NN.err </b>files under
+              the log directory.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>$PCP_SYSCONF_DIR/pmmgr/</b>
+                 default configuration directory
+       <b>$PCP_LOG_DIR/pmmgr/</b>
+                 default logging directory
+</pre>
+<h2><a id="PCP_ENVIRONMENT" href="#PCP_ENVIRONMENT"></a>PCP ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Environment variables with the prefix <b>PCP_ </b>are used to parametrize
+       the file and directory names used by PCP.  On each installation, the
+       file <i>/etc/pcp.conf</i> contains the local values for these variables.
+       The <b>$PCP_CONF </b>variable may be used to specify an alternative
+       configuration file, as described in <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PCPIntro.1.html">PCPIntro(1)</a>, <b>cron</b>(1), <a href="pmcd.1.html">pmcd(1)</a>, <a href="pmlogconf.1.html">pmlogconf(1)</a>, <a href="pmlogger.1.html">pmlogger(1)</a>,
+       <a href="pmieconf.1.html">pmieconf(1)</a>, <a href="pmie.1.html">pmie(1)</a>, <a href="pmrep.1.html">pmrep(1)</a>, <a href="pcp2graphite.1.html">pcp2graphite(1)</a>, <a href="pcp2influxdb.1.html">pcp2influxdb(1)</a>,
+       <a href="pmlogreduce.1.html">pmlogreduce(1)</a>, <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a> and <a href="../man5/pcp.env.5.html">pcp.env(5)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                            PMMGR(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pcp2graphite.1.html">pcp2graphite(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

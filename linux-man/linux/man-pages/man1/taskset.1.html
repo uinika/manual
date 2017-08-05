@@ -1,0 +1,278 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>taskset(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#USAGE">USAGE</a> | <a href="#PERMISSIONS">PERMISSIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#COPYRIGHT">COPYRIGHT</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">TASKSET(1)                      User Commands                     TASKSET(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       taskset - set or retrieve a process's CPU affinity
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>taskset </b>[options] <i>mask command</i> [<i>argument</i>...]
+       <b>taskset </b>[options] <b>-p </b>[<i>mask</i>] <i>pid</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>taskset </b>is used to set or retrieve the CPU affinity of a running
+       process given its <i>pid</i>, or to launch a new <i>command</i> with a given CPU
+       affinity.  CPU affinity is a scheduler property that "bonds" a
+       process to a given set of CPUs on the system.  The Linux scheduler
+       will honor the given CPU affinity and the process will not run on any
+       other CPUs.  Note that the Linux scheduler also supports natural CPU
+       affinity: the scheduler attempts to keep processes on the same CPU as
+       long as practical for performance reasons.  Therefore, forcing a
+       specific CPU affinity is useful only in certain applications.
+
+       The CPU affinity is represented as a bitmask, with the lowest order
+       bit corresponding to the first logical CPU and the highest order bit
+       corresponding to the last logical CPU.  Not all CPUs may exist on a
+       given system but a mask may specify more CPUs than are present.  A
+       retrieved mask will reflect only the bits that correspond to CPUs
+       physically on the system.  If an invalid mask is given (i.e., one
+       that corresponds to no valid CPUs on the current system) an error is
+       returned.  The masks may be specified in hexadecimal (with or without
+       a leading "0x"), or as a CPU list with the <b>--cpu-list </b>option.  For
+       example,
+
+           <b>0x00000001  </b>is processor #0,
+
+           <b>0x00000003  </b>is processors #0 and #1,
+
+           <b>0xFFFFFFFF  </b>is processors #0 through #31,
+
+           <b>32          </b>is processors #1, #4, and #5,
+
+           <b>--cpu-list 0-2,6</b>
+                       is processors #0, #1, #2, and #6.
+
+       When <b>taskset </b>returns, it is guaranteed that the given program has
+       been scheduled to a legal CPU.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-a</b>, <b>--all-tasks</b>
+              Set or retrieve the CPU affinity of all the tasks (threads)
+              for a given PID.
+
+       <b>-c</b>, <b>--cpu-list</b>
+              Interpret <i>mask</i> as numerical list of processors instead of a
+              bitmask.  Numbers are separated by commas and may include
+              ranges.  For example: <b>0,5,8-11</b>.
+
+       <b>-p</b>, <b>--pid</b>
+              Operate on an existing PID and do not launch a new task.
+
+       <b>-V</b>, <b>--version</b>
+              Display version information and exit.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.
+</pre>
+<h2><a id="USAGE" href="#USAGE"></a>USAGE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The default behavior is to run a new command with a given affinity
+       mask:
+              <b>taskset </b><i>mask command</i> [<i>arguments</i>]
+
+       You can also retrieve the CPU affinity of an existing task:
+              <b>taskset -p </b><i>pid</i>
+
+       Or set it:
+              <b>taskset -p </b><i>mask pid</i>
+</pre>
+<h2><a id="PERMISSIONS" href="#PERMISSIONS"></a>PERMISSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A user can change the CPU affinity of a process belonging to the same
+       user.  A user must possess <b>CAP_SYS_NICE </b>to change the CPU affinity of
+       a process belonging to another user.  A user can retrieve the
+       affinity mask of any process.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="chrt.1.html">chrt(1)</a>, <a href="nice.1.html">nice(1)</a>, <a href="renice.1.html">renice(1)</a>, <a href="../man2/sched_getaffinity.2.html">sched_getaffinity(2)</a>,
+       <a href="../man2/sched_setaffinity.2.html">sched_setaffinity(2)</a>
+
+       See <a href="../man7/sched.7.html">sched(7)</a> for a description of the Linux scheduling scheme.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Written by Robert M. Love.
+</pre>
+<h2><a id="COPYRIGHT" href="#COPYRIGHT"></a>COPYRIGHT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Copyright © 2004 Robert M. Love.  This is free software; see the
+       source for copying conditions.  There is NO warranty; not even for
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The taskset command is part of the util-linux package and is
+       available from <a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                       August 2014                      TASKSET(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="chrt.1.html">chrt(1)</a>,&nbsp; 
+    <a href="../man2/sched_setaffinity.2.html">sched_setaffinity(2)</a>,&nbsp; 
+    <a href="../man7/cpuset.7.html">cpuset(7)</a>,&nbsp; 
+    <a href="../man7/sched.7.html">sched(7)</a>,&nbsp; 
+    <a href="../man8/migratepages.8.html">migratepages(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

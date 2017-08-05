@@ -1,0 +1,393 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>access(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ACCESS(2)                 Linux Programmer's Manual                ACCESS(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       access, faccessat - check user's permissions for a file
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>int access(const char *</b><i>pathname</i><b>, int </b><i>mode</i><b>);</b>
+
+       <b>#include &lt;fcntl.h&gt;           </b>/* Definition of AT_* constants */
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>int faccessat(int </b><i>dirfd</i><b>, const char *</b><i>pathname</i><b>, int </b><i>mode</i><b>, int </b><i>flags</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>faccessat</b>():
+           Since glibc 2.10:
+               _POSIX_C_SOURCE &gt;= 200809L
+           Before glibc 2.10:
+               _ATFILE_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>access</b>() checks whether the calling process can access the file
+       <i>pathname</i>.  If <i>pathname</i> is a symbolic link, it is dereferenced.
+
+       The <i>mode</i> specifies the accessibility check(s) to be performed, and is
+       either the value <b>F_OK</b>, or a mask consisting of the bitwise OR of one
+       or more of <b>R_OK</b>, <b>W_OK</b>, and <b>X_OK</b>.  <b>F_OK </b>tests for the existence of the
+       file.  <b>R_OK</b>, <b>W_OK</b>, and <b>X_OK </b>test whether the file exists and grants
+       read, write, and execute permissions, respectively.
+
+       The check is done using the calling process's <i>real</i> UID and GID,
+       rather than the effective IDs as is done when actually attempting an
+       operation (e.g., <a href="open.2.html">open(2)</a>) on the file.  Similarly, for the root user,
+       the check uses the set of permitted capabilities rather than the set
+       of effective capabilities; and for non-root users, the check uses an
+       empty set of capabilities.
+
+       This allows set-user-ID programs and capability-endowed programs to
+       easily determine the invoking user's authority.  In other words,
+       <b>access</b>() does not answer the "can I read/write/execute this file?"
+       question.  It answers a slightly different question: "(assuming I'm a
+       setuid binary) can <i>the user who invoked me</i> read/write/execute this
+       file?", which gives set-user-ID programs the possibility to prevent
+       malicious users from causing them to read files which users shouldn't
+       be able to read.
+
+       If the calling process is privileged (i.e., its real UID is zero),
+       then an <b>X_OK </b>check is successful for a regular file if execute
+       permission is enabled for any of the file owner, group, or other.
+
+   <b>faccessat()</b>
+       The <b>faccessat</b>() system call operates in exactly the same way as
+       <b>access</b>(), except for the differences described here.
+
+       If the pathname given in <i>pathname</i> is relative, then it is interpreted
+       relative to the directory referred to by the file descriptor <i>dirfd</i>
+       (rather than relative to the current working directory of the calling
+       process, as is done by <b>access</b>() for a relative pathname).
+
+       If <i>pathname</i> is relative and <i>dirfd</i> is the special value <b>AT_FDCWD</b>, then
+       <i>pathname</i> is interpreted relative to the current working directory of
+       the calling process (like <b>access</b>()).
+
+       If <i>pathname</i> is absolute, then <i>dirfd</i> is ignored.
+
+       <i>flags</i> is constructed by ORing together zero or more of the following
+       values:
+
+       <b>AT_EACCESS</b>
+              Perform access checks using the effective user and group IDs.
+              By default, <b>faccessat</b>() uses the real IDs (like <b>access</b>()).
+
+       <b>AT_SYMLINK_NOFOLLOW</b>
+              If <i>pathname</i> is a symbolic link, do not dereference it: instead
+              return information about the link itself.
+
+       See <a href="openat.2.html">openat(2)</a> for an explanation of the need for <b>faccessat</b>().
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success (all requested permissions granted, or <i>mode</i> is <b>F_OK </b>and
+       the file exists), zero is returned.  On error (at least one bit in
+       <i>mode</i> asked for a permission that is denied, or <i>mode</i> is <b>F_OK </b>and the
+       file does not exist, or some other error occurred), -1 is returned,
+       and <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>access</b>() and <b>faccessat</b>() shall fail if:
+
+       <b>EACCES </b>The requested access would be denied to the file, or search
+              permission is denied for one of the directories in the path
+              prefix of <i>pathname</i>.  (See also <a href="../man7/path_resolution.7.html">path_resolution(7)</a>.)
+
+       <b>ELOOP  </b>Too many symbolic links were encountered in resolving
+              <i>pathname</i>.
+
+       <b>ENAMETOOLONG</b>
+              <i>pathname</i> is too long.
+
+       <b>ENOENT </b>A component of <i>pathname</i> does not exist or is a dangling
+              symbolic link.
+
+       <b>ENOTDIR</b>
+              A component used as a directory in <i>pathname</i> is not, in fact, a
+              directory.
+
+       <b>EROFS  </b>Write permission was requested for a file on a read-only
+              filesystem.
+
+       <b>access</b>() and <b>faccessat</b>() may fail if:
+
+       <b>EFAULT </b><i>pathname</i> points outside your accessible address space.
+
+       <b>EINVAL </b><i>mode</i> was incorrectly specified.
+
+       <b>EIO    </b>An I/O error occurred.
+
+       <b>ENOMEM </b>Insufficient kernel memory was available.
+
+       <b>ETXTBSY</b>
+              Write access was requested to an executable which is being
+              executed.
+
+       The following additional errors can occur for <b>faccessat</b>():
+
+       <b>EBADF  </b><i>dirfd</i> is not a valid file descriptor.
+
+       <b>EINVAL </b>Invalid flag specified in <i>flags</i>.
+
+       <b>ENOTDIR</b>
+              <i>pathname</i> is relative and <i>dirfd</i> is a file descriptor referring
+              to a file other than a directory.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>faccessat</b>() was added to Linux in kernel 2.6.16; library support was
+       added to glibc in version 2.4.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>access</b>(): SVr4, 4.3BSD, POSIX.1-2001, POSIX.1-2008.
+
+       <b>faccessat</b>(): POSIX.1-2008.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Warning</b>: Using these calls to check if a user is authorized to, for
+       example, open a file before actually doing so using <a href="open.2.html">open(2)</a> creates a
+       security hole, because the user might exploit the short time interval
+       between checking and opening the file to manipulate it.  <b>For this</b>
+       <b>reason, the use of this system call should be avoided</b>.  (In the
+       example just described, a safer alternative would be to temporarily
+       switch the process's effective user ID to the real ID and then call
+       <a href="open.2.html">open(2)</a>.)
+
+       <b>access</b>() always dereferences symbolic links.  If you need to check
+       the permissions on a symbolic link, use <b>faccessat</b>() with the flag
+       <b>AT_SYMLINK_NOFOLLOW</b>.
+
+       These calls return an error if any of the access types in <i>mode</i> is
+       denied, even if some of the other access types in <i>mode</i> are permitted.
+
+       If the calling process has appropriate privileges (i.e., is
+       superuser), POSIX.1-2001 permits an implementation to indicate
+       success for an <b>X_OK </b>check even if none of the execute file permission
+       bits are set.  Linux does not do this.
+
+       A file is accessible only if the permissions on each of the
+       directories in the path prefix of <i>pathname</i> grant search (i.e.,
+       execute) access.  If any directory is inaccessible, then the <b>access</b>()
+       call will fail, regardless of the permissions on the file itself.
+
+       Only access bits are checked, not the file type or contents.
+       Therefore, if a directory is found to be writable, it probably means
+       that files can be created in the directory, and not that the
+       directory can be written as a file.  Similarly, a DOS file may be
+       found to be "executable," but the <a href="execve.2.html">execve(2)</a> call will still fail.
+
+       These calls may not work correctly on NFSv2 filesystems with UID
+       mapping enabled, because UID mapping is done on the server and hidden
+       from the client, which checks permissions.  (NFS versions 3 and
+       higher perform the check on the server.)  Similar problems can occur
+       to FUSE mounts.
+
+   <b>C library/kernel differences</b>
+       The raw <b>faccessat</b>() system call takes only the first three arguments.
+       The <b>AT_EACCESS </b>and <b>AT_SYMLINK_NOFOLLOW </b>flags are actually implemented
+       within the glibc wrapper function for <b>faccessat</b>().  If either of
+       these flags is specified, then the wrapper function employs
+       <a href="fstatat.2.html">fstatat(2)</a> to determine access permissions.
+
+   <b>Glibc notes</b>
+       On older kernels where <b>faccessat</b>() is unavailable (and when the
+       <b>AT_EACCESS </b>and <b>AT_SYMLINK_NOFOLLOW </b>flags are not specified), the
+       glibc wrapper function falls back to the use of <b>access</b>().  When
+       <i>pathname</i> is a relative pathname, glibc constructs a pathname based on
+       the symbolic link in <i>/proc/self/fd</i> that corresponds to the <i>dirfd</i>
+       argument.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In kernel 2.4 (and earlier) there is some strangeness in the handling
+       of <b>X_OK </b>tests for superuser.  If all categories of execute permission
+       are disabled for a nondirectory file, then the only <b>access</b>() test
+       that returns -1 is when <i>mode</i> is specified as just <b>X_OK</b>; if <b>R_OK </b>or
+       <b>W_OK </b>is also specified in <i>mode</i>, then <b>access</b>() returns 0 for such
+       files.  Early 2.6 kernels (up to and including 2.6.3) also behaved in
+       the same way as kernel 2.4.
+
+       In kernels before 2.6.20, these calls ignored the effect of the
+       <b>MS_NOEXEC </b>flag if it was used to <a href="mount.2.html">mount(2)</a> the underlying filesystem.
+       Since kernel 2.6.20, the <b>MS_NOEXEC </b>flag is honored.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="chmod.2.html">chmod(2)</a>, <a href="chown.2.html">chown(2)</a>, <a href="open.2.html">open(2)</a>, <a href="setgid.2.html">setgid(2)</a>, <a href="setuid.2.html">setuid(2)</a>, <a href="stat.2.html">stat(2)</a>,
+       <a href="../man3/euidaccess.3.html">euidaccess(3)</a>, <a href="../man7/credentials.7.html">credentials(7)</a>, <a href="../man7/path_resolution.7.html">path_resolution(7)</a>, <a href="../man7/symlink.7.html">symlink(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-03-15                        ACCESS(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/find.1.html">find(1)</a>,&nbsp; 
+    <a href="open.2.html">open(2)</a>,&nbsp; 
+    <a href="stat.2.html">stat(2)</a>,&nbsp; 
+    <a href="statx.2.html">statx(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/euidaccess.3.html">euidaccess(3)</a>,&nbsp; 
+    <a href="../man7/cpuset.7.html">cpuset(7)</a>,&nbsp; 
+    <a href="../man7/credentials.7.html">credentials(7)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>,&nbsp; 
+    <a href="../man7/spufs.7.html">spufs(7)</a>,&nbsp; 
+    <a href="../man7/symlink.7.html">symlink(7)</a>,&nbsp; 
+    <a href="../man8/lsof.8.html">lsof(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="access.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

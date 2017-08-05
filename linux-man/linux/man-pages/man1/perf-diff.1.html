@@ -1,0 +1,378 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>perf-diff(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#COMPARISON">COMPARISON</a> | <a href="#COMPARISON_METHODS">COMPARISON&nbsp;METHODS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PERF-DIFF(1)                     perf Manual                    PERF-DIFF(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       perf-diff - Read perf.data files and display the differential profile
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>perf diff</i> [baseline file] [data file1] [[data file2] ... ]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This command displays the performance difference amongst two or more
+       perf.data files captured via perf record.
+
+       If no parameters are passed it will assume perf.data.old and
+       perf.data.
+
+       The differential profile is displayed only for events matching both
+       specified perf.data files.
+
+       If no parameters are passed the samples will be sorted by dso and
+       symbol. As the perf.data files could come from different binaries,
+       the symbols addresses could vary. So perf diff is based on the
+       comparison of the files and symbols name.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -D, --dump-raw-trace
+           Dump raw trace in ASCII.
+
+       --kallsyms=&lt;file&gt;
+           kallsyms pathname
+
+       -m, --modules
+           Load module symbols. WARNING: use only with -k and LIVE kernel
+
+       -d, --dsos=
+           Only consider symbols in these dsos. CSV that understands
+           <b>file://filename </b><b></b>entries. This option will affect the percentage
+           of the Baseline/Delta column. See --percentage for more info.
+
+       -C, --comms=
+           Only consider symbols in these comms. CSV that understands
+           <b>file://filename </b><b></b>entries. This option will affect the percentage
+           of the Baseline/Delta column. See --percentage for more info.
+
+       -S, --symbols=
+           Only consider these symbols. CSV that understands <b>file://filename</b>
+           entries. This option will affect the percentage of the
+           Baseline/Delta column. See --percentage for more info.
+
+       -s, --sort=
+           Sort by key(s): pid, comm, dso, symbol, cpu, parent, srcline.
+           Please see description of --sort in the perf-report man page.
+
+       -t, --field-separator=
+           Use a special separator character and don’t pad with spaces,
+           replacing all occurrences of this separator in symbol names (and
+           other output) with a <i>.</i>  character, that thus it’s the only non
+           valid separator.
+
+       -v, --verbose
+           Be verbose, for instance, show the raw counts in addition to the
+           diff.
+
+       -q, --quiet
+           Do not show any message. (Suppress -v)
+
+       -f, --force
+           Don’t do ownership validation.
+
+       --symfs=&lt;directory&gt;
+           Look for files with symbols relative to this directory.
+
+       -b, --baseline-only
+           Show only items with match in baseline.
+
+       -c, --compute
+           Differential computation selection - delta, ratio, wdiff,
+           delta-abs (default is delta-abs). Default can be changed using
+           diff.compute config option. See COMPARISON METHODS section for
+           more info.
+
+       -p, --period
+           Show period values for both compared hist entries.
+
+       -F, --formula
+           Show formula for given computation.
+
+       -o, --order
+           Specify compute sorting column number. 0 means sorting by
+           baseline overhead and 1 (default) means sorting by computed value
+           of column 1 (data from the first file other base baseline).
+           Values more than 1 can be used only if enough data files are
+           provided. The default value can be set using the diff.order
+           config option.
+
+       --percentage
+           Determine how to display the overhead percentage of filtered
+           entries. Filters can be applied by --comms, --dsos and/or
+           --symbols options.
+
+               "relative" means it's relative to filtered entries only so that the
+               sum of shown entries will be always 100%.  "absolute" means it retains
+               the original value before and after the filter is applied.
+</pre>
+<h2><a id="COMPARISON" href="#COMPARISON"></a>COMPARISON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The comparison is governed by the baseline file. The baseline
+       perf.data file is iterated for samples. All other perf.data files
+       specified on the command line are searched for the baseline sample
+       pair. If the pair is found, specified computation is made and result
+       is displayed.
+
+       All samples from non-baseline perf.data files, that do not match any
+       baseline entry, are displayed with empty space within baseline column
+       and possible computation results (delta) in their related column.
+
+       Example files samples: - file A with samples f1, f2, f3, f4, f6 -
+       file B with samples f2, f4, f5 - file C with samples f1, f2, f5
+
+       Example output: x - computation takes place for pair b - baseline
+       sample percentage
+
+       ·   perf diff A B C
+
+               baseline/A compute/B compute/C  samples
+               ---------------------------------------
+               b                    x          f1
+               b          x         x          f2
+               b                               f3
+               b          x                    f4
+               b                               f6
+                          x         x          f5
+
+       ·   perf diff B A C
+
+               baseline/B compute/A compute/C  samples
+               ---------------------------------------
+               b          x         x          f2
+               b          x                    f4
+               b                    x          f5
+                          x         x          f1
+                          x                    f3
+                          x                    f6
+
+       ·   perf diff C B A
+
+               baseline/C compute/B compute/A  samples
+               ---------------------------------------
+               b                    x          f1
+               b          x         x          f2
+               b          x                    f5
+                                    x          f3
+                          x         x          f4
+                                    x          f6
+</pre>
+<h2><a id="COMPARISON_METHODS" href="#COMPARISON_METHODS"></a>COMPARISON METHODS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>delta</b>
+       If specified the <i>Delta</i> column is displayed with value <i>d</i> computed as:
+
+           d = A-&gt;period_percent - B-&gt;period_percent
+
+       with: - A/B being matching hist entry from data/baseline file
+       specified (or perf.data/perf.data.old) respectively.
+
+       ·   period_percent being the % of the hist entry period value within
+           single data file
+
+       ·   with filtering by -C, -d and/or -S, period_percent might be
+           changed relative to how entries are filtered. Use
+           --percentage=absolute to prevent such fluctuation.
+
+   <b>delta-abs</b>
+       Same as 'delta` method, but sort the result with the absolute values.
+
+   <b>ratio</b>
+       If specified the <i>Ratio</i> column is displayed with value <i>r</i> computed as:
+
+           r = A-&gt;period / B-&gt;period
+
+       with: - A/B being matching hist entry from data/baseline file
+       specified (or perf.data/perf.data.old) respectively.
+
+       ·   period being the hist entry period value
+
+   <b>wdiff:WEIGHT-B,WEIGHT-A</b>
+       If specified the <i>Weighted diff</i> column is displayed with value <i>d</i>
+       computed as:
+
+           d = B-&gt;period * WEIGHT-A - A-&gt;period * WEIGHT-B
+
+       ·   A/B being matching hist entry from data/baseline file specified
+           (or perf.data/perf.data.old) respectively.
+
+       ·   period being the hist entry period value
+
+       ·   WEIGHT-A/WEIGHT-B being user supplied weights in the the <i>-c</i>
+           option behind <i>:</i> separator like <i>-c wdiff:1,2</i>.
+
+       ·   WEIGHT-A being the weight of the data file
+
+       ·   WEIGHT-B being the weight of the baseline data file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="perf-record.1.html">perf-record(1)</a>, <a href="perf-report.1.html">perf-report(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>perf</i> (Performance analysis tools for Linux
+       (in Linux source tree)) project.  Information about the project can
+       be found at ⟨<a href="https://perf.wiki.kernel.org/index.php/Main_Page">https://perf.wiki.kernel.org/index.php/Main_Page</a>⟩.  If
+       you have a bug report for this manual page, send it to
+       linux-kernel@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨<a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git">http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">perf                             03/12/2017                     PERF-DIFF(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="perf-kvm.1.html">perf-kvm(1)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

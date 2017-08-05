@@ -1,0 +1,355 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>selinux_restorecon(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">selinux_restorecon(3)     SELinux API documentation    selinux_restorecon(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       selinux_restorecon  -  restore  file(s) default SELinux security con‐
+       texts
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;selinux/restorecon.h&gt;</b>
+
+       <b>int selinux_restorecon(const char *</b><i>pathname</i><b>,</b>
+                              <b>unsigned int </b><i>restorecon_flags</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>selinux_restorecon</b>() restores file default security contexts on
+       filesystems that support extended attributes (see <a href="../man7/xattr.7.html">xattr(7)</a>), based
+       on:
+
+              <i>pathname</i> containing a directory or file to be relabeled.
+              If this is a directory and the <i>restorecon_flags</i>
+              <b>SELINUX_RESTORECON_RECURSE </b>has been set (for descending
+              through directories), then <b>selinux_restorecon</b>() will write an
+              SHA1 digest of the combined specfiles (see the <b>NOTES </b>section
+              for details) to an extended attribute of
+              <i>security.restorecon_last</i> once the relabeling has been
+              completed successfully. This digest will be checked should
+              <b>selinux_restorecon</b>() be rerun with the <i>restorecon_flags</i>
+              <b>SELINUX_RESTORECON_RECURSE </b>flag set. If any of the specfiles
+              had been updated, the digest will also be updated. However if
+              the digest is the same, no relabeling checks will take place
+              (unless the <b>SELINUX_RESTORECON_IGNORE_DIGEST </b>flag is set).
+
+              <i>restorecon_flags</i> contains the labeling option/rules as
+              follows:
+
+                     <b>SELINUX_RESTORECON_IGNORE_DIGEST </b>force the checking of
+                     labels even if the stored SHA1 digest matches the
+                     specfiles SHA1 digest. The specfiles digest will be
+                     written to the <i>security.restorecon_last</i> extended
+                     attribute once relabeling has been completed
+                     successfully provided the <b>SELINUX_RESTORECON_NOCHANGE</b>
+                     flag has not been set.
+
+                     <b>SELINUX_RESTORECON_NOCHANGE </b>don't change any file
+                     labels (passive check) or update the digest in the
+                     <i>security.restorecon_last</i> extended attribute.
+
+                     <b>SELINUX_RESTORECON_SET_SPECFILE_CTX </b>If set, reset the
+                     files label to match the default specfile context.  If
+                     not set only reset the files "type" component of the
+                     context to match the default specfile context.
+
+                     <b>SELINUX_RESTORECON_RECURSE </b>change file and directory
+                     labels recursively (descend directories) and if
+                     successful write an SHA1 digest of the combined
+                     specfiles to an extended attribute as described in the
+                     <b>NOTES </b>section.
+
+                     <b>SELINUX_RESTORECON_VERBOSE </b>log file label changes.
+                            Note that if <b>SELINUX_RESTORECON_VERBOSE </b>and
+                            <b>SELINUX_RESTORECON_PROGRESS </b>flags are set, then
+                            <b>SELINUX_RESTORECON_PROGRESS </b>will take
+                            precedence.
+
+                     <b>SELINUX_RESTORECON_PROGRESS </b>show progress by outputting
+                     the number of files in 1k blocks processed to stdout.
+                     If the <b>SELINUX_RESTORECON_MASS_RELABEL </b>flag is also set
+                     then the approximate percentage complete will be shown.
+
+                     <b>SELINUX_RESTORECON_MASS_RELABEL </b>generally set when
+                     relabeling the entire OS, that will then show the
+                     approximate percentage complete. The
+                     <b>SELINUX_RESTORECON_PROGRESS </b>flag must also be set.
+
+                     <b>SELINUX_RESTORECON_REALPATH </b>convert passed-in <i>pathname</i>
+                     to the canonical pathname using <a href="realpath.3.html">realpath(3)</a>.
+
+                     <b>SELINUX_RESTORECON_XDEV </b>prevent descending into
+                     directories that have a different device number than
+                     the <i>pathname</i> entry from which the descent began.
+
+                     <b>SELINUX_RESTORECON_ADD_ASSOC </b>attempt to add an
+                     association between an inode and a specification. If
+                     there is already an association for the inode and it
+                     conflicts with the specification, then use the last
+                     matching specification.
+
+                     <b>SELINUX_RESTORECON_ABORT_ON_ERROR </b>abort on errors
+                     during the file tree walk.
+
+                     <b>SELINUX_RESTORECON_SYSLOG_CHANGES </b>log any label changes
+                     to <a href="syslog.3.html">syslog(3)</a>.
+
+                     <b>SELINUX_RESTORECON_LOG_MATCHES </b>log what specfile
+                     context matched each file.
+
+                     <b>SELINUX_RESTORECON_IGNORE_NOENTRY </b>ignore files that do
+                     not exist.
+
+                     <b>SELINUX_RESTORECON_IGNORE_MOUNTS </b>do not read
+                     <b>/proc/mounts </b>to obtain a list of non-seclabel mounts to
+                     be excluded from relabeling checks.
+                     Setting <b>SELINUX_RESTORECON_IGNORE_MOUNTS </b>is useful
+                     where there is a non-seclabel fs mounted with a
+                     seclabel fs mounted on a directory below this.
+
+              The behavior regarding the checking and updating of the SHA1
+              digest described above is the default behavior. It is possible
+              to change this by first calling <a href="selabel_open.3.html">selabel_open(3)</a> and not
+              enabling the <b>SELABEL_OPT_DIGEST </b>option, then calling
+              <a href="selinux_restorecon_set_sehandle.3.html">selinux_restorecon_set_sehandle(3)</a> to set the handle to be
+              used by <a href="selinux_restorecon.3.html">selinux_restorecon(3)</a>.
+
+              If the <i>pathname</i> is a directory path, then it is possible to
+              set directories to be excluded from the path by calling
+              <a href="selinux_restorecon_set_exclude_list.3.html">selinux_restorecon_set_exclude_list(3)</a> with a <b>NULL </b>terminated
+              list before calling <a href="selinux_restorecon.3.html">selinux_restorecon(3)</a>.
+
+              By default <a href="selinux_restorecon.3.html">selinux_restorecon(3)</a> reads <b>/proc/mounts </b>to obtain
+              a list of non-seclabel mounts to be excluded from relabeling
+              checks unless the <b>SELINUX_RESTORECON_IGNORE_MOUNTS </b>flag has
+              been set.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned and <i><a href="errno.3.html">errno</a></i> is
+       set appropriately.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       1.  To improve performance when relabeling file systems recursively
+           (e.g. the <i>restorecon_flags</i> <b>SELINUX_RESTORECON_RECURSE </b>flag is
+           set) <b>selinux_restorecon</b>() will write an SHA1 digest of the
+           specfiles that are processed by <a href="selabel_open.3.html">selabel_open(3)</a> to an extended
+           attribute named <i>security.restorecon_last</i> to the directory
+           specified in the <i>pathname</i>.
+
+       2.  To check the extended attribute entry use <a href="../man1/getfattr.1.html">getfattr(1)</a>, for
+           example:
+
+                  getfattr -e hex -n security.restorecon_last /
+
+       3.  The SHA1 digest is calculated by <a href="selabel_open.3.html">selabel_open(3)</a> concatenating
+           the specfiles it reads during initialisation with the resulting
+           digest and list of specfiles being retrieved by
+           <a href="selabel_digest.3.html">selabel_digest(3)</a>.
+
+       4.  The specfiles consist of the mandatory <i>file_contexts</i> file plus
+           any subs, subs_dist, local and homedir entries (text or binary
+           versions) as determined by any <a href="selabel_open.3.html">selabel_open(3)</a> options e.g.
+           <b>SELABEL_OPT_BASEONLY</b>.
+
+           Should any of the specfiles have changed, then when
+           <b>selinux_restorecon</b>() is run again with the
+           <b>SELINUX_RESTORECON_RECURSE </b>flag set, a new SHA1 digest will be
+           calculated and all files will be automatically relabeled
+           depending on the settings of the
+           <b>SELINUX_RESTORECON_SET_SPECFILE_CTX </b>flag (provided
+           <b>SELINUX_RESTORECON_NOCHANGE </b>is not set).
+
+       5.  <b>/sys </b>and in-memory filesystems do not support the
+           <i>security.restorecon_last</i> extended attribute and are automatically
+           excluded from any relabeling checks.
+
+       6.  By default <b>stderr </b>is used to log output messages and errors. This
+           may be changed by calling <a href="selinux_set_callback.3.html">selinux_set_callback(3)</a> with the
+           <b>SELINUX_CB_LOG </b><i>type</i> option.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="selinux_restorecon_set_sehandle.3.html">selinux_restorecon_set_sehandle(3)</a>,
+       <a href="selinux_restorecon_default_handle.3.html">selinux_restorecon_default_handle(3)</a>,
+       <a href="selinux_restorecon_set_exclude_list.3.html">selinux_restorecon_set_exclude_list(3)</a>,
+       <a href="selinux_restorecon_set_alt_rootpath.3.html">selinux_restorecon_set_alt_rootpath(3)</a>,
+       <a href="selinux_restorecon_xattr.3.html">selinux_restorecon_xattr(3)</a>,
+       <a href="selinux_set_callback.3.html">selinux_set_callback(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Security Enhanced Linux          20 Oct 2015           selinux_restorecon(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="selinux_restorecon.3.html">selinux_restorecon(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_default_handle.3.html">selinux_restorecon_default_handle(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_set_alt_rootpath.3.html">selinux_restorecon_set_alt_rootpath(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_set_exclude_list.3.html">selinux_restorecon_set_exclude_list(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_set_sehandle.3.html">selinux_restorecon_set_sehandle(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_xattr.3.html">selinux_restorecon_xattr(3)</a>,&nbsp; 
+    <a href="../man8/restorecon.8.html">restorecon(8)</a>,&nbsp; 
+    <a href="../man8/setfiles.8.html">setfiles(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

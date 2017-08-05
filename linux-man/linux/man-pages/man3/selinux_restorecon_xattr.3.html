@@ -1,0 +1,280 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>selinux_restorecon_xattr(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">selinux_restorecon_xattr(3)ELinux API documentationlinux_restorecon_xattr(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       selinux_restorecon_xattr  -  manage  default <i>security.restorecon_last</i>
+       extended   attribute   entries   added   by    <a href="selinux_restorecon.3.html">selinux_restorecon(3)</a>,
+       <a href="../man8/setfiles.8.html">setfiles(8)</a> or <a href="../man8/restorecon.8.html">restorecon(8)</a>.
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;selinux/restorecon.h&gt;</b>
+
+       <b>int selinux_restorecon_xattr(const char *</b><i>pathname</i><b>,</b>
+                              <b>unsigned int </b><i>xattr_flags</i><b>,</b>
+                              <b>struct dir_xattr ***</b><i>xattr_list</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>selinux_restorecon_xattr</b>() returns a linked list of <b>dir_xattr</b>
+       structures containing information described below based on:
+
+              <i>pathname</i> containing a directory tree to be searched for
+              <i>security.restorecon_last</i> extended attribute entries.
+
+              <i>xattr_flags</i> contains options as follows:
+
+                     <b>SELINUX_RESTORECON_XATTR_RECURSE </b>recursively descend
+                     directories.
+
+                     <b>SELINUX_RESTORECON_XATTR_DELETE_NONMATCH_DIGESTS </b>delete
+                     non-matching digests from each directory in <i>pathname</i>.
+
+                     <b>SELINUX_RESTORECON_XATTR_DELETE_ALL_DIGESTS </b>delete all
+                     digests from each directory in <i>pathname</i>.
+
+                     <b>SELINUX_RESTORECON_XATTR_IGNORE_MOUNTS </b>do not read
+                     <b>/proc/mounts </b>to obtain a list of non-seclabel mounts to
+                     be excluded from the search.
+                     Setting <b>SELINUX_RESTORECON_XATTR_IGNORE_MOUNTS </b>is
+                     useful where there is a non-seclabel fs mounted with a
+                     seclabel fs mounted on a directory below this.
+
+              <i>xattr_list</i> is the returned pointer to a linked list of
+              <b>dir_xattr </b>structures, each containing the following
+              information:
+
+                     struct dir_xattr {
+                         char *directory;
+                         char *digest;    /* Printable hex encoded string */
+                         enum digest_result result;
+                         struct dir_xattr *next;
+                     };
+
+              The <b>result </b>entry is enumerated as follows:
+                     enum digest_result {
+                         MATCH = 0,
+                         NOMATCH,
+                         DELETED_MATCH,
+                         DELETED_NOMATCH,
+                         ERROR
+                     };
+
+              <i>xattr_list</i> must be set to <b>NULL </b>before calling
+              <a href="selinux_restorecon_xattr.3.html">selinux_restorecon_xattr(3)</a>.  The caller is responsible for
+              freeing the returned <i>xattr_list</i> entries in the linked list.
+
+       See the <b>NOTES </b>section for more information.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned and <i><a href="errno.3.html">errno</a></i> is
+       set appropriately.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       1.  By default <a href="selinux_restorecon_xattr.3.html">selinux_restorecon_xattr(3)</a> will use the default set
+           of specfiles described in <b>files_contexts</b>(5) to calculate the
+           initial SHA1 digest to be used for comparision.  To change this
+           default behavior <a href="selabel_open.3.html">selabel_open(3)</a> must be called specifying the
+           required <b>SELABEL_OPT_PATH </b>and setting the <b>SELABEL_OPT_DIGEST</b>
+           option to a non-NULL value.  <a href="selinux_restorecon_set_sehandle.3.html">selinux_restorecon_set_sehandle(3)</a>
+           is then called to set the handle to be used by
+           <a href="selinux_restorecon_xattr.3.html">selinux_restorecon_xattr(3)</a>.
+
+       2.  By default <a href="selinux_restorecon_xattr.3.html">selinux_restorecon_xattr(3)</a> reads <b>/proc/mounts </b>to
+           obtain a list of non-seclabel mounts to be excluded from searches
+           unless the <b>SELINUX_RESTORECON_XATTR_IGNORE_MOUNTS </b>flag has been
+           set.
+
+       3.  <b>RAMFS </b>and <b>TMPFS </b>filesystems do not support the
+           <i>security.restorecon_last</i> extended attribute and are automatically
+           excluded from searches.
+
+       4.  By default <b>stderr </b>is used to log output messages and errors. This
+           may be changed by calling <a href="selinux_set_callback.3.html">selinux_set_callback(3)</a> with the
+           <b>SELINUX_CB_LOG </b><i>type</i> option.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="selinux_restorecon.3.html">selinux_restorecon(3)</a>
+       <a href="selinux_restorecon_set_sehandle.3.html">selinux_restorecon_set_sehandle(3)</a>,
+       <a href="selinux_restorecon_default_handle.3.html">selinux_restorecon_default_handle(3)</a>,
+       <a href="selinux_restorecon_set_exclude_list.3.html">selinux_restorecon_set_exclude_list(3)</a>,
+       <a href="selinux_restorecon_set_alt_rootpath.3.html">selinux_restorecon_set_alt_rootpath(3)</a>,
+       <a href="selinux_set_callback.3.html">selinux_set_callback(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                30 July 2016     selinux_restorecon_xattr(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="selinux_restorecon.3.html">selinux_restorecon(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_default_handle.3.html">selinux_restorecon_default_handle(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_set_alt_rootpath.3.html">selinux_restorecon_set_alt_rootpath(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_set_exclude_list.3.html">selinux_restorecon_set_exclude_list(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_set_sehandle.3.html">selinux_restorecon_set_sehandle(3)</a>,&nbsp; 
+    <a href="selinux_restorecon_xattr.3.html">selinux_restorecon_xattr(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

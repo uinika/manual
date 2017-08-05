@@ -1,0 +1,424 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd-analyze(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#EXAMPLES_FOR_DOT">EXAMPLES&nbsp;FOR&nbsp;DOT</a> | <a href="#EXAMPLES_FOR_VERIFY">EXAMPLES&nbsp;FOR&nbsp;VERIFY</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD-ANALYZE(1)             systemd-analyze            SYSTEMD-ANALYZE(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-analyze - Analyze system boot-up performance
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-analyze </b>[OPTIONS...] [time]
+
+       <b>systemd-analyze </b>[OPTIONS...] blame
+
+       <b>systemd-analyze </b>[OPTIONS...] critical-chain [<i>UNIT</i>...]
+
+       <b>systemd-analyze </b>[OPTIONS...] plot [&gt; file.svg]
+
+       <b>systemd-analyze </b>[OPTIONS...] dot [<i>PATTERN</i>...] [&gt; file.dot]
+
+       <b>systemd-analyze </b>[OPTIONS...] dump
+
+       <b>systemd-analyze </b>[OPTIONS...] set-log-level <i>LEVEL</i>
+
+       <b>systemd-analyze </b>[OPTIONS...] set-log-target <i>TARGET</i>
+
+       <b>systemd-analyze </b>[OPTIONS...] syscall-filter [<i>SET</i>...]
+
+       <b>systemd-analyze </b>[OPTIONS...] verify [<i>FILES</i>...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-analyze </b>may be used to determine system boot-up performance
+       statistics and retrieve other state and tracing information from the
+       system and service manager, and to verify the correctness of unit
+       files.
+
+       <b>systemd-analyze time </b>prints the time spent in the kernel before
+       userspace has been reached, the time spent in the initial RAM disk
+       (initrd) before normal system userspace has been reached, and the
+       time normal system userspace took to initialize. Note that these
+       measurements simply measure the time passed up to the point where all
+       system services have been spawned, but not necessarily until they
+       fully finished initialization or the disk is idle.
+
+       <b>systemd-analyze blame </b>prints a list of all running units, ordered by
+       the time they took to initialize. This information may be used to
+       optimize boot-up times. Note that the output might be misleading as
+       the initialization of one service might be slow simply because it
+       waits for the initialization of another service to complete.
+
+       <b>systemd-analyze critical-chain [</b><i>UNIT...</i><b>]  </b>prints a tree of the
+       time-critical chain of units (for each of the specified <i>UNIT</i>s or for
+       the default target otherwise). The time after the unit is active or
+       started is printed after the "@" character. The time the unit takes
+       to start is printed after the "+" character. Note that the output
+       might be misleading as the initialization of one service might depend
+       on socket activation and because of the parallel execution of units.
+
+       <b>systemd-analyze plot </b>prints an SVG graphic detailing which system
+       services have been started at what time, highlighting the time they
+       spent on initialization.
+
+       <b>systemd-analyze dot </b>generates textual dependency graph description in
+       dot format for further processing with the GraphViz <b>dot</b>(1) tool. Use
+       a command line like <b>systemd-analyze dot | dot -Tsvg &gt; systemd.svg </b>to
+       generate a graphical dependency tree. Unless <b>--order </b>or <b>--require </b>is
+       passed, the generated graph will show both ordering and requirement
+       dependencies. Optional pattern globbing style specifications (e.g.
+       *.target) may be given at the end. A unit dependency is included in
+       the graph if any of these patterns match either the origin or
+       destination node.
+
+       <b>systemd-analyze dump </b>outputs a (usually very long) human-readable
+       serialization of the complete server state. Its format is subject to
+       change without notice and should not be parsed by applications.
+
+       <b>systemd-analyze set-log-level </b><i>LEVEL</i> changes the current log level of
+       the <b>systemd </b>daemon to <i>LEVEL</i> (accepts the same values as <b>--log-level=</b>
+       described in <a href="systemd.1.html">systemd(1)</a>).
+
+       <b>systemd-analyze set-log-target </b><i>TARGET</i> changes the current log target
+       of the <b>systemd </b>daemon to <i>TARGET</i> (accepts the same values as
+       <b>--log-target=</b>, described in <a href="systemd.1.html">systemd(1)</a>).
+
+       <b>systemd-analyze syscall-filter [</b><i>SET</i>...]  will list system calls
+       contained in the specified system call set <i>SET</i>, or all known sets if
+       no sets are specified. Argument <i>SET</i> must include the "@" prefix.
+
+       <b>systemd-analyze verify </b>will load unit files and print warnings if any
+       errors are detected. Files specified on the command line will be
+       loaded, but also any other units referenced by them. The full unit
+       search path is formed by combining the directories for all command
+       line arguments, and the usual unit load paths (variable
+       <i>$SYSTEMD_UNIT_PATH</i> is supported, and may be used to replace or
+       augment the compiled in set of unit load paths; see <a href="../man5/systemd.unit.5.html">systemd.unit(5)</a>).
+       All units files present in the directories containing the command
+       line arguments will be used in preference to the other paths.
+
+       If no command is passed, <b>systemd-analyze time </b>is implied.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following options are understood:
+
+       <b>--user</b>
+           Operates on the user systemd instance.
+
+       <b>--system</b>
+           Operates on the system systemd instance. This is the implied
+           default.
+
+       <b>--order</b>, <b>--require</b>
+           When used in conjunction with the <b>dot </b>command (see above),
+           selects which dependencies are shown in the dependency graph. If
+           <b>--order </b>is passed, only dependencies of type <i>After=</i> or <i>Before=</i>
+           are shown. If <b>--require </b>is passed, only dependencies of type
+           <i>Requires=</i>, <i>Requisite=</i>, <i>Wants=</i> and <i>Conflicts=</i> are shown. If
+           neither is passed, this shows dependencies of all these types.
+
+       <b>--from-pattern=</b>, <b>--to-pattern=</b>
+           When used in conjunction with the <b>dot </b>command (see above), this
+           selects which relationships are shown in the dependency graph.
+           Both options require a <a href="../man7/glob.7.html">glob(7)</a> pattern as an argument, which will
+           be matched against the left-hand and the right-hand,
+           respectively, nodes of a relationship.
+
+           Each of these can be used more than once, in which case the unit
+           name must match one of the values. When tests for both sides of
+           the relation are present, a relation must pass both tests to be
+           shown. When patterns are also specified as positional arguments,
+           they must match at least one side of the relation. In other
+           words, patterns specified with those two options will trim the
+           list of edges matched by the positional arguments, if any are
+           given, and fully determine the list of edges shown otherwise.
+
+       <b>--fuzz=</b><i>timespan</i>
+           When used in conjunction with the <b>critical-chain </b>command (see
+           above), also show units, which finished <i>timespan</i> earlier, than
+           the latest unit in the same level. The unit of <i>timespan</i> is
+           seconds unless specified with a different unit, e.g. "50ms".
+
+       <b>--no-man</b>
+           Do not invoke man to verify the existence of man pages listed in
+           <i>Documentation=</i>.
+
+       <b>-H</b>, <b>--host=</b>
+           Execute the operation remotely. Specify a hostname, or a username
+           and hostname separated by "@", to connect to. The hostname may
+           optionally be suffixed by a container name, separated by ":",
+           which connects directly to a specific container on the specified
+           host. This will use SSH to talk to the remote machine manager
+           instance. Container names may be enumerated with <b>machinectl -H</b>
+           <i>HOST</i>.
+
+       <b>-M</b>, <b>--machine=</b>
+           Execute operation on a local container. Specify a container name
+           to connect to.
+
+       <b>-h</b>, <b>--help</b>
+           Print a short help text and exit.
+
+       <b>--version</b>
+           Print a short version string and exit.
+
+       <b>--no-pager</b>
+           Do not pipe output into a pager.
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, 0 is returned, a non-zero failure code otherwise.
+</pre>
+<h2><a id="EXAMPLES_FOR_DOT" href="#EXAMPLES_FOR_DOT"></a>EXAMPLES FOR DOT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Example 1. Plots all dependencies of any unit whose name starts with</b>
+       <b>"avahi-daemon"</b>
+
+           $ systemd-analyze dot 'avahi-daemon.*' | dot -Tsvg &gt; avahi.svg
+                 $ eog avahi.svg
+
+       <b>Example 2. Plots the dependencies between all known target units</b>
+
+           systemd-analyze dot --to-pattern='*.target' --from-pattern='*.target' | dot -Tsvg &gt; targets.svg
+           $ eog targets.svg
+</pre>
+<h2><a id="EXAMPLES_FOR_VERIFY" href="#EXAMPLES_FOR_VERIFY"></a>EXAMPLES FOR VERIFY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following errors are currently detected:
+
+       ·   unknown sections and directives,
+
+       ·   missing dependencies which are required to start the given unit,
+
+       ·   man pages listed in <i>Documentation=</i> which are not found in the
+           system,
+
+       ·   commands listed in <i>ExecStart=</i> and similar which are not found in
+           the system or not executable.
+
+       <b>Example 3. Misspelt directives</b>
+
+           $ cat ./user.slice
+           [Unit]
+           WhatIsThis=11
+           Documentation=man:nosuchfile(1)
+           Requires=different.service
+
+           [Service]
+           Description=x
+
+           $ systemd-analyze verify ./user.slice
+           [./user.slice:9] Unknown lvalue 'WhatIsThis' in section 'Unit'
+           [./user.slice:13] Unknown section 'Service'. Ignoring.
+           Error: org.freedesktop.systemd1.LoadFailed:
+              Unit different.service failed to load:
+              No such file or directory.
+           Failed to create user.slice/start: Invalid argument
+           user.slice: man nosuchfile(1) command failed with code 16
+
+       <b>Example 4. Missing service units</b>
+
+           $ tail ./a.socket ./b.socket
+           ==&gt; ./a.socket &lt;==
+           [Socket]
+           ListenStream=100
+
+           ==&gt; ./b.socket &lt;==
+           [Socket]
+           ListenStream=100
+           Accept=yes
+
+           $ systemd-analyze verify ./a.socket ./b.socket
+           Service a.service not loaded, a.socket cannot be started.
+           Service b@0.service not loaded, b.socket cannot be started.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>$SYSTEMD_PAGER</i>
+           Pager to use when <b>--no-pager </b>is not given; overrides <i>$PAGER</i>. If
+           neither <i>$SYSTEMD_PAGER</i> nor <i>$PAGER</i> are set, a set of well-known
+           pager implementations are tried in turn, including <a href="less.1.html">less(1)</a> and
+           <a href="more.1.html">more(1)</a>, until one is found. If no pager implementation is
+           discovered no pager is invoked. Setting this environment variable
+           to an empty string or the value "cat" is equivalent to passing
+           <b>--no-pager</b>.
+
+       <i>$SYSTEMD_LESS</i>
+           Override the options passed to <b>less </b>(by default "FRSXMK").
+
+       <i>$SYSTEMD_LESSCHARSET</i>
+           Override the charset passed to <b>less </b>(by default "utf-8", if the
+           invoking terminal is determined to be UTF-8 compatible).
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="systemd.1.html">systemd(1)</a>, <a href="systemctl.1.html">systemctl(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                               SYSTEMD-ANALYZE(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man5/systemd.unit.5.html">systemd.unit(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

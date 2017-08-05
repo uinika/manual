@@ -1,0 +1,263 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>tc-fq_codel(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#PARAMETERS">PARAMETERS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHORS">AUTHORS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">FQ_CoDel(8)                         Linux                        FQ_CoDel(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       CoDel - Fair Queuing (FQ) with Controlled Delay (CoDel)
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>tc qdisc ... fq_codel </b>[ <b>limit </b>PACKETS ] [ <b>flows </b>NUMBER ] [ <b>target</b>
+       TIME ] [ <b>interval </b>TIME ] [ <b>quantum </b>BYTES ] [ <b>ecn </b>| <b>noecn </b>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       FQ_Codel (Fair Queuing Controlled Delay) is queuing discipline that
+       combines Fair Queuing with the CoDel AQM scheme. FQ_Codel uses a
+       stochastic model to classify incoming packets into different flows
+       and is used to provide a fair share of the bandwidth to all the flows
+       using the queue. Each such flow is managed by the CoDel queuing
+       discipline. Reordering within a flow is avoided since Codel
+       internally uses a FIFO queue.
+</pre>
+<h2><a id="PARAMETERS" href="#PARAMETERS"></a>PARAMETERS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>limit</b>
+       has the same semantics as <b>codel </b>and is the hard limit on the real
+       queue size.  When this limit is reached, incoming packets are
+       dropped. Default is 10240 packets.
+
+   <b>flows</b>
+       is the number of flows into which the incoming packets are
+       classified. Due to the stochastic nature of hashing, multiple flows
+       may end up being hashed into the same slot. Newer flows have priority
+       over older ones. This parameter can be set only at load time since
+       memory has to be allocated for the hash table.  Default value is
+       1024.
+
+   <b>target</b>
+       has the same semantics as <b>codel </b>and is the acceptable minimum
+       standing/persistent queue delay. This minimum delay is identified by
+       tracking the local minimum queue delay that packets experience.
+       Default value is 5ms.
+
+   <b>interval</b>
+       has the same semantics as <b>codel </b>and is used to ensure that the
+       measured minimum delay does not become too stale.  The minimum delay
+       must be experienced in the last epoch of length .B interval.  It
+       should be set on the order of the worst-case RTT through the
+       bottleneck to give endpoints sufficient time to react. Default value
+       is 100ms.
+
+   <b>quantum</b>
+       is the number of bytes used as 'deficit' in the fair queuing
+       algorithm. Default is set to 1514 bytes which corresponds to the
+       Ethernet MTU plus the hardware header length of 14 bytes.
+
+   <b>ecn | noecn</b>
+       has the same semantics as <b>codel </b>and can be used to mark packets
+       instead of dropping them. If <b>ecn </b>has been enabled, <b>noecn </b>can be used
+       to turn it off and vice-a-versa. Unlike <b>codel, ecn </b>is turned on by
+       default.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       #tc qdisc add   dev eth0 root fq_codel
+       #tc -s qdisc show
+       qdisc fq_codel 8002: dev eth0 root refcnt 2 limit 10240p flows 1024
+       quantum 1514
+        target 5.0ms interval 100.0ms ecn
+          Sent 428514 bytes 2269 pkt (dropped 0, overlimits 0 requeues 0)
+          backlog 0b 0p requeues 0
+           maxpacket 256 drop_overlimit 0 new_flow_count 0 ecn_mark 0
+           new_flows_len 0 old_flows_len 0
+
+       #tc qdisc add dev eth0 root fq_codel limit 2000 target 3ms interval
+       40ms noecn
+       #tc -s qdisc show
+       qdisc fq_codel 8003: dev eth0 root refcnt 2 limit 2000p flows 1024
+       quantum 1514 target 3.0ms interval 40.0ms
+        Sent 2588985006 bytes 1783629 pkt (dropped 0, overlimits 0 requeues
+       34869)
+        backlog 0b 0p requeues 34869
+         maxpacket 65226 drop_overlimit 0 new_flow_count 73 ecn_mark 0
+         new_flows_len 1 old_flows_len 3
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="tc.8.html">tc(8)</a>, <a href="tc-codel.8.html">tc-codel(8)</a>, <a href="tc-red.8.html">tc-red(8)</a>
+</pre>
+<h2><a id="AUTHORS" href="#AUTHORS"></a>AUTHORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       FQ_CoDel was implemented by Eric Dumazet. This manpage was written by
+       Vijay Subramanian. Please report corrections to the Linux Networking
+       mailing list &lt;netdev@vger.kernel.org&gt;.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>iproute2</i> (utilities for controlling TCP/IP
+       networking and traffic) project.  Information about the project can
+       be found at 
+       ⟨<a href="http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2">http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2</a>⟩.
+       If you have a bug report for this manual page, send it to
+       netdev@vger.kernel.org, shemminger@osdl.org.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git⟩
+       on 2017-07-05.  If you discover any rendering problems in this HTML
+       version of the page, or you believe there is a better or more up-to-
+       date source for the page, or you have corrections or improvements to
+       the information in this COLOPHON (which is <i>not</i> part of the original
+       manual page), send a mail to man-pages@man7.org
+
+<span class="footline">iproute2                         4 June 2012                     FQ_CoDel(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="tc.8.html">tc(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

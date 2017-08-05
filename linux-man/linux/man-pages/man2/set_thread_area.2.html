@@ -1,0 +1,279 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>set_thread_area(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SET_THREAD_AREA(2)        Linux Programmer's Manual       SET_THREAD_AREA(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       get_thread_area,  set_thread_area  - set a GDT entry for thread-local
+       storage
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;linux/unistd.h&gt;</b>
+       <b>#include &lt;asm/ldt.h&gt;</b>
+
+       <b>int get_thread_area(struct user_desc *</b><i>u_info</i><b>);</b>
+       <b>int set_thread_area(struct user_desc *</b><i>u_info</i><b>);</b>
+
+       <i>Note</i>: There are no glibc wrappers for these system calls; see NOTES.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Linux dedicates three global descriptor table (GDT) entries for
+       thread-local storage.  For more information about the GDT, see the
+       Intel Software Developer's Manual or the AMD Architecture Programming
+       Manual.
+
+       Both of these system calls take an argument that is a pointer to a
+       structure of the following type:
+
+           struct user_desc {
+               unsigned int  entry_number;
+               unsigned long base_addr;
+               unsigned int  limit;
+               unsigned int  seg_32bit:1;
+               unsigned int  contents:2;
+               unsigned int  read_exec_only:1;
+               unsigned int  limit_in_pages:1;
+               unsigned int  seg_not_present:1;
+               unsigned int  useable:1;
+           };
+
+       <b>get_thread_area</b>() reads the GDT entry indicated by
+       <i>u_info-&gt;entry_number</i> and fills in the rest of the fields in <i>u_info</i>.
+
+       <b>set_thread_area</b>() sets a TLS entry in the GDT.
+
+       The TLS array entry set by <b>set_thread_area</b>() corresponds to the value
+       of <i>u_info-&gt;entry_number</i> passed in by the user.  If this value is in
+       bounds, <b>set_thread_area</b>() writes the TLS descriptor pointed to by
+       <i>u_info</i> into the thread's TLS array.
+
+       When <b>set_thread_area</b>() is passed an <i>entry_number</i> of -1, it searches
+       for a free TLS entry.  If <b>set_thread_area</b>() finds a free TLS entry,
+       the value of <i>u_info-&gt;entry_number</i> is set upon return to show which
+       entry was changed.
+
+       A <i>user_desc</i> is considered "empty" if <i>read_exec_only</i> and
+       <i>seg_not_present</i> are set to 1 and all of the other fields are 0.  If
+       an "empty" descriptor is passed to <b>set_thread_area, </b>the corresponding
+       TLS entry will be cleared.  See BUGS for additional details.
+
+       Since Linux 3.19, <b>set_thread_area</b>() cannot be used to write non-
+       present segments, 16-bit segments, or code segments, although
+       clearing a segment is still acceptable.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These system calls return 0 on success, and -1 on failure, with <i><a href="../man3/errno.3.html">errno</a></i>
+       set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b><i>u_info</i> is an invalid pointer.
+
+       <b>EINVAL </b><i>u_info-&gt;entry_number</i> is out of bounds.
+
+       <b>ENOSYS get_thread_area</b>() or <b>set_thread_area</b>() was invoked as a 64-bit
+              system call.
+
+       <b>ESRCH  </b>(<b>set_thread_area</b>()) A free TLS entry could not be located.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>set_thread_area</b>() first appeared in Linux 2.5.29.  <b>get_thread_area</b>()
+       first appeared in Linux 2.5.32.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>set_thread_area</b>() is Linux-specific and should not be used in
+       programs that are intended to be portable.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Glibc does not provide wrappers for these system calls, since they
+       are generally intended for use only by threading libraries.  In the
+       unlikely event that you want to call them directly, use <a href="syscall.2.html">syscall(2)</a>.
+
+       <a href="arch_prctl.2.html">arch_prctl(2)</a> can interfere with <b>set_thread_area</b>().  See
+       <a href="arch_prctl.2.html">arch_prctl(2)</a> for more details.  This is not normally a problem, as
+       <a href="arch_prctl.2.html">arch_prctl(2)</a> is normally used only by 64-bit programs.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On 64-bit kernels before Linux 3.19, one of the padding bits in
+       <i>user_desc</i>, if set, would prevent the descriptor from being considered
+       empty (see <a href="modify_ldt.2.html">modify_ldt(2)</a>).  As a result, the only reliable way to
+       clear a TLS entry is to use <a href="../man3/memset.3.html">memset(3)</a> to zero the entire <i>user_desc</i>
+       structure, including padding bits, and then to set the <i>read_exec_only</i>
+       and <i>seg_not_present</i> bits.  On Linux 3.19, a <i>user_desc</i> consisting
+       entirely of zeros except for <i>entry_number</i> will also be interpreted as
+       a request to clear a TLS entry, but this behaved differently on older
+       kernels.
+
+       Prior to Linux 3.19, the DS and ES segment registers must not
+       reference TLS entries.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="arch_prctl.2.html">arch_prctl(2)</a>, <a href="modify_ldt.2.html">modify_ldt(2)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08               SET_THREAD_AREA(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="arch_prctl.2.html">arch_prctl(2)</a>,&nbsp; 
+    <a href="clone.2.html">clone(2)</a>,&nbsp; 
+    <a href="modify_ldt.2.html">modify_ldt(2)</a>,&nbsp; 
+    <a href="ptrace.2.html">ptrace(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="set_thread_area.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

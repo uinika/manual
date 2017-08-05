@@ -1,0 +1,305 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>perf-sched(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#OPTIONS_FOR_PERF_SCHED_MAP">OPTIONS&nbsp;FOR&nbsp;PERF&nbsp;SCHED&nbsp;MAP</a> | <a href="#OPTIONS_FOR_PERF_SCHED_TIMEHIST">OPTIONS&nbsp;FOR&nbsp;PERF&nbsp;SCHED&nbsp;TIMEHIST</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PERF-SCHED(1)                    perf Manual                   PERF-SCHED(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       perf-sched - Tool to trace/measure scheduler properties (latencies)
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>perf sched</i> {record|latency|map|replay|script|timehist}
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       There are several variants of <i>perf sched</i>:
+
+           'perf sched record &lt;command&gt;' to record the scheduling events
+           of an arbitrary workload.
+
+           'perf sched latency' to report the per task scheduling latencies
+           and other scheduling properties of the workload.
+
+           'perf sched script' to see a detailed trace of the workload that
+            was recorded (aliased to 'perf script' for now).
+
+           'perf sched replay' to simulate the workload that was recorded
+           via perf sched record. (this is done by starting up mockup threads
+           that mimic the workload based on the events in the trace. These
+           threads can then replay the timings (CPU runtime and sleep patterns)
+           of the workload as it occurred when it was recorded - and can repeat
+           it a number of times, measuring its performance.)
+
+           'perf sched map' to print a textual context-switching outline of
+           workload captured via perf sched record.  Columns stand for
+           individual CPUs, and the two-letter shortcuts stand for tasks that
+           are running on a CPU. A '*' denotes the CPU that had the event, and
+           a dot signals an idle CPU.
+
+           'perf sched timehist' provides an analysis of scheduling events.
+
+           Example usage:
+               perf sched record -- sleep 1
+               perf sched timehist
+
+           By default it shows the individual schedule events, including the wait
+           time (time between sched-out and next sched-in events for the task), the
+           task scheduling delay (time between wakeup and actually running) and run
+           time for the task:
+
+                       time    cpu  task name             wait time  sch delay   run time
+                                    [tid/pid]                (msec)     (msec)     (msec)
+             -------------- ------  --------------------  ---------  ---------  ---------
+               79371.874569 [0011]  gcc[31949]                0.014      0.000      1.148
+               79371.874591 [0010]  gcc[31951]                0.000      0.000      0.024
+               79371.874603 [0010]  migration/10[59]          3.350      0.004      0.011
+               79371.874604 [0011]  &lt;idle&gt;                    1.148      0.000      0.035
+               79371.874723 [0005]  &lt;idle&gt;                    0.016      0.000      1.383
+               79371.874746 [0005]  gcc[31949]                0.153      0.078      0.022
+           ...
+
+           Times are in msec.usec.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -i, --input=&lt;file&gt;
+           Input file name. (default: perf.data unless stdin is a fifo)
+
+       -v, --verbose
+           Be more verbose. (show symbol address, etc)
+
+       -D, --dump-raw-trace=
+           Display verbose dump of the sched data.
+</pre>
+<h2><a id="OPTIONS_FOR_PERF_SCHED_MAP" href="#OPTIONS_FOR_PERF_SCHED_MAP"></a>OPTIONS FOR PERF SCHED MAP  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       --compact
+           Show only CPUs with activity. Helps visualizing on high core
+           count systems.
+
+       --cpus
+           Show just entries with activities for the given CPUs.
+
+       --color-cpus
+           Highlight the given cpus.
+
+       --color-pids
+           Highlight the given pids.
+</pre>
+<h2><a id="OPTIONS_FOR_PERF_SCHED_TIMEHIST" href="#OPTIONS_FOR_PERF_SCHED_TIMEHIST"></a>OPTIONS FOR PERF SCHED TIMEHIST  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       -k, --vmlinux=&lt;file&gt;
+           vmlinux pathname
+
+       --kallsyms=&lt;file&gt;
+           kallsyms pathname
+
+       -g, --no-call-graph
+           Do not display call chains if present.
+
+       --max-stack
+           Maximum number of functions to display in backtrace, default 5.
+
+       -s, --summary
+           Show only a summary of scheduling by thread with min, max, and
+           average run times (in sec) and relative stddev.
+
+       -S, --with-summary
+           Show all scheduling events followed by a summary by thread with
+           min, max, and average run times (in sec) and relative stddev.
+
+       --symfs=&lt;directory&gt;
+           Look for files with symbols relative to this directory.
+
+       -V, --cpu-visual
+           Show visual aid for sched switches by CPU: <i>i</i> marks idle time, <i>s</i>
+           are scheduler events.
+
+       -w, --wakeups
+           Show wakeup events.
+
+       -M, --migrations
+           Show migration events.
+
+       -n, --next
+           Show next task.
+
+       -I, --idle-hist
+           Show idle-related events only.
+
+       --time
+           Only analyze samples within given time window: &lt;start&gt;,&lt;stop&gt;.
+           Times have the format seconds.microseconds. If start is not given
+           (i.e., time string is <i>,x.y</i>) then analysis starts at the beginning
+           of the file. If stop time is not given (i.e, time string is <i>x.y,</i>)
+           then analysis goes to end of file.
+
+       --state
+           Show task state when it switched out.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="perf-record.1.html">perf-record(1)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>perf</i> (Performance analysis tools for Linux
+       (in Linux source tree)) project.  Information about the project can
+       be found at ⟨<a href="https://perf.wiki.kernel.org/index.php/Main_Page">https://perf.wiki.kernel.org/index.php/Main_Page</a>⟩.  If
+       you have a bug report for this manual page, send it to
+       linux-kernel@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨<a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git">http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git</a>⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">perf                             05/03/2017                    PERF-SCHED(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

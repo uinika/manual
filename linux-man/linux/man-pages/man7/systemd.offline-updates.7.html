@@ -1,0 +1,293 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd.offline-updates(7) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#IMPLEMENTING_OFFLINE_SYSTEM_UPDATES">IMPLEMENTING&nbsp;OFFLINE&nbsp;SYSTEM&nbsp;UPDATES</a> | <a href="#RECOMMENDATIONS">RECOMMENDATIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD.OFFLINE-UPDATES(7) systemd.offline-updatesSYSTEMD.OFFLINE-UPDATES(7)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd.offline-updates - Implementation of offline updates in
+       systemd
+</pre>
+<h2><a id="IMPLEMENTING_OFFLINE_SYSTEM_UPDATES" href="#IMPLEMENTING_OFFLINE_SYSTEM_UPDATES"></a>IMPLEMENTING OFFLINE SYSTEM UPDATES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This man page describes how to implement "offline" system updates
+       with systemd. By "offline" OS updates we mean package installations
+       and updates that are run with the system booted into a special system
+       update mode, in order to avoid problems related to conflicts of
+       libraries and services that are currently running with those on disk.
+       This document is inspired by this <b>GNOME design whiteboard</b><b></b>[1].
+
+       The logic:
+
+        1. The package manager prepares system updates by downloading all
+           (RPM or DEB or whatever) packages to update off-line in a special
+           directory /var/lib/system-update (or another directory of the
+           package/upgrade manager's choice).
+
+        2. When the user OK'ed the update, the symlink /system-update is
+           created that points to /var/lib/system-update (or wherever the
+           directory with the upgrade files is located) and the system is
+           rebooted. This symlink is in the root directory, since we need to
+           check for it very early at boot, at a time where /var is not
+           available yet.
+
+        3. Very early in the new boot <a href="../man8/systemd-system-update-generator.8.html">systemd-system-update-generator(8)</a>
+           checks whether /system-update exists. If so, it (temporarily and
+           for this boot only) redirects (i.e. symlinks) default.target to
+           system-update.target, a special target that is pulls in the base
+           system (i.e.  sysinit.target, so that all file systems are
+           mounted but little else) and the system update units.
+
+        4. The system now continues to boot into default.target, and thus
+           into system-update.target. This target pulls in all system update
+           units. Only one service should perform an update (see the next
+           point), and all the other ones should exit cleanly with a
+           "success" return code and without doing anything. Update services
+           should be ordered after sysinit.target so that the update starts
+           after all file systems have been mounted.
+
+        5. As the first step, an update service should check if the
+           /system-update symlink points to the location used by that update
+           service. In case it does not exist or points to a different
+           location, the service must exit without error. It is possible for
+           multiple update services to be installed, and for multiple update
+           services to be launched in parallel, and only the one that
+           corresponds to the tool that <i>created</i> the symlink before reboot
+           should perform any actions. It is unsafe to run multiple updates
+           in parallel.
+
+        6. The update service should now do its job. If applicable and
+           possible, it should create a file system snapshot, then install
+           all packages. After completion (regardless whether the update
+           succeeded or failed) the machine must be rebooted, for example by
+           calling <b>systemctl reboot</b>. In addition, on failure the script
+           should revert to the old file system snapshot (without the
+           symlink).
+
+        7. The upgrade scripts should exit only after the update is
+           finished. It is expected that the service which performs the
+           upgrade will cause the machine to reboot after it is done. If the
+           system-update.target is successfully reached, i.e. all update
+           services have run, and the /system-update symlink still exists,
+           it will be removed and the machine rebooted as a safety measure.
+
+        8. After a reboot, now that the /system-update symlink is gone, the
+           generator won't redirect default.target anymore and the system
+           now boots into the default target again.
+</pre>
+<h2><a id="RECOMMENDATIONS" href="#RECOMMENDATIONS"></a>RECOMMENDATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. To make things a bit more robust we recommend hooking the update
+           script into system-update.target via a .wants/ symlink in the
+           distribution package, rather than depending on <b>systemctl enable</b>
+           in the postinst scriptlets of your package. More specifically,
+           for your update script create a .service file, without [Install]
+           section, and then add a symlink like
+           /usr/lib/systemd/system-update.target.wants/foobar.service →
+           ../foobar.service to your package.
+
+        2. Make sure to remove the /system-update symlink as early as
+           possible in the update script to avoid reboot loops in case the
+           update fails.
+
+        3. Use <i>FailureAction=reboot</i> in the service file for your update
+           script to ensure that a reboot is automatically triggered if the
+           update fails.  <i>FailureAction=</i> makes sure that the specified unit
+           is activated if your script exits uncleanly (by non-zero error
+           code, or signal/coredump). If your script succeeds you should
+           trigger the reboot in your own code, for example by invoking
+           logind's <b>Reboot() </b>call or calling <b>systemctl reboot</b>. See <b>logind</b>
+           <b>dbus API</b><b></b>[2] for details.
+
+        4. The update service should declare <i>DefaultDependencies=false</i>,
+           <i>Requires=sysinit.target</i>, <i>After=sysinit.target</i>, and explicitly
+           pull in any other services it requires.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Implementing Offline System Updates</b><b></b>[3], <a href="../man1/systemd.1.html">systemd(1)</a>,
+       <a href="systemd.generator.7.html">systemd.generator(7)</a>, <a href="../man8/systemd-system-update-generator.8.html">systemd-system-update-generator(8)</a>,
+       <b>dnf.plugin.system-upgrade</b>(8)
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. GNOME design whiteboard
+           <a href="https://wiki.gnome.org/Design/OS/SoftwareUpdates">https://wiki.gnome.org/Design/OS/SoftwareUpdates</a>
+
+        2. logind dbus API
+           <a href="https://www.freedesktop.org/wiki/Software/systemd/logind">https://www.freedesktop.org/wiki/Software/systemd/logind</a>
+
+        3. Implementing Offline System Updates
+           <a href="https://www.freedesktop.org/wiki/Software/systemd/SystemUpdates/">https://www.freedesktop.org/wiki/Software/systemd/SystemUpdates/</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                       SYSTEMD.OFFLINE-UPDATES(7)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="systemd.generator.7.html">systemd.generator(7)</a>,&nbsp; 
+    <a href="systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="systemd.special.7.html">systemd.special(7)</a>,&nbsp; 
+    <a href="../man8/systemd-system-update-generator.8.html">systemd-system-update-generator(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

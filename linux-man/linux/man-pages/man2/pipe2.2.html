@@ -1,0 +1,337 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pipe(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PIPE(2)                   Linux Programmer's Manual                  PIPE(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       pipe, pipe2 - create pipe
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>int pipe(int </b><i>pipefd</i><b>[2]);</b>
+
+       <b>#define _GNU_SOURCE             </b>/* See feature_test_macros(7) */
+       <b>#include &lt;fcntl.h&gt;              </b>/* Obtain O_* constant definitions */
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>int pipe2(int </b><i>pipefd</i><b>[2], int </b><i>flags</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pipe</b>() creates a pipe, a unidirectional data channel that can be used
+       for interprocess communication.  The array <i>pipefd</i> is used to return
+       two file descriptors referring to the ends of the pipe.  <i>pipefd[0]</i>
+       refers to the read end of the pipe.  <i>pipefd[1]</i> refers to the write
+       end of the pipe.  Data written to the write end of the pipe is
+       buffered by the kernel until it is read from the read end of the
+       pipe.  For further details, see <a href="../man7/pipe.7.html">pipe(7)</a>.
+
+       If <i>flags</i> is 0, then <b>pipe2</b>() is the same as <b>pipe</b>().  The following
+       values can be bitwise ORed in <i>flags</i> to obtain different behavior:
+
+       <b>O_CLOEXEC</b>
+              Set the close-on-exec (<b>FD_CLOEXEC</b>) flag on the two new file
+              descriptors.  See the description of the same flag in <a href="open.2.html">open(2)</a>
+              for reasons why this may be useful.
+
+       <b>O_DIRECT </b>(since Linux 3.4)
+              Create a pipe that performs I/O in "packet" mode.  Each
+              <a href="write.2.html">write(2)</a> to the pipe is dealt with as a separate packet, and
+              <a href="read.2.html">read(2)</a>s from the pipe will read one packet at a time.  Note
+              the following points:
+
+              *  Writes of greater than <b>PIPE_BUF </b>bytes (see <a href="../man7/pipe.7.html">pipe(7)</a>) will be
+                 split into multiple packets.  The constant <b>PIPE_BUF </b>is
+                 defined in <i>&lt;limits.h&gt;</i>.
+
+              *  If a <a href="read.2.html">read(2)</a> specifies a buffer size that is smaller than
+                 the next packet, then the requested number of bytes are
+                 read, and the excess bytes in the packet are discarded.
+                 Specifying a buffer size of <b>PIPE_BUF </b>will be sufficient to
+                 read the largest possible packets (see the previous point).
+
+              *  Zero-length packets are not supported.  (A <a href="read.2.html">read(2)</a> that
+                 specifies a buffer size of zero is a no-op, and returns 0.)
+
+              Older kernels that do not support this flag will indicate this
+              via an <b>EINVAL </b>error.
+
+       <b>O_NONBLOCK</b>
+              Set the <b>O_NONBLOCK </b>file status flag on the two new open file
+              descriptions.  Using this flag saves extra calls to <a href="fcntl.2.html">fcntl(2)</a>
+              to achieve the same result.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set appropriately.
+
+       On Linux (and other systems), <b>pipe</b>() does not modify <i>pipefd</i> on
+       failure.  A requirement standardizing this behavior was added in
+       POSIX.1-2016.  The Linux-specific <b>pipe2</b>() system call likewise does
+       not modify <i>pipefd</i> on failure.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b><i>pipefd</i> is not valid.
+
+       <b>EINVAL </b>(<b>pipe2</b>()) Invalid value in <i>flags</i>.
+
+       <b>EMFILE </b>The per-process limit on the number of open file descriptors
+              has been reached.
+
+       <b>ENFILE </b>The system-wide limit on the total number of open files has
+              been reached.
+
+       <b>ENFILE </b>The user hard limit on memory that can be allocated for pipes
+              has been reached and the caller is not privileged; see
+              <a href="../man7/pipe.7.html">pipe(7)</a>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pipe2</b>() was added to Linux in version 2.6.27; glibc support is
+       available starting with version 2.9.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pipe</b>(): POSIX.1-2001, POSIX.1-2008.
+
+       <b>pipe2</b>() is Linux-specific.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The following program creates a pipe, and then <a href="fork.2.html">fork(2)</a>s to create a
+       child process; the child inherits a duplicate set of file descriptors
+       that refer to the same pipe.  After the <a href="fork.2.html">fork(2)</a>, each process closes
+       the file descriptors that it doesn't need for the pipe (see <a href="../man7/pipe.7.html">pipe(7)</a>).
+       The parent then writes the string contained in the program's command-
+       line argument to the pipe, and the child reads this string a byte at
+       a time from the pipe and echoes it on standard output.
+
+   <b>Program source</b>
+       #include &lt;sys/types.h&gt;
+       #include &lt;sys/wait.h&gt;
+       #include &lt;stdio.h&gt;
+       #include &lt;stdlib.h&gt;
+       #include &lt;unistd.h&gt;
+       #include &lt;string.h&gt;
+
+       int
+       main(int argc, char *argv[])
+       {
+           int pipefd[2];
+           pid_t cpid;
+           char buf;
+
+           if (argc != 2) {
+               fprintf(stderr, "Usage: %s &lt;string&gt;\n", argv[0]);
+               exit(EXIT_FAILURE);
+           }
+
+           if (pipe(pipefd) == -1) {
+               perror("pipe");
+               exit(EXIT_FAILURE);
+           }
+
+           cpid = fork();
+           if (cpid == -1) {
+               perror("fork");
+               exit(EXIT_FAILURE);
+           }
+
+           if (cpid == 0) {    /* Child reads from pipe */
+               close(pipefd[1]);          /* Close unused write end */
+
+               while (read(pipefd[0], &amp;buf, 1) &gt; 0)
+                   write(STDOUT_FILENO, &amp;buf, 1);
+
+               write(STDOUT_FILENO, "\n", 1);
+               close(pipefd[0]);
+               _exit(EXIT_SUCCESS);
+
+           } else {            /* Parent writes argv[1] to pipe */
+               close(pipefd[0]);          /* Close unused read end */
+               write(pipefd[1], argv[1], strlen(argv[1]));
+               close(pipefd[1]);          /* Reader will see EOF */
+               wait(NULL);                /* Wait for child */
+               exit(EXIT_SUCCESS);
+           }
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="fork.2.html">fork(2)</a>, <a href="read.2.html">read(2)</a>, <a href="socketpair.2.html">socketpair(2)</a>, <a href="splice.2.html">splice(2)</a>, <a href="tee.2.html">tee(2)</a>, <a href="vmsplice.2.html">vmsplice(2)</a>,
+       <a href="write.2.html">write(2)</a>, <a href="../man3/popen.3.html">popen(3)</a>, <a href="../man7/pipe.7.html">pipe(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-07-13                          PIPE(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="eventfd.2.html">eventfd(2)</a>,&nbsp; 
+    <a href="fork.2.html">fork(2)</a>,&nbsp; 
+    <a href="getrlimit.2.html">getrlimit(2)</a>,&nbsp; 
+    <a href="socketpair.2.html">socketpair(2)</a>,&nbsp; 
+    <a href="statfs.2.html">statfs(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/pmda.3-2.html">pmda(3)</a>,&nbsp; 
+    <a href="../man3/pmdaconnect.3-2.html">pmdaconnect(3)</a>,&nbsp; 
+    <a href="../man3/popen.3.html">popen(3)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="../man7/fifo.7.html">fifo(7)</a>,&nbsp; 
+    <a href="../man7/inode.7.html">inode(7)</a>,&nbsp; 
+    <a href="../man7/man-pages.7.html">man-pages(7)</a>,&nbsp; 
+    <a href="../man7/pipe.7.html">pipe(7)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="pipe.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,1079 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>systemd-nspawn(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#EXAMPLES">EXAMPLES</a> | <a href="#EXIT_STATUS">EXIT&nbsp;STATUS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#NOTES">NOTES</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SYSTEMD-NSPAWN(1)              systemd-nspawn              SYSTEMD-NSPAWN(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       systemd-nspawn - Spawn a namespace container for debugging, testing
+       and building
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-nspawn </b>[OPTIONS...] [<i>COMMAND</i> [ARGS...]]
+
+       <b>systemd-nspawn </b>--boot [OPTIONS...] [ARGS...]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>systemd-nspawn </b>may be used to run a command or OS in a light-weight
+       namespace container. In many ways it is similar to <a href="chroot.1.html">chroot(1)</a>, but
+       more powerful since it fully virtualizes the file system hierarchy,
+       as well as the process tree, the various IPC subsystems and the host
+       and domain name.
+
+       <b>systemd-nspawn </b>may be invoked on any directory tree containing an
+       operating system tree, using the <b>--directory= </b>command line option. By
+       using the <b>--machine= </b>option an OS tree is automatically searched for
+       in a couple of locations, most importantly in /var/lib/machines, the
+       suggested directory to place container images installed on the
+       system.
+
+       In contrast to <a href="chroot.1.html">chroot(1)</a> <b>systemd-nspawn </b>may be used to boot full
+       Linux-based operating systems in a container.
+
+       <b>systemd-nspawn </b>limits access to various kernel interfaces in the
+       container to read-only, such as /sys, /proc/sys or /sys/fs/selinux.
+       The host's network interfaces and the system clock may not be changed
+       from within the container. Device nodes may not be created. The host
+       system cannot be rebooted and kernel modules may not be loaded from
+       within the container.
+
+       Use a tool like <b>dnf</b>(8), <b>debootstrap</b>(8), or <b>pacman</b>(8) to set up an OS
+       directory tree suitable as file system hierarchy for <b>systemd-nspawn</b>
+       containers. See the Examples section below for details on suitable
+       invocation of these commands.
+
+       As a safety check <b>systemd-nspawn </b>will verify the existence of
+       /usr/lib/os-release or /etc/os-release in the container tree before
+       starting the container (see <a href="../man5/os-release.5.html">os-release(5)</a>). It might be necessary to
+       add this file to the container tree manually if the OS of the
+       container is too old to contain this file out-of-the-box.
+
+       <b>systemd-nspawn </b>may be invoked directly from the interactive command
+       line or run as system service in the background. In this mode each
+       container instance runs as its own service instance; a default
+       template unit file systemd-nspawn@.service is provided to make this
+       easy, taking the container name as instance identifier. Note that
+       different default options apply when <b>systemd-nspawn </b>is invoked by the
+       template unit file than interactively on the command line. Most
+       importantly the template unit file makes use of the <b>--boot </b>which is
+       not the default in case <b>systemd-nspawn </b>is invoked from the
+       interactive command line. Further differences with the defaults are
+       documented along with the various supported options below.
+
+       The <a href="machinectl.1.html">machinectl(1)</a> tool may be used to execute a number of operations
+       on containers. In particular it provides easy-to-use commands to run
+       containers as system services using the systemd-nspawn@.service
+       template unit file.
+
+       Along with each container a settings file with the .nspawn suffix may
+       exist, containing additional settings to apply when running the
+       container. See <a href="../man5/systemd.nspawn.5.html">systemd.nspawn(5)</a> for details. Settings files override
+       the default options used by the systemd-nspawn@.service template unit
+       file, making it usually unnecessary to alter this template file
+       directly.
+
+       Note that <b>systemd-nspawn </b>will mount file systems private to the
+       container to /dev, /run and similar. These will not be visible
+       outside of the container, and their contents will be lost when the
+       container exits.
+
+       Note that running two <b>systemd-nspawn </b>containers from the same
+       directory tree will not make processes in them see each other. The
+       PID namespace separation of the two containers is complete and the
+       containers will share very few runtime objects except for the
+       underlying file system. Use <a href="machinectl.1.html">machinectl(1)</a>'s <b>login </b>or <b>shell </b>commands
+       to request an additional login session in a running container.
+
+       <b>systemd-nspawn </b>implements the <b>Container Interface</b><b></b>[1] specification.
+
+       While running, containers invoked with <b>systemd-nspawn </b>are registered
+       with the <a href="../man8/systemd-machined.8.html">systemd-machined(8)</a> service that keeps track of running
+       containers, and provides programming interfaces to interact with
+       them.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If option <b>-b </b>is specified, the arguments are used as arguments for
+       the init binary. Otherwise, <i>COMMAND</i> specifies the program to launch
+       in the container, and the remaining arguments are used as arguments
+       for this program. If <b>--boot </b>is not used and no arguments are
+       specified, a shell is launched in the container.
+
+       The following options are understood:
+
+       <b>-D</b>, <b>--directory=</b>
+           Directory to use as file system root for the container.
+
+           If neither <b>--directory=</b>, nor <b>--image= </b>is specified the directory
+           is determined by searching for a directory named the same as the
+           machine name specified with <b>--machine=</b>. See <a href="machinectl.1.html">machinectl(1)</a> section
+           "Files and Directories" for the precise search path.
+
+           If neither <b>--directory=</b>, <b>--image=</b>, nor <b>--machine= </b>are specified,
+           the current directory will be used. May not be specified together
+           with <b>--image=</b>.
+
+       <b>--template=</b>
+           Directory or "btrfs" subvolume to use as template for the
+           container's root directory. If this is specified and the
+           container's root directory (as configured by <b>--directory=</b>) does
+           not yet exist it is created as "btrfs" snapshot (if supported) or
+           plain directory (otherwise) and populated from this template
+           tree. Ideally, the specified template path refers to the root of
+           a "btrfs" subvolume, in which case a simple copy-on-write
+           snapshot is taken, and populating the root directory is instant.
+           If the specified template path does not refer to the root of a
+           "btrfs" subvolume (or not even to a "btrfs" file system at all),
+           the tree is copied (though possibly in a copy-on-write scheme —
+           if the file system supports that), which can be substantially
+           more time-consuming. May not be specified together with <b>--image=</b>
+           or <b>--ephemeral</b>.
+
+           Note that this switch leaves host name, machine ID and all other
+           settings that could identify the instance unmodified.
+
+       <b>-x</b>, <b>--ephemeral</b>
+           If specified, the container is run with a temporary snapshot of
+           its file system that is removed immediately when the container
+           terminates. May not be specified together with <b>--template=</b>.
+
+           Note that this switch leaves host name, machine ID and all other
+           settings that could identify the instance unmodified.
+
+       <b>-i</b>, <b>--image=</b>
+           Disk image to mount the root directory for the container from.
+           Takes a path to a regular file or to a block device node. The
+           file or block device must contain either:
+
+           ·   An MBR partition table with a single partition of type 0x83
+               that is marked bootable.
+
+           ·   A GUID partition table (GPT) with a single partition of type
+               0fc63daf-8483-4772-8e79-3d69d8477de4.
+
+           ·   A GUID partition table (GPT) with a marked root partition
+               which is mounted as the root directory of the container.
+               Optionally, GPT images may contain a home and/or a server
+               data partition which are mounted to the appropriate places in
+               the container. All these partitions must be identified by the
+               partition types defined by the <b>Discoverable Partitions</b>
+               <b>Specification</b><b></b>[2].
+
+           ·   No partition table, and a single file system spanning the
+               whole image.
+
+           On GPT images, if an EFI System Partition (ESP) is discovered, it
+           is automatically mounted to /efi (or /boot as fallback) in case a
+           directory by this name exists and is empty.
+
+           Partitions encrypted with LUKS are automatically decrypted. Also,
+           on GPT images dm-verity data integrity hash partitions are set up
+           if the root hash for them is specified using the <b>--root-hash=</b>
+           option.
+
+           Any other partitions, such as foreign partitions or swap
+           partitions are not mounted. May not be specified together with
+           <b>--directory=</b>, <b>--template=</b>.
+
+       <b>--root-hash=</b>
+           Takes a data integrity (dm-verity) root hash specified in
+           hexadecimal. This option enables data integrity checks using
+           dm-verity, if the used image contains the appropriate integrity
+           data (see above). The specified hash must match the root hash of
+           integrity data, and is usually at least 256 bits (and hence 64
+           formatted hexadecimal characters) long (in case of SHA256 for
+           example). If this option is not specified, but the image file
+           carries the "user.verity.roothash" extended file attribute (see
+           <a href="../man7/xattr.7.html">xattr(7)</a>), then the root hash is read from it, also as formatted
+           hexadecimal characters. If the extended file attribute is not
+           found (or is not supported by the underlying file system), but a
+           file with the .roothash suffix is found next to the image file,
+           bearing otherwise the same name, the root hash is read from it
+           and automatically used, also as formatted hexadecimal characters.
+
+       <b>-a</b>, <b>--as-pid2</b>
+           Invoke the shell or specified program as process ID (PID) 2
+           instead of PID 1 (init). By default, if neither this option nor
+           <b>--boot </b>is used, the selected binary is run as process with PID 1,
+           a mode only suitable for programs that are aware of the special
+           semantics that the process with PID 1 has on UNIX. For example,
+           it needs to reap all processes reparented to it, and should
+           implement <b>sysvinit </b>compatible signal handling (specifically: it
+           needs to reboot on SIGINT, reexecute on SIGTERM, reload
+           configuration on SIGHUP, and so on). With <b>--as-pid2 </b>a minimal
+           stub init process is run as PID 1 and the selected binary is
+           executed as PID 2 (and hence does not need to implement any
+           special semantics). The stub init process will reap processes as
+           necessary and react appropriately to signals. It is recommended
+           to use this mode to invoke arbitrary commands in containers,
+           unless they have been modified to run correctly as PID 1. Or in
+           other words: this switch should be used for pretty much all
+           commands, except when the command refers to an init or shell
+           implementation, as these are generally capable of running
+           correctly as PID 1. This option may not be combined with <b>--boot</b>.
+
+       <b>-b</b>, <b>--boot</b>
+           Automatically search for an init binary and invoke it as PID 1,
+           instead of a shell or a user supplied program. If this option is
+           used, arguments specified on the command line are used as
+           arguments for the init binary. This option may not be combined
+           with <b>--as-pid2</b>.
+
+           The following table explains the different modes of invocation
+           and relationship to <b>--as-pid2 </b>(see above):
+
+           <b>Table 1. Invocation Mode</b>
+           ┌──────────────────────┬───────────────────────────┐
+           │<b>Switch                </b>│ <b>Explanation               </b>│
+           ├──────────────────────┼───────────────────────────┤
+           │Neither <b>--as-pid2 </b>nor │ The passed parameters are │
+           │<b>--boot </b>specified      │ interpreted as the        │
+           │                      │ command line, which is    │
+           │                      │ executed as PID 1 in the  │
+           │                      │ container.                │
+           ├──────────────────────┼───────────────────────────┤
+           │<b>--as-pid2 </b>specified   │ The passed parameters are │
+           │                      │ interpreted as the        │
+           │                      │ command line, which is    │
+           │                      │ executed as PID 2 in the  │
+           │                      │ container. A stub init    │
+           │                      │ process is run as PID 1.  │
+           ├──────────────────────┼───────────────────────────┤
+           │<b>--boot </b>specified      │ An init binary as         │
+           │                      │ automatically searched    │
+           │                      │ and run as PID 1 in the   │
+           │                      │ container. The passed     │
+           │                      │ parameters are used as    │
+           │                      │ invocation parameters for │
+           │                      │ this process.             │
+           └──────────────────────┴───────────────────────────┘
+           Note that <b>--boot </b>is the default mode of operation if the
+           systemd-nspawn@.service template unit file is used.
+
+       <b>--chdir=</b>
+           Change to the specified working directory before invoking the
+           process in the container. Expects an absolute path in the
+           container's file system namespace.
+
+       <b>--pivot-root=</b>
+           Pivot the specified directory to / inside the container, and
+           either unmount the container's old root, or pivot it to another
+           specified directory. Takes one of: a path argument — in which
+           case the specified path will be pivoted to / and the old root
+           will be unmounted; or a colon-separated pair of new root path and
+           pivot destination for the old root. The new root path will be
+           pivoted to /, and the old / will be pivoted to the other
+           directory. Both paths must be absolute, and are resolved in the
+           container's file system namespace.
+
+           This is for containers which have several bootable directories in
+           them; for example, several <b>OSTree</b><b></b>[3] deployments. It emulates the
+           behavior of the boot loader and initial RAM disk which normally
+           select which directory to mount as the root and start the
+           container's PID 1 in.
+
+       <b>-u</b>, <b>--user=</b>
+           After transitioning into the container, change to the specified
+           user-defined in the container's user database. Like all other
+           systemd-nspawn features, this is not a security feature and
+           provides protection against accidental destructive operations
+           only.
+
+       <b>-M</b>, <b>--machine=</b>
+           Sets the machine name for this container. This name may be used
+           to identify this container during its runtime (for example in
+           tools like <a href="machinectl.1.html">machinectl(1)</a> and similar), and is used to initialize
+           the container's hostname (which the container can choose to
+           override, however). If not specified, the last component of the
+           root directory path of the container is used, possibly suffixed
+           with a random identifier in case <b>--ephemeral </b>mode is selected. If
+           the root directory selected is the host's root directory the
+           host's hostname is used as default instead.
+
+       <b>--uuid=</b>
+           Set the specified UUID for the container. The init system will
+           initialize /etc/machine-id from this if this file is not set yet.
+           Note that this option takes effect only if /etc/machine-id in the
+           container is unpopulated.
+
+       <b>--slice=</b>
+           Make the container part of the specified slice, instead of the
+           default machine.slice. This applies only if the machine is run in
+           its own scope unit, i.e. if <b>--keep-unit </b>isn't used.
+
+       <b>--property=</b>
+           Set a unit property on the scope unit to register for the
+           machine. This applies only if the machine is run in its own scope
+           unit, i.e. if <b>--keep-unit </b>isn't used. Takes unit property
+           assignments in the same format as <b>systemctl set-property</b>. This is
+           useful to set memory limits and similar for container.
+
+       <b>--private-users=</b>
+           Controls user namespacing. If enabled, the container will run
+           with its own private set of UNIX user and group ids (UIDs and
+           GIDs). This involves mapping the private UIDs/GIDs used in the
+           container (starting with the container's root user 0 and up) to a
+           range of UIDs/GIDs on the host that are not used for other
+           purposes (usually in the range beyond the host's UID/GID 65536).
+           The parameter may be specified as follows:
+
+            1. If one or two colon-separated numbers are specified, user
+               namespacing is turned on. The first parameter specifies the
+               first host UID/GID to assign to the container, the second
+               parameter specifies the number of host UIDs/GIDs to assign to
+               the container. If the second parameter is omitted, 65536
+               UIDs/GIDs are assigned.
+
+            2. If the parameter is omitted, or true, user namespacing is
+               turned on. The UID/GID range to use is determined
+               automatically from the file ownership of the root directory
+               of the container's directory tree. To use this option, make
+               sure to prepare the directory tree in advance, and ensure
+               that all files and directories in it are owned by UIDs/GIDs
+               in the range you'd like to use. Also, make sure that used
+               file ACLs exclusively reference UIDs/GIDs in the appropriate
+               range. If this mode is used the number of UIDs/GIDs assigned
+               to the container for use is 65536, and the UID/GID of the
+               root directory must be a multiple of 65536.
+
+            3. If the parameter is false, user namespacing is turned off.
+               This is the default.
+
+            4. The special value "pick" turns on user namespacing. In this
+               case the UID/GID range is automatically chosen. As first
+               step, the file owner of the root directory of the container's
+               directory tree is read, and it is checked that it is
+               currently not used by the system otherwise (in particular,
+               that no other container is using it). If this check is
+               successful, the UID/GID range determined this way is used,
+               similar to the behavior if "yes" is specified. If the check
+               is not successful (and thus the UID/GID range indicated in
+               the root directory's file owner is already used elsewhere) a
+               new – currently unused – UID/GID range of 65536 UIDs/GIDs is
+               randomly chosen between the host UID/GIDs of 524288 and
+               1878982656, always starting at a multiple of 65536. This
+               setting implies <b>--private-users-chown </b>(see below), which has
+               the effect that the files and directories in the container's
+               directory tree will be owned by the appropriate users of the
+               range picked. Using this option makes user namespace behavior
+               fully automatic. Note that the first invocation of a
+               previously unused container image might result in picking a
+               new UID/GID range for it, and thus in the (possibly
+               expensive) file ownership adjustment operation. However,
+               subsequent invocations of the container will be cheap (unless
+               of course the picked UID/GID range is assigned to a different
+               use by then).
+
+           It is recommended to assign at least 65536 UIDs/GIDs to each
+           container, so that the usable UID/GID range in the container
+           covers 16 bit. For best security, do not assign overlapping
+           UID/GID ranges to multiple containers. It is hence a good idea to
+           use the upper 16 bit of the host 32-bit UIDs/GIDs as container
+           identifier, while the lower 16 bit encode the container UID/GID
+           used. This is in fact the behavior enforced by the
+           <b>--private-users=pick </b>option.
+
+           When user namespaces are used, the GID range assigned to each
+           container is always chosen identical to the UID range.
+
+           In most cases, using <b>--private-users=pick </b>is the recommended
+           option as it enhances container security massively and operates
+           fully automatically in most cases.
+
+           Note that the picked UID/GID range is not written to /etc/passwd
+           or /etc/group. In fact, the allocation of the range is not stored
+           persistently anywhere, except in the file ownership of the files
+           and directories of the container.
+
+           Note that when user namespacing is used file ownership on disk
+           reflects this, and all of the container's files and directories
+           are owned by the container's effective user and group IDs. This
+           means that copying files from and to the container image requires
+           correction of the numeric UID/GID values, according to the
+           UID/GID shift applied.
+
+       <b>--private-users-chown</b>
+           If specified, all files and directories in the container's
+           directory tree will adjusted so that they are owned to the
+           appropriate UIDs/GIDs selected for the container (see above).
+           This operation is potentially expensive, as it involves
+           descending and iterating through the full directory tree of the
+           container. Besides actual file ownership, file ACLs are adjusted
+           as well.
+
+           This option is implied if <b>--private-users=pick </b>is used. This
+           option has no effect if user namespacing is not used.
+
+       <b>-U</b>
+           If the kernel supports the user namespaces feature, equivalent to
+           <b>--private-users=pick --private-users-chown</b>, otherwise equivalent
+           to <b>--private-users=no</b>.
+
+           Note that <b>-U </b>is the default if the systemd-nspawn@.service
+           template unit file is used.
+
+           Note: it is possible to undo the effect of <b>--private-users-chown</b>
+           (or <b>-U</b>) on the file system by redoing the operation with the
+           first UID of 0:
+
+               systemd-nspawn ... --private-users=0 --private-users-chown
+
+       <b>--private-network</b>
+           Disconnect networking of the container from the host. This makes
+           all network interfaces unavailable in the container, with the
+           exception of the loopback device and those specified with
+           <b>--network-interface= </b>and configured with <b>--network-veth</b>. If this
+           option is specified, the CAP_NET_ADMIN capability will be added
+           to the set of capabilities the container retains. The latter may
+           be disabled by using <b>--drop-capability=</b>.
+
+       <b>--network-interface=</b>
+           Assign the specified network interface to the container. This
+           will remove the specified interface from the calling namespace
+           and place it in the container. When the container terminates, it
+           is moved back to the host namespace. Note that
+           <b>--network-interface= </b>implies <b>--private-network</b>. This option may
+           be used more than once to add multiple network interfaces to the
+           container.
+
+       <b>--network-macvlan=</b>
+           Create a "macvlan" interface of the specified Ethernet network
+           interface and add it to the container. A "macvlan" interface is a
+           virtual interface that adds a second MAC address to an existing
+           physical Ethernet link. The interface in the container will be
+           named after the interface on the host, prefixed with "mv-". Note
+           that <b>--network-macvlan= </b>implies <b>--private-network</b>. This option
+           may be used more than once to add multiple network interfaces to
+           the container.
+
+       <b>--network-ipvlan=</b>
+           Create an "ipvlan" interface of the specified Ethernet network
+           interface and add it to the container. An "ipvlan" interface is a
+           virtual interface, similar to a "macvlan" interface, which uses
+           the same MAC address as the underlying interface. The interface
+           in the container will be named after the interface on the host,
+           prefixed with "iv-". Note that <b>--network-ipvlan= </b>implies
+           <b>--private-network</b>. This option may be used more than once to add
+           multiple network interfaces to the container.
+
+       <b>-n</b>, <b>--network-veth</b>
+           Create a virtual Ethernet link ("veth") between host and
+           container. The host side of the Ethernet link will be available
+           as a network interface named after the container's name (as
+           specified with <b>--machine=</b>), prefixed with "ve-". The container
+           side of the Ethernet link will be named "host0". The
+           <b>--network-veth </b>option implies <b>--private-network</b>.
+
+           Note that <a href="../man8/systemd-networkd.service.8.html">systemd-networkd.service(8)</a> includes by default a
+           network file /usr/lib/systemd/network/80-container-ve.network
+           matching the host-side interfaces created this way, which
+           contains settings to enable automatic address provisioning on the
+           created virtual link via DHCP, as well as automatic IP routing
+           onto the host's external network interfaces. It also contains
+           /usr/lib/systemd/network/80-container-host0.network matching the
+           container-side interface created this way, containing settings to
+           enable client side address assignment via DHCP. In case
+           systemd-networkd is running on both the host and inside the
+           container, automatic IP communication from the container to the
+           host is thus available, with further connectivity to the external
+           network.
+
+           Note that <b>--network-veth </b>is the default if the
+           systemd-nspawn@.service template unit file is used.
+
+       <b>--network-veth-extra=</b>
+           Adds an additional virtual Ethernet link between host and
+           container. Takes a colon-separated pair of host interface name
+           and container interface name. The latter may be omitted in which
+           case the container and host sides will be assigned the same name.
+           This switch is independent of <b>--network-veth</b>, and — in contrast —
+           may be used multiple times, and allows configuration of the
+           network interface names. Note that <b>--network-bridge= </b>has no
+           effect on interfaces created with <b>--network-veth-extra=</b>.
+
+       <b>--network-bridge=</b>
+           Adds the host side of the Ethernet link created with
+           <b>--network-veth </b>to the specified Ethernet bridge interface.
+           Expects a valid network interface name of a bridge device as
+           argument. Note that <b>--network-bridge= </b>implies <b>--network-veth</b>. If
+           this option is used, the host side of the Ethernet link will use
+           the "vb-" prefix instead of "ve-".
+
+       <b>--network-zone=</b>
+           Creates a virtual Ethernet link ("veth") to the container and
+           adds it to an automatically managed Ethernet bridge interface.
+           The bridge interface is named after the passed argument, prefixed
+           with "vz-". The bridge interface is automatically created when
+           the first container configured for its name is started, and is
+           automatically removed when the last container configured for its
+           name exits. Hence, each bridge interface configured this way
+           exists only as long as there's at least one container referencing
+           it running. This option is very similar to <b>--network-bridge=</b>,
+           besides this automatic creation/removal of the bridge device.
+
+           This setting makes it easy to place multiple related containers
+           on a common, virtual Ethernet-based broadcast domain, here called
+           a "zone". Each container may only be part of one zone, but each
+           zone may contain any number of containers. Each zone is
+           referenced by its name. Names may be chosen freely (as long as
+           they form valid network interface names when prefixed with
+           "vz-"), and it is sufficient to pass the same name to the
+           <b>--network-zone= </b>switch of the various concurrently running
+           containers to join them in one zone.
+
+           Note that <a href="../man8/systemd-networkd.service.8.html">systemd-networkd.service(8)</a> includes by default a
+           network file /usr/lib/systemd/network/80-container-vz.network
+           matching the bridge interfaces created this way, which contains
+           settings to enable automatic address provisioning on the created
+           virtual network via DHCP, as well as automatic IP routing onto
+           the host's external network interfaces. Using <b>--network-zone= </b>is
+           hence in most cases fully automatic and sufficient to connect
+           multiple local containers in a joined broadcast domain to the
+           host, with further connectivity to the external network.
+
+       <b>-p</b>, <b>--port=</b>
+           If private networking is enabled, maps an IP port on the host
+           onto an IP port on the container. Takes a protocol specifier
+           (either "tcp" or "udp"), separated by a colon from a host port
+           number in the range 1 to 65535, separated by a colon from a
+           container port number in the range from 1 to 65535. The protocol
+           specifier and its separating colon may be omitted, in which case
+           "tcp" is assumed. The container port number and its colon may be
+           omitted, in which case the same port as the host port is implied.
+           This option is only supported if private networking is used, such
+           as with <b>--network-veth</b>, <b>--network-zone=--network-bridge=</b>.
+
+       <b>-Z</b>, <b>--selinux-context=</b>
+           Sets the SELinux security context to be used to label processes
+           in the container.
+
+       <b>-L</b>, <b>--selinux-apifs-context=</b>
+           Sets the SELinux security context to be used to label files in
+           the virtual API file systems in the container.
+
+       <b>--capability=</b>
+           List one or more additional capabilities to grant the container.
+           Takes a comma-separated list of capability names, see
+           <a href="../man7/capabilities.7.html">capabilities(7)</a> for more information. Note that the following
+           capabilities will be granted in any way: CAP_CHOWN,
+           CAP_DAC_OVERRIDE, CAP_DAC_READ_SEARCH, CAP_FOWNER, CAP_FSETID,
+           CAP_IPC_OWNER, CAP_KILL, CAP_LEASE, CAP_LINUX_IMMUTABLE,
+           CAP_NET_BIND_SERVICE, CAP_NET_BROADCAST, CAP_NET_RAW, CAP_SETGID,
+           CAP_SETFCAP, CAP_SETPCAP, CAP_SETUID, CAP_SYS_ADMIN,
+           CAP_SYS_CHROOT, CAP_SYS_NICE, CAP_SYS_PTRACE, CAP_SYS_TTY_CONFIG,
+           CAP_SYS_RESOURCE, CAP_SYS_BOOT, CAP_AUDIT_WRITE,
+           CAP_AUDIT_CONTROL. Also CAP_NET_ADMIN is retained if
+           <b>--private-network </b>is specified. If the special value "all" is
+           passed, all capabilities are retained.
+
+       <b>--drop-capability=</b>
+           Specify one or more additional capabilities to drop for the
+           container. This allows running the container with fewer
+           capabilities than the default (see above).
+
+       <b>--kill-signal=</b>
+           Specify the process signal to send to the container's PID 1 when
+           nspawn itself receives SIGTERM, in order to trigger an orderly
+           shutdown of the container. Defaults to SIGRTMIN+3 if <b>--boot </b>is
+           used (on systemd-compatible init systems SIGRTMIN+3 triggers an
+           orderly shutdown). For a list of valid signals, see <a href="../man7/signal.7.html">signal(7)</a>.
+
+       <b>--link-journal=</b>
+           Control whether the container's journal shall be made visible to
+           the host system. If enabled, allows viewing the container's
+           journal files from the host (but not vice versa). Takes one of
+           "no", "host", "try-host", "guest", "try-guest", "auto". If "no",
+           the journal is not linked. If "host", the journal files are
+           stored on the host file system (beneath
+           /var/log/journal/<i>machine-id</i>) and the subdirectory is bind-mounted
+           into the container at the same location. If "guest", the journal
+           files are stored on the guest file system (beneath
+           /var/log/journal/<i>machine-id</i>) and the subdirectory is symlinked
+           into the host at the same location.  "try-host" and "try-guest"
+           do the same but do not fail if the host does not have persistent
+           journaling enabled. If "auto" (the default), and the right
+           subdirectory of /var/log/journal exists, it will be bind mounted
+           into the container. If the subdirectory does not exist, no
+           linking is performed. Effectively, booting a container once with
+           "guest" or "host" will link the journal persistently if further
+           on the default of "auto" is used.
+
+           Note that <b>--link-journal=try-guest </b>is the default if the
+           systemd-nspawn@.service template unit file is used.
+
+       <b>-j</b>
+           Equivalent to <b>--link-journal=try-guest</b>.
+
+       <b>--read-only</b>
+           Mount the root file system read-only for the container.
+
+       <b>--bind=</b>, <b>--bind-ro=</b>
+           Bind mount a file or directory from the host into the container.
+           Takes one of: a path argument — in which case the specified path
+           will be mounted from the host to the same path in the container,
+           or a colon-separated pair of paths — in which case the first
+           specified path is the source in the host, and the second path is
+           the destination in the container, or a colon-separated triple of
+           source path, destination path and mount options. The source path
+           may optionally be prefixed with a "+" character. If so, the
+           source path is taken relative to the image's root directory. This
+           permits setting up bind mounts within the container image. The
+           source path may be specified as empty string, in which case a
+           temporary directory below the host's /var/tmp directory is used.
+           It is automatically removed when the container is shut down.
+           Mount options are comma-separated and currently, only <b>rbind </b>and
+           <b>norbind </b>are allowed, controlling whether to create a recursive or
+           a regular bind mount. Defaults to "rbind". Backslash escapes are
+           interpreted, so "\:" may be used to embed colons in either path.
+           This option may be specified multiple times for creating multiple
+           independent bind mount points. The <b>--bind-ro= </b>option creates
+           read-only bind mounts.
+
+       <b>--tmpfs=</b>
+           Mount a tmpfs file system into the container. Takes a single
+           absolute path argument that specifies where to mount the tmpfs
+           instance to (in which case the directory access mode will be
+           chosen as 0755, owned by root/root), or optionally a
+           colon-separated pair of path and mount option string that is used
+           for mounting (in which case the kernel default for access mode
+           and owner will be chosen, unless otherwise specified). This
+           option is particularly useful for mounting directories such as
+           /var as tmpfs, to allow state-less systems, in particular when
+           combined with <b>--read-only</b>. Backslash escapes are interpreted in
+           the path, so "\:" may be used to embed colons in the path.
+
+       <b>--overlay=</b>, <b>--overlay-ro=</b>
+           Combine multiple directory trees into one overlay file system and
+           mount it into the container. Takes a list of colon-separated
+           paths to the directory trees to combine and the destination mount
+           point.
+
+           Backslash escapes are interpreted in the paths, so "\:" may be
+           used to embed colons in the paths.
+
+           If three or more paths are specified, then the last specified
+           path is the destination mount point in the container, all paths
+           specified before refer to directory trees on the host and are
+           combined in the specified order into one overlay file system. The
+           left-most path is hence the lowest directory tree, the
+           second-to-last path the highest directory tree in the stacking
+           order. If <b>--overlay-ro= </b>is used instead of <b>--overlay=</b>, a
+           read-only overlay file system is created. If a writable overlay
+           file system is created, all changes made to it are written to the
+           highest directory tree in the stacking order, i.e. the
+           second-to-last specified.
+
+           If only two paths are specified, then the second specified path
+           is used both as the top-level directory tree in the stacking
+           order as seen from the host, as well as the mount point for the
+           overlay file system in the container. At least two paths have to
+           be specified.
+
+           The source paths may optionally be prefixed with "+" character.
+           If so they are taken relative to the image's root directory. The
+           uppermost source path may also be specified as empty string, in
+           which case a temporary directory below the host's /var/tmp is
+           used. The directory is removed automatically when the container
+           is shut down. This behaviour is useful in order to make read-only
+           container directories writable while the container is running.
+           For example, use the "--overlay=+/var::/var" option in order to
+           automatically overlay a writable temporary directory on a
+           read-only /var directory.
+
+           For details about overlay file systems, see <b>overlayfs.txt</b><b></b>[4].
+           Note that the semantics of overlay file systems are substantially
+           different from normal file systems, in particular regarding
+           reported device and inode information. Device and inode
+           information may change for a file while it is being written to,
+           and processes might see out-of-date versions of files at times.
+           Note that this switch automatically derives the "workdir=" mount
+           option for the overlay file system from the top-level directory
+           tree, making it a sibling of it. It is hence essential that the
+           top-level directory tree is not a mount point itself (since the
+           working directory must be on the same file system as the top-most
+           directory tree). Also note that the "lowerdir=" mount option
+           receives the paths to stack in the opposite order of this switch.
+
+       <b>-E </b><i>NAME</i><b>=</b><i>VALUE</i>, <b>--setenv=</b><i>NAME</i><b>=</b><i>VALUE</i>
+           Specifies an environment variable assignment to pass to the init
+           process in the container, in the format "NAME=VALUE". This may be
+           used to override the default variables or to set additional
+           variables. This parameter may be used more than once.
+
+       <b>--register=</b>
+           Controls whether the container is registered with
+           <a href="../man8/systemd-machined.8.html">systemd-machined(8)</a>. Takes a boolean argument, which defaults to
+           "yes". This option should be enabled when the container runs a
+           full Operating System (more specifically: a system and service
+           manager as PID 1), and is useful to ensure that the container is
+           accessible via <a href="machinectl.1.html">machinectl(1)</a> and shown by tools such as <a href="ps.1.html">ps(1)</a>. If
+           the container does not run a service manager, it is recommended
+           to set this option to "no".
+
+       <b>--keep-unit</b>
+           Instead of creating a transient scope unit to run the container
+           in, simply register the service or scope unit <b>systemd-nspawn </b>has
+           been invoked in with <a href="../man8/systemd-machined.8.html">systemd-machined(8)</a>. This has no effect if
+           <b>--register=no </b>is used. This switch should be used if
+           <b>systemd-nspawn </b>is invoked from within a service unit, and the
+           service unit's sole purpose is to run a single <b>systemd-nspawn</b>
+           container. This option is not available if run from a user
+           session.
+
+           Note that passing <b>--keep-unit </b>disables the effect of <b>--slice= </b>and
+           <b>--property=</b>.
+
+       <b>--personality=</b>
+           Control the architecture ("personality") reported by <a href="../man2/uname.2.html">uname(2)</a> in
+           the container. Currently, only "x86" and "x86-64" are supported.
+           This is useful when running a 32-bit container on a 64-bit host.
+           If this setting is not used, the personality reported in the
+           container is the same as the one reported on the host.
+
+       <b>-q</b>, <b>--quiet</b>
+           Turns off any status output by the tool itself. When this switch
+           is used, the only output from nspawn will be the console output
+           of the container OS itself.
+
+       <b>--volatile</b>, <b>--volatile=</b><i>MODE</i>
+           Boots the container in volatile mode. When no mode parameter is
+           passed or when mode is specified as <b>yes</b>, full volatile mode is
+           enabled. This means the root directory is mounted as a mostly
+           unpopulated "tmpfs" instance, and /usr from the OS tree is
+           mounted into it in read-only mode (the system thus starts up with
+           read-only OS image, but pristine state and configuration, any
+           changes are lost on shutdown). When the mode parameter is
+           specified as <b>state</b>, the OS tree is mounted read-only, but /var is
+           mounted as a "tmpfs" instance into it (the system thus starts up
+           with read-only OS resources and configuration, but pristine
+           state, and any changes to the latter are lost on shutdown). When
+           the mode parameter is specified as <b>no </b>(the default), the whole OS
+           tree is made available writable.
+
+           This option provides similar functionality for containers as the
+           "systemd.volatile=" kernel command line switch provides for host
+           systems. See <a href="../man7/kernel-command-line.7.html">kernel-command-line(7)</a> for details.
+
+           Note that enabling this setting will only work correctly with
+           operating systems in the container that can boot up with only
+           /usr mounted, and are able to automatically populate /var, and
+           also /etc in case of "--volatile=yes".
+
+       <b>--settings=</b><i>MODE</i>
+           Controls whether <b>systemd-nspawn </b>shall search for and use
+           additional per-container settings from .nspawn files. Takes a
+           boolean or the special values <b>override </b>or <b>trusted</b>.
+
+           If enabled (the default), a settings file named after the machine
+           (as specified with the <b>--machine= </b>setting, or derived from the
+           directory or image file name) with the suffix .nspawn is searched
+           in /etc/systemd/nspawn/ and /run/systemd/nspawn/. If it is found
+           there, its settings are read and used. If it is not found there,
+           it is subsequently searched in the same directory as the image
+           file or in the immediate parent of the root directory of the
+           container. In this case, if the file is found, its settings will
+           be also read and used, but potentially unsafe settings are
+           ignored. Note that in both these cases, settings on the command
+           line take precedence over the corresponding settings from loaded
+           .nspawn files, if both are specified. Unsafe settings are
+           considered all settings that elevate the container's privileges
+           or grant access to additional resources such as files or
+           directories of the host. For details about the format and
+           contents of .nspawn files, consult <a href="../man5/systemd.nspawn.5.html">systemd.nspawn(5)</a>.
+
+           If this option is set to <b>override</b>, the file is searched, read and
+           used the same way, however, the order of precedence is reversed:
+           settings read from the .nspawn file will take precedence over the
+           corresponding command line options, if both are specified.
+
+           If this option is set to <b>trusted</b>, the file is searched, read and
+           used the same way, but regardless of being found in
+           /etc/systemd/nspawn/, /run/systemd/nspawn/ or next to the image
+           file or container root directory, all settings will take effect,
+           however, command line arguments still take precedence over
+           corresponding settings.
+
+           If disabled, no .nspawn file is read and no settings except the
+           ones on the command line are in effect.
+
+       <b>--notify-ready=</b>
+           Configures support for notifications from the container's init
+           process.  <b>--notify-ready= </b>takes a boolean (<b>no </b>and <b>yes</b>). With
+           option <b>no </b>systemd-nspawn notifies systemd with a "READY=1"
+           message when the init process is created. With option <b>yes</b>
+           systemd-nspawn waits for the "READY=1" message from the init
+           process in the container before sending its own to systemd. For
+           more details about notifications see <a href="../man3/sd_notify.3.html">sd_notify(3)</a>).
+
+       <b>-h</b>, <b>--help</b>
+           Print a short help text and exit.
+
+       <b>--version</b>
+           Print a short version string and exit.
+</pre>
+<h2><a id="EXAMPLES" href="#EXAMPLES"></a>EXAMPLES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>Example 1. Download a Fedora image and start a shell in it</b>
+
+           # machinectl pull-raw --verify=no \
+                 <a href="https://download.fedoraproject.org/pub/fedora/linux/releases/25/CloudImages/x86_64/images/Fedora-Cloud-Base-25-1.3.x86_64.raw.xz">https://download.fedoraproject.org/pub/fedora/linux/releases/25/CloudImages/x86_64/images/Fedora-Cloud-Base-25-1.3.x86_64.raw.xz</a>
+           # systemd-nspawn -M Fedora-Cloud-Base-25-1.3.x86_64.raw
+
+       This downloads an image using <a href="machinectl.1.html">machinectl(1)</a> and opens a shell in it.
+
+       <b>Example 2. Build and boot a minimal Fedora distribution in a</b>
+       <b>container</b>
+
+           # dnf -y --releasever=25 --installroot=/srv/mycontainer \
+                 --disablerepo='*' --enablerepo=fedora --enablerepo=updates install \
+                 systemd passwd dnf fedora-release vim-minimal
+           # systemd-nspawn -bD /srv/mycontainer
+
+       This installs a minimal Fedora distribution into the directory
+       /srv/mycontainer/ and then boots an OS in a namespace container in
+       it.
+
+       <b>Example 3. Spawn a shell in a container of a minimal Debian unstable</b>
+       <b>distribution</b>
+
+           # debootstrap --arch=amd64 unstable ~/debian-tree/
+           # systemd-nspawn -D ~/debian-tree/
+
+       This installs a minimal Debian unstable distribution into the
+       directory ~/debian-tree/ and then spawns a shell in a namespace
+       container in it.
+
+       <b>Example 4. Boot a minimal Arch Linux distribution in a container</b>
+
+           # pacstrap -c -d ~/arch-tree/ base
+           # systemd-nspawn -bD ~/arch-tree/
+
+       This installs a minimal Arch Linux distribution into the directory
+       ~/arch-tree/ and then boots an OS in a namespace container in it.
+
+       <b>Example 5. Install the OpenSUSE Tumbleweed rolling distribution</b>
+
+           # zypper --root=/var/lib/machines/tumbleweed ar -c \
+                 <a href="https://download.opensuse.org/tumbleweed/repo/oss">https://download.opensuse.org/tumbleweed/repo/oss</a> tumbleweed
+           # zypper --root=/var/lib/machines/tumbleweed refresh
+           # zypper --root=/var/lib/machines/tumbleweed install --no-recommends \
+                 systemd shadow zypper openSUSE-release vim
+           # systemd-nspawn -M tumbleweed passwd root
+           # systemd-nspawn -M tumbleweed -b
+
+       <b>Example 6. Boot into an ephemeral snapshot of the host system</b>
+
+           # systemd-nspawn -D / -xb
+
+       This runs a copy of the host system in a snapshot which is removed
+       immediately when the container exits. All file system changes made
+       during runtime will be lost on shutdown, hence.
+
+       <b>Example 7. Run a container with SELinux sandbox security contexts</b>
+
+           # chcon system_u:object_r:svirt_sandbox_file_t:s0:c0,c1 -R /srv/container
+           # systemd-nspawn -L system_u:object_r:svirt_sandbox_file_t:s0:c0,c1 \
+                 -Z system_u:system_r:svirt_lxc_net_t:s0:c0,c1 -D /srv/container /bin/sh
+
+       <b>Example 8. Run a container with an OSTree deployment</b>
+
+           # systemd-nspawn -b -i ~/image.raw \
+                 --pivot-root=/ostree/deploy/$OS/deploy/$CHECKSUM:/sysroot \
+                 --bind=+/sysroot/ostree/deploy/$OS/var:/var
+</pre>
+<h2><a id="EXIT_STATUS" href="#EXIT_STATUS"></a>EXIT STATUS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The exit code of the program executed in the container is returned.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="systemd.1.html">systemd(1)</a>, <a href="../man5/systemd.nspawn.5.html">systemd.nspawn(5)</a>, <a href="chroot.1.html">chroot(1)</a>, <b>dnf</b>(8), <b>debootstrap</b>(8),
+       <b>pacman</b>(8), <b>zypper</b>(8), <a href="../man5/systemd.slice.5.html">systemd.slice(5)</a>, <a href="machinectl.1.html">machinectl(1)</a>, <a href="../man8/btrfs.8.html">btrfs(8)</a>
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+        1. Container Interface
+           <a href="https://www.freedesktop.org/wiki/Software/systemd/ContainerInterface">https://www.freedesktop.org/wiki/Software/systemd/ContainerInterface</a>
+
+        2. Discoverable Partitions Specification
+           <a href="https://www.freedesktop.org/wiki/Specifications/DiscoverablePartitionsSpec/">https://www.freedesktop.org/wiki/Specifications/DiscoverablePartitionsSpec/</a>
+
+        3. OSTree
+           <a href="https://ostree.readthedocs.io/en/latest/">https://ostree.readthedocs.io/en/latest/</a>
+
+        4. overlayfs.txt
+           <a href="https://www.kernel.org/doc/Documentation/filesystems/overlayfs.txt">https://www.kernel.org/doc/Documentation/filesystems/overlayfs.txt</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                SYSTEMD-NSPAWN(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="machinectl.1.html">machinectl(1)</a>,&nbsp; 
+    <a href="systemd-cgls.1.html">systemd-cgls(1)</a>,&nbsp; 
+    <a href="systemd-detect-virt.1.html">systemd-detect-virt(1)</a>,&nbsp; 
+    <a href="../man5/systemd.nspawn.5.html">systemd.nspawn(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man8/systemd-importd.service.8.html">systemd-importd.service(8)</a>,&nbsp; 
+    <a href="../man8/systemd-machined.service.8.html">systemd-machined.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

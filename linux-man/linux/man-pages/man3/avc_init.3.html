@@ -1,0 +1,313 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>avc_init(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#CALLBACKS">CALLBACKS</a> | <a href="#NETLINK_NOTIFICATION">NETLINK&nbsp;NOTIFICATION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#NOTES">NOTES</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">avc_init(3)               SELinux API documentation              avc_init(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       avc_init - legacy userspace SELinux AVC setup
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;selinux/selinux.h&gt;</b>
+       <b>#include &lt;selinux/avc.h&gt;</b>
+
+       <b>int avc_init(const char *</b><i>msgprefix</i><b>,</b>
+                    <b>const struct avc_memory_callback *</b><i>mem_callbacks</i><b>,</b>
+                    <b>const struct avc_log_callback *</b><i>log_callbacks</i><b>,</b>
+                    <b>const struct avc_thread_callback *</b><i>thread_callbacks</i><b>,</b>
+                    <b>const struct avc_lock_callback *</b><i>lock_callbacks</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>avc_init</b>() is deprecated; please use <a href="avc_open.3.html">avc_open(3)</a> in conjunction with
+       <a href="selinux_set_callback.3.html">selinux_set_callback(3)</a> in all new code.
+
+       <b>avc_init</b>() initializes the userspace AVC and must be called before
+       any other AVC operation can be performed.  A non-NULL <i>msgprefix</i> will
+       be prepended to all audit messages produced by the userspace AVC.
+       The default is `uavc'.  The remaining arguments, if non-NULL, specify
+       callbacks to be used by the userspace AVC.
+</pre>
+<h2><a id="CALLBACKS" href="#CALLBACKS"></a>CALLBACKS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The userspace AVC can be directed how to perform memory allocation,
+       logging, thread creation, and locking via callback functions passed
+       to <b>avc_init</b>().  The purpose of this functionality is to allow the
+       userspace AVC to be smoothly integrated into existing userspace
+       object managers.
+
+       Use an <b>avc_memory_callback </b>structure to specify alternate functions
+       for dynamic memory allocation.
+
+              struct avc_memory_callback {
+                  void  *(*func_malloc)(size_t size);
+                  void  (*func_free)(void *ptr);
+              };
+
+       The two fields of the structure should be pointers to functions which
+       behave as <a href="malloc.3.html">malloc(3)</a> and <a href="free.3.html">free(3)</a>, which are used by default.
+
+       Use an <b>avc_log_callback </b>structure to specify alternate functions for
+       logging.
+
+              struct avc_log_callback {
+                  void  (*func_log)(const char *fmt, ...);
+                  void  (*func_audit)(void *auditdata,
+                                      security_class_t class,
+                                      char *msgbuf, size_t msgbufsize);
+              };
+
+       The <b>func_log </b>callback should accept a <a href="printf.3.html">printf(3)</a> style format and
+       arguments and log them as desired.  The default behavior prints the
+       message on the standard error.  The <b>func_audit </b>callback should
+       interpret the <i>auditdata</i> parameter for the given <i>class</i>, printing a
+       human-readable interpretation to <i>msgbuf</i> using no more than <i>msgbufsize</i>
+       characters.  The default behavior is to ignore <i>auditdata</i>.
+
+       Use an <b>avc_thread_callback </b>structure to specify functions for
+       starting and manipulating threads.
+
+              struct avc_thread_callback {
+                  void  *(*func_create_thread)(void (*run)(void));
+                  void  (*func_stop_thread)(void *thread);
+              };
+
+       The <b>func_create_thread </b>callback should create a new thread and return
+       a pointer which references it.  The thread should execute the <i>run</i>
+       argument, which does not return under normal conditions.  The
+       <b>func_stop_thread </b>callback should cancel the running thread referenced
+       by <i>thread</i>.  By default, threading is not used; see <b>NETLINK</b>
+       <b>NOTIFICATION </b>below.
+
+       Use an <b>avc_lock_callback </b>structure to specify functions to create,
+       obtain, and release locks for use by threads.
+
+              struct avc_lock_callback {
+                  void  *(*func_alloc_lock)(void);
+                  void  (*func_get_lock)(void *lock);
+                  void  (*func_release_lock)(void *lock);
+                  void  (*func_free_lock)(void *lock);
+              };
+
+       The <b>func_alloc_lock </b>callback should create a new lock, returning a
+       pointer which references it.  The <b>func_get_lock </b>callback should
+       obtain <i>lock</i>, blocking if necessary.  The <b>func_release_lock </b>callback
+       should release <i>lock</i>.  The <b>func_free_lock </b>callback should destroy
+       <i>lock</i>, freeing any resources associated with it.  The default behavior
+       is not to perform any locking.  Note that undefined behavior may
+       result if threading is used without appropriate locking.
+</pre>
+<h2><a id="NETLINK_NOTIFICATION" href="#NETLINK_NOTIFICATION"></a>NETLINK NOTIFICATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Beginning with version 2.6.4, the Linux kernel supports SELinux
+       status change notification via netlink.  Two message types are
+       currently implemented, indicating changes to the enforcing mode and
+       to the loaded policy in the kernel, respectively.  The userspace AVC
+       listens for these messages and takes the appropriate action,
+       modifying the behavior of <a href="avc_has_perm.3.html">avc_has_perm(3)</a> to reflect the current
+       enforcing mode and flushing the cache on receipt of a policy load
+       notification.  Audit messages are produced when netlink notifications
+       are processed.
+
+       In the default single-threaded mode, the userspace AVC checks for new
+       netlink messages at the start of each permission query.  If threading
+       and locking callbacks are passed to <b>avc_init</b>() however, a dedicated
+       thread will be started to listen on the netlink socket.  This may
+       increase performance and will ensure that log messages are generated
+       immediately rather than at the time of the next permission query.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Functions with a return value return zero on success.  On error, -1
+       is returned and <i><a href="errno.3.html">errno</a></i> is set appropriately.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <i>msgprefix</i> argument to <b>avc_init</b>() currently has a length limit of
+       15 characters and will be truncated if necessary.
+
+       If a provided <b>func_malloc </b>callback does not set <i><a href="errno.3.html">errno</a></i> appropriately
+       on error, userspace AVC calls may exhibit the same behavior.
+
+       If a netlink thread has been created and an error occurs on the
+       socket (such as an access error), the thread may terminate and cause
+       the userspace AVC to return <b>EINVAL </b>on all further permission checks
+       until <b>avc_destroy </b>is called.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Eamon Walsh &lt;ewalsh@tycho.nsa.gov&gt;
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="avc_open.3.html">avc_open(3)</a>, <a href="selinux_set_callback.3.html">selinux_set_callback(3)</a>, <a href="../man8/selinux.8-2.html">selinux(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>selinux</i> (Security-Enhanced Linux user-space
+       libraries and tools) project.  Information about the project can be
+       found at ⟨<a href="https://github.com/SELinuxProject/selinux/wiki">https://github.com/SELinuxProject/selinux/wiki</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="https://github.com/SELinuxProject/selinux/wiki/Contributing">https://github.com/SELinuxProject/selinux/wiki/Contributing</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/SELinuxProject/selinux">https://github.com/SELinuxProject/selinux</a>⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                 27 May 2004                     avc_init(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="avc_add_callback.3.html">avc_add_callback(3)</a>,&nbsp; 
+    <a href="avc_cache_stats.3.html">avc_cache_stats(3)</a>,&nbsp; 
+    <a href="avc_compute_create.3.html">avc_compute_create(3)</a>,&nbsp; 
+    <a href="avc_context_to_sid.3.html">avc_context_to_sid(3)</a>,&nbsp; 
+    <a href="avc_has_perm.3.html">avc_has_perm(3)</a>,&nbsp; 
+    <a href="selinux_set_callback.3.html">selinux_set_callback(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,346 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>shmop(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SHMOP(2)                  Linux Programmer's Manual                 SHMOP(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       shmat, shmdt - System V shared memory operations
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/types.h&gt;</b>
+       <b>#include &lt;sys/shm.h&gt;</b>
+
+       <b>void *shmat(int </b><i>shmid</i><b>, const void *</b><i>shmaddr</i><b>, int </b><i>shmflg</i><b>);</b>
+
+       <b>int shmdt(const void *</b><i>shmaddr</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+   <b>shmat()</b>
+       <b>shmat</b>() attaches the System V shared memory segment identified by
+       <i>shmid</i> to the address space of the calling process.  The attaching
+       address is specified by <i>shmaddr</i> with one of the following criteria:
+
+       *  If <i>shmaddr</i> is NULL, the system chooses a suitable (unused) address
+          at which to attach the segment.
+
+       *  If <i>shmaddr</i> isn't NULL and <b>SHM_RND </b>is specified in <i>shmflg</i>, the
+          attach occurs at the address equal to <i>shmaddr</i> rounded down to the
+          nearest multiple of <b>SHMLBA</b>.
+
+       *  Otherwise, <i>shmaddr</i> must be a page-aligned address at which the
+          attach occurs.
+
+       In addition to <b>SHM_RND</b>, the following flags may be specified in the
+       <i>shmflg</i> bit-mask argument:
+
+       <b>SHM_EXEC </b>(Linux-specific; since Linux 2.6.9)
+              Allow the contents of the segment to be executed.  The caller
+              must have execute permission on the segment.
+
+       <b>SHM_RDONLY</b>
+              Attach the segment for read-only access.  The process must
+              have read permission for the segment.  If this flag is not
+              specified, the segment is attached for read and write access,
+              and the process must have read and write permission for the
+              segment.  There is no notion of a write-only shared memory
+              segment.
+
+       <b>SHM_REMAP </b>(Linux-specific)
+              This flag specifies that the mapping of the segment should
+              replace any existing mapping in the range starting at <i>shmaddr</i>
+              and continuing for the size of the segment.  (Normally, an
+              <b>EINVAL </b>error would result if a mapping already exists in this
+              address range.)  In this case, <i>shmaddr</i> must not be NULL.
+
+       The <a href="brk.2.html">brk(2)</a> value of the calling process is not altered by the attach.
+       The segment will automatically be detached at process exit.  The same
+       segment may be attached as a read and as a read-write one, and more
+       than once, in the process's address space.
+
+       A successful <b>shmat</b>() call updates the members of the <i>shmid_ds</i>
+       structure (see <a href="shmctl.2.html">shmctl(2)</a>) associated with the shared memory segment
+       as follows:
+
+              <i>shm_atime</i> is set to the current time.
+
+              <i>shm_lpid</i> is set to the process-ID of the calling process.
+
+              <i>shm_nattch</i> is incremented by one.
+
+   <b>shmdt()</b>
+       <b>shmdt</b>() detaches the shared memory segment located at the address
+       specified by <i>shmaddr</i> from the address space of the calling process.
+       The to-be-detached segment must be currently attached with <i>shmaddr</i>
+       equal to the value returned by the attaching <b>shmat</b>() call.
+
+       On a successful <b>shmdt</b>() call, the system updates the members of the
+       <i>shmid_ds</i> structure associated with the shared memory segment as
+       follows:
+
+              <i>shm_dtime</i> is set to the current time.
+
+              <i>shm_lpid</i> is set to the process-ID of the calling process.
+
+              <i>shm_nattch</i> is decremented by one.  If it becomes 0 and the
+              segment is marked for deletion, the segment is deleted.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>shmat</b>() returns the address of the attached shared memory
+       segment; on error, <i>(void *) -1</i> is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is set to
+       indicate the cause of the error.
+
+       On success, <b>shmdt</b>() returns 0; on error -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set to indicate the cause of the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       When <b>shmat</b>() fails, <i><a href="../man3/errno.3.html">errno</a></i> is set to one of the following:
+
+       <b>EACCES </b>The calling process does not have the required permissions for
+              the requested attach type, and does not have the <b>CAP_IPC_OWNER</b>
+              capability in the user namespace that governs its IPC
+              namespace.
+
+       <b>EIDRM  </b><i>shmid</i> points to a removed identifier.
+
+       <b>EINVAL </b>Invalid <i>shmid</i> value, unaligned (i.e., not page-aligned and
+              <b>SHM_RND </b>was not specified) or invalid <i>shmaddr</i> value, or can't
+              attach segment at <i>shmaddr</i>, or <b>SHM_REMAP </b>was specified and
+              <i>shmaddr</i> was NULL.
+
+       <b>ENOMEM </b>Could not allocate memory for the descriptor or for the page
+              tables.
+
+       When <b>shmdt</b>() fails, <i><a href="../man3/errno.3.html">errno</a></i> is set as follows:
+
+       <b>EINVAL </b>There is no shared memory segment attached at <i>shmaddr</i>; or,
+              <i>shmaddr</i> is not aligned on a page boundary.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SVr4.
+
+       In SVID 3 (or perhaps earlier), the type of the <i>shmaddr</i> argument was
+       changed from <i>char *</i> into <i>const void *</i>, and the returned type of
+       <b>shmat</b>() from <i>char *</i> into <i>void *</i>.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       After a <a href="fork.2.html">fork(2)</a>, the child inherits the attached shared memory
+       segments.
+
+       After an <a href="execve.2.html">execve(2)</a>, all attached shared memory segments are detached
+       from the process.
+
+       Upon <a href="_exit.2-2.html">_exit(2)</a>, all attached shared memory segments are detached from
+       the process.
+
+       Using <b>shmat</b>() with <i>shmaddr</i> equal to NULL is the preferred, portable
+       way of attaching a shared memory segment.  Be aware that the shared
+       memory segment attached in this way may be attached at different
+       addresses in different processes.  Therefore, any pointers maintained
+       within the shared memory must be made relative (typically to the
+       starting address of the segment), rather than absolute.
+
+       On Linux, it is possible to attach a shared memory segment even if it
+       is already marked to be deleted.  However, POSIX.1 does not specify
+       this behavior and many other implementations do not support it.
+
+       The following system parameter affects <b>shmat</b>():
+
+       <b>SHMLBA </b>Segment low boundary address multiple.  When explicitly
+              specifying an attach address in a call to <b>shmat</b>(), the caller
+              should ensure that the address is a multiple of this value.
+              This is necessary on some architectures, in order either to
+              ensure good CPU cache performance or to ensure that different
+              attaches of the same segment have consistent views within the
+              CPU cache.  <b>SHMLBA </b>is normally some multiple of the system
+              page size (on many Linux architectures, it is the same as the
+              system page size).
+
+       The implementation places no intrinsic per-process limit on the
+       number of shared memory segments (<b>SHMSEG</b>).
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="brk.2.html">brk(2)</a>, <a href="mmap.2.html">mmap(2)</a>, <a href="shmctl.2.html">shmctl(2)</a>, <a href="shmget.2.html">shmget(2)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>,
+       <a href="../man7/shm_overview.7.html">shm_overview(7)</a>, <a href="../man7/svipc.7.html">svipc(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                         SHMOP(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/ipcrm.1.html">ipcrm(1)</a>,&nbsp; 
+    <a href="../man1/ipcs.1.html">ipcs(1)</a>,&nbsp; 
+    <a href="../man1/lsipc.1.html">lsipc(1)</a>,&nbsp; 
+    <a href="../man1/pcp-ipcs.1.html">pcp-ipcs(1)</a>,&nbsp; 
+    <a href="execve.2.html">execve(2)</a>,&nbsp; 
+    <a href="futex.2.html">futex(2)</a>,&nbsp; 
+    <a href="ipc.2.html">ipc(2)</a>,&nbsp; 
+    <a href="mbind.2.html">mbind(2)</a>,&nbsp; 
+    <a href="mmap.2.html">mmap(2)</a>,&nbsp; 
+    <a href="open.2.html">open(2)</a>,&nbsp; 
+    <a href="shmctl.2.html">shmctl(2)</a>,&nbsp; 
+    <a href="shmget.2.html">shmget(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/numa.3.html">numa(3)</a>,&nbsp; 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man7/shm_overview.7.html">shm_overview(7)</a>,&nbsp; 
+    <a href="../man7/svipc.7.html">svipc(7)</a>,&nbsp; 
+    <a href="../man8/migratepages.8.html">migratepages(8)</a>,&nbsp; 
+    <a href="../man8/numactl.8.html">numactl(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="shmop.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

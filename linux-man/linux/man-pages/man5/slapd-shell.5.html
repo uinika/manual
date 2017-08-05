@@ -1,0 +1,336 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>slapd-shell(5) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#WARNING">WARNING</a> | <a href="#CONFIGURATION">CONFIGURATION</a> | <a href="#ACCESS_CONTROL">ACCESS&nbsp;CONTROL</a> | <a href="#EXAMPLE">EXAMPLE</a> | <a href="#LIMITATIONS">LIMITATIONS</a> | <a href="#FILES">FILES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SLAPD-SHELL(5)               File Formats Manual              SLAPD-SHELL(5)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       slapd-shell - Shell backend to slapd
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ETCDIR/slapd.conf
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The Shell backend to <a href="../man8/slapd.8.html">slapd(8)</a> executes external programs to implement
+       operations, and is designed to make it easy to tie an existing
+       database to the <b>slapd </b>front-end.
+
+       This backend is primarily intended to be used in prototypes.
+</pre>
+<h2><a id="WARNING" href="#WARNING"></a>WARNING  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>abandon </b>shell command has been removed since OpenLDAP 2.1.
+</pre>
+<h2><a id="CONFIGURATION" href="#CONFIGURATION"></a>CONFIGURATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       These <b>slapd.conf </b>options apply to the SHELL backend database.  That
+       is, they must follow a "database shell" line and come before any
+       subsequent "backend" or "database" lines.  Other database options are
+       described in the <a href="slapd.conf.5.html">slapd.conf(5)</a> manual page.
+
+       These options specify the pathname and arguments of the program to
+       execute in response to the given LDAP operation.  Each option is
+       followed by the input lines that the program receives:
+
+       <b>add &lt;pathname&gt; &lt;argument&gt;...</b>
+              ADD
+              msgid: &lt;message id&gt;
+              &lt;repeat { "suffix:" &lt;database suffix DN&gt; }&gt;
+              &lt;entry in LDIF format&gt;
+
+       <b>bind &lt;pathname&gt; &lt;argument&gt;...</b>
+              BIND
+              msgid: &lt;message id&gt;
+              &lt;repeat { "suffix:" &lt;database suffix DN&gt; }&gt;
+              dn: &lt;DN&gt;
+              method: &lt;method number&gt;
+              credlen: &lt;length of &lt;credentials&gt;&gt;
+              cred: &lt;credentials&gt;
+
+       <b>compare &lt;pathname&gt; &lt;argument&gt;...</b>
+              COMPARE
+              msgid: &lt;message id&gt;
+              &lt;repeat { "suffix:" &lt;database suffix DN&gt; }&gt;
+              dn: &lt;DN&gt;
+              &lt;attribute&gt;: &lt;value&gt;
+
+       <b>delete &lt;pathname&gt; &lt;argument&gt;...</b>
+              DELETE
+              msgid: &lt;message id&gt;
+              &lt;repeat { "suffix:" &lt;database suffix DN&gt; }&gt;
+              dn: &lt;DN&gt;
+
+       <b>modify &lt;pathname&gt; &lt;argument&gt;...</b>
+              MODIFY
+              msgid: &lt;message id&gt;
+              &lt;repeat { "suffix:" &lt;database suffix DN&gt; }&gt;
+              dn: &lt;DN&gt;
+              &lt;repeat {
+                  &lt;"add"/"delete"/"replace"&gt;: &lt;attribute&gt;
+                  &lt;repeat { &lt;attribute&gt;: &lt;value&gt; }&gt;
+                  -
+              }&gt;
+
+       <b>modrdn &lt;pathname&gt; &lt;argument&gt;...</b>
+              MODRDN
+              msgid: &lt;message id&gt;
+              &lt;repeat { "suffix:" &lt;database suffix DN&gt; }&gt;
+              dn: &lt;DN&gt;
+              newrdn: &lt;new RDN&gt;
+              deleteoldrdn: &lt;0 or 1&gt;
+              &lt;if new superior is specified: "newSuperior: &lt;DN&gt;"&gt;
+
+       <b>search &lt;pathname&gt; &lt;argument&gt;...</b>
+              SEARCH
+              msgid: &lt;message id&gt;
+              &lt;repeat { "suffix:" &lt;database suffix DN&gt; }&gt;
+              base: &lt;base DN&gt;
+              scope: &lt;0-2, see ldap.h&gt;
+              deref: &lt;0-3, see ldap.h&gt;
+              sizelimit: &lt;size limit&gt;
+              timelimit: &lt;time limit&gt;
+              filter: &lt;filter&gt;
+              attrsonly: &lt;0 or 1&gt;
+              attrs: &lt;"all" or space-separated attribute list&gt;
+
+       <b>unbind &lt;pathname&gt; &lt;argument&gt;...</b>
+              UNBIND
+              msgid: &lt;message id&gt;
+              &lt;repeat { "suffix:" &lt;database suffix DN&gt; }&gt;
+              dn: &lt;bound DN&gt;
+
+       Note that you need only supply configuration lines for those commands
+       you want the backend to handle.  Operations for which a command is
+       not supplied will be refused with an "unwilling to perform" error.
+
+       The <b>search </b>command should output the entries in LDIF format, each
+       entry followed by a blank line, and after these the RESULT below.
+
+       All commands except <b>unbind </b>should then output:
+              RESULT
+              code: &lt;integer&gt;
+              matched: &lt;matched DN&gt;
+              info: &lt;text&gt;
+       where only the RESULT line is mandatory.  Lines starting with `#' or
+       `DEBUG:' are ignored.
+</pre>
+<h2><a id="ACCESS_CONTROL" href="#ACCESS_CONTROL"></a>ACCESS CONTROL  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>shell </b>backend does not honor all ACL semantics as described in
+       <a href="slapd.access.5.html">slapd.access(5)</a>.  In general, access to objects is checked by using a
+       dummy object that contains only the DN, so access rules that rely on
+       the contents of the object are not honored.  In detail:
+
+       The <b>add </b>operation does not require <b>write (=w) </b>access to the <b>children</b>
+       pseudo-attribute of the parent entry.
+
+       The <b>bind </b>operation requires <b>auth (=x) </b>access to the <b>entry </b>pseudo-
+       attribute of the entry whose identity is being assessed; <b>auth (=x)</b>
+       access to the credentials is not checked, but rather delegated to the
+       underlying shell script.
+
+       The <b>compare </b>operation requires <b>read (=r) </b>access (FIXME: wouldn't
+       <b>compare (=c) </b>be a more appropriate choice?)  to the <b>entry </b>pseudo-
+       attribute of the object whose value is being asserted; <b>compare (=c)</b>
+       access to the attribute whose value is being asserted is not checked.
+
+       The <b>delete </b>operation does not require <b>write (=w) </b>access to the
+       <b>children </b>pseudo-attribute of the parent entry.
+
+       The <b>modify </b>operation requires <b>write (=w) </b>access to the <b>entry </b>pseudo-
+       attribute; <b>write (=w) </b>access to the specific attributes that are
+       modified is not checked.
+
+       The <b>modrdn </b>operation does not require <b>write (=w) </b>access to the
+       <b>children </b>pseudo-attribute of the parent entry, nor to that of the new
+       parent, if different; <b>write (=w) </b>access to the distinguished values
+       of the naming attributes is not checked.
+
+       The <b>search </b>operation does not require <b>search (=s) </b>access to the <b>entry</b>
+       pseudo_attribute of the searchBase; <b>search (=s) </b>access to the
+       attributes and values used in the filter is not checked.
+</pre>
+<h2><a id="EXAMPLE" href="#EXAMPLE"></a>EXAMPLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       There is an example search script in the slapd/back-shell/ directory
+       in the OpenLDAP source tree.
+</pre>
+<h2><a id="LIMITATIONS" href="#LIMITATIONS"></a>LIMITATIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The shell backend does not support threaded environments.  When using
+       the shell backend, <a href="../man8/slapd.8.html">slapd(8)</a> should be built <i>--without-threads</i>.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       ETCDIR/slapd.conf
+              default slapd configuration file
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="slapd.conf.5.html">slapd.conf(5)</a>, <a href="../man8/slapd.8.html">slapd(8)</a>, <b>sh</b>(1).
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>OpenLDAP</i> (an open source implementation of
+       the Lightweight Directory Access Protocol) project.  Information
+       about the project can be found at ⟨<a href="http://www.openldap.org/">http://www.openldap.org/</a>⟩.  If you
+       have a bug report for this manual page, see 
+       ⟨<a href="http://www.openldap.org/its/">http://www.openldap.org/its/</a>⟩.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.openldap.org/openldap.git⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">OpenLDAP LDVERSION               RELEASEDATE                  SLAPD-SHELL(5)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="slapd.backends.5.html">slapd.backends(5)</a>,&nbsp; 
+    <a href="slapd-sock.5.html">slapd-sock(5)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

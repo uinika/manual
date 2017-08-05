@@ -1,0 +1,656 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>sfdisk(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#COMMANDS">COMMANDS</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#INPUT_FORMATS">INPUT&nbsp;FORMATS</a> | <a href="#EMPTY_DISK_LABEL">EMPTY&nbsp;DISK&nbsp;LABEL</a> | <a href="#BACKING_UP_THE_PARTITION_TABLE">BACKING&nbsp;UP&nbsp;THE&nbsp;PARTITION&nbsp;TABLE</a> | <a href="#COLORS">COLORS</a> | <a href="#NOTES">NOTES</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SFDISK(8)                   System Administration                  SFDISK(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       sfdisk - display or manipulate a disk partition table
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sfdisk </b>[options] <i>device</i> [<b>-N </b><i>partition-number</i>]
+
+       <b>sfdisk </b>[options] <i>command</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sfdisk </b>is a script-oriented tool for partitioning any block device.
+
+       Since version 2.26 <b>sfdisk </b>supports MBR (DOS), GPT, SUN and SGI disk
+       labels, but no longer provides any functionality for CHS (Cylinder-
+       Head-Sector) addressing.  CHS has never been important for Linux, and
+       this addressing concept does not make any sense for new devices.
+
+       <b>sfdisk </b>(since version 2.26) <b>aligns the start and end of partitions </b>to
+       block-device I/O limits when relative sizes are specified, when the
+       default values are used or when multiplicative suffixes (e.g MiB) are
+       used for sizes.  It is possible that partition size will be optimized
+       (reduced or enlarged) due to alignment if the start offset is
+       specified exactly in sectors and partition size relative or by
+       multiplicative suffixes.
+
+       The recommended way is not to specify start offsets at all and
+       specify partition size in MiB, GiB (or so).  In this case sfdisk
+       align all partitions to block-device I/O limits (or when I/O limits
+       are too small then to megabyte boundary to keep disk layout
+       portable).  If this default behaviour is unwanted (usually for very
+       small partitions) then specify offsets and sizes in sectors.  In this
+       case sfdisk entirely follows specified numbers without any
+       optimization.
+
+       <b>sfdisk </b>does not create the standard system partitions for SGI and SUN
+       disk labels like <a href="fdisk.8.html">fdisk(8)</a> does.  It is necessary to explicitly create
+       all partitions including whole-disk system partitions.
+</pre>
+<h2><a id="COMMANDS" href="#COMMANDS"></a>COMMANDS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The commands are mutually exclusive.
+
+       [<b>-N </b><i>partition-number</i>] <i>device</i>
+              The default <b>sfdisk </b>command is to read the specification for
+              the desired partitioning of <i>device</i> from standard input, and
+              then create a partition table according to the specification.
+              See below for the description of the input format.  If
+              standard input is a terminal, then <b>sfdisk </b>starts an
+              interactive session.
+
+              If the option <b>-N </b>is specified, then the changes are applied to
+              the partition addressed by <i>partition-number</i>.  The unspecified
+              fields of the partition are not modified.
+
+              Note that it's possible to address an unused partition with
+              <b>-N</b>.  For example, an MBR always contains 4 partitions, but the
+              number of used partitions may be smaller.  In this case <b>sfdisk</b>
+              follows the default values from the partition table and does
+              not use built-in defaults for the unused partition given with
+              <b>-N</b>.  See also <b>--append</b>.
+
+       <b>-A</b>, <b>--activate </b><i>device</i> [<i>partition-number</i>...]
+              Switch on the bootable flag for the specified partitions.  If
+              no <i>partition-number</i> is specified, then list the partitions
+              with an enabled flag.
+
+       <b>--delete </b><i>device</i> [<i>partition-number</i>...]
+              Delete all or the specified partitions.
+
+       <b>-d</b>, <b>--dump </b><i>device</i>
+              Dump the partitions of a device in a format that is usable as
+              input to <b>sfdisk</b>.  See the section <b>BACKING UP THE PARTITION</b>
+              <b>TABLE</b>.
+
+       <b>-g</b>, <b>--show-geometry </b>[<i>device</i>...]
+              List the geometry of all or the specified devices. For
+              backward compatibility the deprecated option
+              <b>--show-pt-geometry </b>have the same meaning as this one.
+
+       <b>-J</b>, <b>--json </b><i>device</i>
+              Dump the partitions of a device in JSON format.  Note that
+              <b>sfdisk </b>is not able to use JSON as input format.
+
+       <b>-l</b>, <b>--list </b>[<i>device</i>...]
+              List the partitions of all or the specified devices.  This
+              command can be used together with <b>--verify</b>.
+
+       <b>-F</b>, <b>--list-free </b>[<i>device</i>...]
+              List the free unpartitioned areas on all or the specified
+              devices.
+
+       <b>--part-attrs </b><i>device partition-number</i> [<i>attributes</i>]
+              Change the GPT partition attribute bits.  If <i>attributes</i> is not
+              specified, then print the current partition settings.  The
+              <i>attributes</i> argument is a comma- or space-delimited list of
+              bits.  The currently supported attribute bits are:
+              RequiredPartition, NoBlockIOProtocol, LegacyBIOSBootable and
+              GUID-specific bits in the range from 48 to 63.  For example,
+              the string "RequiredPartition,50,51" sets three bits.
+
+       <b>--part-label </b><i>device partition-number</i> [<i>label</i>]
+              Change the GPT partition name (label).  If <i>label</i> is not
+              specified, then print the current partition label.
+
+       <b>--part-type </b><i>device partition-number</i> [<i>type</i>]
+              Change the partition type.  If <i>type</i> is not specified, then
+              print the current partition type.  The <i>type</i> argument is
+              hexadecimal for MBR, or a GUID for GPT.  For backward
+              compatibility the options <b>-c </b>and <b>--id </b>have the same meaning as
+              this one.
+
+       <b>--part-uuid </b><i>device partition-number</i> [<i>uuid</i>]
+              Change the GPT partition UUID.  If <i>uuid</i> is not specified, then
+              print the current partition UUID.
+
+       <b>-r</b>, <b>--reorder </b><i>device</i>
+              Renumber the partitions, ordering them by their start offset.
+
+       <b>-s</b>, <b>--show-size </b>[<i>device</i>...]
+              List the sizes of all or the specified devices in units of
+              1024 byte size.  This command is DEPRECATED in favour of
+              <b>blockdev</b>(1).
+
+       <b>-T</b>, <b>--list-types</b>
+              Print all supported types for the current disk label or the
+              label specified by <b>--label</b>.
+
+       <b>-V</b>, <b>--verify </b>[<i>device</i>...]
+              Test whether the partition table and partitions seem correct.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-a</b>, <b>--append</b>
+              Don't create a new partition table, but only append the
+              specified partitions.
+
+       <b>-b</b>, <b>--backup</b>
+              Back up the current partition table sectors before starting
+              the partitioning.  The default backup file name is
+              ~/sfdisk-&lt;device&gt;-&lt;offset&gt;.bak; to use another name see option
+              <b>-O</b>, <b>--backup-file</b>.
+
+       <b>--color</b>[<b>=</b><i>when</i>]
+              Colorize the output.  The optional argument <i>when</i> can be <b>auto</b>,
+              <b>never </b>or <b>always</b>.  If the <i>when</i> argument is omitted, it defaults
+              to <b>auto</b>.  The colors can be disabled; for the current built-in
+              default see the <b>--help </b>output.  See also the <b>COLORS </b>section.
+
+       <b>-f</b>, <b>--force</b>
+              Disable all consistency checking.
+
+       <b>--Linux</b>
+              Deprecated and ignored option.  Partitioning that is
+              compatible with Linux (and other modern operating systems) is
+              the default.
+
+       <b>-n</b>, <b>--no-act</b>
+              Do everything except writing to the device.
+
+       <b>--no-reread</b>
+              Do not check through the re-read-partition-table ioctl whether
+              the device is in use.
+
+       <b>--no-tell-kernel</b>
+              Don't tell the kernel about partition changes. This option is
+              recommended together with <b>--no-reread </b>to modify a partition on
+              used disk. The modified partition should not be used (e.g.
+              mounted).
+
+       <b>-O</b>, <b>--backup-file </b><i>path</i>
+              Override the default backup file name.  Note that the device
+              name and offset are always appended to the file name.
+
+       <b>--move-data</b>[<b>=</b><i>path</i>]
+              Move data after partition relocation, for example when moving
+              the beginning of a partition to another place on the disk.
+              The size of the partition has to remain the same, the new and
+              old location may overlap.  This option requires option <b>-N </b>in
+              order to be processed on one specific partition only.
+
+              The <i>path</i> overrides the default log file name (the default is
+              ~/sfdisk-&lt;devname&gt;.move).  The log file contains information
+              about all read/write operations on the partition data.
+
+              Note that this operation is risky and not atomic. <b>Don't forget</b>
+              <b>to backup your data!</b>
+
+              In the example below, the first command creates a 100MiB free
+              area before the first partition and moves the data it contains
+              (e.g. a filesystem), the next command creates a new partition
+              from the free space (at offset 2048), and the last command
+              reorders partitions to match disk order (the original sdc1
+              will become sdc2).
+
+              <b>echo '+100M,' | sfdisk --move-data /dev/sdc -N 1</b>
+              <b>echo '2048,' | sfdisk /dev/sdc --append</b>
+              <b>sfdisk /dev/sdc --reorder</b>
+
+       <b>-o</b>, <b>--output </b><i>list</i>
+              Specify which output columns to print.  Use <b>--help </b>to get a
+              list of all supported columns.
+
+              The default list of columns may be extended if <i>list</i> is
+              specified in the format <i>+list</i> (e.g. <b>-o +UUID</b>).
+
+       <b>-q</b>, <b>--quiet</b>
+              Suppress extra info messages.
+
+       <b>-u</b>, <b>--unit S</b>
+              Deprecated option.  Only the sector unit is supported. This
+              option is not supported when using the --show-size command.
+
+       <b>-X</b>, <b>--label </b><i>type</i>
+              Specify the disk label type (e.g. <b>dos</b>, <b>gpt</b>, ...).  If this
+              option is not given, then <b>sfdisk </b>defaults to the existing
+              label, but if there is no label on the device yet, then the
+              type defaults to <b>dos</b>. The default or the current label may be
+              overwritten by the "label: &lt;name&gt;" script header line. The
+              option <b>--label </b>does not force <b>sfdisk </b>to create empty disk
+              label (see the <b>EMPTY DISK LABEL </b>section below).
+
+       <b>-Y</b>, <b>--label-nested </b><i>type</i>
+              Force editing of a nested disk label.  The primary disk label
+              has to exist already.  This option allows to edit for example
+              a hybrid/protective MBR on devices with GPT.
+
+       <b>-w</b>, <b>--wipe </b><i>when</i>
+              Wipe filesystem, RAID and partition-table signatures from the
+              device, in order to avoid possible collisions.  The argument
+              <i>when</i> can be <b>auto</b>, <b>never </b>or <b>always</b>.  When this option is not
+              given, the default is <b>auto</b>, in which case signatures are wiped
+              only when in interactive mode; except the old partition-table
+              signatures which are always wiped before create a new
+              partition-table if the argument <i>when</i> is not <b>never</b>. In all
+              cases detected signatures are reported by warning messages
+              before a new partition table is created.  See also <a href="wipefs.8.html">wipefs(8)</a>
+              command.
+
+       <b>-W</b>, <b>--wipe-partitions </b><i>when</i>
+              Wipe filesystem, RAID and partition-table signatures from a
+              newly created partitions, in order to avoid possible
+              collisions.  The argument <i>when</i> can be <b>auto</b>, <b>never </b>or <b>always</b>.
+              When this option is not given, the default is <b>auto</b>, in which
+              case signatures are wiped only when in interactive mode and
+              after confirmation by user.  In all cases detected signatures
+              are reported by warning messages after a new partition is
+              created.  See also <a href="wipefs.8.html">wipefs(8)</a> command.
+
+       <b>-v</b>, <b>--version</b>
+              Display version information and exit.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.
+</pre>
+<h2><a id="INPUT_FORMATS" href="#INPUT_FORMATS"></a>INPUT FORMATS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sfdisk </b>supports two input formats and generic header lines.
+
+       <b>Header lines</b>
+              The optional header lines specify generic information that
+              apply to the partition table.  The header-line format is:
+
+                     <b>&lt;name&gt;: &lt;value&gt;</b>
+
+              The currently recognized headers are:
+
+                     <b>unit   </b>Specify the partitioning unit.  The only
+                            supported unit is <b>sectors</b>.
+
+                     <b>label  </b>Specify the partition table type.  For example
+                            <b>dos </b>or <b>gpt</b>.
+
+                     <b>label-id</b>
+                            Specify the partition table identifier.  It
+                            should be a  hexadecimal number (with a 0x
+                            prefix) for MBR and a UUID for GPT.
+
+              Note that it is only possible to use header lines before the
+              first partition is specified in the input.
+
+       <b>Unnamed-fields format</b>
+
+                     <i>start size type bootable</i>
+
+              where each line fills one partition descriptor.
+
+              Fields are separated by whitespace, comma or semicolon
+              possibly followed by whitespace; initial and trailing
+              whitespace is ignored.  Numbers can be octal, decimal or
+              hexadecimal; decimal is the default.  When a field is absent,
+              empty or specified as '-' a default value is used.  But when
+              the <b>-N </b>option (change a single partition) is given, the
+              default for each field is its previous value.
+
+              The default value of <i>start</i> is the first non-assigned sector
+              aligned according to device I/O limits.  The default start
+              offset for the first partition is 1 MiB.  The offset may be
+              followed by the multiplicative suffixes (KiB, MiB, GiB, TiB,
+              PiB, EiB, ZiB and YiB) then the number is interpreted as
+              offset in bytes.
+
+              The default value of <i>size</i> indicates "as much as possible";
+              i.e. until the next partition or end-of-device.  A numerical
+              argument is by default interpreted as a number of sectors,
+              however if the size is followed by one of the multiplicative
+              suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and YiB) then the
+              number is interpreted as the size of the partition in bytes
+              and it is then aligned according to the device I/O limits.  A
+              '+' can be used instead of a number to enlarge the partition
+              as much as possible.  Note '+' is equivalent to the default
+              behaviour for a new partition; existing partitions will be
+              resized as required.
+
+              The partition <i>type</i> is given in hex for MBR (DOS), without the
+              0x prefix, a GUID string for GPT, or a shortcut:
+
+                     <b>L      </b>Linux; means 83 for MBR and
+                            0FC63DAF-8483-4772-8E79-3D69D8477DE4 for GPT.
+
+                     <b>S      </b>swap area; means 82 for MBR and 0657FD6D-
+                            A4AB-43C4-84E5-0933C84B4F4F for GPT
+
+                     <b>E      </b>extended partition; means 5 for MBR
+
+                     <b>H      </b>home partition; means
+                            933AC7E1-2EB4-4F13-B844-0E14E2AEF915 for GPT
+
+                     <b>X      </b>linux extended partition; means 85 for MBR.
+
+                     <b>U      </b>EFI System partition, means EF for MBR and
+                            C12A7328-F81F-11D2-BA4B-00A0C93EC93B for GPT
+
+              The default <i>type</i> value is <i>L</i>
+
+              <i>bootable</i> is specified as [<b>*</b>|<b>-</b>], with as default not-bootable.
+              The value of this field is irrelevant for Linux - when Linux
+              runs it has been booted already - but ir might play a role for
+              certain boot loaders and for other operating systems.
+
+       <b>Named-fields format</b>
+              This format is more readable, robust, extensible and allows to
+              specify additional information (e.g. a UUID).  It is
+              recommended to use this format to keep your scripts more
+              readable.
+
+                     [<i>device</i> <b>:</b>] <i>name</i>[<b>=</b><i>value</i>], ...
+
+              The <i>device</i> field is optional.  <b>sfdisk </b>extracts the partition
+              number from the device name.  It allows to specify the
+              partitions in random order.  This functionality is mostly used
+              by <b>--dump</b>.  Don't use it if you are not sure.
+
+              The <i>value</i> can be between quotation marks (e.g. name="This is
+              partition name").  The currently supported fields are:
+
+                     <b>start=</b><i>number</i>
+                            The first non-assigned sector aligned according
+                            to device I/O limits.  The default start offset
+                            for the first partition is 1 MiB. The offset may
+                            be followed by the multiplicative suffixes (KiB,
+                            MiB, GiB, TiB, PiB, EiB, ZiB and YiB) then the
+                            number is interpreted as offset in bytes.
+
+                     <b>size=</b><i>number</i>
+                            Specify the partition size in sectors.  The
+                            number may be followed by the multiplicative
+                            suffixes (KiB, MiB, GiB, TiB, PiB, EiB, ZiB and
+                            YiB), then it's interpreted as size in bytes and
+                            the size is aligned according to device I/O
+                            limits.
+
+                     <b>bootable</b>
+                            Mark the partition as bootable.
+
+                     <b>attrs=</b><i>string</i>
+                            Partition attributes, usually GPT partition
+                            attribute bits.  See <b>--part-attrs </b>for more
+                            details about the GPT-bits string format.
+
+                     <b>uuid=</b><i>string</i>
+                            GPT partition UUID.
+
+                     <b>name=</b><i>string</i>
+                            GPT partition name.
+
+                     <b>type=</b><i>code</i>
+                            A hexadecimal number (without 0x) for an MBR
+                            partition, or a GUID for a GPT partition.  For
+                            backward compatibility the <b>Id= </b>field has the
+                            same meaning.
+</pre>
+<h2><a id="EMPTY_DISK_LABEL" href="#EMPTY_DISK_LABEL"></a>EMPTY DISK LABEL  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sfdisk </b>does not create partition table without partitions by default.
+       The lines with partitions are expected in the script by default. The
+       empty partition table has to be explicitly requested by "label:
+       &lt;name&gt;" script header line without any partitions lines. For example:
+
+              <b>echo 'label: gpt' | sfdisk /dev/sdb</b>
+
+       creates empty GPT partition table. Note that the <b>--append </b>disables
+       this feature.
+</pre>
+<h2><a id="BACKING_UP_THE_PARTITION_TABLE" href="#BACKING_UP_THE_PARTITION_TABLE"></a>BACKING UP THE PARTITION TABLE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       It is recommended to save the layout of your devices.  <b>sfdisk</b>
+       supports two ways.
+
+       Use the <b>--dump </b>option to save a description of the device layout to a
+       text file.  The dump format is suitable for later <b>sfdisk </b>input.  For
+       example:
+
+              <b>sfdisk --dump /dev/sda &gt; sda.dump</b>
+
+       This can later be restored by:
+
+              <b>sfdisk /dev/sda &lt; sda.dump</b>
+
+       If you want to do a full (binary) backup of all sectors where the
+       partition table is stored, then use the <b>--backup </b>option.  It writes
+       the sectors to ~/sfdisk-&lt;device&gt;-&lt;offset&gt;.bak files.  The default
+       name of the backup file can be changed with the <b>--backup-file </b>option.
+       The backup files contain only raw data from the <i>device</i>.  Note that
+       the same concept of backup files is used by <a href="wipefs.8.html">wipefs(8)</a>.  For example:
+
+              <b>sfdisk --backup /dev/sda</b>
+
+       The GPT header can later be restored by:
+
+              <b>dd  if=~/sfdisk-sda-0x00000200.bak  of=/dev/sda  \</b>
+                <b>seek=$((0x00000200))  bs=1  conv=notrunc</b>
+
+       Note that <b>sfdisk </b>since version 2.26 no longer provides the <b>-I </b>option
+       to restore sectors.  <a href="../man1/dd.1.html">dd(1)</a> provides all necessary functionality.
+</pre>
+<h2><a id="COLORS" href="#COLORS"></a>COLORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Implicit coloring can be disabled by an empty file <i>/etc/terminal-</i>
+       <i>colors.d/sfdisk.disable</i>.
+
+       See <a href="../man5/terminal-colors.d.5.html">terminal-colors.d(5)</a> for more details about colorization
+       configuration. The logical color names supported by <b>sfdisk </b>are:
+
+       <b>header </b>The header of the output tables.
+
+       <b>warn   </b>The warning messages.
+
+       <b>welcome</b>
+              The welcome message.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Since version 2.26 <b>sfdisk </b>no longer provides the <b>-R </b>or <b>--re-read</b>
+       option to force the kernel to reread the partition table.  Use
+       <b>blockdev --rereadpt </b>instead.
+
+       Since version 2.26 <b>sfdisk </b>does not provide the <b>--DOS</b>, <b>--IBM</b>,
+       <b>--DOS-extended</b>, <b>--unhide</b>, <b>--show-extended</b>, <b>--cylinders</b>, <b>--heads</b>,
+       <b>--sectors</b>, <b>--inside-outer</b>, <b>--not-inside-outer </b>options.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       SFDISK_DEBUG=all
+              enables sfdisk debug output.
+
+       LIBFDISK_DEBUG=all
+              enables libfdisk debug output.
+
+       LIBBLKID_DEBUG=all
+              enables libblkid debug output.
+
+       LIBSMARTCOLS_DEBUG=all
+              enables libsmartcols debug output.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="fdisk.8.html">fdisk(8)</a>, <a href="cfdisk.8.html">cfdisk(8)</a>, <a href="parted.8.html">parted(8)</a>, <a href="partprobe.8.html">partprobe(8)</a>, <a href="partx.8.html">partx(8)</a>
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Karel Zak &lt;kzak@redhat.com&gt;
+
+       The current sfdisk implementation is based on the original sfdisk
+       from Andries E. Brouwer.
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The sfdisk command is part of the util-linux package and is available
+       from <a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                        June 2015                        SFDISK(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="cfdisk.8.html">cfdisk(8)</a>,&nbsp; 
+    <a href="fdisk.8.html">fdisk(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

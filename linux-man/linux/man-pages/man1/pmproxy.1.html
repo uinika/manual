@@ -1,0 +1,391 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmproxy(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#STARTING_AND_STOPPING_PMPROXY">STARTING&nbsp;AND&nbsp;STOPPING&nbsp;PMPROXY</a> | <a href="#FILES">FILES</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#PCP_ENVIRONMENT">PCP&nbsp;ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#DIAGNOSTICS">DIAGNOSTICS</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMPROXY(1)                 General Commands Manual                PMPROXY(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmproxy </b>- proxy for performance metrics collector daemon
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmproxy </b>[<b>-Af</b>] [<b>-C </b><i>dirname</i>] [<b>-i </b><i>ipaddress</i>] [<b>-l </b><i>logfile</i>] [<b>-L </b><i>bytes</i>] [<b>-M</b>
+       <i>certname</i>] [<b>-p </b><i>port</i>[,<i>port</i> ...]  [<b>-P </b><i>passfile</i>] [<b>-U </b><i>username</i>] [<b>-x </b><i>file</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmproxy </b>acts as a protocol proxy for <a href="pmcd.1.html">pmcd(1)</a>, allowing Performance
+       Co-Pilot (PCP) monitoring clients to connect to one or more <a href="pmcd.1.html">pmcd(1)</a>
+       instances via <b>pmproxy</b>.
+
+       Normally <b>pmproxy </b>is deployed in a firewall domain, or on a ``head''
+       node of a cluster where the IP (Internet Protocol) address of the
+       hosts where <a href="pmcd.1.html">pmcd(1)</a> is running may be unknown to the PCP monitoring
+       clients, although the IP address of the host where <b>pmproxy </b>is running
+       is known to these clients.  Similarly, the clients may have network
+       connectivity only to the host where <b>pmproxy </b>is running, while there
+       is network connectivity from that host to the hosts of interest where
+       <a href="pmcd.1.html">pmcd(1)</a> is running.
+
+       The behaviour of the PCP monitoring clients is controlled by either
+       the <b>PMPROXY_HOST </b>environment variable or through the extended
+       hostname specification (see <a href="PCPIntro.1.html">PCPIntro(1)</a> for details).  If neither of
+       these mechanisms is used, clients will make their connections
+       directly to <a href="pmcd.1.html">pmcd(1)</a>.  If the proxy hostname syntax is used or
+       <b>PMPROXY_HOST </b>is set, then this should be the hostname or IP address
+       of the system where <b>pmproxy </b>is running, and the clients will connect
+       to <a href="pmcd.1.html">pmcd(1)</a> indirectly through the protocol proxy services of <b>pmproxy.</b>
+
+       The options to <b>pmproxy </b>are as follows.
+
+       <b>-A     </b>Disable service advertisement.  By default, <b>pmproxy </b>will
+              advertise its presence on the network using any available
+              mechanisms (such as Avahi/DNS-SD), assisting remote monitoring
+              tools with finding it.  These mechanisms are disabled with
+              this option.
+
+       <b>-C </b><i>dirname</i>
+              Specify the path to the Network Security Services certificate
+              database, for (optional) secure connections.  The default is
+              <b>/etc/pki/nssdb</b>.  Refer also to the <b>-P </b>option.  If it does not
+              already exist, this database can be created using the <b>certutil</b>
+              utility.  This process and other certificate database
+              maintenance information is provided in the <a href="PCPIntro.1.html">PCPIntro(1)</a> manual
+              page and the online PCP tutorials.
+
+       <b>-f     </b>By default <b>pmproxy </b>is started as a daemon.  The <b>-f </b>option
+              indicates that it should run in the foreground.  This is most
+              useful when trying to diagnose problems with establishing
+              connections.
+
+       <b>-i </b><i>ipaddress</i>
+              This option is usually only used on hosts with more than one
+              network interface (very common for firewall and ``head'' node
+              hosts where <b>pmproxy </b>is most likely to be deployed).  If no <b>-i</b>
+              options are specified <b>pmproxy </b>accepts PCP client connections
+              on  any of its host's IP addresses.  The <b>-i </b>option is used to
+              specify explicitly an IP address that PCP client connections
+              should be accepted on.  <i>ipaddress</i> should be in the standard
+              dotted form (e.g. 100.23.45.6).  The <b>-i </b>option may be used
+              multiple times to define a list of IP addresses.  When one or
+              more <b>-i </b>options is specified, attempted connections made on
+              any other IP addresses will be refused.
+
+       <b>-l </b><i>logfile</i>
+              By default a log file named <i>pmproxy.log</i> is written in the
+              current directory.  The <b>-l </b>option causes the log file to be
+              written to <i>logfile</i> instead of the default.  If the log file
+              cannot be created or is not writable, output is written to the
+              standard error instead.
+
+       <b>-L </b><i>bytes</i>
+              <i>PDU</i>s received by <b>pmproxy </b>from PCP monitoring clients are
+              restricted to a maximum size of 65536 bytes by default to
+              defend against Denial of Service attacks.  The <b>-L </b>option may
+              be used to change the maximum incoming <i>PDU</i> size.
+
+       <b>-M </b><i>certname</i>
+              By default, pmproxy will try to use a certificate called <b>PCP</b>
+              <b>Collector certificate </b>in its server role. The <b>-M </b>option allows
+              this to be changed.
+
+       <b>-P </b><i>passfile</i>
+              Specify the path to a file containing the Network Security
+              Services certificate database password for (optional) secure
+              connections, and for databases that are password protected.
+              Refer also to the <b>-C </b>option.  When using this option, great
+              care should be exercised to ensure appropriate ownership
+              ("pcp" user, typically) and permissions on this file (0400, so
+              as to be unreadable by any user other than the user running
+              the <b>pmproxy </b>process).
+
+       <b>-U </b><i>username</i>
+              Assume the identity of <i>username</i> before starting to accept
+              incoming packets from PCP monitoring clients.
+
+       <b>-x </b><i>file</i>
+              Before the <b>pmproxy </b><i>logfile</i> can be opened, <b>pmproxy </b>may
+              encounter a fatal error which prevents it from starting.  By
+              default, the output describing this error is sent to <b>/dev/tty</b>
+              but it may redirected to <i>file</i>.
+</pre>
+<h2><a id="STARTING_AND_STOPPING_PMPROXY" href="#STARTING_AND_STOPPING_PMPROXY"></a>STARTING AND STOPPING PMPROXY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Normally, <b>pmproxy </b>is started automatically at boot time and stopped
+       when the system is being brought down.  Under certain circumstances
+       it is necessary to start or stop <b>pmproxy </b>manually.  To do this one
+       must become superuser and type
+
+       # $PCP_RC_DIR/pmproxy start
+
+       to start <b>pmproxy</b>, or
+
+       # $PCP_RC_DIR/pmproxy stop
+
+       to stop <b>pmproxy</b>.  Starting <b>pmproxy </b>when it is already running is the
+       same as stopping it and then starting it again.
+
+       Normally <b>pmproxy </b>listens for PCP client connections on TCP/IP port
+       number 44322 (registered at <i><a href="http://www.iana.org/">http://www.iana.org/</a> </i>).  Either the
+       environment variable <b>PMPROXY_PORT -p </b>command line option may be used
+       to specify alternative port number(s) when <b>PMPROXY_PORT </b>or the <b>-p</b>
+       command line option may be used to specify alternative port number(s)
+       when <b>pmproxy </b>is started; in each case, the specification is a comma-
+       separated list of one or more numerical port numbers.  Should both
+       methods be used or multiple <b>-p </b>options appear on the command line,
+       <b>pmproxy </b>will listen on the union of the set of ports specified via
+       all <b>-p </b>options and the <b>PMPROXY_PORT </b>environment variable.  If non-
+       default ports are used with <b>pmproxy </b>care should be taken to ensure
+       that <b>PMPROXY_PORT </b>is also set in the environment of any client
+       application that will connect to <b>pmproxy</b>, or that the extended host
+       specification syntax is used (see <a href="PCPIntro.1.html">PCPIntro(1)</a> for details).
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>PCP_PMPROXYOPTIONS_PATH</b>
+              command line options for <b>pmproxy </b>when launched from
+              <b>$PCP_RC_DIR/pmproxy </b>All the command line option lines should
+              start with a hyphen as the first character.
+       <b>$PCP_SYSCONFIG_DIR/pmproxy</b>
+              additional environment variables that will be set when <b>pmproxy</b>
+              executes.  Only settings of the form "PMPROXY_VARIABLE=value"
+              will be honoured.
+       <b>./pmproxy.log</b>
+              (or <b>$PCP_LOG_DIR/pmproxy/pmproxy.log </b>when started
+              automatically)
+              All messages and diagnostics are directed here
+       <b>/etc/pki/nssdb</b>
+              default Network Security Services (NSS) certificate database
+              directory, used for optional Secure Socket Layer connections.
+              This database can be created and queried using the NSS
+              <b>certutil </b>tool, amongst others.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In addition to the PCP environment variables described in the <b>PCP</b>
+       <b>ENVIRONMENT </b>section below, there are several environment variables
+       that influence the interactions between a PCP monitoring client, <b>pmcd</b>
+       and <a href="pmcd.1.html">pmcd(1)</a>.
+
+       <b>PMCD_PORT</b>
+              For the PCP monitoring client this (or the default port
+              number) is passed to <b>pmproxy </b>and used to connect to <a href="pmcd.1.html">pmcd(1)</a>.
+              In the environment of <b>pmproxy PMCD_PORT is not used.</b>
+
+       <b>PMPROXY_HOST</b>
+              For the PCP monitoring client this is the hostname or IP
+              address of the host where <b>pmproxy </b>is running.  In recent
+              versions of PCP (since version 3) this has been superseded by
+              the extended hostname syntax (see <a href="PCPIntro.1.html">PCPIntro(1)</a> for details).
+
+       <b>PMPROXY_PORT</b>
+              For the PCP monitoring client this is the port on which
+              <b>pmproxy </b>will accept connections.  The default is 44322.
+
+       <b>PMCD_CONNECT_TIMEOUT</b>, <b>PMCD_RECONNECT_TIMEOUT </b>and <b>PMCD_REQUEST_TIMEOUT</b>
+              (see <a href="PCPIntro.1.html">PCPIntro(1)</a>) For the PCP monitoring client, setting these
+              environment variables will modify the timeouts used for
+              interactions between the client and <b>pmproxy </b>(independent of
+              which <a href="pmcd.1.html">pmcd(1)</a> is being used).  For <b>pmproxy </b>these same
+              environment variables control the timeouts between <b>pmproxy </b>and
+              all <a href="pmcd.1.html">pmcd(1)</a> instances (independent of which monitoring client
+              is involved).
+
+       If set to the value 1, the <b>PMPROXY_LOCAL </b>environment variable will
+       cause <b>pmproxy </b>to run in a localhost-only mode of operation, where it
+       binds only to the loopback interface.
+
+       The <b>PMPROXY_MAXPENDING </b>variable can be set to indicate the maximum
+       length to which the queue of pending client connections may grow.
+</pre>
+<h2><a id="PCP_ENVIRONMENT" href="#PCP_ENVIRONMENT"></a>PCP ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Environment variables with the prefix <b>PCP_ </b>are used to parameterize
+       the file and directory names used by PCP.  On each installation, the
+       file <b>/etc/pcp.conf </b>contains the local values for these variables.
+       The <b>PCP_CONF </b>variable may be used to specify an alternative
+       configuration file, as described in <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PCPIntro.1.html">PCPIntro(1)</a>, <a href="pmcd.1.html">pmcd(1)</a>, <a href="pmdbg.1.html">pmdbg(1)</a>, <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a> and <a href="../man5/pcp.env.5.html">pcp.env(5)</a>.
+</pre>
+<h2><a id="DIAGNOSTICS" href="#DIAGNOSTICS"></a>DIAGNOSTICS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If <b>pmproxy </b>is already running the message "Error: OpenRequestSocket
+       bind: Address already in use" will appear.  This may also appear if
+       <b>pmproxy </b>was shutdown with an outstanding request from a client.  In
+       this case, a request socket has been left in the TIME_WAIT state and
+       until the system closes it down (after some timeout period) it will
+       not be possible to run <b>pmproxy</b>.
+
+       In addition to the standard <b>PCP </b>debugging flags, see <a href="pmdbg.1.html">pmdbg(1)</a>,
+       <b>pmproxy </b>currently uses <b>DBG_TRACE_CONTEXT </b>for tracing client
+       connections and disconnections
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                          PMPROXY(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="pcpintro.1-2.html">pcpintro(1)</a>,&nbsp; 
+    <a href="pmfind.1.html">pmfind(1)</a>,&nbsp; 
+    <a href="../man3/pmdiscoverservices.3-2.html">pmdiscoverservices(3)</a>,&nbsp; 
+    <a href="../man3/pmnewcontext.3-2.html">pmnewcontext(3)</a>,&nbsp; 
+    <a href="../man3/pmparsehostattrsspec.3.html">pmparsehostattrsspec(3)</a>,&nbsp; 
+    <a href="../man3/pmparsehostspec.3.html">pmparsehostspec(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,273 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>pmdalogger(1) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#INSTALLATION">INSTALLATION</a> | <a href="#FILES">FILES</a> | <a href="#PCP_ENVIRONMENT">PCP&nbsp;ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">PMDALOGGER(1)              General Commands Manual             PMDALOGGER(1)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmdalogger </b>- log file performance metrics domain agent (PMDA)
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>$PCP_PMDAS_DIR/logger/pmdalogger </b>[<b>-d </b><i>domain</i>] [<b>-l </b><i>logfile</i>] [<b>-m </b><i>memory</i>]
+       [<b>-s </b><i>interval</i>] [<b>-U </b><i>username</i>] [<i>configfile</i>]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>pmdalogger </b>is a configurable log file monitoring Performance Metrics
+       Domain Agent (PMDA).  It can be seen as analogous to the <b>-f </b>option to
+       <a href="tail.1.html">tail(1)</a> and converts each new log line into a performance event.  It
+       was the first PMDA to make extensive use of event metrics, which can
+       be consumed by client tools like <a href="pmevent.1.html">pmevent(1)</a>.
+
+       The <b>logger </b>PMDA exports both event-style metrics reflecting
+       timestamped event records for text logged to a file (or set of files
+       or output from a process), as well as the more orthodox sample-style
+       metrics such as event counts and throughput size values.
+
+       The PMDA is configured via a <i>configfile</i> which contains one line for
+       each source of events (file or process).  This file is setup by the
+       Install script described in the later section on ``INSTALLATION'' of
+       the PMDA.
+
+       A brief description of the <b>pmdalogger </b>command line options follows:
+
+       <b>-d   </b>It is absolutely crucial that the performance metrics <i>domain</i>
+            number specified here is unique and consistent.  That is, <i>domain</i>
+            should be different for every PMDA on the one host, and the same
+            <i>domain</i> number should be used for the same PMDA on all hosts.
+
+       <b>-l   </b>Location of the log file.  By default, a log file named
+            <i>logger.log</i> is written in the current directory of <a href="pmcd.1.html">pmcd(1)</a> when
+            <b>pmdalogger </b>is started, i.e.  <b>$PCP_LOG_DIR/pmcd</b>.  If the log file
+            cannot be created or is not writable, output is written to the
+            standard error instead.
+
+       <b>-m   </b>Limit the physical memory used by the PMDA to buffer event
+            records to <i>maxsize</i> bytes.  As log events arrive at the PMDA,
+            they must be buffered until individual client tools request the
+            next batch since their previous batch of events.  The default
+            maximum is 2 megabytes.
+
+       <b>-s   </b>Sets the polling interval for detecting newly arrived log lines.
+            Mirrors the same option from the <a href="tail.1.html">tail(1)</a> command.
+
+       <b>-U   </b>User account under which to run the agent.  The default is the
+            unprivileged "pcp" account in current versions of PCP, but in
+            older versions the superuser account ("root") was used by
+            default.
+</pre>
+<h2><a id="INSTALLATION" href="#INSTALLATION"></a>INSTALLATION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       If you want access to the names, help text and values for the logger
+       performance metrics, do the following as root:
+
+            # cd $PCP_PMDAS_DIR/logger
+            # ./Install
+
+       This is an interactive installation process which prompts for each
+       log file path to be monitored (or command to be run), a metric
+       instance name to identify it, and whether access should be restricted
+       (refer to the <b>-x </b>option to <a href="pmevent.1.html">pmevent(1)</a> for further details).
+
+       If you want to undo the installation, do the following as root:
+
+            # cd $PCP_PMDAS_DIR/logger
+            # ./Remove
+
+       <b>pmdalogger </b>is launched by <a href="pmcd.1.html">pmcd(1)</a> and should never be executed
+       directly.  The Install and Remove scripts notify <a href="pmcd.1.html">pmcd(1)</a> when the
+       agent is installed or removed.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>$PCP_PMCDCONF_PATH</b>
+                 command line options used to launch <b>pmdalogger</b>
+       <b>$PCP_PMDAS_DIR/logger/logger.conf</b>
+                 default configuration file for the logger metrics
+       <b>$PCP_PMDAS_DIR/logger/help</b>
+                 default help text file for the logger metrics
+       <b>$PCP_PMDAS_DIR/logger/Install</b>
+                 installation script for the <b>pmdalogger </b>agent
+       <b>$PCP_PMDAS_DIR/logger/Remove</b>
+                 undo installation script for the <b>pmdalogger </b>agent
+       <b>$PCP_LOG_DIR/pmcd/logger.log</b>
+                 default log file for error messages and other information
+                 from <b>pmdalogger</b>
+</pre>
+<h2><a id="PCP_ENVIRONMENT" href="#PCP_ENVIRONMENT"></a>PCP ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Environment variables with the prefix <b>PCP_ </b>are used to parameterize
+       the file and directory names used by PCP.  On each installation, the
+       file <i>/etc/pcp.conf</i> contains the local values for these variables.
+       The <b>$PCP_CONF </b>variable may be used to specify an alternative
+       configuration file, as described in <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="PCPIntro.1.html">PCPIntro(1)</a>, <a href="pmevent.1.html">pmevent(1)</a>, <a href="pmcd.1.html">pmcd(1)</a>, <a href="tail.1.html">tail(1)</a>, <a href="../man5/pcp.conf.5.html">pcp.conf(5)</a> and
+       <a href="../man5/pcp.env.5.html">pcp.env(5)</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>PCP</i> (Performance Co-Pilot) project.
+       Information about the project can be found at ⟨<a href="http://www.pcp.io/">http://www.pcp.io/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       pcp@oss.sgi.com.  This page was obtained from the project's upstream
+       Git repository ⟨git://git.pcp.io/pcp⟩ on 2017-07-05.  If you discover
+       any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">Performance Co-Pilot                 PCP                       PMDALOGGER(1)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man3/pmda.3-2.html">pmda(3)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

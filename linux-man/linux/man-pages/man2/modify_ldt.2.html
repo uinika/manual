@@ -1,0 +1,278 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>modify_ldt(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MODIFY_LDT(2)             Linux Programmer's Manual            MODIFY_LDT(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       modify_ldt - get or set a per-process LDT entry
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/types.h&gt;</b>
+
+       <b>int modify_ldt(int </b><i>func</i><b>, void *</b><i>ptr</i><b>, unsigned long </b><i>bytecount</i><b>);</b>
+
+       <i>Note</i>: There is no glibc wrapper for this system call; see NOTES.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>modify_ldt</b>() reads or writes the local descriptor table (LDT) for a
+       process.  The LDT is an array of segment descriptors that can be
+       referenced by user code.  Linux allows processes to configure a per-
+       process (actually per-mm) LDT.  For more information about the LDT,
+       see the Intel Software Developer's Manual or the AMD Architecture
+       Programming Manual.
+
+       When <i>func</i> is 0, <b>modify_ldt</b>() reads the LDT into the memory pointed to
+       by <i>ptr</i>.  The number of bytes read is the smaller of <i>bytecount</i> and the
+       actual size of the LDT, although the kernel may act as though the LDT
+       is padded with additional trailing zero bytes.  On success,
+       <b>modify_ldt</b>() will return the number of bytes read.
+
+       When <i>func</i> is 1 or 0x11, <b>modify_ldt</b>() modifies the LDT entry indicated
+       by <i>ptr-&gt;entry_number</i>.  <i>ptr</i> points to a <i>user_desc</i> structure and
+       <i>bytecount</i> must equal the size of this structure.
+
+       The <i>user_desc</i> structure is defined in <i>&lt;asm/ldt.h&gt;</i> as:
+
+           struct user_desc {
+               unsigned int  entry_number;
+               unsigned long base_addr;
+               unsigned int  limit;
+               unsigned int  seg_32bit:1;
+               unsigned int  contents:2;
+               unsigned int  read_exec_only:1;
+               unsigned int  limit_in_pages:1;
+               unsigned int  seg_not_present:1;
+               unsigned int  useable:1;
+           };
+
+       In Linux 2.4 and earlier, this structure was named <i>modify_ldt_ldt_s</i>.
+
+       The <i>contents</i> field is the segment type (data, expand-down data, non-
+       conforming code, or conforming code).  The other fields match their
+       descriptions in the CPU manual, although <b>modify_ldt</b>() cannot set the
+       hardware-defined "accessed" bit described in the CPU manual.
+
+       A <i>user_desc</i> is considered "empty" if <i>read_exec_only</i> and
+       <i>seg_not_present</i> are set to 1 and all of the other fields are 0.  An
+       LDT entry can be cleared by setting it to an "empty" <i>user_desc</i> or, if
+       <i>func</i> is 1, by setting both <i>base</i> and <i>limit</i> to 0.
+
+       A conforming code segment (i.e., one with <i>contents==3</i>) will be
+       rejected if <i>func</i> is 1 or if <i>seg_not_present</i> is 0.
+
+       When <i>func</i> is 2, <b>modify_ldt</b>() will read zeros.  This appears to be a
+       leftover from Linux 2.4.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>modify_ldt</b>() returns either the actual number of bytes
+       read (for reading) or 0 (for writing).  On failure, <b>modify_ldt</b>()
+       returns -1 and sets <i><a href="../man3/errno.3.html">errno</a></i> to indicate the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b><i>ptr</i> points outside the address space.
+
+       <b>EINVAL </b><i>ptr</i> is 0, or <i>func</i> is 1 and <i>bytecount</i> is not equal to the size
+              of the structure <i>user_desc</i>, or <i>func</i> is 1 or 0x11 and the new
+              LDT entry has invalid values.
+
+       <b>ENOSYS </b><i>func</i> is neither 0, 1, 2, nor 0x11.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This call is Linux-specific and should not be used in programs
+       intended to be portable.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Glibc does not provide a wrapper for this system call; call it using
+       <a href="syscall.2.html">syscall(2)</a>.
+
+       <b>modify_ldt</b>() should not be used for thread-local storage, as it slows
+       down context switches and only supports a limited number of threads.
+       Threading libraries should use <a href="set_thread_area.2.html">set_thread_area(2)</a> or <a href="arch_prctl.2.html">arch_prctl(2)</a>
+       instead, except on extremely old kernels that do not support those
+       system calls.
+
+       The normal use for <b>modify_ldt</b>() is to run legacy 16-bit or segmented
+       32-bit code.  Not all kernels allow 16-bit segments to be installed,
+       however.
+
+       Even on 64-bit kernels, <b>modify_ldt</b>() cannot be used to create a long
+       mode (i.e., 64-bit) code segment.  The undocumented field "lm" in
+       <i>user_desc</i> is not useful, and, despite its name, does not result in a
+       long mode segment.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On 64-bit kernels before Linux 3.19, setting the "lm" bit in
+       <i>user_desc</i> prevents the descriptor from being considered empty.  Keep
+       in mind that the "lm" bit does not exist in the 32-bit headers, but
+       these buggy kernels will still notice the bit even when set in a
+       32-bit process.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="arch_prctl.2.html">arch_prctl(2)</a>, <a href="set_thread_area.2.html">set_thread_area(2)</a>, <a href="vm86.2.html">vm86(2)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                    MODIFY_LDT(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="arch_prctl.2.html">arch_prctl(2)</a>,&nbsp; 
+    <a href="set_thread_area.2.html">set_thread_area(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="modify_ldt.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

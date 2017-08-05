@@ -1,0 +1,454 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>udevadm(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">UDEVADM(8)                         udevadm                        UDEVADM(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       udevadm - udev management tool
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>udevadm </b>[<b>--debug</b>] [<b>--version</b>] [<b>--help</b>]
+
+       <b>udevadm info </b><i>options</i>
+
+       <b>udevadm trigger [options]</b>
+
+       <b>udevadm settle [options]</b>
+
+       <b>udevadm control </b><i>command</i>
+
+       <b>udevadm monitor [options]</b>
+
+       <b>udevadm test [options] </b><i>devpath</i>
+
+       <b>udevadm test-builtin [options] </b><i>command devpath</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>udevadm </b>expects a command and command specific options. It controls
+       the runtime behavior of <b>systemd-udevd</b>, requests kernel events,
+       manages the event queue, and provides simple debugging mechanisms.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>--debug</b>
+           Print debug messages to standard error.
+
+       <b>--version</b>
+           Print version number.
+
+       <b>-h</b>, <b>--help</b>
+           Print help text.
+
+   <b>udevadm info [</b><i>options</i>] [<i>devpath</i>|<i>file</i>]
+       Queries the udev database for device information stored in the udev
+       database. It can also query the properties of a device from its sysfs
+       representation to help creating udev rules that match this device.
+
+       <b>-q</b>, <b>--query=</b><i>TYPE</i>
+           Query the database for the specified type of device data. It
+           needs the <b>--path </b>or <b>--name </b>to identify the specified device.
+           Valid <i>TYPE</i>s are: <b>name</b>, <b>symlink</b>, <b>path</b>, <b>property</b>, <b>all</b>.
+
+       <b>-p</b>, <b>--path=</b><i>DEVPATH</i>
+           The /sys path of the device to query, e.g.
+           [/sys]/class/block/sda. Note that this option usually is not very
+           useful, since <b>udev </b>can guess the type of the argument, so <b>udevadm</b>
+           <b>--devpath=/class/block/sda </b>is equivalent to <b>udevadm</b>
+           <b>/sys/class/block/sda</b>.
+
+       <b>-n</b>, <b>--name=</b><i>FILE</i>
+           The name of the device node or a symlink to query, e.g.
+           [/dev]/sda. Note that this option usually is not very useful,
+           since <b>udev </b>can guess the type of the argument, so <b>udevadm</b>
+           <b>--name=sda </b>is equivalent to <b>udevadm /dev/sda</b>.
+
+       <b>-r</b>, <b>--root</b>
+           Print absolute paths in <b>name </b>or <b>symlink </b>query.
+
+       <b>-a</b>, <b>--attribute-walk</b>
+           Print all sysfs properties of the specified device that can be
+           used in udev rules to match the specified device. It prints all
+           devices along the chain, up to the root of sysfs that can be used
+           in udev rules.
+
+       <b>-x</b>, <b>--export</b>
+           Print output as key/value pairs. Values are enclosed in single
+           quotes.
+
+       <b>-P</b>, <b>--export-prefix=</b><i>NAME</i>
+           Add a prefix to the key name of exported values.
+
+       <b>-d</b>, <b>--device-id-of-file=</b><i>FILE</i>
+           Print major/minor numbers of the underlying device, where the
+           file lives on.
+
+       <b>-e</b>, <b>--export-db</b>
+           Export the content of the udev database.
+
+       <b>-c</b>, <b>--cleanup-db</b>
+           Cleanup the udev database.
+
+       <b>--version</b>
+           Print version.
+
+       <b>-h</b>, <b>--help</b>
+           Print help text.
+
+       In addition, an optional positional argument can be used to specify a
+       device name or a sys path. It must start with /dev or /sys
+       respectively.
+
+   <b>udevadm trigger [</b><i>options</i>] [<i>devpath</i>|<i>file</i>...]
+       Request device events from the kernel. Primarily used to replay
+       events at system coldplug time.
+
+       <b>-v</b>, <b>--verbose</b>
+           Print the list of devices which will be triggered.
+
+       <b>-n</b>, <b>--dry-run</b>
+           Do not actually trigger the event.
+
+       <b>-t</b>, <b>--type=</b><i>TYPE</i>
+           Trigger a specific type of devices. Valid types are: <b>devices</b>,
+           <b>subsystems</b>. The default value is <b>devices</b>.
+
+       <b>-c</b>, <b>--action=</b><i>ACTION</i>
+           Type of event to be triggered. The default value is <b>change</b>.
+
+       <b>-s</b>, <b>--subsystem-match=</b><i>SUBSYSTEM</i>
+           Trigger events for devices which belong to a matching subsystem.
+           This option can be specified multiple times and supports shell
+           style pattern matching.
+
+       <b>-S</b>, <b>--subsystem-nomatch=</b><i>SUBSYSTEM</i>
+           Do not trigger events for devices which belong to a matching
+           subsystem. This option can be specified multiple times and
+           supports shell style pattern matching.
+
+       <b>-a</b>, <b>--attr-match=</b><i>ATTRIBUTE</i><b>=</b><i>VALUE</i>
+           Trigger events for devices with a matching sysfs attribute. If a
+           value is specified along with the attribute name, the content of
+           the attribute is matched against the given value using shell
+           style pattern matching. If no value is specified, the existence
+           of the sysfs attribute is checked. This option can be specified
+           multiple times.
+
+       <b>-A</b>, <b>--attr-nomatch=</b><i>ATTRIBUTE</i><b>=</b><i>VALUE</i>
+           Do not trigger events for devices with a matching sysfs
+           attribute. If a value is specified along with the attribute name,
+           the content of the attribute is matched against the given value
+           using shell style pattern matching. If no value is specified, the
+           existence of the sysfs attribute is checked. This option can be
+           specified multiple times.
+
+       <b>-p</b>, <b>--property-match=</b><i>PROPERTY</i><b>=</b><i>VALUE</i>
+           Trigger events for devices with a matching property value. This
+           option can be specified multiple times and supports shell style
+           pattern matching.
+
+       <b>-g</b>, <b>--tag-match=</b><i>PROPERTY</i>
+           Trigger events for devices with a matching tag. This option can
+           be specified multiple times.
+
+       <b>-y</b>, <b>--sysname-match=</b><i>PATH</i>
+           Trigger events for devices with a matching sys device path. This
+           option can be specified multiple times and supports shell style
+           pattern matching.
+
+       <b>--name-match=</b><i>NAME</i>
+           Trigger events for devices with a matching device path. This
+           option can be specified multiple times.
+
+       <b>-b</b>, <b>--parent-match=</b><i>SYSPATH</i>
+           Trigger events for all children of a given device.
+
+       <b>-h</b>, <b>--help</b>
+           Print help text.
+
+       In addition, optional positional arguments can be used to specify
+       device names or sys paths. They must start with /dev or /sys
+       respectively.
+
+   <b>udevadm settle [</b><i>options</i>]
+       Watches the udev event queue, and exits if all current events are
+       handled.
+
+       <b>-t</b>, <b>--timeout=</b><i>SECONDS</i>
+           Maximum number of seconds to wait for the event queue to become
+           empty. The default value is 120 seconds. A value of 0 will check
+           if the queue is empty and always return immediately.
+
+       <b>-E</b>, <b>--exit-if-exists=</b><i>FILE</i>
+           Stop waiting if file exists.
+
+       <b>-h</b>, <b>--help</b>
+           Print help text.
+
+   <b>udevadm control </b><i>command</i>
+       Modify the internal state of the running udev daemon.
+
+       <b>-e</b>, <b>--exit</b>
+           Signal and wait for systemd-udevd to exit.
+
+       <b>-l</b>, <b>--log-priority=</b><i>value</i>
+           Set the internal log level of systemd-udevd. Valid values are the
+           numerical syslog priorities or their textual representations:
+           <b>emerg</b>, <b>alert</b>, <b>crit</b>, <b>err</b>, <b>warning</b>, <b>notice</b>, <b>info</b>, and <b>debug</b>.
+
+       <b>-s</b>, <b>--stop-exec-queue</b>
+           Signal systemd-udevd to stop executing new events. Incoming
+           events will be queued.
+
+       <b>-S</b>, <b>--start-exec-queue</b>
+           Signal systemd-udevd to enable the execution of events.
+
+       <b>-R</b>, <b>--reload</b>
+           Signal systemd-udevd to reload the rules files and other
+           databases like the kernel module index. Reloading rules and
+           databases does not apply any changes to already existing devices;
+           the new configuration will only be applied to new events.
+
+       <b>-p</b>, <b>--property=</b><i>KEY</i><b>=</b><i>value</i>
+           Set a global property for all events.
+
+       <b>-m</b>, <b>--children-max=</b><i>value</i>
+           Set the maximum number of events, systemd-udevd will handle at
+           the same time.
+
+       <b>--timeout=</b><i>seconds</i>
+           The maximum number of seconds to wait for a reply from
+           systemd-udevd.
+
+       <b>-h</b>, <b>--help</b>
+           Print help text.
+
+   <b>udevadm monitor [</b><i>options</i>]
+       Listens to the kernel uevents and events sent out by a udev rule and
+       prints the devpath of the event to the console. It can be used to
+       analyze the event timing, by comparing the timestamps of the kernel
+       uevent and the udev event.
+
+       <b>-k</b>, <b>--kernel</b>
+           Print the kernel uevents.
+
+       <b>-u</b>, <b>--udev</b>
+           Print the udev event after the rule processing.
+
+       <b>-p</b>, <b>--property</b>
+           Also print the properties of the event.
+
+       <b>-s</b>, <b>--subsystem-match=</b><i>string[/string]</i>
+           Filter kernel uevents and udev events by subsystem[/devtype].
+           Only events with a matching subsystem value will pass.
+
+       <b>-t</b>, <b>--tag-match=</b><i>string</i>
+           Filter udev events by tag. Only udev events with a given tag
+           attached will pass.
+
+       <b>-h</b>, <b>--help</b>
+           Print help text.
+
+   <b>udevadm test [</b><i>options</i>] [<i>devpath</i>]
+       Simulate a udev event run for the given device, and print debug
+       output.
+
+       <b>-a</b>, <b>--action=</b><i>string</i>
+           The action string.
+
+       <b>-N</b>, <b>--resolve-names=early|late|never</b>
+           Specify when udevadm should resolve names of users and groups.
+           When set to <b>early </b>(the default), names will be resolved when the
+           rules are parsed. When set to <b>late</b>, names will be resolved for
+           every event. When set to <b>never</b>, names will never be resolved and
+           all devices will be owned by root.
+
+       <b>-h</b>, <b>--help</b>
+           Print help text.
+
+   <b>udevadm test-builtin [</b><i>options</i>] [<i>command</i>] [<i>devpath</i>]
+       Run a built-in command <i>COMMAND</i> for device <i>DEVPATH</i>, and print debug
+       output.
+
+       <b>-h</b>, <b>--help</b>
+           Print help text.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man7/udev.7.html">udev(7)</a>, <a href="systemd-udevd.service.8.html">systemd-udevd.service(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemd</i> (systemd system and service manager)
+       project.  Information about the project can be found at 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd">http://www.freedesktop.org/wiki/Software/systemd</a>⟩.  If you have a bug
+       report for this manual page, see 
+       ⟨<a href="http://www.freedesktop.org/wiki/Software/systemd/#bugreports">http://www.freedesktop.org/wiki/Software/systemd/#bugreports</a>⟩.  This
+       page was obtained from the project's upstream Git repository 
+       ⟨<a href="https://github.com/systemd/systemd.git">https://github.com/systemd/systemd.git</a>⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">systemd 234                                                       UDEVADM(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man5/systemd.link.5.html">systemd.link(5)</a>,&nbsp; 
+    <a href="../man5/udev.conf.5.html">udev.conf(5)</a>,&nbsp; 
+    <a href="../man7/systemd.directives.7.html">systemd.directives(7)</a>,&nbsp; 
+    <a href="../man7/systemd.index.7.html">systemd.index(7)</a>,&nbsp; 
+    <a href="../man7/udev.7.html">udev(7)</a>,&nbsp; 
+    <a href="dmsetup.8.html">dmsetup(8)</a>,&nbsp; 
+    <a href="systemd-udevd.service.8.html">systemd-udevd.service(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,362 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>e2image(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RESTORING_FILESYSTEM_METADATA_USING_AN_IMAGE_FILE">RESTORING&nbsp;FILESYSTEM&nbsp;METADATA&nbsp;USING&nbsp;AN&nbsp;IMAGE&nbsp;FILE</a> | <a href="#RAW_IMAGE_FILES">RAW&nbsp;IMAGE&nbsp;FILES</a> | <a href="#QCOW2_IMAGE_FILES">QCOW2&nbsp;IMAGE&nbsp;FILES</a> | <a href="#INCLUDING_DATA">INCLUDING&nbsp;DATA</a> | <a href="#OFFSETS">OFFSETS</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">E2IMAGE(8)                 System Manager's Manual                E2IMAGE(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       e2image - Save critical ext2/ext3/ext4 filesystem metadata to a file
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>e2image </b>[ <b>-r|Q </b>] [ <b>-fr </b>] <i>device image-file</i>
+       <b>e2image -I </b><i>device image-file</i>
+       <b>e2image -ra </b>[ <b>-cfnp </b>] [ <b>-o </b><i>src_offset</i> ] [ <b>-O </b><i>dest_offset</i> ] <i>src_fs</i> [
+       <i>dest_fs</i> ]
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>e2image </b>program will save critical ext2, ext3, or ext4 filesystem
+       metadata located on <i>device</i> to a file specified by <i>image-file</i>.  The
+       image file may be examined by <b>dumpe2fs </b>and <b>debugfs</b>, by using the <b>-i</b>
+       option to those programs.  This can assist an expert in recovering
+       catastrophically corrupted filesystems.  In the future, e2fsck will
+       be enhanced to be able to use the image file to help recover a badly
+       damaged filesystem.
+
+       When saving an e2image for debugging purposes, using either the <b>-r </b>or
+       <b>-Q </b>options, the filesystem must be unmounted or be mounted read/only,
+       in order for the image file to be in a consistent state.  This
+       requirement can be overridden using the <b>-f </b>option, but the resulting
+       image file is very likely not going to be useful.
+
+       If <i>image-file</i> is -, then the output of <b>e2image </b>will be sent to
+       standard output, so that the output can be piped to another program,
+       such as <b>gzip</b>(1).  (Note that this is currently only supported when
+       creating a raw image file using the <b>-r </b>option, since the process of
+       creating a normal image file, or QCOW2 image currently requires
+       random access to the file, which cannot be done using a pipe.  This
+       restriction will hopefully be lifted in a future version of <b>e2image</b>.)
+
+       It is a very good idea to create image files for all of filesystems
+       on a system and save the partition layout (which can be generated
+       using the <b>fdisk -l </b>command) at regular intervals --- at boot time,
+       and/or every week or so.  The image file should be stored on some
+       filesystem other than the filesystem whose data it contains, to
+       ensure that this data is accessible in the case where the filesystem
+       has been badly damaged.
+
+       To save disk space, <b>e2image </b>creates the image file as a sparse file,
+       or in QCOW2 format.  Hence, if the sparse image file needs to be
+       copied to another location, it should either be compressed first or
+       copied using the <b>--sparse=always </b>option to the GNU version of <b>cp</b>.
+       This does not apply to the QCOW2 image, which is not sparse.
+
+       The size of an ext2 image file depends primarily on the size of the
+       filesystems and how many inodes are in use.  For a typical 10
+       gigabyte filesystem, with 200,000 inodes in use out of 1.2 million
+       inodes, the image file will be approximately 35 megabytes; a 4
+       gigabyte filesystem with 15,000 inodes in use out of 550,000 inodes
+       will result in a 3 megabyte image file.  Image files tend to be quite
+       compressible; an image file taking up 32 megabytes of space on disk
+       will generally compress down to 3 or 4 megabytes.
+</pre>
+<h2><a id="RESTORING_FILESYSTEM_METADATA_USING_AN_IMAGE_FILE" href="#RESTORING_FILESYSTEM_METADATA_USING_AN_IMAGE_FILE"></a>RESTORING FILESYSTEM METADATA USING AN IMAGE FILE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>-I </b>option will cause e2image to install the metadata stored in
+       the image file back to the device.  It can be used to restore the
+       filesystem metadata back to the device in emergency situations.
+
+       <b>WARNING!!!!  </b>The <b>-I </b>option should only be used as a desperation
+       measure when other alternatives have failed.  If the filesystem has
+       changed since the image file was created, data <b>will </b>be lost.  In
+       general, you should make a full image backup of the filesystem first,
+       in case you wish to try other recovery strategies afterwards.
+</pre>
+<h2><a id="RAW_IMAGE_FILES" href="#RAW_IMAGE_FILES"></a>RAW IMAGE FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>-r </b>option will create a raw image file instead of a normal image
+       file.  A raw image file differs from a normal image file in two ways.
+       First, the filesystem metadata is placed in the proper position so
+       that e2fsck, dumpe2fs, debugfs, etc. can be run directly on the raw
+       image file.  In order to minimize the amount of disk space consumed
+       by a raw image file, the file is created as a sparse file.  (Beware
+       of copying or compressing/decompressing this file with utilities that
+       don't understand how to create sparse files; the file will become as
+       large as the filesystem itself!)  Secondly, the raw image file also
+       includes indirect blocks and directory blocks, which the standard
+       image file does not have, although this may change in the future.
+
+       Raw image files are sometimes used when sending filesystems to the
+       maintainer as part of bug reports to e2fsprogs.  When used in this
+       capacity, the recommended command is as follows (replace hda1 with
+       the appropriate device):
+
+            <b>e2image -r /dev/hda1 - | bzip2 &gt; hda1.e2i.bz2</b>
+
+       This will only send the metadata information, without any data
+       blocks.  However, the filenames in the directory blocks can still
+       reveal information about the contents of the filesystem that the bug
+       reporter may wish to keep confidential.  To address this concern, the
+       <b>-s </b>option can be specified.  This will cause <b>e2image </b>to scramble
+       directory entries and zero out any unused portions of the directory
+       blocks before writing the image file.  However, the <b>-s </b>option will
+       prevent analysis of problems related to hash-tree indexed
+       directories.
+
+       Note that this will work even if you substitute "/dev/hda1" for
+       another raw disk image, or QCOW2 image previously created by <b>e2image</b>.
+</pre>
+<h2><a id="QCOW2_IMAGE_FILES" href="#QCOW2_IMAGE_FILES"></a>QCOW2 IMAGE FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>-Q </b>option will create a QCOW2 image file instead of a normal, or
+       raw image file.  A QCOW2 image contains all the information the raw
+       image does, however unlike the raw image it is not sparse. The QCOW2
+       image minimize the amount of disk space by storing data in special
+       format with pack data closely together, hence avoiding holes while
+       still minimizing size.
+
+       In order to send filesystem to the maintainer as a part of bug report
+       to e2fsprogs, use following commands (replace hda1 with the
+       appropriate device):
+
+            <b>e2image -Q /dev/hda1 hda1.qcow2</b>
+            <b>bzip2 -z hda1.qcow2</b>
+
+       This will only send the metadata information, without any data
+       blocks.  However, the filenames in the directory blocks can still
+       reveal information about the contents of the filesystem that the bug
+       reporter may wish to keep confidential.  To address this concern, the
+       <b>-s </b>option can be specified.  This will cause <b>e2image </b>to scramble
+       directory entries and zero out any unused portions of the directory
+       blocks before writing the image file.  However, the <b>-s </b>option will
+       prevent analysis of problems related to hash-tree indexed
+       directories.
+
+       Note that QCOW2 image created by <b>e2image </b>is regular QCOW2 image and
+       can be processed by tools aware of QCOW2 format such as for example
+       <b>qemu-img</b>.
+
+       You can convert a qcow2 image into a raw image with:
+
+            <b>e2image -r hda1.qcow2 hda1.raw</b>
+
+       This can be useful to write a qcow2 image containing all data to a
+       sparse image file where it can be loop mounted, or to a disk
+       partition.  Note that this may not work with qcow2 images not
+       generated by e2image.
+</pre>
+<h2><a id="INCLUDING_DATA" href="#INCLUDING_DATA"></a>INCLUDING DATA  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Normally <b>e2image </b>only includes fs metadata, not regular file data.
+       The <b>-a </b>option can be specified to include all data.  This will give
+       an image that is suitable to use to clone the entire FS or for backup
+       purposes.  Note that this option only works with the raw or QCOW2
+       formats.  The <b>-p </b>switch may be given to show progress.  If the file
+       system is being cloned to a flash-based storage device (where reads
+       are very fast and where it is desirable to avoid unnecessary writes
+       to reduce write wear on the device), the <b>-c </b>option which cause
+       e2image to try reading a block from the destination to see if it is
+       identical to the block which <b>e2image </b>is about to copy.  If the block
+       is already the same, the write can be skipped.  The <b>-n </b>option will
+       cause all of the writes to be no-ops, and print the blocks that would
+       have been written.
+</pre>
+<h2><a id="OFFSETS" href="#OFFSETS"></a>OFFSETS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Normally a filesystem starts at the beginning of a partition, and
+       <b>e2image </b>is run on the partition.  When working with image files, you
+       don't have the option of using the partition device, so you can
+       specify the offset where the filesystem starts directly with the <b>-o</b>
+       option.  Similarly the <b>-O </b>option specifies the offset that should be
+       seeked to in the destination before writing the filesystem.
+
+       For example, if you have a <b>dd </b>image of a whole hard drive that
+       contains an ext2 fs in a partition starting at 1 MiB, you can clone
+       that fs with:
+
+            <b>e2image -aro 1048576 img /dev/sda1</b>
+
+       Or you can clone a fs into an image file, leaving room in the first
+       MiB for a partition table with:
+
+            <b>e2image -arO 1048576 /dev/sda1 img</b>
+
+       If you specify at least one offset, and only one file, an in-place
+       move will be performed, allowing you to safely move the filesystem
+       from one offset to another.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>e2image </b>was written by Theodore Ts'o (tytso@mit.edu).
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>e2image </b>is part of the e2fsprogs package and is available from
+       <a href="http://e2fsprogs.sourceforge.net/">http://e2fsprogs.sourceforge.net</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="dumpe2fs.8.html">dumpe2fs(8)</a>, <a href="debugfs.8.html">debugfs(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>e2fsprogs</i> (utilities for ext2/3/4
+       filesystems) project.  Information about the project can be found at
+       ⟨<a href="http://e2fsprogs.sourceforge.net/">http://e2fsprogs.sourceforge.net/</a>⟩.  It is not known how to report
+       bugs for this man page; if you know, please send a mail to
+       man-pages@man7.org.  This page was obtained from the project's
+       upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git⟩ on 2017-07-05.
+       If you discover any rendering problems in this HTML version of the
+       page, or you believe there is a better or more up-to-date source for
+       the page, or you have corrections or improvements to the information
+       in this COLOPHON (which is <i>not</i> part of the original manual page),
+       send a mail to man-pages@man7.org
+
+<span class="footline">E2fsprogs version 1.43.5-WIP    February 2017                     E2IMAGE(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="e2fsck.8.html">e2fsck(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

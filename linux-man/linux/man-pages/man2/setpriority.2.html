@@ -1,0 +1,307 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getpriority(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETPRIORITY(2)            Linux Programmer's Manual           GETPRIORITY(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getpriority, setpriority - get/set program scheduling priority
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/time.h&gt;</b>
+       <b>#include &lt;sys/resource.h&gt;</b>
+
+       <b>int getpriority(int </b><i>which</i><b>, id_t </b><i>who</i><b>);</b>
+       <b>int setpriority(int </b><i>which</i><b>, id_t </b><i>who</i><b>, int </b><i>prio</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The scheduling priority of the process, process group, or user, as
+       indicated by <i>which</i> and <i>who</i> is obtained with the <b>getpriority</b>() call
+       and set with the <b>setpriority</b>() call.  The process attribute dealt
+       with by these system calls is the same attribute (also known as the
+       "nice" value) that is dealt with by <a href="nice.2.html">nice(2)</a>.
+
+       The value <i>which</i> is one of <b>PRIO_PROCESS</b>, <b>PRIO_PGRP</b>, or <b>PRIO_USER</b>, and
+       <i>who</i> is interpreted relative to <i>which</i> (a process identifier for
+       <b>PRIO_PROCESS</b>, process group identifier for <b>PRIO_PGRP</b>, and a user ID
+       for <b>PRIO_USER</b>).  A zero value for <i>who</i> denotes (respectively) the
+       calling process, the process group of the calling process, or the
+       real user ID of the calling process.
+
+       The <i>prio</i> argument is a value in the range -20 to 19 (but see NOTES
+       below).  with -20 being the highest priority and 19 being the lowest
+       priority.  Attempts to set a priority outside this range are silently
+       clamped to the range.  The default priority is 0; lower values give a
+       process a higher scheduling priority.
+
+       The <b>getpriority</b>() call returns the highest priority (lowest numerical
+       value) enjoyed by any of the specified processes.  The <b>setpriority</b>()
+       call sets the priorities of all of the specified processes to the
+       specified value.
+
+       Traditionally, only a privileged process could lower the nice value
+       (i.e., set a higher priority).  However, since Linux 2.6.12, an
+       unprivileged process can decrease the nice value of a target process
+       that has a suitable <b>RLIMIT_NICE </b>soft limit; see <a href="getrlimit.2.html">getrlimit(2)</a> for
+       details.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, <b>getpriority</b>() returns the calling thread's nice value,
+       which may be a negative number.  On error, it returns -1 and sets
+       <i><a href="../man3/errno.3.html">errno</a></i> to indicate the cause of the error.  Since a successful call to
+       <b>getpriority</b>() can legitimately return the value -1, it is necessary
+       to clear the external variable <i><a href="../man3/errno.3.html">errno</a></i> prior to the call, then check it
+       afterward to determine if -1 is an error or a legitimate value.
+
+       <b>setpriority</b>() returns 0 on success.  On error, it returns -1 and sets
+       <i><a href="../man3/errno.3.html">errno</a></i> to indicate the cause of the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EINVAL </b><i>which</i> was not one of <b>PRIO_PROCESS</b>, <b>PRIO_PGRP</b>, or <b>PRIO_USER</b>.
+
+       <b>ESRCH  </b>No process was located using the <i>which</i> and <i>who</i> values
+              specified.
+
+       In addition to the errors indicated above, <b>setpriority</b>() may fail if:
+
+       <b>EACCES </b>The caller attempted to set a lower nice value (i.e., a higher
+              process priority), but did not have the required privilege (on
+              Linux: did not have the <b>CAP_SYS_NICE </b>capability).
+
+       <b>EPERM  </b>A process was located, but its effective user ID did not match
+              either the effective or the real user ID of the caller, and
+              was not privileged (on Linux: did not have the <b>CAP_SYS_NICE</b>
+              capability).  But see NOTES below.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD (these interfaces first
+       appeared in 4.2BSD).
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For further details on the nice value, see <a href="../man7/sched.7.html">sched(7)</a>.
+
+       <i>Note</i>: the addition of the "autogroup" feature in Linux 2.6.38 means
+       that the nice value no longer has its traditional effect in many
+       circumstances.  For details, see <a href="../man7/sched.7.html">sched(7)</a>.
+
+       A child created by <a href="fork.2.html">fork(2)</a> inherits its parent's nice value.  The
+       nice value is preserved across <a href="execve.2.html">execve(2)</a>.
+
+       The details on the condition for <b>EPERM </b>depend on the system.  The
+       above description is what POSIX.1-2001 says, and seems to be followed
+       on all System V-like systems.  Linux kernels before 2.6.12 required
+       the real or effective user ID of the caller to match the real user of
+       the process <i>who</i> (instead of its effective user ID).  Linux 2.6.12 and
+       later require the effective user ID of the caller to match the real
+       or effective user ID of the process <i>who</i>.  All BSD-like systems (SunOS
+       4.1.3, Ultrix 4.2, 4.3BSD, FreeBSD 4.3, OpenBSD-2.5, ...) behave in
+       the same manner as Linux 2.6.12 and later.
+
+       Including <i>&lt;sys/time.h&gt;</i> is not required these days, but increases
+       portability.  (Indeed, <i>&lt;sys/resource.h&gt;</i> defines the <i>rusage</i> structure
+       with fields of type <i>struct timeval</i> defined in <i>&lt;sys/time.h&gt;</i>.)
+
+   <b>C library/kernel differences</b>
+       Within the kernel, nice values are actually represented using the
+       range 40..1 (since negative numbers are error codes) and these are
+       the values employed by the <b>setpriority</b>() and <b>getpriority</b>() system
+       calls.  The glibc wrapper functions for these system calls handle the
+       translations between the user-land and kernel representations of the
+       nice value according to the formula <i>unice = 20 - knice</i>.  (Thus, the
+       kernel's 40..1 range corresponds to the range -20..19 as seen by user
+       space.)
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       According to POSIX, the nice value is a per-process setting.
+       However, under the current Linux/NPTL implementation of POSIX
+       threads, the nice value is a per-thread attribute: different threads
+       in the same process can have different nice values.  Portable
+       applications should avoid relying on the Linux behavior, which may be
+       made standards conformant in the future.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/nice.1.html">nice(1)</a>, <a href="../man1/renice.1.html">renice(1)</a>, <a href="fork.2.html">fork(2)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>, <a href="../man7/sched.7.html">sched(7)</a>
+
+       <i>Documentation/scheduler/sched-nice-design.txt</i> in the Linux kernel
+       source tree (since Linux 2.6.23)
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-12-12                   GETPRIORITY(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/renice.1.html">renice(1)</a>,&nbsp; 
+    <a href="getrlimit.2.html">getrlimit(2)</a>,&nbsp; 
+    <a href="ioprio_set.2.html">ioprio_set(2)</a>,&nbsp; 
+    <a href="nice.2.html">nice(2)</a>,&nbsp; 
+    <a href="sched_rr_get_interval.2.html">sched_rr_get_interval(2)</a>,&nbsp; 
+    <a href="sched_setaffinity.2.html">sched_setaffinity(2)</a>,&nbsp; 
+    <a href="sched_setattr.2.html">sched_setattr(2)</a>,&nbsp; 
+    <a href="sched_setparam.2.html">sched_setparam(2)</a>,&nbsp; 
+    <a href="sched_setscheduler.2.html">sched_setscheduler(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man3/errno.3.html">errno(3)</a>,&nbsp; 
+    <a href="../man5/proc.5.html">proc(5)</a>,&nbsp; 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="../man7/credentials.7.html">credentials(7)</a>,&nbsp; 
+    <a href="../man7/pid_namespaces.7.html">pid_namespaces(7)</a>,&nbsp; 
+    <a href="../man7/pthreads.7.html">pthreads(7)</a>,&nbsp; 
+    <a href="../man7/sched.7.html">sched(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getpriority.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

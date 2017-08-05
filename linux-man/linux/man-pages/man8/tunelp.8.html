@@ -1,0 +1,325 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>tunelp(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#FILES">FILES</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">TUNELP(8)                   System Administration                  TUNELP(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       tunelp - set various parameters for the lp device
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>tunelp </b>[options] <i>device</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>tunelp </b>sets several parameters for the /dev/lp<i>?</i> devices, for better
+       performance (or for any performance at all, if your printer won't
+       work without it...) Without parameters, it tells whether the device
+       is using interrupts, and if so, which one.  With parameters, it sets
+       the device characteristics accordingly.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-i</b>, <b>--irq </b><i>argument</i>
+              specifies the IRQ to use for the parallel port in question.
+              If this is set to something non-zero, -t and -c have no
+              effect.  If your port does not use interrupts, this option
+              will make printing stop.  The command <b>tunelp -i 0 </b>restores
+              non-interrupt driven (polling) action, and your printer should
+              work again.  If your parallel port does support interrupts,
+              interrupt-driven printing should be somewhat faster and
+              efficient, and will probably be desirable.
+
+              NOTE: This option will have no effect with kernel 2.1.131 or
+              later since the irq is handled by the parport driver.  You can
+              change the parport irq for example via <i>/proc/parport/*/irq</i>.
+              Read <i>/usr/src/linux/Documentation/parport.txt</i> for more details
+              on parport.
+
+       <b>-t</b>, <b>--time </b><i>milliseconds</i>
+              is the amount of time in jiffies that the driver waits if the
+              printer doesn't take a character for the number of tries
+              dictated by the -c parameter.  10 is the default value.  If
+              you want fastest possible printing, and don't care about
+              system load, you may set this to 0.  If you don't care how
+              fast your printer goes, or are printing text on a slow printer
+              with a buffer, then 500 (5 seconds) should be fine, and will
+              give you very low system load.  This value generally should be
+              lower for printing graphics than text, by a factor of
+              approximately 10, for best performance.
+
+       <b>-c</b>, <b>--chars </b><i>characters</i>
+              is the number of times to try to output a character to the
+              printer before sleeping for -t <i>TIME</i>.  It is the number of
+              times around a loop that tries to send a character to the
+              printer.  120 appears to be a good value for most printers in
+              polling mode.  1000 is the default, because there are some
+              printers that become jerky otherwise, but you <i>must</i> set this to
+              `1' to handle the maximal CPU efficiency if you are using
+              interrupts.  If you have a very fast printer, a value of 10
+              might make more sense even if in polling mode.  If you have a
+              <i>really</i> old printer, you can increase this further.
+
+              Setting -t <i>TIME</i> to 0 is equivalent to setting -c <i>CHARS</i> to
+              infinity.
+
+       <b>-w</b>, <b>--wait </b><i>milliseconds</i>
+              is the number of usec we wait while playing with the strobe
+              signal.  While most printers appear to be able to deal with an
+              extremely short strobe, some printers demand a longer one.
+              Increasing this from the default 1 may make it possible to
+              print with those printers.  This may also make it possible to
+              use longer cables.  It's also possible to decrease this value
+              to 0 if your printer is fast enough or your machine is slow
+              enough.
+
+       <b>-a</b>, <b>--abort </b><i>&lt;on|off&gt;</i>
+              This is whether to abort on printer error - the default is not
+              to.  If you are sitting at your computer, you probably want to
+              be able to see an error and fix it, and have the printer go on
+              printing.  On the other hand, if you aren't, you might rather
+              that your printer spooler find out that the printer isn't
+              ready, quit trying, and send you mail about it.  The choice is
+              yours.
+
+       <b>-o</b>, <b>--check-status </b><i>&lt;on|off&gt;</i>
+              This option is much like -a.  It makes any <a href="../man2/open.2.html">open(2)</a> of this
+              device check to see that the device is on-line and not
+              reporting any out of paper or other errors.  This is the
+              correct setting for most versions of lpd.
+
+       <b>-C</b>, <b>--careful </b><i>&lt;on|off&gt;</i>
+              This option adds extra ("careful") error checking.  When this
+              option is on, the printer driver will ensure that the printer
+              is on-line and not reporting any out of paper or other errors
+              before sending data.  This is particularly useful for printers
+              that normally appear to accept data when turned off.
+
+              NOTE: This option is obsolete because it's the default in
+              2.1.131 kernel or later.
+
+       <b>-s</b>, <b>--status</b>
+              This option returns the current printer status, both as a
+              decimal number from 0..255, and as a list of active flags.
+              When this option is specified, -q off, turning off the display
+              of the current IRQ, is implied.
+
+       <b>-T</b>, <b>--trust-irq </b><i>&lt;on|off&gt;</i>
+              This option is obsolete. It was added in Linux 2.1.131, and
+              removed again in Linux 2.3.10.  The below is for these old
+              kernels only.
+
+              This option tells the lp driver to trust or not the IRQ.  This
+              option makes sense only if you are using interrupts.  If you
+              tell the lp driver to trust the irq, then, when the lp driver
+              will get an irq, it will send the next pending character to
+              the printer unconditionally, even if the printer still claims
+              to be BUSY.  This is the only way to sleep on interrupt (and
+              so the handle the irq printing efficiently) at least on Epson
+              Stylus Color Printers.  The lp driver automagically detects if
+              you could get improved performance by setting this flag, and
+              in such case it will warn you with a kernel message.
+
+              NOTE: Trusting the irq is reported to corrupt the printing on
+              some hardware, you must try to know if your printer will work
+              or not...
+
+       <b>-r</b>, <b>--reset</b>
+              This option resets the port.  It requires a Linux kernel
+              version of 1.1.80 or later.
+
+       <b>-q</b>, <b>--print-irq </b><i>&lt;on|off&gt;</i>
+              This option sets printing the display of the current IRQ
+              setting.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-o</b>, <b>-C</b>, and <b>-s </b>all require a Linux kernel version of 1.1.76 or later.
+
+       <b>-C </b>requires a Linux version prior to 2.1.131.
+
+       <b>-T </b>requires a Linux version of 2.1.131 or later.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       By some unfortunate coincidence the ioctl LPSTRICT of 2.0.36 has the
+       same number as the ioctl LPTRUSTIRQ introduced in 2.1.131.  So, use
+       of the -T option on a 2.0.36 kernel with an tunelp compiled under
+       2.1.131 or later may have unexpected effects.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/dev/lp?</i>
+       <i>/proc/parport/*/*</i>
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The tunelp  command is part of the util-linux package and is
+       available from Linux Kernel Archive 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                      October 2011                       TUNELP(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man4/lp.4.html">lp(4)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

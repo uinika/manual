@@ -1,0 +1,310 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>gettimeofday(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETTIMEOFDAY(2)           Linux Programmer's Manual          GETTIMEOFDAY(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       gettimeofday, settimeofday - get / set time
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/time.h&gt;</b>
+
+       <b>int gettimeofday(struct timeval *</b><i>tv</i><b>, struct timezone *</b><i>tz</i><b>);</b>
+
+       <b>int settimeofday(const struct timeval *</b><i>tv</i><b>, const struct timezone *</b><i>tz</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>settimeofday</b>():
+           Since glibc 2.19:
+               _DEFAULT_SOURCE
+           Glibc 2.19 and earlier:
+               _BSD_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The functions <b>gettimeofday</b>() and <b>settimeofday</b>() can get and set the
+       time as well as a timezone.  The <i>tv</i> argument is a <i>struct timeval</i> (as
+       specified in <i>&lt;sys/time.h&gt;</i>):
+
+           struct timeval {
+               time_t      tv_sec;     /* seconds */
+               suseconds_t tv_usec;    /* microseconds */
+           };
+
+       and gives the number of seconds and microseconds since the Epoch (see
+       <a href="time.2.html">time(2)</a>).  The <i>tz</i> argument is a <i>struct timezone</i>:
+
+           struct timezone {
+               int tz_minuteswest;     /* minutes west of Greenwich */
+               int tz_dsttime;         /* type of DST correction */
+           };
+
+       If either <i>tv</i> or <i>tz</i> is NULL, the corresponding structure is not set or
+       returned.  (However, compilation warnings will result if <i>tv</i> is NULL.)
+
+       The use of the <i>timezone</i> structure is obsolete; the <i>tz</i> argument should
+       normally be specified as NULL.  (See NOTES below.)
+
+       Under Linux, there are some peculiar "warp clock" semantics
+       associated with the <b>settimeofday</b>() system call if on the very first
+       call (after booting) that has a non-NULL <i>tz</i> argument, the <i>tv</i> argument
+       is NULL and the <i>tz_minuteswest</i> field is nonzero.  (The <i>tz_dsttime</i>
+       field should be zero for this case.)  In such a case it is assumed
+       that the CMOS clock is on local time, and that it has to be
+       incremented by this amount to get UTC system time.  No doubt it is a
+       bad idea to use this feature.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>gettimeofday</b>() and <b>settimeofday</b>() return 0 for success, or -1 for
+       failure (in which case <i><a href="../man3/errno.3.html">errno</a></i> is set appropriately).
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b>One of <i>tv</i> or <i>tz</i> pointed outside the accessible address space.
+
+       <b>EINVAL </b>Timezone (or something else) is invalid.
+
+       <b>EPERM  </b>The calling process has insufficient privilege to call
+              <b>settimeofday</b>(); under Linux the <b>CAP_SYS_TIME </b>capability is
+              required.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       SVr4, 4.3BSD.  POSIX.1-2001 describes <b>gettimeofday</b>() but not
+       <b>settimeofday</b>().  POSIX.1-2008 marks <b>gettimeofday</b>() as obsolete,
+       recommending the use of <a href="clock_gettime.2.html">clock_gettime(2)</a> instead.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The time returned by <b>gettimeofday</b>() <i>is</i> affected by discontinuous
+       jumps in the system time (e.g., if the system administrator manually
+       changes the system time).  If you need a monotonically increasing
+       clock, see <a href="clock_gettime.2.html">clock_gettime(2)</a>.
+
+       Macros for operating on <i>timeval</i> structures are described in
+       <a href="../man3/timeradd.3.html">timeradd(3)</a>.
+
+       Traditionally, the fields of <i>struct timeval</i> were of type <i>long</i>.
+
+   <b>The tz_dsttime field</b>
+       On a non-Linux kernel, with glibc, the <i>tz_dsttime</i> field of <i>struct</i>
+       <i>timezone</i> will be set to a nonzero value by <b>gettimeofday</b>() if the
+       current timezone has ever had or will have a daylight saving rule
+       applied.  In this sense it exactly mirrors the meaning of <a href="../man3/daylight.3.html">daylight(3)</a>
+       for the current zone.  On Linux, with glibc, the setting of the
+       <i>tz_dsttime</i> field of <i>struct timezone</i> has never been used by
+       <b>settimeofday</b>() or <b>gettimeofday</b>().  Thus, the following is purely of
+       historical interest.
+
+       On old systems, the field <i>tz_dsttime</i> contains a symbolic constant
+       (values are given below) that indicates in which part of the year
+       Daylight Saving Time is in force.  (Note: this value is constant
+       throughout the year: it does not indicate that DST is in force, it
+       just selects an algorithm.)  The daylight saving time algorithms
+       defined are as follows:
+
+           <b>DST_NONE     </b>/* not on DST */
+           <b>DST_USA      </b>/* USA style DST */
+           <b>DST_AUST     </b>/* Australian style DST */
+           <b>DST_WET      </b>/* Western European DST */
+           <b>DST_MET      </b>/* Middle European DST */
+           <b>DST_EET      </b>/* Eastern European DST */
+           <b>DST_CAN      </b>/* Canada */
+           <b>DST_GB       </b>/* Great Britain and Eire */
+           <b>DST_RUM      </b>/* Romania */
+           <b>DST_TUR      </b>/* Turkey */
+           <b>DST_AUSTALT  </b>/* Australian style with shift in 1986 */
+
+       Of course it turned out that the period in which Daylight Saving Time
+       is in force cannot be given by a simple algorithm, one per country;
+       indeed, this period is determined by unpredictable political
+       decisions.  So this method of representing timezones has been
+       abandoned.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/date.1.html">date(1)</a>, <a href="adjtimex.2.html">adjtimex(2)</a>, <a href="clock_gettime.2.html">clock_gettime(2)</a>, <a href="time.2.html">time(2)</a>, <a href="../man3/ctime.3.html">ctime(3)</a>, <a href="../man3/ftime.3.html">ftime(3)</a>,
+       <a href="../man3/timeradd.3.html">timeradd(3)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>, <a href="../man7/time.7.html">time(7)</a>, <a href="../man7/vdso.7.html">vdso(7)</a>, <a href="../man8/hwclock.8.html">hwclock(8)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-12-12                  GETTIMEOFDAY(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="adjtimex.2.html">adjtimex(2)</a>,&nbsp; 
+    <a href="alarm.2.html">alarm(2)</a>,&nbsp; 
+    <a href="clock_getres.2.html">clock_getres(2)</a>,&nbsp; 
+    <a href="getitimer.2.html">getitimer(2)</a>,&nbsp; 
+    <a href="stime.2.html">stime(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="time.2.html">time(2)</a>,&nbsp; 
+    <a href="timerfd_create.2.html">timerfd_create(2)</a>,&nbsp; 
+    <a href="../man3/adjtime.3.html">adjtime(3)</a>,&nbsp; 
+    <a href="../man3/ctime.3.html">ctime(3)</a>,&nbsp; 
+    <a href="../man3/difftime.3.html">difftime(3)</a>,&nbsp; 
+    <a href="../man3/ftime.3.html">ftime(3)</a>,&nbsp; 
+    <a href="../man3/pmdaeventarray.3.html">pmdaeventarray(3)</a>,&nbsp; 
+    <a href="../man3/timeradd.3.html">timeradd(3)</a>,&nbsp; 
+    <a href="../man3/tzset.3.html">tzset(3)</a>,&nbsp; 
+    <a href="../man3/uuid_time.3.html">uuid_time(3)</a>,&nbsp; 
+    <a href="../man4/rtc.4.html">rtc(4)</a>,&nbsp; 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man7/capabilities.7.html">capabilities(7)</a>,&nbsp; 
+    <a href="../man7/time.7.html">time(7)</a>,&nbsp; 
+    <a href="../man7/vdso.7.html">vdso(7)</a>,&nbsp; 
+    <a href="../man8/hwclock.8.html">hwclock(8)</a>,&nbsp; 
+    <a href="../man8/mount.8.html">mount(8)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="gettimeofday.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

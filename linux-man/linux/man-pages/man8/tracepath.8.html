@@ -1,0 +1,262 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>tracepath(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#OUTPUT">OUTPUT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#AUTHOR">AUTHOR</a> | <a href="#SECURITY">SECURITY</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">TRACEPATH(8)          System Manager's Manual: iputils          TRACEPATH(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       tracepath, tracepath6 - traces path to a network host discovering MTU
+       along this path
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>tracepath </b>[<b>-n</b>] [<b>-b</b>] [<b>-l </b><i>pktlen</i>] [<b>-m </b><i>max_hops</i>] [<b>-p </b><i>port</i>] <i>destination</i>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       It traces path to <i>destination</i> discovering MTU along this path.  It
+       uses UDP port <i>port</i> or some random port.  It is similar to <b>traceroute</b>,
+       only does not require superuser privileges and has no fancy options.
+
+       <b>tracepath6 </b>is good replacement for <b>traceroute6 </b>and classic example of
+       application of Linux error queues.  The situation with IPv4 is worse,
+       because commercial IP routers do not return enough information in
+       ICMP error messages.  Probably, it will change, when they will be
+       updated.  For now it uses Van Jacobson's trick, sweeping a range of
+       UDP ports to maintain trace history.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-n     </b>Print primarily IP addresses numerically.
+
+       <b>-b     </b>Print both of host names and IP addresses.
+
+       <b>-l     </b>Sets the initial packet length to <i>pktlen</i> instead of 65535 for
+              <b>tracepath </b>or 128000 for <b>tracepath6</b>.
+
+       <b>-m     </b>Set maximum hops (or maximum TTLs) to <i>max_hops</i> instead of 30.
+
+       <b>-p     </b>Sets the initial destination port to use.
+</pre>
+<h2><a id="OUTPUT" href="#OUTPUT"></a>OUTPUT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       root@mops:~ # tracepath6 3ffe:2400:0:109::2
+        1?: [LOCALHOST]                              pmtu 1500
+        1:  dust.inr.ac.ru                   0.411ms
+        2:  dust.inr.ac.ru        asymm  1   0.390ms pmtu 1480
+        2:  3ffe:2400:0:109::2               463.514ms reached
+            Resume: pmtu 1480 hops 2 back 2
+
+       The first column shows TTL of the probe, followed by colon.  Usually
+       value of TTL is obtained from reply from network, but sometimes reply
+       does not contain necessary information and we have to guess it. In
+       this case the number is followed by ?.
+
+       The second column shows the network hop, which replied to the probe.
+       It is either address of router or word [LOCALHOST], if the probe was
+       not sent to the network.
+
+       The rest of line shows miscellaneous information about path to the
+       correspinding network hop. As rule it contains value of RTT.
+       Additionally, it can show Path MTU, when it changes.  If the path is
+       asymmetric or the probe finishes before it reach prescribed hop,
+       difference between number of hops in forward and backward direction
+       is shown following keyword async. This information is not reliable.
+       F.e. the third line shows asymmetry of 1, it is because the first
+       probe with TTL of 2 was rejected at the first hop due to Path MTU
+       Discovery.
+
+       The last line summarizes information about all the path to the
+       destination, it shows detected Path MTU, amount of hops to the
+       destination and our guess about amount of hops from the destination
+       to us, which can be different when the path is asymmetric.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="traceroute.8.html">traceroute(8)</a>, <a href="traceroute6.8.html">traceroute6(8)</a>, <a href="ping.8.html">ping(8)</a>.
+</pre>
+<h2><a id="AUTHOR" href="#AUTHOR"></a>AUTHOR  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>tracepath </b>was written by Alexey Kuznetsov &lt;kuznet@ms2.inr.ac.ru&gt;.
+</pre>
+<h2><a id="SECURITY" href="#SECURITY"></a>SECURITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       No security issues.
+
+       This lapidary deserves to be elaborated.  <b>tracepath </b>is not a
+       privileged program, unlike <b>traceroute</b>, <b>ping </b>and other beasts of this
+       kind.  <b>tracepath </b>may be executed by everyone who has some access to
+       network, enough to send UDP datagrams to investigated destination
+       using given port.
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>tracepath </b>is part of <i>iputils</i> package and the latest versions are
+       available in source form at
+       <a href="http://www.skbuff.net/iputils/iputils-current.tar.bz2">http://www.skbuff.net/iputils/iputils-current.tar.bz2</a>.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>iputils</i> (IP utilities) project.  Information
+       about the project can be found at ⟨<a href="http://www.skbuff.net/iputils/">http://www.skbuff.net/iputils/</a>⟩.
+       If you have a bug report for this manual page, send it to
+       yoshfuji@skbuff.net, netdev@vger.kernel.org.  This page was obtained
+       from the project's upstream Git repository 
+       ⟨git://git.linux-ipv6.org/gitroot/iputils.git⟩ on 2017-07-05.  If you
+       discover any rendering problems in this HTML version of the page, or
+       you believe there is a better or more up-to-date source for the page,
+       or you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">iputils-151218                  05 July 2017                    TRACEPATH(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man7/ip.7.html">ip(7)</a>,&nbsp; 
+    <a href="arping.8.html">arping(8)</a>,&nbsp; 
+    <a href="clockdiff.8.html">clockdiff(8)</a>,&nbsp; 
+    <a href="traceroute6.8.html">traceroute6(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

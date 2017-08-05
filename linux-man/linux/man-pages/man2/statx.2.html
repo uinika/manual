@@ -1,0 +1,512 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>statx(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">STATX(2)                  Linux Programmer's Manual                 STATX(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       statx - get file status (extended)
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/types.h&gt;</b>
+       <b>#include &lt;sys/stat.h&gt;</b>
+       <b>#include &lt;unistd.h&gt;</b>
+       <b>#include &lt;fcntl.h&gt;           </b>/* Definition of AT_* constants */
+
+       <b>int statx(int </b><i>dirfd</i><b>, const char *</b><i>pathname</i><b>, int </b><i>flags</i><b>,</b>
+                 <b>unsigned int </b><i>mask</i><b>, struct statx *</b><i>statxbuf</i><b>);</b>
+
+       <i>Note</i>: There is no glibc wrapper for <b>statx</b>(); see NOTES.
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This function returns information about a file, storing it in the
+       buffer pointed to by <i>statxbuf</i>.  The returned buffer is a structure of
+       the following type:
+
+           struct statx {
+               __u32 stx_mask;        /* Mask of bits indicating
+                                         filled fields */
+               __u32 stx_blksize;     /* Block size for filesystem I/O */
+               __u64 stx_attributes;  /* Extra file attribute indicators */
+               __u32 stx_nlink;       /* Number of hard links */
+               __u32 stx_uid;         /* User ID of owner */
+               __u32 stx_gid;         /* Group ID of owner */
+               __u16 stx_mode;        /* File type and mode */
+               __u64 stx_ino;         /* Inode number */
+               __u64 stx_size;        /* Total size in bytes */
+               __u64 stx_blocks;      /* Number of 512B blocks allocated */
+               __u64 stx_attributes_mask;
+                                      /* Mask to show what's supported
+                                         in stx_attributes */
+
+               /* The following fields are file timestamps */
+               struct statx_timestamp stx_atime;  /* Last access */
+               struct statx_timestamp stx_btime;  /* Creation */
+               struct statx_timestamp stx_ctime;  /* Last status change */
+               struct statx_timestamp stx_mtime;  /* Last modification */
+
+               /* If this file represents a device, then the next two
+                  fields contain the ID of the device */
+               __u32 stx_rdev_major;  /* Major ID */
+               __u32 stx_rdev_minor;  /* Minor ID */
+
+               /* The next two fields contain the ID of the device
+                  containing the filesystem where the file resides */
+               __u32 stx_dev_major;   /* Major ID */
+               __u32 stx_dev_minor;   /* Minor ID */
+           };
+
+       The file timestamps are structures of the following type:
+
+           struct statx_timestamp {
+               __s64 tv_sec;    /* Seconds since the Epoch (UNIX time) */
+               __u32 tv_nsec;   /* Nanoseconds since tv_sec */
+           };
+
+       (Note that reserved space and padding is omitted.)
+
+   <b>Invoking statx</b>():
+       To access a file's status, no permissions are required on the file
+       itself, but in the case of <b>statx</b>() with a pathname, execute (search)
+       permission is required on all of the directories in <i>pathname</i> that
+       lead to the file.
+
+       <b>statx</b>() uses <i>pathname</i>, <i>dirfd</i>, and <i>flags</i> to identify the target file
+       in one of the following ways:
+
+       An absolute pathname
+              If <i>pathname</i> begins with a slash, then it is an absolute
+              pathname that identifies the target file.  In this case, <i>dirfd</i>
+              is ignored.
+
+       A relative pathname
+              If <i>pathname</i> is a string that begins with a character other
+              than a slash and <i>dirfd</i> is <b>AT_FDCWD</b>, then <i>pathname</i> is a
+              relative pathname that is interpreted relative to the
+              process's current working directory.
+
+       A directory-relative pathname
+              If <i>pathname</i> is a string that begins with a character other
+              than a slash and <i>dirfd</i> is a file descriptor that refers to a
+              directory, then <i>pathname</i> is a relative pathname that is
+              interpreted relative to the directory referred to by <i>dirfd</i>.
+
+       By file descriptor
+              If <i>pathname</i> is an empty string and the <b>AT_EMPTY_PATH </b>flag is
+              specified in <i>flags</i> (see below), then the target file is the
+              one referred to by the file descriptor <i>dirfd</i>.
+
+       <i>flags</i> can be used to influence a pathname-based lookup.  A value for
+       <i>flags</i> is constructed by ORing together zero or more of the following
+       constants:
+
+       <b>AT_EMPTY_PATH</b>
+              If <i>pathname</i> is an empty string, operate on the file referred
+              to by <i>dirfd</i> (which may have been obtained using the <a href="open.2.html">open(2)</a>
+              <b>O_PATH </b>flag).  In this case, <i>dirfd</i> can refer to any type of
+              file, not just a directory.
+
+              If <i>dirfd</i> is <b>AT_FDCWD</b>, the call operates on the current working
+              directory.
+
+              This flag is Linux-specific; define <b>_GNU_SOURCE </b>to obtain its
+              definition.
+
+       <b>AT_NO_AUTOMOUNT</b>
+              Don't automount the terminal ("basename") component of
+              <i>pathname</i> if it is a directory that is an automount point.
+              This allows the caller to gather attributes of an automount
+              point (rather than the location it would mount).  This flag
+              can be used in tools that scan directories to prevent mass-
+              automounting of a directory of automount points.  The
+              <b>AT_NO_AUTOMOUNT </b>flag has no effect if the mount point has
+              already been mounted over.  This flag is Linux-specific;
+              define <b>_GNU_SOURCE </b>to obtain its definition.
+
+       <b>AT_SYMLINK_NOFOLLOW</b>
+              If <i>pathname</i> is a symbolic link, do not dereference it: instead
+              return information about the link itself, like <a href="lstat.2.html">lstat(2)</a>.
+
+       <i>flags</i> can also be used to control what sort of synchronization the
+       kernel will do when querying a file on a remote filesystem.  This is
+       done by ORing in one of the following values:
+
+       <b>AT_STATX_SYNC_AS_STAT</b>
+              Do whatever <a href="stat.2.html">stat(2)</a> does.  This is the default and is very
+              much filesystem-specific.
+
+       <b>AT_STATX_FORCE_SYNC</b>
+              Force the attributes to be synchronized with the server.  This
+              may require that a network filesystem perform a data writeback
+              to get the timestamps correct.
+
+       <b>AT_STATX_DONT_SYNC</b>
+              Don't synchronize anything, but rather just take whatever the
+              system has cached if possible.  This may mean that the
+              information returned is approximate, but, on a network
+              filesystem, it may not involve a round trip to the server -
+              even if no lease is held.
+
+       The <i>mask</i> argument to <b>statx</b>() is used to tell the kernel which fields
+       the caller is interested in.  <i>mask</i> is an ORed combination of the
+       following constants:
+
+           <b>STATX_TYPE          </b>Want stx_mode &amp; S_IFMT
+           <b>STATX_MODE          </b>Want stx_mode &amp; ~S_IFMT
+           <b>STATX_NLINK         </b>Want stx_nlink
+           <b>STATX_UID           </b>Want stx_uid
+           <b>STATX_GID           </b>Want stx_gid
+           <b>STATX_ATIME         </b>Want stx_atime
+           <b>STATX_MTIME         </b>Want stx_mtime
+           <b>STATX_CTIME         </b>Want stx_ctime
+           <b>STATX_INO           </b>Want stx_ino
+           <b>STATX_SIZE          </b>Want stx_size
+           <b>STATX_BLOCKS        </b>Want stx_blocks
+           <b>STATX_BASIC_STATS   </b>[All of the above]
+           <b>STATX_BTIME         </b>Want stx_btime
+           <b>STATX_ALL           </b>[All currently available fields]
+
+       Note that the kernel does <i>not</i> reject values in <i>mask</i> other than the
+       above.  Instead, it simply informs the caller which values are
+       supported by this kernel and filesystem via the <i>statx.stx_mask</i> field.
+       Therefore, <i>do not</i> simply set <i>mask</i> to <b>UINT_MAX </b>(all bits set), as one
+       or more bits may, in the future, be used to specify an extension to
+       the buffer.
+
+   <b>The returned information</b>
+       The status information for the target file is returned in the <i>statx</i>
+       structure pointed to by <i>statxbuf</i>.  Included in this is <i>stx_mask</i> which
+       indicates what other information has been returned.  <i>stx_mask</i> has the
+       same format as the <i>mask</i> argument and bits are set in it to indicate
+       which fields have been filled in.
+
+       It should be noted that the kernel may return fields that weren't
+       requested and may fail to return fields that were requested,
+       depending on what the backing filesystem supports.  (Fields that are
+       given values despite being unrequested can just be ignored.)  In
+       either case, <i>stx_mask</i> will not be equal <i>mask</i>.
+
+       If a filesystem does not support a field or if it has an
+       unrepresentable value (for instance, a file with an exotic type),
+       then the mask bit corresponding to that field will be cleared in
+       <i>stx_mask</i> even if the user asked for it and a dummy value will be
+       filled in for compatibility purposes if one is available (e.g., a
+       dummy UID and GID may be specified to mount under some
+       circumstances).
+
+       A filesystem may also fill in fields that the caller didn't ask for
+       if it has values for them available and the information is available
+       at no extra cost.  If this happens, the corresponding bits will be
+       set in <i>stx_mask</i>.
+
+       <i>Note</i>: for performance and simplicity reasons, different fields in the
+       <i>statx</i> structure may contain state information from different moments
+       during the execution of the system call.  For example, if <i>stx_mode</i> or
+       <i>stx_uid</i> is changed by another process by calling <a href="chmod.2.html">chmod(2)</a> or
+       <a href="chown.2.html">chown(2)</a>, <b>stat</b>() might return the old <i>stx_mode</i> together with the new
+       <i>stx_uid</i>, or the old <i>stx_uid</i> together with the new <i>stx_mode</i>.
+
+       Apart from <i>stx_mask</i> (which is described above), the fields in the
+       <i>statx</i> structure are:
+
+       <i>stx_blksize</i>
+              The "preferred" block size for efficient filesystem I/O.
+              (Writing to a file in smaller chunks may cause an inefficient
+              read-modify-rewrite.)
+
+       <i>stx_attributes</i>
+              Further status information about the file (see below for more
+              information).
+
+       <i>stx_nlink</i>
+              The number of hard links on a file.
+
+       <i>stx_uid</i>
+              This field contains the user ID of the owner of the file.
+
+       <i>stx_gid</i>
+              This field contains the ID of the group owner of the file.
+
+       <i>stx_mode</i>
+              The file type and mode.  See <a href="../man7/inode.7.html">inode(7)</a> for details.
+
+       <i>stx_ino</i>
+              The inode number of the file.
+
+       <i>stx_size</i>
+              The size of the file (if it is a regular file or a symbolic
+              link) in bytes.  The size of a symbolic link is the length of
+              the pathname it contains, without a terminating null byte.
+
+       <i>stx_blocks</i>
+              The number of blocks allocated to the file on the medium, in
+              512-byte units.  (This may be smaller than <i>stx_size</i>/512 when
+              the file has holes.)
+
+       <i>stx_attributes_mask</i>
+              A mask indicating which bits in <i>stx_attributes</i> are supported
+              by the VFS and the filesystem.
+
+       <i>stx_atime</i>
+              The file's last access timestamp.
+
+       <i>stx_btime</i>
+              The file's creation timestamp.
+
+       <i>stx_ctime</i>
+              The file's last status change timestamp.
+
+       <i>stx_mtime</i>
+              The file's last modification timestamp.
+
+       <i>stx_dev_major</i> and <i>stx_dev_minor</i>
+              The device on which this file (inode) resides.
+
+       <i>stx_rdev_major</i> and <i>stx_rdev_minor</i>
+              The device that this file (inode) represents if the file is of
+              block or character device type.
+
+       For further information on the above fields, see <a href="../man7/inode.7.html">inode(7)</a>.
+
+   <b>File attributes</b>
+       The <i>stx_attributes</i> field contains a set of ORed flags that indicate
+       additional attributes of the file.  Note that any attribute that is
+       not indicated as supported by <i>stx_attributes_mask</i> has no usable value
+       here.  The bits in <i>stx_attributes_mask</i> correspond bit-by-bit to
+       <i>stx_attributes</i>.
+
+       The flags are as follows:
+
+       <b>STATX_ATTR_COMPRESSED</b>
+              The file is compressed by the filesystem and may take extra
+              resources to access.
+
+       <b>STATX_ATTR_IMMUTABLE</b>
+              The file cannot be modified: it cannot be deleted or renamed,
+              no hard links can be created to this file and no data can be
+              written to it.  See <a href="../man1/chattr.1.html">chattr(1)</a>.
+
+       <b>STATX_ATTR_APPEND</b>
+              The file can only be opened in append mode for writing.
+              Random access writing is not permitted.  See <a href="../man1/chattr.1.html">chattr(1)</a>.
+
+       <b>STATX_ATTR_NODUMP</b>
+              File is not a candidate for backup when a backup program such
+              as <b>dump</b>(8) is run.  See <a href="../man1/chattr.1.html">chattr(1)</a>.
+
+       <b>STATX_ATTR_ENCRYPTED</b>
+              A key is required for the file to be encrypted by the
+              filesystem.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EACCES </b>Search permission is denied for one of the directories in the
+              path prefix of <i>pathname</i>.  (See also <a href="../man7/path_resolution.7.html">path_resolution(7)</a>.)
+
+       <b>EBADF  </b><i>dirfd</i> is not a valid open file descriptor.
+
+       <b>EFAULT </b><i>pathname</i> or <i>statxbuf</i> is NULL or points to a location outside
+              the process's accessible address space.
+
+       <b>EINVAL </b>Invalid flag specified in <i>flags</i>.
+
+       <b>EINVAL </b>Reserved flag specified in <i>mask</i>.
+
+       <b>ELOOP  </b>Too many symbolic links encountered while traversing the
+              pathname.
+
+       <b>ENAMETOOLONG</b>
+              <i>pathname</i> is too long.
+
+       <b>ENOENT </b>A component of <i>pathname</i> does not exist, or <i>pathname</i> is an
+              empty string and <b>AT_EMPTY_PATH </b>was not specified in <i>flags</i>.
+
+       <b>ENOMEM </b>Out of memory (i.e., kernel memory).
+
+       <b>ENOTDIR</b>
+              A component of the path prefix of <i>pathname</i> is not a directory
+              or <i>pathname</i> is relative and <i>dirfd</i> is a file descriptor
+              referring to a file other than a directory.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>statx</b>() was added to Linux in kernel 4.11.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>statx</b>() is Linux-specific.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Glibc does not (yet) provide a wrapper for the <b>statx</b>() system call;
+       call it using <a href="syscall.2.html">syscall(2)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/ls.1.html">ls(1)</a>, <a href="../man1/stat.1.html">stat(1)</a>, <a href="access.2.html">access(2)</a>, <a href="chmod.2.html">chmod(2)</a>, <a href="chown.2.html">chown(2)</a>, <a href="stat.2.html">stat(2)</a>, <a href="readlink.2.html">readlink(2)</a>,
+       <a href="utime.2.html">utime(2)</a>, <a href="../man7/capabilities.7.html">capabilities(7)</a>, <a href="../man7/inode.7.html">inode(7)</a>, <a href="../man7/symlink.7.html">symlink(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2017-05-03                         STATX(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="open.2.html">open(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="../man7/inode.7.html">inode(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="statx.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

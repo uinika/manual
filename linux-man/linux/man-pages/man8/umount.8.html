@@ -1,0 +1,376 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>umount(8) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#OPTIONS">OPTIONS</a> | <a href="#LOOP_DEVICE">LOOP&nbsp;DEVICE</a> | <a href="#EXTERNAL_HELPERS">EXTERNAL&nbsp;HELPERS</a> | <a href="#FILES">FILES</a> | <a href="#ENVIRONMENT">ENVIRONMENT</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#HISTORY">HISTORY</a> | <a href="#AVAILABILITY">AVAILABILITY</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">UMOUNT(8)                   System Administration                  UMOUNT(8)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       umount - unmount file systems
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>umount -a </b>[<b>-dflnrv</b>] [<b>-t </b><i>fstype</i>] [<b>-O </b><i>option</i>...]
+
+       <b>umount </b>[<b>-dflnrv</b>] {<i>directory</i>|<i>device</i>}...
+
+       <b>umount -h</b>|<b>-V</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>umount </b>command detaches the mentioned file system(s) from the
+       file hierarchy.  A file system is specified by giving the directory
+       where it has been mounted.  Giving the special device on which the
+       file system lives may also work, but is obsolete, mainly because it
+       will fail in case this device was mounted on more than one directory.
+
+       Note that a file system cannot be unmounted when it is 'busy' - for
+       example, when there are open files on it, or when some process has
+       its working directory there, or when a swap file on it is in use.
+       The offending process could even be <b>umount </b>itself - it opens libc,
+       and libc in its turn may open for example locale files.  A lazy
+       unmount avoids this problem.
+</pre>
+<h2><a id="OPTIONS" href="#OPTIONS"></a>OPTIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>-a</b>, <b>--all</b>
+              All of the filesystems described in <i>/proc/self/mountinfo</i> (or
+              in deprecated /etc/mtab) are unmounted, except the proc,
+              devfs, devpts, sysfs, rpc_pipefs and nfsd filesystems. This
+              list of the filesystems may be replaced by <b>--types </b>umount
+              option.
+
+       <b>-A</b>, <b>--all-targets</b>
+              Unmount all mountpoints in the current namespace for the
+              specified filesystem.  The filesystem can be specified by one
+              of the mountpoints or the device name (or UUID, etc.).  When
+              this option is used together with <b>--recursive</b>, then all nested
+              mounts within the filesystem are recursively unmounted.  This
+              option is only supported on systems where /etc/mtab is a
+              symlink to /proc/mounts.
+
+       <b>-c</b>, <b>--no-canonicalize</b>
+              Do not canonicalize paths.  The paths canonicalization is
+              based on <a href="../man2/stat.2.html">stat(2)</a> and <a href="../man2/readlink.2.html">readlink(2)</a> system calls. These system
+              calls may hang in some cases (for example on NFS if server is
+              not available). The option has to be used with canonical path
+              to the mount point.
+
+              For more details about this option see the <a href="mount.8.html">mount(8)</a> man page.
+              Note that <b>umount </b>does not pass this option to the
+              <b>/sbin/umount.</b><i>type</i> helpers.
+
+       <b>-d</b>, <b>--detach-loop</b>
+              When the unmounted device was a loop device, also free this
+              loop device. This option is unnecessary for devices
+              initialized by <a href="mount.8.html">mount(8)</a>, in this case "autoclear"
+              functionality is enabled by default.
+
+       <b>--fake </b>Causes everything to be done except for the actual system call
+              or umount helper execution; this 'fakes' unmounting the
+              filesystem.  It can be used to remove entries from the
+              deprecated <i>/etc/mtab</i> that were unmounted earlier with the <b>-n</b>
+              option.
+
+       <b>-f</b>, <b>--force</b>
+              Force an unmount (in case of an unreachable NFS system).
+
+              Note that this option does not guarantee that umount command
+              does not hang.  It's strongly recommended to use absolute
+              paths without symlinks to avoid unwanted readlink and stat
+              system calls on unreachable NFS in umount.
+
+       <b>-i</b>, <b>--internal-only</b>
+              Do not call the <b>/sbin/umount.</b><i>filesystem</i> helper even if it
+              exists.  By default such a helper program is called if it
+              exists.
+
+       <b>-l</b>, <b>--lazy</b>
+              Lazy unmount.  Detach the filesystem from the file hierarchy
+              now, and clean up all references to this filesystem as soon as
+              it is not busy anymore.
+
+       <b>-n</b>, <b>--no-mtab</b>
+              Unmount without writing in <i>/etc/mtab</i>.
+
+       <b>-O</b>, <b>--test-opts </b><i>option</i>...
+              Unmount only the filesystems that have the specified option
+              set in <i>/etc/fstab</i>.  More than one option may be specified in a
+              comma-separated list.  Each option can be prefixed with <b>no </b>to
+              indicate that no action should be taken for this option.
+
+       <b>-R</b>, <b>--recursive</b>
+              Recursively unmount each specified directory.  Recursion for
+              each directory will stop if any unmount operation in the chain
+              fails for any reason.  The relationship between mountpoints is
+              determined by /proc/self/mountinfo entries.  The filesystem
+              must be specified by mountpoint path; a recursive unmount by
+              device name (or UUID) is unsupported.
+
+       <b>-r</b>, <b>--read-only</b>
+              When an unmount fails, try to remount the filesystem read-
+              only.
+
+       <b>-t</b>, <b>--types </b><i>type</i>...
+              Indicate that the actions should only be taken on filesystems
+              of the specified <i>type</i>.  More than one type may be specified in
+              a comma-separated list.  The list of filesystem types can be
+              prefixed with <b>no </b>to indicate that no action should be taken
+              for all of the mentioned types.   Note that <b>umount </b>reads
+              information about mounted filesystems from kernel
+              (/proc/mounts) and filesystem names may be different than
+              filesystem names used in the /etc/fstab (e.g. "nfs4" vs.
+              "nfs").
+
+       <b>-v</b>, <b>--verbose</b>
+              Verbose mode.
+
+       <b>-V</b>, <b>--version</b>
+              Display version information and exit.
+
+       <b>-h</b>, <b>--help</b>
+              Display help text and exit.
+</pre>
+<h2><a id="LOOP_DEVICE" href="#LOOP_DEVICE"></a>LOOP DEVICE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>umount </b>command will automatically detach loop device previously
+       initialized by <a href="mount.8.html">mount(8)</a> command independently of /etc/mtab.
+
+       In this case the device is initialized with "autoclear" flag (see
+       <a href="losetup.8.html">losetup(8)</a> output for more details), otherwise it's necessary to use
+       the option  <b>--detach-loop </b>or call <b>losetup -d &lt;device&gt;</b>. The autoclear
+       feature is supported since Linux 2.6.25.
+</pre>
+<h2><a id="EXTERNAL_HELPERS" href="#EXTERNAL_HELPERS"></a>EXTERNAL HELPERS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The syntax of external unmount helpers is:
+
+              <b>umount.</b><i>suffix</i> {<i>directory</i>|<i>device</i>} [<b>-flnrv</b>] [<b>-t </b><i>type</i>.<i>subtype</i>]
+
+       where <i>suffix</i> is the filesystem type (or the value from a <b>uhelper= </b>or
+       <b>helper= </b>marker in the mtab file).  The <b>-t </b>option can be used for
+       filesystems that have subtype support.  For example:
+
+              <b>umount.fuse -t fuse.sshfs</b>
+
+       A <b>uhelper=</b><i>something</i> marker (unprivileged helper) can appear in the
+       <i>/etc/mtab</i> file when ordinary users need to be able to unmount a
+       mountpoint that is not defined in <i>/etc/fstab</i> (for example for a
+       device that was mounted by <b>udisks</b>(1)).
+
+       A <b>helper=</b><i>type</i> marker in the mtab file will redirect all unmount
+       requests to the <b>/sbin/umount.</b><i>type</i> helper independently of UID.
+
+       Note that <i>/etc/mtab</i> is currently deprecated and helper= and another
+       userspace mount options are maintained by libmount.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/etc/mtab</i>
+              table of mounted filesystems (deprecated and usually replaced
+              by symlink to /proc/mounts)
+
+       <i>/etc/fstab</i>
+              table of known filesystems
+
+       <i>/proc/self/mountinfo</i>
+              table of mounted filesystems generated by kernel.
+</pre>
+<h2><a id="ENVIRONMENT" href="#ENVIRONMENT"></a>ENVIRONMENT  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       LIBMOUNT_FSTAB=&lt;path&gt;
+              overrides the default location of the fstab file (ignored for
+              suid)
+
+       LIBMOUNT_MTAB=&lt;path&gt;
+              overrides the default location of the mtab file (ignored for
+              suid)
+
+       LIBMOUNT_DEBUG=all
+              enables libmount debug output
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man2/umount.2.html">umount(2)</a>, <a href="losetup.8.html">losetup(8)</a>, <a href="mount.8.html">mount(8)</a>
+</pre>
+<h2><a id="HISTORY" href="#HISTORY"></a>HISTORY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       A <b>umount </b>command appeared in Version 6 AT&amp;T UNIX.
+</pre>
+<h2><a id="AVAILABILITY" href="#AVAILABILITY"></a>AVAILABILITY  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The umount command is part of the util-linux package and is available
+       from Linux Kernel Archive 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>util-linux</i> (a random collection of Linux
+       utilities) project.  Information about the project can be found at 
+       ⟨<a href="https://www.kernel.org/pub/linux/utils/util-linux/">https://www.kernel.org/pub/linux/utils/util-linux/</a>⟩.  If you have a
+       bug report for this manual page, send it to
+       util-linux@vger.kernel.org.  This page was obtained from the
+       project's upstream Git repository 
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ on
+       2017-07-05.  If you discover any rendering problems in this HTML ver‐
+       sion of the page, or you believe there is a better or more up-to-date
+       source for the page, or you have corrections or improvements to the
+       information in this COLOPHON (which is <i>not</i> part of the original man‐
+       ual page), send a mail to man-pages@man7.org
+
+<span class="footline">util-linux                        July 2014                        UMOUNT(8)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/eject.1.html">eject(1)</a>,&nbsp; 
+    <a href="../man1/unshare.1.html">unshare(1)</a>,&nbsp; 
+    <a href="../man2/mount.2.html">mount(2)</a>,&nbsp; 
+    <a href="../man2/umount.2.html">umount(2)</a>,&nbsp; 
+    <a href="../man5/fstab.5.html">fstab(5)</a>,&nbsp; 
+    <a href="../man5/nfs.5.html">nfs(5)</a>,&nbsp; 
+    <a href="../man5/systemd.mount.5.html">systemd.mount(5)</a>,&nbsp; 
+    <a href="blkdeactivate.8.html">blkdeactivate(8)</a>,&nbsp; 
+    <a href="mount.8.html">mount(8)</a>,&nbsp; 
+    <a href="pivot_root.8.html">pivot_root(8)</a>,&nbsp; 
+    <a href="umount.nfs.8.html">umount.nfs(8)</a>,&nbsp; 
+    <a href="xfs_repair.8.html">xfs_repair(8)</a>
+</p>
+<hr/>
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

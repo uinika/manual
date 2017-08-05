@@ -1,0 +1,251 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>mbrtowc(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">MBRTOWC(3)                Linux Programmer's Manual               MBRTOWC(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       mbrtowc - convert a multibyte sequence to a wide character
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;wchar.h&gt;</b>
+
+       <b>size_t mbrtowc(wchar_t *</b><i>pwc</i><b>, const char *</b><i>s</i><b>, size_t </b><i>n</i><b>, mbstate_t *</b><i>ps</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The main case for this function is when <i>s</i> is not NULL and <i>pwc</i> is not
+       NULL.  In this case, the <b>mbrtowc</b>() function inspects at most <i>n</i> bytes
+       of the multibyte string starting at <i>s</i>, extracts the next complete
+       multibyte character, converts it to a wide character and stores it at
+       <i>*pwc</i>.  It updates the shift state <i>*ps</i>.  If the converted wide
+       character is not L'\0' (the null wide character), it returns the
+       number of bytes that were consumed from <i>s</i>.  If the converted wide
+       character is L'\0', it resets the shift state <i>*ps</i> to the initial
+       state and returns 0.
+
+       If the <i>n</i> bytes starting at <i>s</i> do not contain a complete multibyte
+       character, <b>mbrtowc</b>() returns <i>(size_t) -2</i>.  This can happen even if <i>n</i>
+       &gt;= <i>MB_CUR_MAX</i>, if the multibyte string contains redundant shift
+       sequences.
+
+       If the multibyte string starting at <i>s</i> contains an invalid multibyte
+       sequence before the next complete character, <b>mbrtowc</b>() returns
+       <i>(size_t) -1</i> and sets <i><a href="errno.3.html">errno</a></i> to <b>EILSEQ</b>.  In this case, the effects on
+       <i>*ps</i> are undefined.
+
+       A different case is when <i>s</i> is not NULL but <i>pwc</i> is NULL.  In this
+       case, the <b>mbrtowc</b>() function behaves as above, except that it does
+       not store the converted wide character in memory.
+
+       A third case is when <i>s</i> is NULL.  In this case, <i>pwc</i> and <i>n</i> are ignored.
+       If the conversion state represented by <i>*ps</i> denotes an incomplete
+       multibyte character conversion, the <b>mbrtowc</b>() function returns
+       <i>(size_t) -1</i>, sets <i><a href="errno.3.html">errno</a></i> to <b>EILSEQ</b>, and leaves <i>*ps</i> in an undefined
+       state.  Otherwise, the <b>mbrtowc</b>() function puts <i>*ps</i> in the initial
+       state and returns 0.
+
+       In all of the above cases, if <i>ps</i> is NULL, a static anonymous state
+       known only to the <b>mbrtowc</b>() function is used instead.  Otherwise, <i>*ps</i>
+       must be a valid <i>mbstate_t</i> object.  An <i>mbstate_t</i> object <i>a</i> can be
+       initialized to the initial state by zeroing it, for example using
+
+           memset(&amp;a, 0, sizeof(a));
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>mbrtowc</b>() function returns the number of bytes parsed from the
+       multibyte sequence starting at <i>s</i>, if a non-L'\0' wide character was
+       recognized.  It returns 0, if a L'\0' wide character was recognized.
+       It returns <i>(size_t) -1</i> and sets <i><a href="errno.3.html">errno</a></i> to <b>EILSEQ</b>, if an invalid
+       multibyte sequence was encountered.  It returns <i>(size_t) -2</i> if it
+       couldn't parse a complete multibyte character, meaning that <i>n</i> should
+       be increased.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────┬───────────────┬────────────────────────────┐
+       │<b>Interface </b>│ <b>Attribute     </b>│ <b>Value                      </b>│
+       ├──────────┼───────────────┼────────────────────────────┤
+       │<b>mbrtowc</b>() │ Thread safety │ MT-Unsafe race:mbrtowc/!ps │
+       └──────────┴───────────────┴────────────────────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, C99.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The behavior of <b>mbrtowc</b>() depends on the <b>LC_CTYPE </b>category of the
+       current locale.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="mbsinit.3.html">mbsinit(3)</a>, <a href="mbsrtowcs.3.html">mbsrtowcs(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2015-08-08                       MBRTOWC(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="btowc.3.html">btowc(3)</a>,&nbsp; 
+    <a href="mbrlen.3.html">mbrlen(3)</a>,&nbsp; 
+    <a href="mbsinit.3.html">mbsinit(3)</a>,&nbsp; 
+    <a href="mbsnrtowcs.3.html">mbsnrtowcs(3)</a>,&nbsp; 
+    <a href="mbsrtowcs.3.html">mbsrtowcs(3)</a>,&nbsp; 
+    <a href="mbtowc.3.html">mbtowc(3)</a>,&nbsp; 
+    <a href="wprintf.3.html">wprintf(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="mbrtowc.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

@@ -1,0 +1,345 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getrusage(2) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETRUSAGE(2)              Linux Programmer's Manual             GETRUSAGE(2)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getrusage - get resource usage
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;sys/time.h&gt;</b>
+       <b>#include &lt;sys/resource.h&gt;</b>
+
+       <b>int getrusage(int </b><i>who</i><b>, struct rusage *</b><i>usage</i><b>);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>getrusage</b>() returns resource usage measures for <i>who</i>, which can be one
+       of the following:
+
+       <b>RUSAGE_SELF</b>
+              Return resource usage statistics for the calling process,
+              which is the sum of resources used by all threads in the
+              process.
+
+       <b>RUSAGE_CHILDREN</b>
+              Return resource usage statistics for all children of the
+              calling process that have terminated and been waited for.
+              These statistics will include the resources used by
+              grandchildren, and further removed descendants, if all of the
+              intervening descendants waited on their terminated children.
+
+       <b>RUSAGE_THREAD </b>(since Linux 2.6.26)
+              Return resource usage statistics for the calling thread.  The
+              <b>_GNU_SOURCE </b>feature test macro must be defined (before
+              including <i>any</i> header file) in order to obtain the definition
+              of this constant from <i>&lt;sys/resource.h&gt;</i>.
+
+       The resource usages are returned in the structure pointed to by
+       <i>usage</i>, which has the following form:
+
+           struct rusage {
+               struct timeval ru_utime; /* user CPU time used */
+               struct timeval ru_stime; /* system CPU time used */
+               long   ru_maxrss;        /* maximum resident set size */
+               long   ru_ixrss;         /* integral shared memory size */
+               long   ru_idrss;         /* integral unshared data size */
+               long   ru_isrss;         /* integral unshared stack size */
+               long   ru_minflt;        /* page reclaims (soft page faults) */
+               long   ru_majflt;        /* page faults (hard page faults) */
+               long   ru_nswap;         /* swaps */
+               long   ru_inblock;       /* block input operations */
+               long   ru_oublock;       /* block output operations */
+               long   ru_msgsnd;        /* IPC messages sent */
+               long   ru_msgrcv;        /* IPC messages received */
+               long   ru_nsignals;      /* signals received */
+               long   ru_nvcsw;         /* voluntary context switches */
+               long   ru_nivcsw;        /* involuntary context switches */
+           };
+
+       Not all fields are completed; unmaintained fields are set to zero by
+       the kernel.  (The unmaintained fields are provided for compatibility
+       with other systems, and because they may one day be supported on
+       Linux.)  The fields are interpreted as follows:
+
+       <i>ru_utime</i>
+              This is the total amount of time spent executing in user mode,
+              expressed in a <i>timeval</i> structure (seconds plus microseconds).
+
+       <i>ru_stime</i>
+              This is the total amount of time spent executing in kernel
+              mode, expressed in a <i>timeval</i> structure (seconds plus
+              microseconds).
+
+       <i>ru_maxrss</i> (since Linux 2.6.32)
+              This is the maximum resident set size used (in kilobytes).
+              For <b>RUSAGE_CHILDREN</b>, this is the resident set size of the
+              largest child, not the maximum resident set size of the
+              process tree.
+
+       <i>ru_ixrss</i> (unmaintained)
+              This field is currently unused on Linux.
+
+       <i>ru_idrss</i> (unmaintained)
+              This field is currently unused on Linux.
+
+       <i>ru_isrss</i> (unmaintained)
+              This field is currently unused on Linux.
+
+       <i>ru_minflt</i>
+              The number of page faults serviced without any I/O activity;
+              here I/O activity is avoided by “reclaiming” a page frame from
+              the list of pages awaiting reallocation.
+
+       <i>ru_majflt</i>
+              The number of page faults serviced that required I/O activity.
+
+       <i>ru_nswap</i> (unmaintained)
+              This field is currently unused on Linux.
+
+       <i>ru_inblock</i> (since Linux 2.6.22)
+              The number of times the filesystem had to perform input.
+
+       <i>ru_oublock</i> (since Linux 2.6.22)
+              The number of times the filesystem had to perform output.
+
+       <i>ru_msgsnd</i> (unmaintained)
+              This field is currently unused on Linux.
+
+       <i>ru_msgrcv</i> (unmaintained)
+              This field is currently unused on Linux.
+
+       <i>ru_nsignals</i> (unmaintained)
+              This field is currently unused on Linux.
+
+       <i>ru_nvcsw</i> (since Linux 2.6)
+              The number of times a context switch resulted due to a process
+              voluntarily giving up the processor before its time slice was
+              completed (usually to await availability of a resource).
+
+       <i>ru_nivcsw</i> (since Linux 2.6)
+              The number of times a context switch resulted due to a higher
+              priority process becoming runnable or because the current
+              process exceeded its time slice.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On success, zero is returned.  On error, -1 is returned, and <i><a href="../man3/errno.3.html">errno</a></i> is
+       set appropriately.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>EFAULT </b><i>usage</i> points outside the accessible address space.
+
+       <b>EINVAL </b><i>who</i> is invalid.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────┬───────────────┬─────────┐
+       │<b>Interface   </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────┼───────────────┼─────────┤
+       │<b>getrusage</b>() │ Thread safety │ MT-Safe │
+       └────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.  POSIX.1 specifies
+       <b>getrusage</b>(), but specifies only the fields <i>ru_utime</i> and <i>ru_stime</i>.
+
+       <b>RUSAGE_THREAD </b>is Linux-specific.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Resource usage metrics are preserved across an <a href="execve.2.html">execve(2)</a>.
+
+       Including <i>&lt;sys/time.h&gt;</i> is not required these days, but increases
+       portability.  (Indeed, <i>struct timeval</i> is defined in <i>&lt;sys/time.h&gt;</i>.)
+
+       In Linux kernel versions before 2.6.9, if the disposition of <b>SIGCHLD</b>
+       is set to <b>SIG_IGN </b>then the resource usages of child processes are
+       automatically included in the value returned by <b>RUSAGE_CHILDREN</b>,
+       although POSIX.1-2001 explicitly prohibits this.  This nonconformance
+       is rectified in Linux 2.6.9 and later.
+
+       The structure definition shown at the start of this page was taken
+       from 4.3BSD Reno.
+
+       Ancient systems provided a <b>vtimes</b>() function with a similar purpose
+       to <b>getrusage</b>().  For backward compatibility, glibc also provides
+       <b>vtimes</b>().  All new applications should be written using <b>getrusage</b>().
+
+       See also the description of <i>/proc/[pid]/stat</i> in <a href="../man5/proc.5.html">proc(5)</a>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="clock_gettime.2.html">clock_gettime(2)</a>, <a href="getrlimit.2.html">getrlimit(2)</a>, <a href="times.2.html">times(2)</a>, <a href="wait.2.html">wait(2)</a>, <a href="wait4.2.html">wait4(2)</a>, <a href="../man3/clock.3.html">clock(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-10-08                     GETRUSAGE(2)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="fork.2.html">fork(2)</a>,&nbsp; 
+    <a href="getrlimit.2.html">getrlimit(2)</a>,&nbsp; 
+    <a href="sigaction.2.html">sigaction(2)</a>,&nbsp; 
+    <a href="syscalls.2.html">syscalls(2)</a>,&nbsp; 
+    <a href="times.2.html">times(2)</a>,&nbsp; 
+    <a href="wait.2.html">wait(2)</a>,&nbsp; 
+    <a href="wait4.2.html">wait4(2)</a>,&nbsp; 
+    <a href="../man3/clock.3.html">clock(3)</a>,&nbsp; 
+    <a href="../man7/pthreads.7.html">pthreads(7)</a>,&nbsp; 
+    <a href="../man7/time.7.html">time(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getrusage.2.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

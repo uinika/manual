@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>getnetent(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#FILES">FILES</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">GETNETENT(3)              Linux Programmer's Manual             GETNETENT(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       getnetent,  getnetbyname,  getnetbyaddr,  setnetent,  endnetent - get
+       network entry
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;netdb.h&gt;</b>
+
+       <b>struct netent *getnetent(void);</b>
+
+       <b>struct netent *getnetbyname(const char *</b><i>name</i><b>);</b>
+
+       <b>struct netent *getnetbyaddr(uint32_t </b><i>net</i><b>, int </b><i>type</i><b>);</b>
+
+       <b>void setnetent(int </b><i>stayopen</i><b>);</b>
+
+       <b>void endnetent(void);</b>
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>getnetent</b>() function reads the next entry from the networks
+       database and returns a <i>netent</i> structure containing the broken-out
+       fields from the entry.  A connection is opened to the database if
+       necessary.
+
+       The <b>getnetbyname</b>() function returns a <i>netent</i> structure for the entry
+       from the database that matches the network <i>name</i>.
+
+       The <b>getnetbyaddr</b>() function returns a <i>netent</i> structure for the entry
+       from the database that matches the network number <i>net</i> of type <i>type</i>.
+       The <i>net</i> argument must be in host byte order.
+
+       The <b>setnetent</b>() function opens a connection to the database, and sets
+       the next entry to the first entry.  If <i>stayopen</i> is nonzero, then the
+       connection to the database will not be closed between calls to one of
+       the <b>getnet*</b>() functions.
+
+       The <b>endnetent</b>() function closes the connection to the database.
+
+       The <i>netent</i> structure is defined in <i>&lt;netdb.h&gt;</i> as follows:
+
+           struct netent {
+               char      *n_name;     /* official network name */
+               char     **n_aliases;  /* alias list */
+               int        n_addrtype; /* net address type */
+               uint32_t   n_net;      /* network number */
+           }
+
+       The members of the <i>netent</i> structure are:
+
+       <i>n_name</i> The official name of the network.
+
+       <i>n_aliases</i>
+              A NULL-terminated list of alternative names for the network.
+
+       <i>n_addrtype</i>
+              The type of the network number; always <b>AF_INET</b>.
+
+       <i>n_net</i>  The network number in host byte order.
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>getnetent</b>(), <b>getnetbyname</b>() and <b>getnetbyaddr</b>() functions return a
+       pointer to a statically allocated <i>netent</i> structure, or a null pointer
+       if an error occurs or the end of the file is reached.
+</pre>
+<h2><a id="FILES" href="#FILES"></a>FILES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <i>/etc/networks</i>
+              networks database file
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌───────────────┬───────────────┬───────────────────────────┐
+       │<b>Interface      </b>│ <b>Attribute     </b>│ <b>Value                     </b>│
+       ├───────────────┼───────────────┼───────────────────────────┤
+       │<b>getnetent</b>()    │ Thread safety │ MT-Unsafe race:netent     │
+       │               │               │ race:netentbuf env locale │
+       ├───────────────┼───────────────┼───────────────────────────┤
+       │<b>getnetbyname</b>() │ Thread safety │ MT-Unsafe race:netbyname  │
+       │               │               │ env locale                │
+       ├───────────────┼───────────────┼───────────────────────────┤
+       │<b>getnetbyaddr</b>() │ Thread safety │ MT-Unsafe race:netbyaddr  │
+       │               │               │ locale                    │
+       ├───────────────┼───────────────┼───────────────────────────┤
+       │<b>setnetent</b>(),   │ Thread safety │ MT-Unsafe race:netent env │
+       │<b>endnetent</b>()    │               │ locale                    │
+       └───────────────┴───────────────┴───────────────────────────┘
+       In the above table, <i>netent</i> in <i>race:netent</i> signifies that if any of
+       the functions <b>setnetent</b>(), <b>getnetent</b>(), or <b>endnetent</b>() are used in
+       parallel in different threads of a program, then data races could
+       occur.
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008, 4.3BSD.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       In glibc versions before 2.2, the <i>net</i> argument of <b>getnetbyaddr</b>() was
+       of type <i>long</i>.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="getnetent_r.3.html">getnetent_r(3)</a>, <a href="getprotoent.3.html">getprotoent(3)</a>, <a href="getservent.3.html">getservent(3)</a>
+       RFC 1101
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2016-10-08                     GETNETENT(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/getent.1.html">getent(1)</a>,&nbsp; 
+    <a href="getnetent_r.3.html">getnetent_r(3)</a>,&nbsp; 
+    <a href="getprotoent.3.html">getprotoent(3)</a>,&nbsp; 
+    <a href="getservent.3.html">getservent(3)</a>,&nbsp; 
+    <a href="inet.3.html">inet(3)</a>,&nbsp; 
+    <a href="../man5/networks.5.html">networks(5)</a>,&nbsp; 
+    <a href="../man5/nsswitch.conf.5.html">nsswitch.conf(5)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="getnetent.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

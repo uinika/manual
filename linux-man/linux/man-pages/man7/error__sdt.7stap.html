@@ -1,0 +1,245 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>error::sdt.7stap - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">ERROR::SDT(7stap)                                          ERROR::SDT(7stap)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       error::sdt - &lt;sys/sdt.h&gt; marker failures
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Systemtap's <b>&lt;sys/sdt.h&gt; </b>probes are modeled after the dtrace USDT API,
+       but are implemented differently.  They leave a only a NOP instruction
+       in the userspace program's text segment, and add an ELF note to the
+       binary with metadata.  This metadata describes the marker's name and
+       parameters.  This encoding is designed to be parseable by multiple
+       tools (not just systemtap: GDB, the GNU Debugger, also contains
+       support).  These allow the tools to find parameters and their types,
+       wherever they happen to reside, even without DWARF debuginfo.
+
+       The reason finding parameters is tricky is because the STAP_PROBE /
+       DTRACE_PROBE markers store an assembly language expression for each
+       operand, as a result of use of gcc inline-assembly directives.  The
+       compiler is given a broad gcc operand constraint string ("nor") for
+       the operands, which usually works well.  Usually, it does not force
+       the compiler to load the parameters into or out of registers, which
+       would slow down an instrumented program.  However, some
+       instrumentation sites with some parameters do not work well with the
+       default "nor" constraint.
+
+       unresolveable at run-time
+              GCC may emit strings that an assembler could resolve (from the
+              context of compiling the original program), but a run-time
+              tool cannot.  For example, the operand string might refer to a
+              label of a local symbol that is not emitted into the ELF
+              object file at all, which leaves no trace for the run-time.
+              Reference to such parameters from within systemtap can result
+              in "SDT asm not understood" errors.
+
+       too complicated expression
+              GCC might synthesize very complicated assembly addressing
+              modes from complex C data types / pointer expressions.
+              systemtap or gdb may not be able to parse some valid but
+              complicated expressions.  Reference to such parameters from
+              within systemtap can result in "SDT asm not understood"
+              errors.
+
+       overly restrictive constraint
+              GCC might not be able to even compile the original program
+              with the default "nor" constraint due to shortage of registers
+              or other reasons.  A compile-time gcc error such as "asm
+              operand has impossible constraints" may result.
+
+       There are two general workarounds to this family of problems.
+
+       change the constraints
+              While compiling the original instrumented program, set the
+              <i>STAP_SDT_ARG_CONSTRAINT</i> macro to different constraint strings.
+              See the GCC manual about various options.  For example, on
+              many machine architectures, "r" forces operands into
+              registers, and "g" leaves operands essentially unconstrained.
+
+       revert to debuginfo
+              As long as the instrumented program compiles, it may be fine
+              simply to keep using &lt;sys/sdt.h&gt; but eschew extraction of a
+              few individual parameters.  In the worst case, disable
+              &lt;sys/sdt.h&gt; macros entirely to eschew the compiled-in
+              instrumentation.  If DWARF debuginfo was generated and
+              preserved, a systemtap script could refer to the underlying
+              source context variables instead of the positional STAP_PROBE
+              parameters.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/stap.1.html">stap(1)</a>,
+       <a href="../man3/stapprobes.3stap.html">stapprobes(3stap)</a>,
+       <a href="error__dwarf.7stap.html">error::dwarf(7stap)</a>,
+       <i><a href="http://gcc.gnu.org/onlinedocs/gcc/Constraints.html">http://gcc.gnu.org/onlinedocs/gcc/Constraints.html</a> </i>,
+       <i><a href="http://sourceware.org/systemtap/wiki/UserSpaceProbeImplementation">http://sourceware.org/systemtap/wiki/UserSpaceProbeImplementation</a> </i>,
+       <a href="error__reporting.7stap.html">error::reporting(7stap)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of the <i>systemtap</i> (a tracing and live-system
+       analysis tool) project.  Information about the project can be found
+       at ⟨<a href="https://sourceware.org/systemtap/">https://sourceware.org/systemtap/</a>⟩.  If you have a bug report for
+       this manual page, send it to systemtap@sourceware.org.  This page was
+       obtained from the project's upstream Git repository 
+       ⟨git://sourceware.org/git/systemtap.git⟩ on 2017-07-05.  If you dis‐
+       cover any rendering problems in this HTML version of the page, or you
+       believe there is a better or more up-to-date source for the page, or
+       you have corrections or improvements to the information in this
+       COLOPHON (which is <i>not</i> part of the original manual page), send a mail
+       to man-pages@man7.org
+
+<span class="footline">                                                           ERROR::SDT(7stap)</span>
+</pre>
+
+<hr class="end-man-text" />
+
+ 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

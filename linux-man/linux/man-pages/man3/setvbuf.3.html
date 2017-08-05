@@ -1,0 +1,279 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>setbuf(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">SETBUF(3)                 Linux Programmer's Manual                SETBUF(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       setbuf, setbuffer, setlinebuf, setvbuf - stream buffering operations
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;stdio.h&gt;</b>
+
+       <b>void setbuf(FILE *</b><i>stream</i><b>, char *</b><i>buf</i><b>);</b>
+
+       <b>void setbuffer(FILE *</b><i>stream</i><b>, char *</b><i>buf</i><b>, size_t </b><i>size</i><b>);</b>
+
+       <b>void setlinebuf(FILE *</b><i>stream</i><b>);</b>
+
+       <b>int setvbuf(FILE *</b><i>stream</i><b>, char *</b><i>buf</i><b>, int </b><i>mode</i><b>, size_t </b><i>size</i><b>);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>setbuffer</b>(), <b>setlinebuf</b>():
+           Since glibc 2.19:
+               _DEFAULT_SOURCE
+           Glibc 2.19 and earlier:
+               _BSD_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The three types of buffering available are unbuffered, block
+       buffered, and line buffered.  When an output stream is unbuffered,
+       information appears on the destination file or terminal as soon as
+       written; when it is block buffered many characters are saved up and
+       written as a block; when it is line buffered characters are saved up
+       until a newline is output or input is read from any stream attached
+       to a terminal device (typically <i>stdin</i>).  The function <a href="fflush.3.html">fflush(3)</a> may
+       be used to force the block out early.  (See <a href="fclose.3.html">fclose(3)</a>.)
+
+       Normally all files are block buffered.  If a stream refers to a
+       terminal (as <i>stdout</i> normally does), it is line buffered.  The
+       standard error stream <i>stderr</i> is always unbuffered by default.
+
+       The <b>setvbuf</b>() function may be used on any open stream to change its
+       buffer.  The <i>mode</i> argument must be one of the following three macros:
+
+              <b>_IONBF </b>unbuffered
+
+              <b>_IOLBF </b>line buffered
+
+              <b>_IOFBF </b>fully buffered
+
+       Except for unbuffered files, the <i>buf</i> argument should point to a
+       buffer at least <i>size</i> bytes long; this buffer will be used instead of
+       the current buffer.  If the argument <i>buf</i> is NULL, only the mode is
+       affected; a new buffer will be allocated on the next read or write
+       operation.  The <b>setvbuf</b>() function may be used only after opening a
+       stream and before any other operations have been performed on it.
+
+       The other three calls are, in effect, simply aliases for calls to
+       <b>setvbuf</b>().  The <b>setbuf</b>() function is exactly equivalent to the call
+
+           setvbuf(stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
+
+       The <b>setbuffer</b>() function is the same, except that the size of the
+       buffer is up to the caller, rather than being determined by the
+       default <b>BUFSIZ</b>.  The <b>setlinebuf</b>() function is exactly equivalent to
+       the call:
+
+           setvbuf(stream, NULL, _IOLBF, 0);
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The function <b>setvbuf</b>() returns 0 on success.  It returns nonzero on
+       failure (<i>mode</i> is invalid or the request cannot be honored).  It may
+       set <i><a href="errno.3.html">errno</a></i> on failure.
+
+       The other functions do not return a value.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌────────────────────────┬───────────────┬─────────┐
+       │<b>Interface               </b>│ <b>Attribute     </b>│ <b>Value   </b>│
+       ├────────────────────────┼───────────────┼─────────┤
+       │<b>setbuf</b>(), <b>setbuffer</b>(),  │ Thread safety │ MT-Safe │
+       │<b>setlinebuf</b>(), <b>setvbuf</b>() │               │         │
+       └────────────────────────┴───────────────┴─────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>setbuf</b>() and <b>setvbuf</b>() functions conform to C89 and C99.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       You must make sure that the space that <i>buf</i> points to still exists by
+       the time <i>stream</i> is closed, which also happens at program termination.
+       For example, the following is invalid:
+
+       #include &lt;stdio.h&gt;
+
+       int
+       main(void)
+       {
+           char buf[BUFSIZ];
+           setbuf(stdin, buf);
+           printf("Hello, world!\n");
+           return 0;
+       }
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <a href="../man1/stdbuf.1.html">stdbuf(1)</a>, <a href="fclose.3.html">fclose(3)</a>, <a href="fflush.3.html">fflush(3)</a>, <a href="fopen.3.html">fopen(3)</a>, <a href="fread.3.html">fread(3)</a>, <a href="malloc.3.html">malloc(3)</a>,
+       <a href="printf.3.html">printf(3)</a>, <a href="puts.3.html">puts(3)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">Linux                            2016-03-15                        SETBUF(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="fclose.3.html">fclose(3)</a>,&nbsp; 
+    <a href="fcloseall.3.html">fcloseall(3)</a>,&nbsp; 
+    <a href="fflush.3.html">fflush(3)</a>,&nbsp; 
+    <a href="fpurge.3.html">fpurge(3)</a>,&nbsp; 
+    <a href="open_memstream.3.html">open_memstream(3)</a>,&nbsp; 
+    <a href="stdin.3.html">stdin(3)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="setbuf.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>

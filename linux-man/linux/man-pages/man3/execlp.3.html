@@ -1,0 +1,326 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../style.css" title="style" />
+    <link rel="stylesheet" type="text/css" href="../style.css" title="style" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    <title>exec(3) - Linux manual page</title>
+</head>
+
+<body>
+
+<div class="page-top"><a id="top_of_page"></a></div>
+<!--%%%TOP_BAR%%%-->
+    <div class="nav-bar">
+        <table class="nav-table">
+            <tr>
+                <td class="nav-cell">
+                    <p class="nav-text">
+                        <a href="http://man7.org/index.html">man7.org</a> &gt; Linux &gt; <a href="../index.html">man-pages</a>
+                    </p>
+                </td>
+                <td class="training-cell">
+                    <p class="training-text"><a class="training-link" href="http://man7.org/training/">Linux/UNIX system programming training</a></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<hr class="nav-end" />
+
+<!--%%%PAGE_START%%%-->
+
+
+<table class="sec-table">
+<tr>
+    <td>
+        <p class="section-dir">
+<a href="#NAME">NAME</a> | <a href="#SYNOPSIS">SYNOPSIS</a> | <a href="#DESCRIPTION">DESCRIPTION</a> | <a href="#RETURN_VALUE">RETURN&nbsp;VALUE</a> | <a href="#ERRORS">ERRORS</a> | <a href="#VERSIONS">VERSIONS</a> | <a href="#ATTRIBUTES">ATTRIBUTES</a> | <a href="#CONFORMING_TO">CONFORMING&nbsp;TO</a> | <a href="#NOTES">NOTES</a> | <a href="#BUGS">BUGS</a> | <a href="#SEE_ALSO">SEE&nbsp;ALSO</a> | <a href="#COLOPHON">COLOPHON</a>
+        </p>
+    </td>
+    <td class="search-box">
+        <div class="man-search-box">
+
+            <form method="get" action="http://www.google.com/search">
+                <fieldset class="man-search">
+                    <input type="text" name="q" size="10" maxlength="255" value="" />
+                    <input type="hidden" name="sitesearch" value="man7.org/linux/man-pages" />
+                    <input type="submit" name="sa" value="Search online pages" />
+                </fieldset>
+            </form>
+
+        </div>
+    </td>
+    <td> </td>
+</tr>
+</table>
+
+<pre>
+<span class="headline">EXEC(3)                   Linux Programmer's Manual                  EXEC(3)</span>
+</pre>
+<h2><a id="NAME" href="#NAME"></a>NAME  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       execl, execlp, execle, execv, execvp, execvpe - execute a file
+</pre>
+<h2><a id="SYNOPSIS" href="#SYNOPSIS"></a>SYNOPSIS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>#include &lt;unistd.h&gt;</b>
+
+       <b>extern char **environ;</b>
+
+       <b>int execl(const char *</b><i>path</i><b>, const char *</b><i>arg</i><b>, ...</b>
+                       <b>/* (char  *) NULL */);</b>
+       <b>int execlp(const char *</b><i>file</i><b>, const char *</b><i>arg</i><b>, ...</b>
+                       <b>/* (char  *) NULL */);</b>
+       <b>int execle(const char *</b><i>path</i><b>, const char *</b><i>arg</i><b>, ...</b>
+                       <b>/*, (char *) NULL, char * const </b><i>envp</i><b>[] */);</b>
+       <b>int execv(const char *</b><i>path</i><b>, char *const </b><i>argv</i><b>[]);</b>
+       <b>int execvp(const char *</b><i>file</i><b>, char *const </b><i>argv</i><b>[]);</b>
+       <b>int execvpe(const char *</b><i>file</i><b>, char *const </b><i>argv</i><b>[],</b>
+                       <b>char *const </b><i>envp</i><b>[]);</b>
+
+   Feature Test Macro Requirements for glibc (see <a href="../man7/feature_test_macros.7.html">feature_test_macros(7)</a>):
+
+       <b>execvpe</b>(): _GNU_SOURCE
+</pre>
+<h2><a id="DESCRIPTION" href="#DESCRIPTION"></a>DESCRIPTION  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>exec</b>() family of functions replaces the current process image
+       with a new process image.  The functions described in this manual
+       page are front-ends for <a href="../man2/execve.2.html">execve(2)</a>.  (See the manual page for
+       <a href="../man2/execve.2.html">execve(2)</a> for further details about the replacement of the current
+       process image.)
+
+       The initial argument for these functions is the name of a file that
+       is to be executed.
+
+       The <i>const char *arg</i> and subsequent ellipses in the <b>execl</b>(), <b>execlp</b>(),
+       and <b>execle</b>() functions can be thought of as <i>arg0</i>, <i>arg1</i>, ..., <i>argn</i>.
+       Together they describe a list of one or more pointers to null-
+       terminated strings that represent the argument list available to the
+       executed program.  The first argument, by convention, should point to
+       the filename associated with the file being executed.  The list of
+       arguments <i>must</i> be terminated by a null pointer, and, since these are
+       variadic functions, this pointer must be cast <i>(char *) NULL</i>.
+
+       The <b>execv</b>(), <b>execvp</b>(), and <b>execvpe</b>() functions provide an array of
+       pointers to null-terminated strings that represent the argument list
+       available to the new program.  The first argument, by convention,
+       should point to the filename associated with the file being executed.
+       The array of pointers <i>must</i> be terminated by a null pointer.
+
+       The <b>execle</b>() and <b>execvpe</b>() functions allow the caller to specify the
+       environment of the executed program via the argument <i>envp</i>.  The <i>envp</i>
+       argument is an array of pointers to null-terminated strings and <i>must</i>
+       be terminated by a null pointer.  The other functions take the
+       environment for the new process image from the external variable
+       <i>environ</i> in the calling process.
+
+   <b>Special semantics for execlp() and execvp()</b>
+       The <b>execlp</b>(), <b>execvp</b>(), and <b>execvpe</b>() functions duplicate the actions
+       of the shell in searching for an executable file if the specified
+       filename does not contain a slash (/) character.  The file is sought
+       in the colon-separated list of directory pathnames specified in the
+       <b>PATH </b>environment variable.  If this variable isn't defined, the path
+       list defaults to the current directory followed by the list of
+       directories returned by <i>confstr(_CS_PATH)</i>.  (This <a href="confstr.3.html">confstr(3)</a> call
+       typically returns the value "/bin:/usr/bin".)
+
+       If the specified filename includes a slash character, then <b>PATH </b>is
+       ignored, and the file at the specified pathname is executed.
+
+       In addition, certain errors are treated specially.
+
+       If permission is denied for a file (the attempted <a href="../man2/execve.2.html">execve(2)</a> failed
+       with the error <b>EACCES</b>), these functions will continue searching the
+       rest of the search path.  If no other file is found, however, they
+       will return with <i><a href="errno.3.html">errno</a></i> set to <b>EACCES</b>.
+
+       If the header of a file isn't recognized (the attempted <a href="../man2/execve.2.html">execve(2)</a>
+       failed with the error <b>ENOEXEC</b>), these functions will execute the
+       shell (<i>/bin/sh</i>) with the path of the file as its first argument.  (If
+       this attempt fails, no further searching is done.)
+</pre>
+<h2><a id="RETURN_VALUE" href="#RETURN_VALUE"></a>RETURN VALUE  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>exec</b>() functions return only if an error has occurred.  The
+       return value is -1, and <i><a href="errno.3.html">errno</a></i> is set to indicate the error.
+</pre>
+<h2><a id="ERRORS" href="#ERRORS"></a>ERRORS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       All of these functions may fail and set <i><a href="errno.3.html">errno</a></i> for any of the errors
+       specified for <a href="../man2/execve.2.html">execve(2)</a>.
+</pre>
+<h2><a id="VERSIONS" href="#VERSIONS"></a>VERSIONS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       The <b>execvpe</b>() function first appeared in glibc 2.11.
+</pre>
+<h2><a id="ATTRIBUTES" href="#ATTRIBUTES"></a>ATTRIBUTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       For an explanation of the terms used in this section, see
+       <a href="../man7/attributes.7.html">attributes(7)</a>.
+
+       ┌──────────────────────────────┬───────────────┬─────────────┐
+       │<b>Interface                     </b>│ <b>Attribute     </b>│ <b>Value       </b>│
+       ├──────────────────────────────┼───────────────┼─────────────┤
+       │<b>execl</b>(), <b>execle</b>(), <b>execv</b>()    │ Thread safety │ MT-Safe     │
+       ├──────────────────────────────┼───────────────┼─────────────┤
+       │<b>execlp</b>(), <b>execvp</b>(), <b>execvpe</b>() │ Thread safety │ MT-Safe env │
+       └──────────────────────────────┴───────────────┴─────────────┘
+</pre>
+<h2><a id="CONFORMING_TO" href="#CONFORMING_TO"></a>CONFORMING TO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       POSIX.1-2001, POSIX.1-2008.
+
+       The <b>execvpe</b>() function is a GNU extension.
+</pre>
+<h2><a id="NOTES" href="#NOTES"></a>NOTES  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       On some other systems, the default path (used when the environment
+       does not contain the variable <b>PATH</b>) has the current working directory
+       listed after <i>/bin</i> and <i>/usr/bin</i>, as an anti-Trojan-horse measure.
+       Linux uses here the traditional "current directory first" default
+       path.
+
+       The behavior of <b>execlp</b>() and <b>execvp</b>() when errors occur while
+       attempting to execute the file is historic practice, but has not
+       traditionally been documented and is not specified by the POSIX
+       standard.  BSD (and possibly other systems) do an automatic sleep and
+       retry if <b>ETXTBSY </b>is encountered.  Linux treats it as a hard error and
+       returns immediately.
+
+       Traditionally, the functions <b>execlp</b>() and <b>execvp</b>() ignored all errors
+       except for the ones described above and <b>ENOMEM </b>and <b>E2BIG</b>, upon which
+       they returned.  They now return if any error other than the ones
+       described above occurs.
+</pre>
+<h2><a id="BUGS" href="#BUGS"></a>BUGS  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       Before glibc 2.24, <b>execl</b>() and <b>execle</b>() employed <a href="realloc.3.html">realloc(3)</a>
+       internally and were consequently not async-signal-safe, in violation
+       of the requirements of POSIX.1.  This was fixed in glibc 2.24.
+</pre>
+<h2><a id="SEE_ALSO" href="#SEE_ALSO"></a>SEE ALSO  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       <b>sh</b>(1), <a href="../man2/execve.2.html">execve(2)</a>, <a href="../man2/execveat.2.html">execveat(2)</a>, <a href="../man2/fork.2.html">fork(2)</a>, <a href="../man2/ptrace.2.html">ptrace(2)</a>, <a href="fexecve.3.html">fexecve(3)</a>,
+       <a href="system.3.html">system(3)</a>, <a href="../man7/environ.7.html">environ(7)</a>
+</pre>
+<h2><a id="COLOPHON" href="#COLOPHON"></a>COLOPHON  &nbsp; &nbsp; &nbsp; &nbsp; <a href="#top_of_page"><span class="top-link">top</span></a></h2><pre>
+       This page is part of release 4.12 of the Linux <i>man-pages</i> project.  A
+       description of the project, information about reporting bugs, and the
+       latest version of this page, can be found at
+       <a href="https://www.kernel.org/doc/man-pages/">https://www.kernel.org/doc/man-pages/</a>.
+
+<span class="footline">GNU                              2017-03-13                          EXEC(3)</span>
+</pre>
+
+<hr class="end-man-text" />
+<p>Pages that refer to this page: 
+    <a href="../man1/xargs.1.html">xargs(1)</a>,&nbsp; 
+    <a href="../man2/execve.2.html">execve(2)</a>,&nbsp; 
+    <a href="../man2/getpid.2.html">getpid(2)</a>,&nbsp; 
+    <a href="../man2/ptrace.2.html">ptrace(2)</a>,&nbsp; 
+    <a href="../man2/seccomp.2.html">seccomp(2)</a>,&nbsp; 
+    <a href="../man2/statfs.2.html">statfs(2)</a>,&nbsp; 
+    <a href="../man2/vfork.2.html">vfork(2)</a>,&nbsp; 
+    <a href="atexit.3.html">atexit(3)</a>,&nbsp; 
+    <a href="clearenv.3.html">clearenv(3)</a>,&nbsp; 
+    <a href="confstr.3.html">confstr(3)</a>,&nbsp; 
+    <a href="glob.3.html">glob(3)</a>,&nbsp; 
+    <a href="lttng-ust.3.html">lttng-ust(3)</a>,&nbsp; 
+    <a href="on_exit.3.html">on_exit(3)</a>,&nbsp; 
+    <a href="pam_getenvlist.3.html">pam_getenvlist(3)</a>,&nbsp; 
+    <a href="posix_spawn.3.html">posix_spawn(3)</a>,&nbsp; 
+    <a href="statvfs.3.html">statvfs(3)</a>,&nbsp; 
+    <a href="stdin.3.html">stdin(3)</a>,&nbsp; 
+    <a href="sysconf.3.html">sysconf(3)</a>,&nbsp; 
+    <a href="system.3.html">system(3)</a>,&nbsp; 
+    <a href="../man5/systemd.exec.5.html">systemd.exec(5)</a>,&nbsp; 
+    <a href="../man7/environ.7.html">environ(7)</a>,&nbsp; 
+    <a href="../man7/signal-safety.7.html">signal-safety(7)</a>
+</p>
+<hr/>
+
+<p class="page-copyright"><a href="exec.3.license.html">Copyright and license for this manual page</a></p> 
+<hr class="start-footer" />
+
+<div class="footer"> 
+
+<table class="colophon-table">
+    <tr>
+    <td class="pub-info">
+        <p>
+            HTML rendering created 2017-07-13
+            by <a href="http://man7.org/mtk/index.html">Michael Kerrisk</a>, 
+            author of 
+            <a href="http://man7.org/tlpi/"><em>The Linux Programming Interface</em></a>, 
+            maintainer of the 
+            <a href="https://www.kernel.org/doc/man-pages/">Linux <em>man-pages</em> project</a>.
+        </p>
+        <p>
+            For details of in-depth
+            <strong>Linux/UNIX system programming training courses</strong>
+            that I teach, look <a href="http://man7.org/training/">here</a>.
+        </p>
+        <p>
+            Hosting by <a href="http://www.jambit.com/index_en.html">jambit GmbH</a>.
+        </p>
+        <p>
+            <a href="http://validator.w3.org/check?uri=referer">
+            <img src="http://www.w3.org/Icons/valid-xhtml11"
+                alt="Valid XHTML 1.1" height="31" width="88" />
+            </a>
+        </p>
+    </td>
+    <td class="colophon-divider">
+    </td>
+    <td class="tlpi-cover">
+        <a href="http://man7.org/tlpi/"><img src="../../../tlpi/cover/TLPI-front-cover-vsmall.png" alt="Cover of TLPI" /></a>
+    </td>
+    </tr>
+</table>
+
+</div>
+
+<hr class="end-footer" />
+
+
+
+<!--BEGIN-SITETRACKING-->
+<!-- SITETRACKING.man7.org_linux_man-pages -->
+
+<!-- Start of StatCounter Code (xhtml) -->
+
+<script type="text/javascript">
+//<![CDATA[
+var sc_project=7422636; 
+var sc_invisible=1; 
+var sc_security="9b6714ff"; 
+//]]>
+</script>
+<script type="text/javascript"
+src="../../../../www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div class="statcounter"><a title="website
+statistics" href="http://statcounter.com/"
+class="statcounter"><img class="statcounter"
+src="http://c.statcounter.com/7422636/0/9b6714ff/1/"
+alt="website statistics" /></a></div></noscript>
+
+<!-- End of StatCounter Code -->
+
+
+<!-- Start of Google Analytics Code -->
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-9830363-8']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<!-- End of Google Analytics Code -->
+
+<!--END-SITETRACKING-->
+
+</body>
+</html>
